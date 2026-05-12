@@ -12,7 +12,8 @@ const itemSnapshotSchema = new Schema({
 })
 
 const proposalSchema = new Schema({
-  freelancerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  profileId: { type: Schema.Types.ObjectId, ref: 'Profile', required: true },
+  title: { type: String, required: true },
   client: {
     name: { type: String, required: true },
     email: { type: String, required: true },

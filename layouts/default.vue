@@ -11,6 +11,7 @@ const { status, data, signOut, signIn } = useAuth()
           <div v-if=\"status === 'authenticated'\" class=\"hidden md:flex gap-4\">
             <NuxtLink to=\"/dashboard\" class=\"text-gray-600 hover:text-blue-600\">Dashboard</NuxtLink>
             <NuxtLink to=\"/dashboard/services\" class=\"text-gray-600 hover:text-blue-600\">Serviços</NuxtLink>
+            <NuxtLink to=\"/dashboard/proposals\" class=\"text-gray-600 hover:text-blue-600\">Propostas</NuxtLink>
           </div>
 
         </div>

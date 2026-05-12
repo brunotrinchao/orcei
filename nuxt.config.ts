@@ -1,14 +1,29 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@sidebase/nuxt-auth', '@nuxtjs/tailwindcss'],
-  auth: {
-    provider: {
-      type: 'authjs'
+  modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss'],
+  
+  future: {
+    compatibilityVersion: 4
+  },
+
+  vite: {
+    optimizeDeps: {
+      include: [
+        '@vue/devtools-core',
+        '@vue/devtools-kit',
+      ]
     }
   },
+
   typescript: {
     strict: true
   },
-  compatibilityDate: '2025-07-15',
+
+  runtimeConfig: {
+    googleClientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID,
+    googleClientSecret: process.env.NUXT_OAUTH_GOOGLE_CLIENT_SECRET,
+  },
+
+  compatibilityDate: '2024-04-03',
   devtools: { enabled: true }
 })

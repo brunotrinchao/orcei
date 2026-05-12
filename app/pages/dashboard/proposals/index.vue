@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  middleware: 'auth'
+  
 })
 
 const { data: proposals } = useFetch('/api/proposals')

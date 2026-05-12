@@ -8,9 +8,11 @@ const { status, data, signOut, signIn } = useAuth()
       <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div class="flex items-center gap-8">
           <NuxtLink to="/" class="text-xl font-bold text-blue-600">Orcei</NuxtLink>
-          <div v-if="status === 'authenticated'" class="hidden md:flex gap-4">
-            <NuxtLink to="/dashboard" class="text-gray-600 hover:text-blue-600">Dashboard</NuxtLink>
+          <div v-if=\"status === 'authenticated'\" class=\"hidden md:flex gap-4\">
+            <NuxtLink to=\"/dashboard\" class=\"text-gray-600 hover:text-blue-600\">Dashboard</NuxtLink>
+            <NuxtLink to=\"/dashboard/services\" class=\"text-gray-600 hover:text-blue-600\">Serviços</NuxtLink>
           </div>
+
         </div>
 
         <div class="flex items-center gap-4">

@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose'
 
 const serviceSchema = new Schema({
-  freelancerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  profileId: { type: Schema.Types.ObjectId, ref: 'Profile', required: true },
   name: { type: String, required: true },
   description: String,
   basePrice: { type: Number, required: true },

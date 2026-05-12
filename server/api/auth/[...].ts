@@ -20,6 +20,12 @@ export default NuxtAuthHandler({
         await ProfileService.createForUser(user)
       }
       return true
+    },
+    async session({ session, user }) {
+      if (session.user) {
+        (session.user as any).id = user.id
+      }
+      return session
     }
   }
 })

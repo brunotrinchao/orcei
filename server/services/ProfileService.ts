@@ -11,5 +11,9 @@ export const ProfileService = {
       email: user.email,
       creditsBalance: 1, // Default inicial
     })
+  },
+
+  async getByUserId(userId: string) {
+    return await Profile.findOne({ userId })
   }
 }

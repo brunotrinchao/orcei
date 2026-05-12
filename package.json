@@ -10,6 +10,9 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@auth/core": "^0.41.2",
+    "@auth/mongodb-adapter": "^3.11.2",
+    "@sidebase/nuxt-auth": "^1.2.0",
     "mongoose": "^9.6.2",
     "nuxt": "^4.4.5",
     "vue": "^3.5.34",

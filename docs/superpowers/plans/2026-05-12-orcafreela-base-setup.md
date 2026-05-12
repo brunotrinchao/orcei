@@ -16,18 +16,18 @@
 - Create: `package.json`, `nuxt.config.ts`, `tsconfig.json`
 - Create: `.env`
 
-- [ ] **Step 1: Inicializar projeto Nuxt**
+- [x] **Step 1: Inicializar projeto Nuxt**
 Run: `npx nuxi@latest init . --force --install`
 
-- [ ] **Step 2: Adicionar dependências essenciais**
+- [x] **Step 2: Adicionar dependências essenciais**
 Run: `npm install mongoose`
 
-- [ ] **Step 3: Criar arquivo .env base**
+- [x] **Step 3: Criar arquivo .env base**
 ```bash
 echo "MONGODB_URI=mongodb://localhost:27017/orcafreela" > .env
 ```
 
-- [ ] **Step 4: Configurar Nuxt para usar TypeScript estrito**
+- [x] **Step 4: Configurar Nuxt para usar TypeScript estrito**
 Modificar `nuxt.config.ts`:
 ```typescript
 export default defineNuxtConfig({
@@ -38,7 +38,7 @@ export default defineNuxtConfig({
 })
 ```
 
-- [ ] **Step 5: Commit inicial**
+- [x] **Step 5: Commit inicial**
 Run: `git init && git add . && git commit -m "chore: initial nuxt 3 setup"`
 
 ---
@@ -48,7 +48,7 @@ Run: `git init && git add . && git commit -m "chore: initial nuxt 3 setup"`
 **Files:**
 - Create: `server/plugins/mongodb.ts`
 
-- [ ] **Step 1: Criar plugin Nitro para conexão MongoDB**
+- [x] **Step 1: Criar plugin Nitro para conexão MongoDB**
 ```typescript
 import mongoose from 'mongoose'
 
@@ -63,10 +63,10 @@ export default defineNitroPlugin(async (nitroApp) => {
 })
 ```
 
-- [ ] **Step 2: Verificar inicialização (Log)**
+- [x] **Step 2: Verificar inicialização (Log)**
 Run: `npm run dev` (verificar se "MongoDB connected" aparece no console).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 Run: `git add . && git commit -m "feat: add mongodb connection plugin"`
 
 ---
@@ -77,7 +77,7 @@ Run: `git add . && git commit -m "feat: add mongodb connection plugin"`
 - Create: `server/models/User.ts`
 - Create: `types/user.ts`
 
-- [ ] **Step 1: Definir Interface DTO**
+- [x] **Step 1: Definir Interface DTO**
 `types/user.ts`:
 ```typescript
 export interface UserDTO {
@@ -88,7 +88,7 @@ export interface UserDTO {
 }
 ```
 
-- [ ] **Step 2: Criar Schema Mongoose**
+- [x] **Step 2: Criar Schema Mongoose**
 `server/models/User.ts`:
 ```typescript
 import { Schema, model } from 'mongoose'
@@ -107,7 +107,7 @@ const userSchema = new Schema({
 export const User = model('User', userSchema)
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 Run: `git add . && git commit -m "feat: add User model"`
 
 ---
@@ -117,7 +117,7 @@ Run: `git add . && git commit -m "feat: add User model"`
 **Files:**
 - Create: `server/models/Service.ts`
 
-- [ ] **Step 1: Criar Schema Mongoose**
+- [x] **Step 1: Criar Schema Mongoose**
 `server/models/Service.ts`:
 ```typescript
 import { Schema, model } from 'mongoose'
@@ -133,7 +133,7 @@ const serviceSchema = new Schema({
 export const Service = model('Service', serviceSchema)
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 Run: `git add . && git commit -m "feat: add Service model"`
 
 ---
@@ -143,7 +143,7 @@ Run: `git add . && git commit -m "feat: add Service model"`
 **Files:**
 - Create: `server/models/Proposal.ts`
 
-- [ ] **Step 1: Definir Schema com sub-documents para Snapshots**
+- [x] **Step 1: Definir Schema com sub-documents para Snapshots**
 `server/models/Proposal.ts`:
 ```typescript
 import { Schema, model } from 'mongoose'
@@ -181,5 +181,5 @@ const proposalSchema = new Schema({
 export const Proposal = model('Proposal', proposalSchema)
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 Run: `git add . && git commit -m "feat: add Proposal model with snapshots"`

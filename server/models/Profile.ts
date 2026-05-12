@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose'
 
-const userSchema = new Schema({
+const profileSchema = new Schema({
+  userId: { type: Schema.Types.ObjectId, required: true, unique: true },
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   brandConfig: {
@@ -11,4 +12,4 @@ const userSchema = new Schema({
   subscriptionPlan: { type: String, enum: ['free', 'starter', 'premium'], default: 'free' }
 }, { timestamps: true })
 
-export const User = model('User', userSchema)
+export const Profile = model('Profile', profileSchema)

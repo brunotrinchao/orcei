@@ -1,6 +1,6 @@
 # OrçaFreela Implementation Plan: Autenticação e Perfil (COMPLETO)
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Implementar o sistema de autenticação via nuxt-auth-utils e a vinculação automática com a coleção de Perfil.
 
@@ -10,7 +10,7 @@
 
 ---
 
-### Task 1: Instalação e Renomeação de Modelos
+### Task 1: Instalação e Renomeação de Modelos [DONE]
 
 **Files:**
 - Modify: `package.json`
@@ -51,7 +51,7 @@ Run: `git add . && git commit -m "refactor: rename User to Profile and add userI
 
 ---
 
-### Task 2: Configuração do Autenticação no Nuxt
+### Task 2: Configuração do Autenticação no Nuxt [DONE]
 
 **Files:**
 - Create: `server/api/auth/google.get.ts`
@@ -75,7 +75,7 @@ Run: `git add . && git commit -m "feat: configure nuxt-auth-utils with google pr
 
 ---
 
-### Task 3: Criação Automática de Perfil e Stripe Customer
+### Task 3: Criação Automática de Perfil e Stripe Customer [DONE]
 
 **Files:**
 - Modify: `server/api/auth/google.get.ts`

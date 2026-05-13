@@ -1,6 +1,6 @@
 # Stripe Plan Management Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Implement plan updates (immediate with proration) and cancellations (immediate) using Stripe API and sync with MongoDB.
 
@@ -10,7 +10,7 @@
 
 ---
 
-### Task 1: Create Backend Endpoint `/api/stripe/manage` [DONE]
+### Task 1: Create Backend Endpoint `/api/stripe/manage` [DONE] [DONE]
 
 **Files:**
 - Create: `server/api/stripe/manage.post.ts`
@@ -30,7 +30,7 @@ git commit -m "feat(api): add stripe manage endpoint for update and cancel"
 
 ---
 
-### Task 2: Update Webhook Handler for Deletion [DONE]
+### Task 2: Update Webhook Handler for Deletion [DONE] [DONE]
 
 **Files:**
 - Modify: `server/api/webhooks/stripe.post.ts`
@@ -50,7 +50,7 @@ git commit -m "fix(webhook): handle customer.subscription.deleted event"
 
 ---
 
-### Task 3: Update Billing Frontend UI [DONE]
+### Task 3: Update Billing Frontend UI [DONE] [DONE]
 
 **Files:**
 - Modify: `app/pages/dashboard/billing.vue`

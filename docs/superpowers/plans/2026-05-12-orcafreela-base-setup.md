@@ -1,6 +1,6 @@
 # OrçaFreela Implementation Plan: Estrutura Base e Schemas
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Configurar a base técnica do OrçaFreela, incluindo Nuxt 3, conexão MongoDB (Mongoose) e os Schemas principais.
 
@@ -10,7 +10,7 @@
 
 ---
 
-### Task 1: Inicialização do Projeto Nuxt 3
+### Task 1: Inicialização do Projeto Nuxt 3 [DONE]
 
 **Files:**
 - Create: `package.json`, `nuxt.config.ts`, `tsconfig.json`
@@ -43,7 +43,7 @@ Run: `git init && git add . && git commit -m "chore: initial nuxt 3 setup"`
 
 ---
 
-### Task 2: Conexão MongoDB e Utilitário de Modelagem
+### Task 2: Conexão MongoDB e Utilitário de Modelagem [DONE]
 
 **Files:**
 - Create: `server/plugins/mongodb.ts`
@@ -71,7 +71,7 @@ Run: `git add . && git commit -m "feat: add mongodb connection plugin"`
 
 ---
 
-### Task 3: Schema de Usuário (User)
+### Task 3: Schema de Usuário (User) [DONE]
 
 **Files:**
 - Create: `server/models/User.ts`
@@ -112,7 +112,7 @@ Run: `git add . && git commit -m "feat: add User model"`
 
 ---
 
-### Task 4: Schema de Catálogo (Service)
+### Task 4: Schema de Catálogo (Service) [DONE]
 
 **Files:**
 - Create: `server/models/Service.ts`
@@ -138,7 +138,7 @@ Run: `git add . && git commit -m "feat: add Service model"`
 
 ---
 
-### Task 5: Schema de Proposta (Proposal) com Snapshots
+### Task 5: Schema de Proposta (Proposal) com Snapshots [DONE]
 
 **Files:**
 - Create: `server/models/Proposal.ts`

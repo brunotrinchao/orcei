@@ -11,5 +11,9 @@ export const ServiceService = {
 
   async delete(id: string, profileId: string) {
     return await Service.findOneAndDelete({ _id: id, profileId })
+  },
+
+  async update(id: string, data: any) {
+    return await Service.findByIdAndUpdate(id, data, { new: true })
   }
 }

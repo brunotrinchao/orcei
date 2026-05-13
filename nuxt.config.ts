@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss'],
+  modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@vueuse/nuxt'],
   
   future: {
     compatibilityVersion: 4
@@ -22,6 +22,13 @@ export default defineNuxtConfig({
   runtimeConfig: {
     googleClientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID,
     googleClientSecret: process.env.NUXT_OAUTH_GOOGLE_CLIENT_SECRET,
+    geminiApiKey: process.env.GEMINI_API_KEY,
+    stripeSecretKey: process.env.STRIPE_SECRET_KEY,
+    stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+    stripeStarterPriceId: process.env.STRIPE_STARTER_PRICE_ID,
+    stripePremiumPriceId: process.env.STRIPE_PREMIUM_PRICE_ID,
+    stripeCredits5PriceId: process.env.STRIPE_CREDITS_5_PRICE_ID,
+    stripeCredits10PriceId: process.env.STRIPE_CREDITS_10_PRICE_ID,
   },
 
   compatibilityDate: '2024-04-03',

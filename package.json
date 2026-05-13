@@ -10,13 +10,26 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@nuxtjs/tailwindcss": "^6.14.0",
+    "@sparticuz/chromium": "^147.0.0",
+    "@tiptap/extension-link": "^3.23.2",
+    "@tiptap/extension-underline": "^3.23.2",
+    "@tiptap/pm": "^3.23.2",
+    "@tiptap/starter-kit": "^3.23.2",
+    "@tiptap/vue-3": "^3.23.2",
+    "@vueuse/core": "^14.3.0",
+    "@vueuse/nuxt": "^14.3.0",
     "mongoose": "^9.6.2",
     "nanoid": "^5.1.11",
     "nuxt": "^4.4.5",
     "nuxt-auth-utils": "^0.5.29",
+    "puppeteer-core": "^24.43.1",
     "stripe": "^22.1.1",
     "vue": "^3.5.34",
     "vue-router": "^5.0.6"
+  },
+  "devDependencies": {
+    "puppeteer": "^24.43.1"
   }
 }

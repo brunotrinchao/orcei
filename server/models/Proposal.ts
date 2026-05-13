@@ -20,7 +20,7 @@ const proposalSchema = new Schema({
     phone: String
   },
   slug: { type: String, required: true, unique: true },
-  status: { type: String, enum: ['draft', 'pending', 'accepted', 'expired'], default: 'draft' },
+  status: { type: String, enum: ['draft', 'pending', 'accepted', 'expired', 'created'], default: 'draft' },
   items: [itemSnapshotSchema],
   upsellItems: [itemSnapshotSchema],
   totals: {
@@ -28,6 +28,8 @@ const proposalSchema = new Schema({
     discount: { type: Number, default: 0 },
     final: { type: Number, default: 0 }
   },
+  contractText: String,
+  termsAndConditions: String,
   expiresAt: Date
 }, { timestamps: true })
 

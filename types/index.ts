@@ -9,13 +9,28 @@ export interface ProfileDTO {
   name: string
   email: string
   brandConfig: BrandConfig
-  address?: {
+  address: {
     street: string
-    number: string
+    number?: string
     neighborhood: string
     city: string
     state: string
     zip: string
+  }
+  company?: {
+    taxId?: string
+    legalName?: string
+    tradeName?: string
+  }
+  contact?: {
+    phones: Array<{
+      number: string
+      isWhatsapp: boolean
+    }>
+    social: {
+      instagram?: string
+      youtube?: string
+    }
   }
   creditsBalance: number
   creditsUsed: number

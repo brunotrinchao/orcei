@@ -9,12 +9,27 @@ const profileSchema = new Schema({
     primaryColor: { type: String, default: '#3B82F6' }
   },
   address: {
-    street: String,
+    street: { type: String, required: true },
     number: String,
-    neighborhood: String,
-    city: String,
-    state: String,
-    zip: String
+    neighborhood: { type: String, required: true },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    zip: { type: String, required: true }
+  },
+  company: {
+    taxId: String,
+    legalName: String,
+    tradeName: String
+  },
+  contact: {
+    phones: [{
+      number: String,
+      isWhatsapp: { type: Boolean, default: false }
+    }],
+    social: {
+      instagram: String,
+      youtube: String
+    }
   },
   creditsBalance: { type: Number, default: 1 },
   creditsUsed: { type: Number, default: 0 },

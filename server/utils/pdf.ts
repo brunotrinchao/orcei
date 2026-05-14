@@ -44,7 +44,7 @@ export function generateProposalHtml(proposal: any, profile: any) {
         </div>
       </div>
 
-      <div class="title">Proposta de Orçamento</div>
+      <div class="title">Orçamento Comercial</div>
       <div class="client-info">
         <strong>Para:</strong> ${proposal.client.name}<br>
         <strong>E-mail:</strong> ${proposal.client.email}

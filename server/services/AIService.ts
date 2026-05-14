@@ -52,7 +52,7 @@ export const AIService = {
           },
           body: JSON.stringify({
             messages: [
-              { role: 'system', content: 'Você é um redator profissional de propostas comerciais.' },
+              { role: 'system', content: 'Você é um redator profissional de orçamentos comerciais.' },
               { role: 'user', content: prompt }
             ]
           })

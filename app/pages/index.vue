@@ -12,7 +12,7 @@ watchEffect(() => {
 <template>
   <div class="min-h-[calc(100vh-80px)] flex flex-col items-center justify-center text-center px-4">
     <h1 class="text-5xl md:text-7xl font-black text-gray-900 mb-6 tracking-tight">
-      Propostas que <span class="text-blue-600">fecham negócios</span>.
+      Orçamentos que <span class="text-blue-600">fecham negócios</span>.
     </h1>
     <p class="text-xl text-gray-500 max-w-2xl mb-10 leading-relaxed">
       Crie orçamentos profissionais em segundos, automatize contratos com IA e receba aprovações online. Tudo em um só lugar.
@@ -41,7 +41,7 @@ watchEffect(() => {
           </svg>
         </div>
         <h3 class="font-bold text-lg mb-2">Rapidez Total</h3>
-        <p class="text-gray-500 text-sm">Gere descrições de serviços com IA e envie propostas em menos de 2 minutos.</p>
+        <p class="text-gray-500 text-sm">Gere descrições de serviços com IA e envie orçamentos em menos de 2 minutos.</p>
       </div>
       <div class="p-6 bg-white rounded-2xl border border-gray-100 text-left">
         <div class="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center mb-4">
@@ -60,7 +60,7 @@ watchEffect(() => {
           </svg>
         </div>
         <h3 class="font-bold text-lg mb-2">Acompanhamento</h3>
-        <p class="text-gray-500 text-sm">Saiba quando o cliente visualizou sua proposta e receba a aprovação em tempo real.</p>
+        <p class="text-gray-500 text-sm">Saiba quando o cliente visualizou seu orçamento e receba a aprovação em tempo real.</p>
       </div>
     </div>
   </div>

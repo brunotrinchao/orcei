@@ -35,6 +35,12 @@ export function generateProposalHtml(proposal: any, profile: any) {
         <div style="text-align: right">
           <div style="font-weight: bold">${profile.name}</div>
           <div style="font-size: 12px; color: #666">${profile.email}</div>
+          ${profile.address?.street ? `
+            <div style="font-size: 10px; color: #999; margin-top: 4px;">
+              ${profile.address.street}, ${profile.address.number || ''} - ${profile.address.neighborhood || ''}<br>
+              ${profile.address.city || ''}/${profile.address.state || ''} - ${profile.address.zip || ''}
+            </div>
+          ` : ''}
         </div>
       </div>
 
@@ -70,8 +76,18 @@ export function generateProposalHtml(proposal: any, profile: any) {
       </table>
 
       <div class="total-box">
-        <div class="total-label">Valor Total</div>
+        <div class="total-label">Valor Total (${proposal.paymentConfig?.method === 'cash' ? 'À Vista' : `Parcelado em ${proposal.paymentConfig?.installments || 1}x`})</div>
         <div class="total-value">R$ ${proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+        ${proposal.paymentConfig?.method === 'cash' && proposal.paymentConfig.cashDiscount > 0 ? `
+          <div style="font-size: 10px; color: #059669; font-weight: bold; margin-top: 4px;">
+            Desconto de ${proposal.paymentConfig.cashDiscount}% aplicado para pagamento à vista
+          </div>
+        ` : ''}
+        ${proposal.paymentConfig?.method === 'credit_card' && (proposal.paymentConfig.installments || 1) > 1 ? `
+          <div style="font-size: 10px; color: #6b7280; margin-top: 4px;">
+            ${proposal.paymentConfig.installments}x de R$ ${(proposal.totals.final / proposal.paymentConfig.installments).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </div>
+        ` : ''}
       </div>
 
       <div class="contract prose">

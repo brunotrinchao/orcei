@@ -18,17 +18,32 @@ export const ProposalService = {
 
   async create(data: any) {
     const slug = nanoid(10)
-    const totals = this.calculateTotals(data.items, data.upsellItems || [])
+    const totals = this.calculateTotals(data.items, data.upsellItems || [], data.paymentConfig)
     
     // Se criar já como 'created', consome crédito
+    let lastEmailId = undefined
     if (data.status === 'created') {
       await this.consumeCredit(data.profileId)
+      
+      // Enviar e-mail via Resend
+      const profile = await Profile.findById(data.profileId)
+      if (profile && data.client?.email) {
+        const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${slug}`
+        const emailRes = await sendProposalEmail(
+          data.client.email,
+          data.client.name,
+          proposalUrl,
+          profile.name
+        )
+        if (emailRes) lastEmailId = emailRes.id
+      }
     }
 
     return await Proposal.create({
       ...data,
       slug,
-      totals
+      totals,
+      lastEmailId
     })
   },
 
@@ -37,15 +52,31 @@ export const ProposalService = {
     if (!oldProposal) return null
     if (oldProposal.status === 'accepted') return null
 
+    let lastEmailId = oldProposal.lastEmailId
     // Consome crédito se mudar de draft para created/pending/etc
     if (oldProposal.status === 'draft' && data.status !== 'draft') {
       await this.consumeCredit(profileId)
+
+      // Se mudou para 'created', envia e-mail
+      if (data.status === 'created') {
+        const profile = await Profile.findById(profileId)
+        if (profile && data.client?.email) {
+          const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${oldProposal.slug}`
+          const emailRes = await sendProposalEmail(
+            data.client.email,
+            data.client.name,
+            proposalUrl,
+            profile.name
+          )
+          if (emailRes) lastEmailId = emailRes.id
+        }
+      }
     }
 
-    const totals = this.calculateTotals(data.items, data.upsellItems || [])
+    const totals = this.calculateTotals(data.items, data.upsellItems || [], data.paymentConfig)
     return await Proposal.findOneAndUpdate(
       { _id: id, profileId },
-      { ...data, totals },
+      { ...data, totals, lastEmailId },
       { new: true }
     )
   },
@@ -68,18 +99,46 @@ export const ProposalService = {
     return await Proposal.findOneAndUpdate({ slug }, { status }, { new: true })
   },
 
-  calculateTotals(items: any[], upsellItems: any[] = []) {
+  async acceptProposal(slug: string, paymentMethod: 'cash' | 'credit_card') {
+    const proposal = await Proposal.findOne({ slug })
+    if (!proposal) return null
+    
+    // Calculate final totals based on client choice
+    const totals = this.calculateTotals(proposal.items, proposal.upsellItems || [], {
+      ...proposal.paymentConfig,
+      method: paymentMethod
+    })
+
+    return await Proposal.findOneAndUpdate(
+      { slug }, 
+      { 
+        status: 'accepted',
+        'paymentConfig.method': paymentMethod,
+        totals
+      }, 
+      { new: true }
+    )
+  },
+
+  calculateTotals(items: any[], upsellItems: any[] = [], paymentConfig: any = {}) {
     const subtotal = items.reduce((acc, item) => {
       const price = item.price || 0
       const qty = item.quantity || 1
       return acc + (price * qty)
     }, 0)
 
-    // Logica de desconto simplificada para o MVP
+    let final = subtotal
+    let discount = 0
+
+    if (paymentConfig.method === 'cash' && paymentConfig.cashDiscount > 0) {
+      discount = subtotal * (paymentConfig.cashDiscount / 100)
+      final = subtotal - discount
+    }
+
     return {
       subtotal,
-      discount: 0,
-      final: subtotal
+      discount,
+      final
     }
   }
 }

@@ -28,9 +28,15 @@ const proposalSchema = new Schema({
     discount: { type: Number, default: 0 },
     final: { type: Number, default: 0 }
   },
+  paymentConfig: {
+    method: { type: String, enum: ['cash', 'credit_card'], default: 'cash' },
+    installments: { type: Number, default: 1 },
+    cashDiscount: { type: Number, default: 0 }
+  },
   contractText: String,
   termsAndConditions: String,
-  expiresAt: Date
+  expiresAt: Date,
+  lastEmailId: String
 }, { timestamps: true })
 
 export const Proposal = model('Proposal', proposalSchema)

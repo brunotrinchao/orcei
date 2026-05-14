@@ -27,6 +27,7 @@
     "puppeteer-core": "^24.43.1",
     "stripe": "^22.1.1",
     "vue": "^3.5.34",
+    "vue-advanced-cropper": "^2.8.9",
     "vue-router": "^5.0.6"
   },
   "devDependencies": {

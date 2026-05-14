@@ -17,9 +17,9 @@ const profileSchema = new Schema({
     zip: { type: String, required: true }
   },
   company: {
-    taxId: String,
-    legalName: String,
-    tradeName: String
+    taxId: { type: String, required: true },
+    legalName: { type: String, required: true },
+    tradeName: { type: String, required: true }
   },
   contact: {
     phones: [{

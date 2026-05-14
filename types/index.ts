@@ -9,11 +9,22 @@ export interface ProfileDTO {
   name: string
   email: string
   brandConfig: BrandConfig
+  address?: {
+    street: string
+    number: string
+    neighborhood: string
+    city: string
+    state: string
+    zip: string
+  }
   creditsBalance: number
   creditsUsed: number
   subscriptionPlan: 'free' | 'starter' | 'premium'
   stripeCustomerId?: string
   stripeSubscriptionId?: string
+  defaultValidityDays: number
+  defaultInstallments: number
+  defaultCashDiscount: number
   defaultContractTemplate: string
   defaultTermsAndConditions: string
 }
@@ -51,6 +62,11 @@ export interface ProposalDTO {
     subtotal: number
     discount: number
     final: number
+  }
+  paymentConfig: {
+    method: 'cash' | 'credit_card'
+    installments: number
+    cashDiscount: number
   }
   contractText: string
   termsAndConditions: string

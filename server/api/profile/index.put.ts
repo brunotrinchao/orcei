@@ -13,6 +13,10 @@ export default defineEventHandler(async (event) => {
     { 
       name: body.name,
       brandConfig: body.brandConfig,
+      address: body.address,
+      defaultValidityDays: body.defaultValidityDays,
+      defaultInstallments: body.defaultInstallments,
+      defaultCashDiscount: body.defaultCashDiscount,
       defaultContractTemplate: body.defaultContractTemplate,
       defaultTermsAndConditions: body.defaultTermsAndConditions
     },

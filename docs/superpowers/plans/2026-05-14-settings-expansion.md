@@ -17,9 +17,9 @@
 - Modify: `server/api/profile/index.put.ts`
 - Modify: `types/index.ts`
 
-- [ ] **Step 1: Adicionar defaultValidityDays ao Schema**
-- [ ] **Step 2: Adicionar defaultValidityDays ao DTO (types)**
-- [ ] **Step 3: Garantir que o campo seja salvo na API PUT**
+- [x] **Step 1: Adicionar defaultValidityDays ao Schema**
+- [x] **Step 2: Adicionar defaultValidityDays ao DTO (types)**
+- [x] **Step 3: Garantir que o campo seja salvo na API PUT**
 - [ ] **Step 4: Commit**
 
 ---
@@ -29,9 +29,9 @@
 **Files:**
 - Modify: `app/pages/dashboard/settings.vue`
 
-- [ ] **Step 1: Criar função handleLogoUpload com Canvas Resize (120x120)**
-- [ ] **Step 2: Implementar componente visual de upload no template**
-- [ ] **Step 3: Adicionar input para defaultValidityDays**
+- [x] **Step 1: Criar função handleLogoUpload com Canvas Resize (120x120)**
+- [x] **Step 2: Implementar componente visual de upload no template**
+- [x] **Step 3: Adicionar input para defaultValidityDays**
 - [ ] **Step 4: Commit**
 
 ---
@@ -41,7 +41,7 @@
 **Files:**
 - Modify: `app/pages/dashboard/settings.vue`
 
-- [ ] **Step 1: Reorganizar layout em cards (Identidade, Regras, Modelos)**
-- [ ] **Step 2: Polimento visual seguindo o estilo Minimalista Moderno**
-- [ ] **Step 3: Validar salvamento e preview da logo**
+- [x] **Step 1: Reorganizar layout em cards (Identidade, Regras, Modelos)**
+- [x] **Step 2: Polimento visual seguindo o estilo Minimalista Moderno**
+- [x] **Step 3: Validar salvamento e preview da logo**
 - [ ] **Step 4: Commit**

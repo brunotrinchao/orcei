@@ -8,6 +8,14 @@ const profileSchema = new Schema({
     logoUrl: String,
     primaryColor: { type: String, default: '#3B82F6' }
   },
+  address: {
+    street: String,
+    number: String,
+    neighborhood: String,
+    city: String,
+    state: String,
+    zip: String
+  },
   creditsBalance: { type: Number, default: 1 },
   creditsUsed: { type: Number, default: 0 },
   subscriptionPlan: { type: String, enum: ['free', 'starter', 'premium'], default: 'free' },
@@ -15,6 +23,9 @@ const profileSchema = new Schema({
   stripeSubscriptionId: String,
   password: { type: String, select: false },
   isEmailVerified: { type: Boolean, default: false },
+  defaultValidityDays: { type: Number, default: 7 },
+  defaultInstallments: { type: Number, default: 1 },
+  defaultCashDiscount: { type: Number, default: 0 },
   defaultContractTemplate: { type: String, default: '<h2>Contrato de Prestação de Serviços</h2><p>Pelo presente instrumento, {{nome_empresa}} se compromete a realizar os serviços para {{nome_cliente}} conforme detalhado nesta proposta.</p>' },
   defaultTermsAndConditions: { type: String, default: `<h2>Termos e Condições de Contratação</h2>
 <p><strong>1. Validade do Orçamento</strong><br>

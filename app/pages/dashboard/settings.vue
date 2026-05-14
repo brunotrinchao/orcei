@@ -35,7 +35,7 @@ function onFileChange(event: Event) {
   reader.readAsDataURL(file)
 }
 
-function cropLogo() {
+async function cropLogo() {
   if (!cropperRef.value) return
   
   const { canvas } = cropperRef.value.getResult()
@@ -52,9 +52,26 @@ function cropLogo() {
   ctx.fillRect(0, 0, 120, 120)
   ctx.drawImage(canvas, 0, 0, 120, 120)
 
-  profile.value.brandConfig.logoUrl = finalCanvas.toDataURL('image/png')
-  showCropper.value = false
-  rawImage.value = null
+  const base64Image = finalCanvas.toDataURL('image/png')
+  
+  isSaving.value = true
+  try {
+    const data = await $fetch('/api/upload/cloudinary', {
+      method: 'POST',
+      body: {
+        image: base64Image,
+        folder: 'orcei/logos'
+      }
+    }) as { url: string }
+    
+    profile.value.brandConfig.logoUrl = data.url
+    showCropper.value = false
+    rawImage.value = null
+  } catch (e) {
+    alert('Erro ao fazer upload da imagem')
+  } finally {
+    isSaving.value = false
+  }
 }
 
 async function updateProfile() {

@@ -1,7 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@vueuse/nuxt'],
+  modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@vueuse/nuxt', '@nuxtjs/cloudinary'],
   
+  cloudinary: {
+    cloudName: process.env.CLOUDINARY_NAME
+  },
+
   app: {
     pageTransition: { name: 'page', mode: 'out-in' }
   },
@@ -33,6 +37,9 @@ export default defineNuxtConfig({
     stripePremiumPriceId: process.env.STRIPE_PREMIUM_PRICE_ID,
     stripeCredits5PriceId: process.env.STRIPE_CREDITS_5_PRICE_ID,
     stripeCredits10PriceId: process.env.STRIPE_CREDITS_10_PRICE_ID,
+    cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
+    cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
+    cloudinaryName: process.env.CLOUDINARY_NAME,
   },
 
   compatibilityDate: '2024-04-03',

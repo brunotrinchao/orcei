@@ -8,6 +8,12 @@ const container = ref(null)
 onClickOutside(container, () => {
   isMenuOpen.value = false
 })
+
+async function logout() {
+  await $fetch('/api/auth/logout', { method: 'POST' })
+  clear()
+  window.location.href = '/'
+}
 </script>
 
 <template>
@@ -54,7 +60,7 @@ onClickOutside(container, () => {
                   </div>
                   <NuxtLink to="/dashboard/settings" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 transition">Configurações</NuxtLink>
                   <NuxtLink to="/dashboard/billing" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 transition">Plano</NuxtLink>
-                  <button @click="clear(); isMenuOpen = false" class="w-full text-left px-4 py-2 text-xs text-red-500 hover:bg-red-50 transition border-t border-gray-50 mt-1">Sair</button>
+                  <button @click="logout" class="w-full text-left px-4 py-2 text-xs text-red-500 hover:bg-red-50 transition border-t border-gray-50 mt-1">Sair</button>
                 </div>
               </Transition>
             </div>

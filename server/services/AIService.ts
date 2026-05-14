@@ -8,7 +8,7 @@ export const AIService = {
       // 1. Tentar Gemini
       if (config.geminiApiKey) {
         const genAI = new GoogleGenerativeAI(config.geminiApiKey)
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
         
         const result = await model.generateContent(prompt)
         const response = await result.response
@@ -16,7 +16,7 @@ export const AIService = {
         
         // Verificar se casa com o regex de fallback do Cloudflare (ex: se for uma resposta padrão indesejada)
         const fallbackRegex = process.env.CLOUDFLARE_FALLBACK_REGEX
-        if (fallbackRegex && new RegExp(fallbackRegex).test(text)) {
+        if (fallbackRegex && fallbackRegex !== 'true' && new RegExp(fallbackRegex, 'i').test(text)) {
           console.log('Gemini response matched fallback regex. Switching to Cloudflare.')
           return await this.generateWithCloudflare(prompt)
         }

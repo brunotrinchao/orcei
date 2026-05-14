@@ -1,12 +1,14 @@
 <script setup lang="ts">
-const { data: proposals, refresh } = useFetch('/api/proposals')
+import type { ProposalDTO } from '~/types'
+
+const { data: proposals, refresh } = useFetch<ProposalDTO[]>('/api/proposals')
 const { copy, copied } = useClipboard()
 
 const isModalOpen = ref(false)
-const selectedProposal = ref<any>(null)
+const selectedProposal = ref<ProposalDTO | null>(null)
 const isSubmitting = ref(false)
 
-function openModal(proposal: any = null) {
+function openModal(proposal: ProposalDTO | null = null) {
   selectedProposal.value = proposal
   isModalOpen.value = true
 }
@@ -48,15 +50,15 @@ function copyProposalLink(slug: string) {
 </script>
 
 <template>
-  <div>
-    <header class="flex justify-between items-center mb-8">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
       <div>
         <h1 class="text-2xl font-bold text-gray-900">Suas Propostas</h1>
-        <p class="text-gray-600">Acompanhe o status dos seus orçamentos.</p>
+        <p class="text-gray-600 text-sm sm:text-base">Acompanhe o status dos seus orçamentos.</p>
       </div>
       <button 
         @click="openModal()"
-        class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-100"
+        class="w-full sm:w-auto bg-blue-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-100"
       >
         Nova Proposta
       </button>
@@ -64,7 +66,47 @@ function copyProposalLink(slug: string) {
 
     <!-- Listagem -->
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-      <table class="w-full text-left border-collapse">
+      <!-- Mobile View (Cards) -->
+      <div class="block sm:hidden divide-y divide-gray-50">
+        <div v-for="proposal in proposals" :key="proposal._id" class="p-4 space-y-3">
+          <div class="flex justify-between items-start">
+            <div class="flex flex-col">
+              <span class="font-bold text-gray-900 leading-tight">{{ proposal.title || 'Sem título' }}</span>
+              <span class="text-xs text-gray-500">{{ proposal.client.name }}</span>
+            </div>
+            <span :class="statusMap[proposal.status]?.color" class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider shrink-0">
+              {{ statusMap[proposal.status]?.label }}
+            </span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="font-black text-gray-900">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+            <div class="flex gap-1">
+              <button 
+                v-if="proposal.status !== 'accepted'"
+                @click="openModal(proposal)"
+                class="p-2 text-gray-400 hover:text-blue-600 bg-gray-50 rounded-lg"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+              <NuxtLink 
+                v-if="proposal.status !== 'draft'"
+                :to="`/p/${proposal.slug}`" 
+                target="_blank" 
+                class="p-2 text-gray-400 hover:text-blue-600 bg-gray-50 rounded-lg"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop View (Table) -->
+      <table class="hidden sm:table w-full text-left border-collapse">
         <thead>
           <tr class="bg-gray-50/50 border-b border-gray-100">
             <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Proposta / Cliente</th>
@@ -130,7 +172,7 @@ function copyProposalLink(slug: string) {
           </tr>
         </tbody>
       </table>
-...
+
       <div v-if="proposals?.length === 0" class="text-center py-20">
         <div class="w-16 h-16 bg-gray-50 text-gray-300 rounded-full flex items-center justify-center mx-auto mb-4">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -149,7 +191,7 @@ function copyProposalLink(slug: string) {
       @close="isModalOpen = false"
     >
       <ProposalForm 
-        :initial-data="selectedProposal" 
+        :initial-data="selectedProposal || undefined" 
         :is-editing="!!selectedProposal" 
         :is-submitting="isSubmitting"
         @submit="handleProposalSubmit" 

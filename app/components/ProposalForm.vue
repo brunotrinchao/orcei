@@ -1,14 +1,15 @@
-<script setup lang="ts">
+import type { ServiceDTO, ProfileDTO, ProposalDTO } from '~/types'
+
 const props = defineProps<{
-  initialData?: any
+  initialData?: ProposalDTO
   isEditing?: boolean
   isSubmitting?: boolean
 }>()
 
 const emit = defineEmits(['submit'])
 
-const { data: services } = useFetch('/api/services')
-const { data: profile } = useFetch('/api/profile')
+const { data: services } = useFetch<ServiceDTO[]>('/api/services')
+const { data: profile } = useFetch<ProfileDTO>('/api/profile')
 
 const form = ref({
   title: props.initialData?.title || '',
@@ -18,7 +19,7 @@ const form = ref({
     email: props.initialData?.client?.email || '',
     phone: props.initialData?.client?.phone || ''
   },
-  items: props.initialData?.items || [],
+  items: props.initialData?.items ? [...props.initialData.items] : [] as any[],
   contractText: props.initialData?.contractText || '',
   termsAndConditions: props.initialData?.termsAndConditions || ''
 })
@@ -45,7 +46,7 @@ watch(() => props.initialData, (newVal) => {
   }
 }, { deep: true })
 
-function toggleService(service: any) {
+function toggleService(service: ServiceDTO) {
   const index = form.value.items.findIndex((i: any) => i.serviceId === service._id)
   if (index > -1) {
     form.value.items.splice(index, 1)
@@ -93,11 +94,11 @@ DADOS DO SERVIÇO:
 
 Escreva a descrição comercial agora:`
 
-    const { text } = await $fetch('/api/ai/generate', {
+    const res = await $fetch<{ text: string }>('/api/ai/generate', {
       method: 'POST',
       body: { prompt: promptTemplate }
     })
-    item.description = text
+    item.description = res.text
   } catch (e) {
     alert('Erro ao gerar descrição')
   } finally {
@@ -108,11 +109,11 @@ Escreva a descrição comercial agora:`
 async function generateContract() {
   isGeneratingContract.value = true
   try {
-    const { text } = await $fetch('/api/ai/generate', {
+    const res = await $fetch<{ text: string }>('/api/ai/generate', {
       method: 'POST',
       body: { prompt: `Reescreva este contrato de prestação de serviços de forma mais profissional e jurídica, mantendo as variáveis {{tags}} intactas. Texto atual: ${form.value.contractText}` }
     })
-    form.value.contractText = text
+    form.value.contractText = res.text
   } catch (e) {
     alert('Erro ao gerar contrato')
   } finally {
@@ -123,11 +124,11 @@ async function generateContract() {
 async function generateTerms() {
   isGeneratingTerms.value = true
   try {
-    const { text } = await $fetch('/api/ai/generate', {
+    const res = await $fetch<{ text: string }>('/api/ai/generate', {
       method: 'POST',
       body: { prompt: `Melhore estes termos e condições para uma proposta de freelancer, mantendo as variáveis {{tags}} intactas. Texto atual: ${form.value.termsAndConditions}` }
     })
-    form.value.termsAndConditions = text
+    form.value.termsAndConditions = res.text
   } catch (e) {
     alert('Erro ao gerar termos')
   } finally {
@@ -137,7 +138,7 @@ async function generateTerms() {
 
 function handleSubmit(status: string = 'draft') {
   if (form.value.items.length === 0) return alert('Selecione pelo menos um serviço')
-  form.value.status = status
+  form.value.status = status as any
   emit('submit', { ...form.value })
 }
 </script>
@@ -259,7 +260,7 @@ function handleSubmit(status: string = 'draft') {
         placeholder="Escreva os detalhes do contrato aqui..."
       />
       <p class="mt-2 text-xs text-gray-400 font-medium">
-        Variáveis disponíveis: {{nome_cliente}}, {{nome_empresa}}, {{valor_total}}, {{dias_validade}}
+        Variáveis disponíveis: <code class="bg-gray-100 px-1 rounded">{{'{{nome_cliente}}'}}</code>, <code class="bg-gray-100 px-1 rounded">{{'{{nome_empresa}}'}}</code>, <code class="bg-gray-100 px-1 rounded">{{'{{valor_total}}'}}</code>, <code class="bg-gray-100 px-1 rounded">{{'{{dias_validade}}'}}</code>
       </p>
     </section>
 

@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import type { ProfileDTO } from '~/types'
+
 const { loggedIn, user } = useUserSession()
-const { data: profile } = useFetch('/api/profile')
-const { data: stats } = useFetch('/api/dashboard/stats')
+const { data: profile } = useFetch<ProfileDTO>('/api/profile')
+const { data: stats } = useFetch<any>('/api/dashboard/stats')
+...
 
 const statusMap: any = {
   draft: { label: 'Rascunho', color: 'bg-gray-100 text-gray-800' },

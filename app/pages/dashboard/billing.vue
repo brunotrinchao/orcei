@@ -1,5 +1,7 @@
 <script setup lang="ts">
-const { data: profile } = useFetch('/api/profile')
+import type { ProfileDTO } from '~/types'
+
+const { data: profile } = useFetch<ProfileDTO>('/api/profile')
 
 const plans = [
   {

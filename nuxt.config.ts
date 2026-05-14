@@ -2,6 +2,10 @@
 export default defineNuxtConfig({
   modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@vueuse/nuxt'],
   
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' }
+  },
+
   future: {
     compatibilityVersion: 4
   },

@@ -7,6 +7,38 @@ const { copy, copied } = useClipboard()
 const isModalOpen = ref(false)
 const selectedProposal = ref<ProposalDTO | null>(null)
 const isSubmitting = ref(false)
+const isResending = ref<string | null>(null)
+
+async function resendEmail(proposalId: string) {
+  isResending.value = proposalId
+  try {
+    await $fetch(`/api/proposals/${proposalId}/resend`, { method: 'POST' })
+    alert('E-mail enviado com sucesso!')
+  } catch (e: any) {
+    alert(e.data?.statusMessage || 'Erro ao reenviar e-mail')
+  } finally {
+    isResending.value = null
+  }
+}
+
+async function shareProposal(proposal: ProposalDTO) {
+  const url = `${window.location.origin}/p/${proposal.slug}`
+  
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: `Proposta: ${proposal.title}`,
+        text: `Confira a proposta que preparei para você: ${proposal.title}`,
+        url: url
+      })
+    } catch (err) {
+      console.log('Share cancelled or failed', err)
+    }
+  } else {
+    copyProposalLink(proposal.slug)
+    alert('Link copiado! Seu navegador não suporta compartilhamento nativo.')
+  }
+}
 
 function openModal(proposal: ProposalDTO | null = null) {
   selectedProposal.value = proposal
@@ -51,55 +83,60 @@ function copyProposalLink(slug: string) {
 
 <template>
   <div class="max-w-6xl mx-auto px-4 sm:px-6">
-    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">Suas Propostas</h1>
-        <p class="text-gray-600 text-sm sm:text-base">Acompanhe o status dos seus orçamentos.</p>
+        <h1 class="text-4xl font-black text-gray-900 tracking-tight uppercase">Suas Propostas</h1>
+        <p class="text-gray-600 mt-2 text-lg font-medium">Acompanhe e gerencie seus orçamentos.</p>
       </div>
       <button 
         @click="openModal()"
-        class="w-full sm:w-auto bg-blue-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-100"
+        class="w-full sm:w-auto bg-gray-900 text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-black transition-all shadow-2xl shadow-gray-200 text-xs"
       >
         Nova Proposta
       </button>
     </header>
 
     <!-- Listagem -->
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div class="bg-white rounded-[2.5rem] border border-gray-200 shadow-sm overflow-hidden">
       <!-- Mobile View (Cards) -->
-      <div class="block sm:hidden divide-y divide-gray-50">
-        <div v-for="proposal in proposals" :key="proposal._id" class="p-4 space-y-3">
+      <div class="block sm:hidden divide-y divide-gray-100">
+        <div v-for="proposal in proposals" :key="proposal._id" class="p-6 space-y-4">
           <div class="flex justify-between items-start">
             <div class="flex flex-col">
-              <span class="font-bold text-gray-900 leading-tight">{{ proposal.title || 'Sem título' }}</span>
-              <span class="text-xs text-gray-500">{{ proposal.client.name }}</span>
+              <span class="font-black text-gray-900 text-lg leading-tight">{{ proposal.title || 'Sem título' }}</span>
+              <span class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">{{ proposal.client.name }}</span>
             </div>
-            <span :class="statusMap[proposal.status]?.color" class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider shrink-0">
+            <span :class="statusMap[proposal.status]?.color" class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shrink-0 border border-current opacity-80">
               {{ statusMap[proposal.status]?.label }}
             </span>
           </div>
-          <div class="flex justify-between items-center">
-            <span class="font-black text-gray-900">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-            <div class="flex gap-1">
+          <div class="flex justify-between items-center pt-2">
+            <span class="font-black text-gray-900 text-xl tracking-tight">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+            <div class="flex gap-2">
+              <button 
+                v-if="proposal.status === 'created' || proposal.status === 'pending'"
+                @click="resendEmail(proposal._id)"
+                :disabled="isResending === proposal._id"
+                class="p-3 text-gray-400 hover:text-blue-600 bg-gray-50 rounded-xl transition-all disabled:opacity-50"
+                title="Reenviar E-mail"
+              >
+                <div :class="isResending === proposal._id ? 'i-heroicons-arrow-path animate-spin' : 'i-heroicons-envelope'" class="w-5 h-5"></div>
+              </button>
+              <button 
+                v-if="proposal.status !== 'draft'"
+                @click="shareProposal(proposal)"
+                class="p-3 text-gray-400 hover:text-blue-600 bg-gray-50 rounded-xl transition-all"
+                title="Compartilhar"
+              >
+                <div class="i-heroicons-share w-5 h-5"></div>
+              </button>
               <button 
                 v-if="proposal.status !== 'accepted'"
                 @click="openModal(proposal)"
-                class="p-2 text-gray-400 hover:text-blue-600 bg-gray-50 rounded-lg"
+                class="p-3 text-gray-400 hover:text-blue-600 bg-gray-50 rounded-xl transition-all"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
+                <div class="i-heroicons-pencil-square w-5 h-5"></div>
               </button>
-              <NuxtLink 
-                v-if="proposal.status !== 'draft'"
-                :to="`/p/${proposal.slug}`" 
-                target="_blank" 
-                class="p-2 text-gray-400 hover:text-blue-600 bg-gray-50 rounded-lg"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              </NuxtLink>
             </div>
           </div>
         </div>
@@ -108,64 +145,64 @@ function copyProposalLink(slug: string) {
       <!-- Desktop View (Table) -->
       <table class="hidden sm:table w-full text-left border-collapse">
         <thead>
-          <tr class="bg-gray-50/50 border-b border-gray-100">
-            <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Proposta / Cliente</th>
-            <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Status</th>
-            <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Total</th>
-            <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Ações</th>
+          <tr class="bg-gray-50/50 border-b border-gray-200">
+            <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Proposta / Cliente</th>
+            <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Status</th>
+            <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">Total</th>
+            <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">Ações</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-50">
-          <tr v-for="proposal in proposals" :key="proposal._id" class="hover:bg-gray-50/50 transition-colors group">
-            <td class="px-6 py-4">
+        <tbody class="divide-y divide-gray-100">
+          <tr v-for="proposal in proposals" :key="proposal._id" class="hover:bg-gray-50/30 transition-all group">
+            <td class="px-8 py-6">
               <div class="flex flex-col">
-                <span class="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{{ proposal.title || 'Sem título' }}</span>
-                <span class="text-xs text-gray-500">{{ proposal.client.name }}</span>
+                <span class="font-black text-gray-900 group-hover:text-blue-600 transition-colors text-lg tracking-tight">{{ proposal.title || 'Sem título' }}</span>
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">{{ proposal.client.name }}</span>
               </div>
             </td>
-            <td class="px-6 py-4">
-              <span :class="statusMap[proposal.status]?.color" class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+            <td class="px-8 py-6">
+              <span :class="statusMap[proposal.status]?.color" class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-current opacity-90">
                 {{ statusMap[proposal.status]?.label }}
               </span>
             </td>
-            <td class="px-6 py-4 text-right">
-              <span class="font-black text-gray-900">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+            <td class="px-8 py-6 text-right">
+              <span class="font-black text-gray-900 text-xl tracking-tight">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
             </td>
-            <td class="px-6 py-4 text-right">
-              <div class="flex justify-end gap-1">
+            <td class="px-8 py-6 text-right">
+              <div class="flex justify-end gap-2">
                 <button 
-                  v-if="proposal.status !== 'accepted'"
-                  @click="openModal(proposal)"
-                  class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
-                  title="Editar"
+                  v-if="proposal.status === 'created' || proposal.status === 'pending'"
+                  @click="resendEmail(proposal._id)"
+                  :disabled="isResending === proposal._id"
+                  class="p-3 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all disabled:opacity-50"
+                  title="Reenviar E-mail"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
+                  <div :class="isResending === proposal._id ? 'i-heroicons-arrow-path animate-spin' : 'i-heroicons-envelope'" class="w-6 h-6"></div>
                 </button>
                 <button 
                   v-if="proposal.status !== 'draft'"
-                  @click="copyProposalLink(proposal.slug)"
-                  class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors relative"
-                  title="Copiar Link"
+                  @click="shareProposal(proposal)"
+                  class="p-3 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all"
+                  title="Compartilhar"
                 >
-                  <svg v-if="!copied || selectedProposal?.slug !== proposal.slug" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-1 4h.01M9 16h5m0 0l-1-1m1 1l-1 1" />
-                  </svg>
-                  <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                  </svg>
+                  <div class="i-heroicons-share w-6 h-6"></div>
+                </button>
+                <button 
+                  v-if="proposal.status !== 'accepted'"
+                  @click="openModal(proposal)"
+                  class="p-3 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all"
+                  title="Editar"
+                >
+                  <div class="i-heroicons-pencil-square w-6 h-6"></div>
                 </button>
                 <NuxtLink 
                   v-if="proposal.status !== 'draft'"
                   :to="`/p/${proposal.slug}`" 
                   target="_blank" 
-                  class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
+                  class="p-3 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all"
                   title="Ver Link Público"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
+                  <div class="i-heroicons-arrow-top-right-on-square w-6 h-6"></div>
                 </NuxtLink>
               </div>
             </td>

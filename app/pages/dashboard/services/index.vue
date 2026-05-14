@@ -60,7 +60,7 @@ REGRA DE SAÍDA ESTILIZADA:
 4. O tom deve ser confiante, direto e premium.
 5. NÃO inclua saudações, conclusões genéricas ou frases como "Aqui está a sua descrição". Retorne EXATAMENTE e APENAS o texto que será impresso no orçamento.
 6. Não mencione valores, preços ou prazos de expiração (isso será tratado pelo sistema).
-7. A descrição deve ser breve (MAX 280 caracteres).
+7. A descrição deve ser breve (MAX 150 caracteres).
 8. O serviço é feito por apenas uma pessoa, por tanto não trate como equipe.
 
 DADOS DO SERVIÇO:

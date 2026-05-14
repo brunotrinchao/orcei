@@ -9,6 +9,23 @@ const route = useRoute()
 const { data: proposal, refresh } = useFetch<ProposalDTO>(`/api/proposals/public/${route.params.slug}`)
 
 const isAccepting = ref(false)
+const selectedMethod = ref<'cash' | 'credit_card'>('cash')
+
+// Initialize with the PROFESSIONAL'S suggested method
+watchEffect(() => {
+  if (proposal.value) {
+    selectedMethod.value = proposal.value.paymentConfig?.method || 'cash'
+  }
+})
+
+const finalTotal = computed(() => {
+  if (!proposal.value) return 0
+  const subtotal = proposal.value.totals.subtotal
+  if (selectedMethod.value === 'cash') {
+    return subtotal * (1 - (proposal.value.paymentConfig.cashDiscount / 100))
+  }
+  return subtotal
+})
 
 async function handleAccept() {
   if (!confirm('Ao aceitar esta proposta, você concorda com os termos e condições. Deseja prosseguir?')) return
@@ -17,7 +34,10 @@ async function handleAccept() {
   try {
     await $fetch('/api/proposals/public/accept', {
       method: 'POST',
-      body: { slug: route.params.slug }
+      body: { 
+        slug: route.params.slug,
+        paymentMethod: selectedMethod.value
+      }
     })
     await refresh()
     alert('Proposta aceita com sucesso! O profissional será notificado.')
@@ -61,6 +81,10 @@ async function handleAccept() {
           <div>
             <p class="text-lg font-bold text-gray-900">{{ (proposal.profileId as any)?.name }}</p>
             <p class="text-sm text-gray-500">{{ (proposal.profileId as any)?.email }}</p>
+            <p v-if="(proposal.profileId as any)?.address?.street" class="text-xs text-gray-400 mt-1">
+              {{ (proposal.profileId as any).address.street }}, {{ (proposal.profileId as any).address.number || '' }} - {{ (proposal.profileId as any).address.neighborhood || '' }}<br>
+              {{ (proposal.profileId as any).address.city || '' }}/{{ (proposal.profileId as any).address.state || '' }} - {{ (proposal.profileId as any).address.zip || '' }}
+            </p>
           </div>
         </div>
         <div class="text-center sm:text-right">
@@ -91,6 +115,70 @@ async function handleAccept() {
         </div>
       </div>
 
+      <!-- Escolha da Forma de Pagamento (Client Choice) -->
+      <div v-if="proposal.status !== 'accepted'" class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-8 p-6 sm:p-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+          </svg>
+          Escolha a Forma de Pagamento
+        </h2>
+        
+        <div class="flex flex-col sm:flex-row gap-4">
+          <button 
+            @click="selectedMethod = 'cash'"
+            :class="{
+              'flex-1 p-6 rounded-2xl border-2 transition-all text-left group': true,
+              'border-blue-600 bg-blue-50/50 ring-4 ring-blue-50': selectedMethod === 'cash',
+              'border-gray-100 hover:border-blue-200 bg-white': selectedMethod !== 'cash'
+            }"
+          >
+            <div class="flex justify-between items-center mb-3">
+              <span class="font-bold text-gray-900 text-lg">À Vista</span>
+              <div v-if="selectedMethod === 'cash'" class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div v-else class="w-6 h-6 border-2 border-gray-200 rounded-full"></div>
+            </div>
+            <p class="text-sm text-gray-600 leading-relaxed">
+              {{ proposal.paymentConfig.cashDiscount > 0 ? `Economize ${proposal.paymentConfig.cashDiscount}% pagando via PIX ou Boleto.` : 'Pagamento integral no ato da contratação.' }}
+            </p>
+            <div class="mt-4 pt-4 border-t border-gray-100 flex items-baseline gap-2">
+              <span class="text-xs font-bold text-gray-400 uppercase">Total</span>
+              <span class="text-xl font-black text-blue-700">R$ {{ (proposal.totals.subtotal * (1 - (proposal.paymentConfig.cashDiscount / 100))).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+            </div>
+          </button>
+
+          <button 
+            @click="selectedMethod = 'credit_card'"
+            :class="{
+              'flex-1 p-6 rounded-2xl border-2 transition-all text-left group': true,
+              'border-blue-600 bg-blue-50/50 ring-4 ring-blue-50': selectedMethod === 'credit_card',
+              'border-gray-100 hover:border-blue-200 bg-white': selectedMethod !== 'credit_card'
+            }"
+          >
+            <div class="flex justify-between items-center mb-3">
+              <span class="font-bold text-gray-900 text-lg">Cartão de Crédito</span>
+              <div v-if="selectedMethod === 'credit_card'" class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div v-else class="w-6 h-6 border-2 border-gray-200 rounded-full"></div>
+            </div>
+            <p class="text-sm text-gray-600 leading-relaxed">
+              Parcele em até {{ proposal.paymentConfig.installments }}x de R$ {{ (proposal.totals.subtotal / proposal.paymentConfig.installments).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }} sem juros.
+            </p>
+            <div class="mt-4 pt-4 border-t border-gray-100 flex items-baseline gap-2">
+              <span class="text-xs font-bold text-gray-400 uppercase">Total</span>
+              <span class="text-xl font-black text-blue-700">R$ {{ proposal.totals.subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
       <!-- Contrato -->
       <div v-if="proposal.contractText" class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-8 overflow-hidden">
         <div class="p-6 sm:p-8 border-b border-gray-50 bg-gray-50/50">
@@ -105,7 +193,27 @@ async function handleAccept() {
       <div class="bg-gray-900 text-white p-8 sm:p-12 rounded-3xl shadow-2xl flex flex-col sm:flex-row justify-between items-center gap-8">
         <div class="text-center sm:text-left">
           <p class="text-gray-400 font-bold uppercase tracking-widest text-xs mb-2">Total do Investimento</p>
-          <p class="text-4xl sm:text-5xl font-black">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
+          <p class="text-4xl sm:text-5xl font-black">R$ {{ finalTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
+          <p v-if="proposal.status !== 'accepted'" class="text-sm font-bold text-blue-400 mt-2 uppercase tracking-tight">
+            {{ selectedMethod === 'cash' ? 'À Vista' : 'Cartão de Crédito' }} 
+            — 
+            <span v-if="selectedMethod === 'cash'">
+              {{ proposal.paymentConfig.cashDiscount > 0 ? `${proposal.paymentConfig.cashDiscount}% de desconto` : 'Preço integral' }}
+            </span>
+            <span v-else>
+              {{ proposal.paymentConfig.installments }}x de R$ {{ (proposal.totals.subtotal / proposal.paymentConfig.installments).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
+            </span>
+          </p>
+          <p v-else-if="proposal.paymentConfig" class="text-sm font-bold text-blue-400 mt-2 uppercase tracking-tight">
+            {{ proposal.paymentConfig.method === 'cash' ? 'À Vista' : 'Cartão de Crédito' }} 
+            — 
+            <span v-if="proposal.paymentConfig.method === 'cash'">
+              {{ proposal.paymentConfig.cashDiscount > 0 ? `${proposal.paymentConfig.cashDiscount}% de desconto` : 'Preço integral' }}
+            </span>
+            <span v-else>
+              {{ proposal.paymentConfig.installments }}x de R$ {{ (proposal.totals.final / proposal.paymentConfig.installments).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
+            </span>
+          </p>
         </div>
         <div class="flex flex-col sm:flex-row gap-4 items-center">
           <a 

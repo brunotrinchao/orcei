@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type { ProfileDTO } from '../../types'
 const { loggedIn, user, clear } = useUserSession()
-const { data: profile } = useFetch('/api/profile')
+const { data: profile } = useFetch<ProfileDTO>('/api/profile')
 
 const isMenuOpen = ref(false)
 const container = ref(null)
@@ -12,8 +13,6 @@ async function logout() {
   await $fetch('/api/auth/logout', { method: 'POST' })
   await clear()
   navigateTo('/')
-}
-  window.location.href = '/'
 }
 </script>
 
@@ -43,8 +42,8 @@ async function logout() {
             <!-- User Avatar -->
             <div class="relative" ref="container">
               <button @click="isMenuOpen = !isMenuOpen" class="w-10 h-10 rounded-2xl bg-gray-100 flex items-center justify-center overflow-hidden hover:ring-4 ring-gray-100 transition-all border-2 border-white shadow-sm">
-                <img v-if="user?.avatar" :src="user.avatar" class="w-full h-full object-cover">
-                <span v-else class="text-sm font-black text-gray-900">{{ user?.name?.charAt(0).toUpperCase() }}</span>
+                <img v-if="(user as any)?.avatar" :src="(user as any).avatar" class="w-full h-full object-cover">
+                <span v-else class="text-sm font-black text-gray-900">{{ (user as any)?.name?.charAt(0).toUpperCase() }}</span>
               </button>
 
               <!-- Dropdown (Minimalist) -->
@@ -58,7 +57,7 @@ async function logout() {
               >
                 <div v-if="isMenuOpen" class="absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 overflow-hidden ring-1 ring-black/5">
                   <div class="px-4 py-2 border-b border-gray-50">
-                    <p class="text-xs font-bold text-gray-900 truncate">{{ user?.name }}</p>
+                    <p class="text-xs font-bold text-gray-900 truncate">{{ (user as any)?.name }}</p>
                   </div>
                   <NuxtLink to="/dashboard/settings" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 transition">Configurações</NuxtLink>
                   <NuxtLink to="/dashboard/billing" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 transition">Plano</NuxtLink>
@@ -70,6 +69,7 @@ async function logout() {
         </div>
       </nav>
     </header>
+
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-6 py-8">

@@ -1,6 +1,8 @@
 import { Proposal } from '../models/Proposal'
 import { Profile } from '../models/Profile'
+import { Counter } from '../models/Counter'
 import { nanoid } from 'nanoid'
+import { sendProposalEmail } from '../utils/email'
 
 export const ProposalService = {
   async listByProfile(profileId: string) {
@@ -18,30 +20,46 @@ export const ProposalService = {
 
   async create(data: any) {
     const slug = nanoid(10)
-    const totals = this.calculateTotals(data.items, data.upsellItems || [], data.paymentConfig)
-    
-    // Se criar já como 'created', consome crédito
+    const token = nanoid(20)
+    const totals = this.calculateTotals(data.items, data.totals?.additional || 0, data.totals?.discount || 0, data.paymentConfig)
+
+    // Numeração Sequencial
+    const currentYear = new Date().getFullYear()
+    const counter = await Counter.findOneAndUpdate(
+      { profileId: data.profileId, year: currentYear },
+      { $inc: { lastSequence: 1 } },
+      { upsert: true, new: true }
+    )
+
+    const sequenceNumber = counter.lastSequence
+    const code = `#ORC-${currentYear}-${String(sequenceNumber).padStart(3, '0')}`
+
+    // Se criar já como 'created' e sendMethod for 'auto', consome crédito e envia
     let lastEmailId = undefined
     if (data.status === 'created') {
       await this.consumeCredit(data.profileId)
-      
-      // Enviar e-mail via Resend
-      const profile = await Profile.findById(data.profileId)
-      if (profile && data.client?.email) {
-        const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${slug}`
-        const emailRes = await sendProposalEmail(
-          data.client.email,
-          data.client.name,
-          proposalUrl,
-          profile.name
-        )
-        if (emailRes) lastEmailId = emailRes.id
+
+      if (data.sendMethod !== 'manual') {
+        const profile = await Profile.findById(data.profileId)
+        if (profile && data.client?.email) {
+          const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${slug}?t=${token}`
+          const emailRes = await sendProposalEmail(
+            data.client.email,
+            data.client.name,
+            proposalUrl,
+            profile.name
+          )
+          if (emailRes) lastEmailId = emailRes.id
+        }
       }
     }
 
     return await Proposal.create({
       ...data,
       slug,
+      token,
+      sequenceNumber,
+      code,
       totals,
       lastEmailId
     })
@@ -57,11 +75,11 @@ export const ProposalService = {
     if (oldProposal.status === 'draft' && data.status !== 'draft') {
       await this.consumeCredit(profileId)
 
-      // Se mudou para 'created', envia e-mail
-      if (data.status === 'created') {
+      // Se mudou para 'created' e não for manual, envia e-mail
+      if (data.status === 'created' && data.sendMethod !== 'manual') {
         const profile = await Profile.findById(profileId)
         if (profile && data.client?.email) {
-          const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${oldProposal.slug}`
+          const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${oldProposal.slug}?t=${oldProposal.token}`
           const emailRes = await sendProposalEmail(
             data.client.email,
             data.client.name,
@@ -73,7 +91,7 @@ export const ProposalService = {
       }
     }
 
-    const totals = this.calculateTotals(data.items, data.upsellItems || [], data.paymentConfig)
+    const totals = this.calculateTotals(data.items, data.totals?.additional || 0, data.totals?.discount || 0, data.paymentConfig)
     return await Proposal.findOneAndUpdate(
       { _id: id, profileId },
       { ...data, totals, lastEmailId },
@@ -104,8 +122,8 @@ export const ProposalService = {
     if (!proposal) return null
     
     // Calculate final totals based on client choice
-    const totals = this.calculateTotals(proposal.items, proposal.upsellItems || [], {
-      ...proposal.paymentConfig,
+    const totals = this.calculateTotals(proposal.items, proposal.totals?.additional || 0, proposal.totals?.discount || 0, {
+      ...(proposal.paymentConfig || {}),
       method: paymentMethod
     })
 
@@ -120,23 +138,34 @@ export const ProposalService = {
     )
   },
 
-  calculateTotals(items: any[], upsellItems: any[] = [], paymentConfig: any = {}) {
+  async declineProposal(slug: string) {
+    return await Proposal.findOneAndUpdate({ slug }, { status: 'expired' }, { new: true })
+  },
+
+  async requestChanges(slug: string, notes?: string) {
+    // Optionally log notes to a history field if we had one
+    return await Proposal.findOneAndUpdate({ slug }, { status: 'pending' }, { new: true })
+  },
+
+  calculateTotals(items: any[], additional: number = 0, discount: number = 0, paymentConfig: any = {}) {
     const subtotal = items.reduce((acc, item) => {
       const price = item.price || 0
       const qty = item.quantity || 1
       return acc + (price * qty)
     }, 0)
 
-    let final = subtotal
-    let discount = 0
+    const baseTotal = subtotal + (additional || 0) - (discount || 0)
+    let final = baseTotal
+    let cashDiscountValue = 0
 
     if (paymentConfig.method === 'cash' && paymentConfig.cashDiscount > 0) {
-      discount = subtotal * (paymentConfig.cashDiscount / 100)
-      final = subtotal - discount
+      cashDiscountValue = baseTotal * (paymentConfig.cashDiscount / 100)
+      final = baseTotal - cashDiscountValue
     }
 
     return {
       subtotal,
+      additional,
       discount,
       final
     }

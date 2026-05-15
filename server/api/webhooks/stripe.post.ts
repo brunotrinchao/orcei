@@ -38,7 +38,8 @@ export default defineEventHandler(async (event) => {
     if (type === 'subscription' && session.mode === 'subscription') {
       const subscriptionId = session.subscription
       const subscription = await stripe.subscriptions.retrieve(subscriptionId as string)
-      const priceId = subscription.items.data[0].price.id
+      const priceId = subscription.items.data?.[0]?.price?.id
+      if (!priceId) return { received: true }
       console.log('Retrieved subscription for checkout', { 
         subscriptionId, 
         priceId,
@@ -99,7 +100,8 @@ export default defineEventHandler(async (event) => {
     
     if (subscriptionId) {
       const subscription = await stripe.subscriptions.retrieve(subscriptionId as string)
-      const priceId = subscription.items.data[0].price.id
+      const priceId = subscription.items.data?.[0]?.price?.id
+      if (!priceId) return { received: true }
       console.log('Retrieved subscription for update', { 
         subscriptionId, 
         priceId,

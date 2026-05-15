@@ -10,6 +10,11 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.20",
+    "@fullcalendar/daygrid": "^6.1.20",
+    "@fullcalendar/interaction": "^6.1.20",
+    "@fullcalendar/timegrid": "^6.1.20",
+    "@fullcalendar/vue3": "^6.1.20",
     "@google/generative-ai": "^0.24.1",
     "@nuxtjs/cloudinary": "^4.0.0",
     "@nuxtjs/tailwindcss": "^6.14.0",
@@ -21,6 +26,7 @@
     "@tiptap/vue-3": "^3.23.2",
     "@vueuse/core": "^14.3.0",
     "@vueuse/nuxt": "^14.3.0",
+    "chart.js": "^4.5.1",
     "cloudinary": "^2.10.0",
     "lucide-vue-next": "^1.0.0",
     "maska": "^3.2.0",
@@ -33,9 +39,13 @@
     "stripe": "^22.1.1",
     "vue": "^3.5.34",
     "vue-advanced-cropper": "^2.8.9",
+    "vue-chartjs": "^5.3.3",
     "vue-router": "^5.0.6"
   },
   "devDependencies": {
-    "puppeteer": "^24.43.1"
+    "@types/node": "^25.8.0",
+    "puppeteer": "^24.43.1",
+    "typescript": "^6.0.3",
+    "vue-tsc": "^3.2.9"
   }
 }

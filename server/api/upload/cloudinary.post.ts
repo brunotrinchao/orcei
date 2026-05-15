@@ -4,6 +4,10 @@ export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)
   const config = useRuntimeConfig()
 
+  const projectName = config.appName
+  const folderMain = config.appEnv
+  const folderPath = `${folderMain}/${projectName}`
+
   cloudinary.config({
     cloud_name: config.cloudinaryName,
     api_key: config.cloudinaryApiKey,
@@ -22,7 +26,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     const uploadResponse = await cloudinary.uploader.upload(image, {
-      folder: folder || 'orcei/logos',
+      folder: folderPath.toLowerCase() + (folder || '/logos'),
       resource_type: 'image',
     })
 

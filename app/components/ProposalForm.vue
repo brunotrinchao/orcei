@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, watchEffect } from 'vue'
-import type { CatalogItemDTO, ProfileDTO, ProposalDTO } from '../../../types'
+import { Plus, Trash2, Sparkles, Loader2 } from 'lucide-vue-next'
+import type { CatalogItemDTO, ProfileDTO, ProposalDTO } from '../../types'
 
 const props = defineProps<{
   initialData?: ProposalDTO
@@ -41,11 +42,16 @@ const form = ref({
     phone: props.initialData?.client?.phone || ''
   },
   items: props.initialData?.items ? [...props.initialData.items] : [] as any[],
+  totals: {
+    additional: props.initialData?.totals?.additional || 0,
+    discount: props.initialData?.totals?.discount || 0
+  },
   paymentConfig: {
     method: props.initialData?.paymentConfig?.method || 'cash',
     installments: props.initialData?.paymentConfig?.installments || 1,
     cashDiscount: props.initialData?.paymentConfig?.cashDiscount || 0
   },
+  sendMethod: props.initialData?.sendMethod || 'auto',
   contractText: props.initialData?.contractText || '',
   termsAndConditions: props.initialData?.termsAndConditions || ''
 })
@@ -72,11 +78,16 @@ watch(() => props.initialData, (newVal) => {
         phone: newVal.client.phone || ''
       },
       items: [...newVal.items],
+      totals: {
+        additional: newVal.totals?.additional || 0,
+        discount: newVal.totals?.discount || 0
+      },
       paymentConfig: {
         method: newVal.paymentConfig?.method || 'cash',
         installments: newVal.paymentConfig?.installments || 1,
         cashDiscount: newVal.paymentConfig?.cashDiscount || 0
       },
+      sendMethod: newVal.sendMethod || 'auto',
       contractText: newVal.contractText || '',
       termsAndConditions: newVal.termsAndConditions || ''
     }
@@ -100,10 +111,12 @@ function toggleItem(item: CatalogItemDTO) {
 
 const totalPreview = computed(() => {
   const subtotal = form.value.items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0)
+  const baseTotal = subtotal + (form.value.totals.additional || 0) - (form.value.totals.discount || 0)
+  
   if (form.value.paymentConfig.method === 'cash') {
-    return subtotal * (1 - (form.value.paymentConfig.cashDiscount / 100))
+    return baseTotal * (1 - (form.value.paymentConfig.cashDiscount / 100))
   }
-  return subtotal
+  return baseTotal
 })
 
 const paymentSummary = computed(() => {
@@ -236,7 +249,7 @@ function handleSubmit(status: string = 'draft') {
       <div v-if="form.items.length > 0" class="space-y-8 pt-6 border-t border-gray-100">
         <div v-for="(item, index) in form.items" :key="index" class="p-8 bg-gray-50/50 rounded-[2rem] relative group border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all">
           <button @click="form.items.splice(index, 1)" type="button" class="absolute -right-3 -top-3 bg-white text-red-600 w-10 h-10 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition shadow-2xl border border-red-50 hover:bg-red-50 hover:scale-110 active:scale-95">
-            <div class="i-heroicons-trash-20-solid w-5 h-5"></div>
+            <Trash2 class="w-5 h-5" />
           </button>
           
           <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -273,7 +286,7 @@ function handleSubmit(status: string = 'draft') {
                   :disabled="generatingIndex === index"
                   class="text-[10px] font-black text-blue-600 uppercase flex items-center gap-1.5 disabled:opacity-50 hover:text-blue-800 transition-colors tracking-widest"
                 >
-                  <div class="i-heroicons-sparkles-20-solid w-3.5 h-3.5"></div>
+                  <Sparkles class="w-3.5 h-3.5" />
                   {{ generatingIndex === index ? 'Melhorando...' : 'Otimizar com IA' }}
                 </button>
               </div>
@@ -288,7 +301,6 @@ function handleSubmit(status: string = 'draft') {
         </div>
       </div>
       <div v-else class="text-center py-16 border-4 border-dashed border-gray-50 rounded-[2rem] bg-gray-50/30">
-        <div class="i-heroicons-shopping-bag w-12 h-12 text-gray-200 mx-auto mb-4"></div>
         <p class="text-gray-400 font-black uppercase tracking-[0.2em] text-[10px]">Selecione itens do catálogo acima</p>
       </div>
     </section>
@@ -393,7 +405,7 @@ function handleSubmit(status: string = 'draft') {
           :disabled="isSubmitting"
           class="flex-1 sm:flex-none"
         >
-          <div v-if="isSubmitting" class="i-heroicons-arrow-path w-4 h-4 animate-spin mr-2"></div>
+          <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin mr-2" />
           {{ isEditing ? 'SALVAR ALTERAÇÕES' : 'GERAR ORÇAMENTO AGORA' }}
         </BaseButton>
       </div>

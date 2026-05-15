@@ -10,8 +10,12 @@ export default defineNuxtConfig({
     pageTransition: { name: 'page', mode: 'out-in' }
   },
 
-  future: {
-    compatibilityVersion: 4
+  // future: {
+  //   compatibilityVersion: 4
+  // },
+
+  build: {
+    transpile: ['@nuxtjs/cloudinary']
   },
 
   vite: {
@@ -19,6 +23,10 @@ export default defineNuxtConfig({
       include: [
         '@vue/devtools-core',
         '@vue/devtools-kit',
+        '@nuxtjs/cloudinary',
+        'lucide-vue-next',
+        'radix-vue',
+        'maska'
       ]
     }
   },
@@ -33,6 +41,9 @@ export default defineNuxtConfig({
     geminiApiKey: process.env.GEMINI_API_KEY,
     stripeSecretKey: process.env.STRIPE_SECRET_KEY,
     stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+    stripePriceMonthly: process.env.STRIPE_PRICE_MONTHLY,
+    stripePriceAnnual: process.env.STRIPE_PRICE_ANNUAL,
+    stripePriceSingle: process.env.STRIPE_PRICE_SINGLE,
     stripeStarterPriceId: process.env.STRIPE_STARTER_PRICE_ID,
     stripePremiumPriceId: process.env.STRIPE_PREMIUM_PRICE_ID,
     stripeCredits5PriceId: process.env.STRIPE_CREDITS_5_PRICE_ID,
@@ -40,6 +51,18 @@ export default defineNuxtConfig({
     cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
     cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
     cloudinaryName: process.env.CLOUDINARY_NAME,
+    appName: process.env.APP_NAME || 'Orcei',
+    appEnv: process.env.APP_ENVIRONMENT || 'development',
+  },
+
+  hooks: {
+    'components:extend'(components) {
+      const toRemove = ['CldImage', 'CldVideoPlayer', 'CldOgImage', 'CldUploadWidget', 'CldUploadButton']
+      toRemove.forEach(name => {
+        const index = components.findIndex(c => c.pascalName === name || c.kebabName === name)
+        if (index !== -1) components.splice(index, 1)
+      })
+    }
   },
 
   compatibilityDate: '2024-04-03',

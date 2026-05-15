@@ -14,6 +14,9 @@ const itemSnapshotSchema = new Schema({
 const proposalSchema = new Schema({
   profileId: { type: Schema.Types.ObjectId, ref: 'Profile', required: true },
   title: { type: String, required: true },
+  sequenceNumber: { type: Number },
+  code: { type: String },
+  token: { type: String },
   client: {
     name: { type: String, required: true },
     email: { type: String, required: true },
@@ -25,6 +28,7 @@ const proposalSchema = new Schema({
   upsellItems: [itemSnapshotSchema],
   totals: {
     subtotal: { type: Number, default: 0 },
+    additional: { type: Number, default: 0 },
     discount: { type: Number, default: 0 },
     final: { type: Number, default: 0 }
   },
@@ -33,6 +37,7 @@ const proposalSchema = new Schema({
     installments: { type: Number, default: 1 },
     cashDiscount: { type: Number, default: 0 }
   },
+  sendMethod: { type: String, enum: ['manual', 'auto'], default: 'auto' },
   contractText: String,
   termsAndConditions: String,
   expiresAt: Date,

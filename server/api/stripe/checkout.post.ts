@@ -17,10 +17,15 @@ export default defineEventHandler(async (event) => {
   let mode: 'subscription' | 'payment' = 'subscription'
 
   if (type === 'subscription') {
-    priceId = tier === 'starter' ? config.stripeStarterPriceId : tier === 'premium' ? config.stripePremiumPriceId : null
+    priceId = tier === 'premium_monthly' ? (config.stripePriceMonthly as string)
+            : tier === 'premium_annual' ? (config.stripePriceAnnual as string)
+            : tier === 'starter' ? (config.stripeStarterPriceId as string)
+            : tier === 'premium' ? (config.stripePremiumPriceId as string) : null
     mode = 'subscription'
   } else {
-    priceId = tier === 'credits_5' ? config.stripeCredits5PriceId : tier === 'credits_10' ? config.stripeCredits10PriceId : null
+    priceId = tier === 'single_credit' ? (config.stripePriceSingle as string)
+            : tier === 'credits_5' ? (config.stripeCredits5PriceId as string)
+            : tier === 'credits_10' ? (config.stripeCredits10PriceId as string) : null
     mode = 'payment'
   }
 
@@ -35,13 +40,11 @@ export default defineEventHandler(async (event) => {
   
   try {
     const checkoutSession = await stripe.checkout.sessions.create({
-      customer: profile.stripeCustomerId,
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
+      customer: profile.stripeCustomerId || undefined,
+      line_items: [{
+        price: priceId,
+        quantity: 1,
+      }],
       mode: mode,
       success_url: `${process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/billing?success=true`,
       cancel_url: `${process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/billing?canceled=true`,

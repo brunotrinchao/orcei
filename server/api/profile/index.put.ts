@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   
   const profile = await Profile.findOneAndUpdate(
-    { userId: session.user.id },
+    { userId: (session.user as any).id },
     { 
       name: body.name,
       brandConfig: body.brandConfig,

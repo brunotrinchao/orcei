@@ -1,86 +1,181 @@
 <script setup lang="ts">
-import type { ProfileDTO } from '~/types'
+import { Sparkles, Loader2, ArrowUpRight, CheckCircle2, Clock, DollarSign, TrendingUp, BarChart3, Users, FileText } from 'lucide-vue-next'
+import { Line, Doughnut } from 'vue-chartjs'
+import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement, ArcElement } from 'chart.js'
 
-const { loggedIn, user } = useUserSession()
-const { data: profile } = useFetch<ProfileDTO>('/api/profile')
-const { data: stats } = useFetch<any>('/api/dashboard/stats')
+ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement, ArcElement)
 
-onMounted(() => {
-  if (!loggedIn.value) navigateTo('/')
+const { data: stats } = await useFetch<any>('/api/dashboard/stats')
+const { loggedIn } = useUserSession()
+
+const period = ref('last_30_days')
+
+// Status Distribution Chart
+const statusChartData = computed(() => {
+  if (!stats.value?.statusDistribution) return { labels: [], datasets: [] }
+  
+  const labels = Object.keys(stats.value.statusDistribution).map(s => s.toUpperCase())
+  const data = Object.values(stats.value.statusDistribution) as number[]
+  
+  return {
+    labels,
+    datasets: [{
+      data,
+      backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#6B7280'],
+      borderWidth: 0
+    }]
+  }
 })
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'bottom' as const,
+      labels: {
+        usePointStyle: true,
+        font: { weight: 'bold' as const, size: 10 }
+      }
+    }
+  }
+}
+
+const aiReport = ref<string | null>(null)
+const isAnalyzing = ref(false)
+
+async function generateAIReport() {
+  isAnalyzing.value = true
+  try {
+    const data: any = await $fetch('/api/ai/analyze')
+    aiReport.value = data.text
+  } catch (e) {
+    alert('Erro ao gerar relatório estratégico')
+  } finally {
+    isAnalyzing.value = false
+  }
+}
 </script>
 
 <template>
-  <div v-if="loggedIn" class="max-w-6xl mx-auto">
-    <header class="mb-12">
-      <h1 class="text-4xl font-black text-gray-900 tracking-tight uppercase">Olá, {{ user?.name?.split(' ')[0] }}</h1>
-      <p class="text-gray-600 mt-2 text-lg font-medium">Bem-vindo de volta ao seu painel estratégico.</p>
-    </header>
-
-    <!-- Cards de Stats -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-      <div class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm group hover:border-blue-500 transition-all">
-        <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 group-hover:text-blue-600 transition-colors">Créditos</p>
-        <p class="text-3xl font-black text-gray-900 tracking-tight">{{ profile?.creditsBalance ?? 0 }}</p>
-      </div>
-      <div class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm">
-        <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Propostas</p>
-        <p class="text-3xl font-black text-gray-900 tracking-tight">{{ stats?.proposalsCount ?? 0 }}</p>
-      </div>
-      <div class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm">
-        <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Serviços</p>
-        <p class="text-3xl font-black text-gray-900 tracking-tight">{{ stats?.servicesCount ?? 0 }}</p>
-      </div>
-      <NuxtLink to="/dashboard/proposals" class="bg-gray-900 text-white p-8 rounded-[2.5rem] flex flex-col justify-center items-center hover:bg-black transition active:scale-95 shadow-2xl shadow-gray-200">
-        <span class="text-xs font-black uppercase tracking-[0.2em] text-center">Nova Proposta</span>
-      </NuxtLink>
-    </div>
-
-    <div class="bg-white p-12 rounded-[3.5rem] border border-gray-200 shadow-sm max-w-4xl">
-      <h2 class="text-2xl font-black text-gray-900 tracking-tight uppercase mb-6">Bem-vindo ao Novo Orcei</h2>
-      <p class="text-gray-600 text-lg font-medium leading-relaxed mb-10">Sua plataforma definitiva para propostas de alto impacto. Gere documentos profissionais e feche mais contratos em minutos.</p>
-      
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-10">
-        <div class="flex items-start gap-5">
-          <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0">
-            <div class="i-heroicons-sparkles w-6 h-6 text-blue-600"></div>
+  <div class="space-y-12">
+    <!-- Header com Banner IA -->
+    <div class="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 p-12 rounded-[3.5rem] shadow-2xl">
+      <div class="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+      <div class="relative flex flex-col md:flex-row items-center justify-between gap-8">
+        <div class="space-y-4 text-center md:text-left">
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-white text-[10px] font-black uppercase tracking-widest border border-white/10">
+            <Sparkles class="w-3 h-3 text-blue-200" /> Consultoria de IA Ativa
           </div>
-          <div>
-            <h3 class="text-sm font-black text-gray-900 mb-1 uppercase tracking-tight">Inteligência Artificial</h3>
-            <p class="text-sm text-gray-500 font-medium leading-relaxed">Gere descrições comerciais persuasivas em segundos.</p>
-          </div>
+          <h1 class="text-4xl md:text-5xl font-black text-white leading-tight tracking-tight">Otimize seu negócio<br>com inteligência.</h1>
+          <p class="text-blue-100 font-medium text-lg max-w-xl">Analisamos seus dados de propostas e catálogo para sugerir as melhores estratégias de precificação e conversão.</p>
         </div>
-        
-        <div class="flex items-start gap-5">
-          <div class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center shrink-0">
-            <div class="i-heroicons-document-arrow-down w-6 h-6 text-emerald-600"></div>
-          </div>
-          <div>
-            <h3 class="text-sm font-black text-gray-900 mb-1 uppercase tracking-tight">Exportação PDF</h3>
-            <p class="text-sm text-gray-500 font-medium leading-relaxed">Documentos prontos para envio com design premium.</p>
-          </div>
-        </div>
-
-        <div class="flex items-start gap-5">
-          <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center shrink-0">
-            <div class="i-heroicons-adjustments-horizontal w-6 h-6 text-purple-600"></div>
-          </div>
-          <div>
-            <h3 class="text-sm font-black text-gray-900 mb-1 uppercase tracking-tight">Editor Flexível</h3>
-            <p class="text-sm text-gray-500 font-medium leading-relaxed">Controle total sobre o conteúdo e termos legais.</p>
-          </div>
-        </div>
-
-        <div class="flex items-start gap-5">
-          <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center shrink-0">
-            <div class="i-heroicons-link w-6 h-6 text-orange-600"></div>
-          </div>
-          <div>
-            <h3 class="text-sm font-black text-gray-900 mb-1 uppercase tracking-tight">Link Público</h3>
-            <p class="text-sm text-gray-500 font-medium leading-relaxed">Aprovação online rápida e integrada pelo cliente.</p>
-          </div>
-        </div>
+        <BaseButton 
+          @click="generateAIReport"
+          :disabled="isAnalyzing"
+          variant="secondary" 
+          class="bg-white text-blue-700 hover:bg-blue-50 px-12 py-5 rounded-[2rem] text-xs shadow-2xl shrink-0"
+        >
+          <Loader2 v-if="isAnalyzing" class="w-4 h-4 animate-spin mr-2" />
+          {{ isAnalyzing ? 'Analisando...' : 'Gerar Relatório IA' }}
+        </BaseButton>
       </div>
     </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group">
+        <div class="flex justify-between items-start mb-6">
+          <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 transition-colors">
+            <FileText class="w-6 h-6 text-blue-600 group-hover:text-white transition-colors" />
+          </div>
+          <span class="text-[10px] font-black text-green-500 uppercase tracking-widest bg-green-50 px-2 py-1 rounded-lg">+12%</span>
+        </div>
+        <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Total Orçamentos</p>
+        <h3 class="text-3xl font-black text-gray-900">{{ stats?.proposalsCount ?? 0 }}</h3>
+      </div>
+
+      <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group">
+        <div class="flex justify-between items-start mb-6">
+          <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center group-hover:bg-green-600 transition-colors">
+            <DollarSign class="w-6 h-6 text-green-600 group-hover:text-white transition-colors" />
+          </div>
+          <span class="text-[10px] font-black text-green-500 uppercase tracking-widest bg-green-50 px-2 py-1 rounded-lg">+R$ 2.4k</span>
+        </div>
+        <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Receita Confirmada</p>
+        <h3 class="text-3xl font-black text-gray-900">R$ {{ stats?.totalRevenue?.toLocaleString('pt-BR') ?? '0,00' }}</h3>
+      </div>
+
+      <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group">
+        <div class="flex justify-between items-start mb-6">
+          <div class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center group-hover:bg-purple-600 transition-colors">
+            <TrendingUp class="w-6 h-6 text-purple-600 group-hover:text-white transition-colors" />
+          </div>
+          <span class="text-[10px] font-black text-purple-500 uppercase tracking-widest bg-purple-50 px-2 py-1 rounded-lg">Top 5%</span>
+        </div>
+        <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Taxa de Aprovação</p>
+        <h3 class="text-3xl font-black text-gray-900">{{ Math.round(stats?.approvalRate ?? 0) }}%</h3>
+      </div>
+
+      <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group">
+        <div class="flex justify-between items-start mb-6">
+          <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center group-hover:bg-orange-600 transition-colors">
+            <Users class="w-6 h-6 text-orange-600 group-hover:text-white transition-colors" />
+          </div>
+        </div>
+        <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Ticket Médio</p>
+        <h3 class="text-3xl font-black text-gray-900">R$ {{ Math.round(stats?.ticketMedia ?? 0).toLocaleString('pt-BR') }}</h3>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Gráfico de Status -->
+      <div class="lg:col-span-1 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm">
+        <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-8">Distribuição de Status</h3>
+        <div class="h-64 relative">
+          <Doughnut :data="statusChartData" :options="chartOptions" />
+        </div>
+      </div>
+
+      <!-- Ranking de Clientes -->
+      <div class="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm">
+        <div class="flex justify-between items-center mb-8">
+          <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Maiores Clientes (Receita)</h3>
+          <NuxtLink to="/dashboard/clients" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-800">Ver Todos</NuxtLink>
+        </div>
+        <div class="space-y-4">
+          <div v-for="(client, idx) in stats?.clientRanking" :key="idx" class="flex items-center justify-between p-5 bg-gray-50/50 rounded-3xl border border-gray-100 hover:bg-gray-50 transition-colors group">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 bg-white rounded-xl border border-gray-200 flex items-center justify-center text-xs font-black text-gray-400 group-hover:border-blue-200 group-hover:text-blue-600 transition-all">
+                #{{ (idx as any) + 1 }}
+              </div>
+              <div>
+                <p class="font-bold text-gray-900">{{ client.name }}</p>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Faturamento Acumulado</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="font-black text-gray-900">R$ {{ client.revenue.toLocaleString('pt-BR') }}</p>
+              <div class="w-24 h-1.5 bg-gray-100 rounded-full mt-2 overflow-hidden">
+                <div class="h-full bg-blue-600 rounded-full" :style="{ width: (client.revenue / stats.totalRevenue * 100) + '%' }"></div>
+              </div>
+            </div>
+          </div>
+          <div v-if="!stats?.clientRanking?.length" class="text-center py-12">
+            <p class="text-gray-400 font-medium">Nenhum dado de faturamento disponível.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal do Relatório IA -->
+    <BaseDialog v-model:open="!!aiReport" title="Relatório Estratégico IA" size="lg" @close="aiReport = null">
+      <div class="prose prose-blue max-w-none p-4">
+        <div v-html="aiReport ? (useNuxtApp() as any).$markdown?.render(aiReport) || aiReport : ''"></div>
+      </div>
+      <template #footer>
+        <BaseButton @click="aiReport = null">Entendido</BaseButton>
+      </template>
+    </BaseDialog>
   </div>
 </template>

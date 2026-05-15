@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Proposta não encontrada' })
   }
 
-  const profile = await Profile.findOne({ userId: session.user.id }).lean()
+  const profile = await Profile.findOne({ userId: (session.user as any).id }).lean()
   if (!profile) {
     throw createError({ statusCode: 404, statusMessage: 'Perfil não encontrado' })
   }

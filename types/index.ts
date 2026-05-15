@@ -17,12 +17,12 @@ export interface ProfileDTO {
     state: string
     zip: string
   }
-  company?: {
-    taxId?: string
-    legalName?: string
-    tradeName?: string
+  company: {
+    taxId: string
+    legalName: string
+    tradeName: string
   }
-  contact?: {
+  contact: {
     phones: Array<{
       number: string
       isWhatsapp: boolean
@@ -44,17 +44,22 @@ export interface ProfileDTO {
   defaultTermsAndConditions: string
 }
 
-export interface ServiceDTO {
+export interface CatalogItemDTO {
   _id: string
   profileId: string
   name: string
   description: string
-  basePrice: number
-  billingType: 'fixed' | 'hourly'
+  price: number
+  type: 'product' | 'service'
+  unit: string
+  sku?: string
+  imageUrl?: string
 }
 
+export type ServiceDTO = CatalogItemDTO
+
 export interface ProposalItemDTO {
-  serviceId?: string
+  catalogItemId?: string
   name: string
   description: string
   price: number
@@ -65,8 +70,12 @@ export interface ProposalDTO {
   _id: string
   profileId: any
   title: string
+  code?: string
+  sequenceNumber?: number
+  token?: string
   slug: string
   status: 'draft' | 'created' | 'pending' | 'accepted' | 'expired'
+  sendMethod?: 'manual' | 'auto'
   client: {
     name: string
     email: string
@@ -75,6 +84,7 @@ export interface ProposalDTO {
   items: ProposalItemDTO[]
   totals: {
     subtotal: number
+    additional?: number
     discount: number
     final: number
   }
@@ -87,4 +97,25 @@ export interface ProposalDTO {
   termsAndConditions: string
   createdAt: string
   updatedAt: string
+}
+
+export interface ClientDTO {
+  _id: string
+  profileId: string
+  name: string
+  taxId?: string
+  email: string
+  phone: string
+  isWhatsapp: boolean
+  address: {
+    street: string
+    number?: string
+    neighborhood: string
+    city: string
+    state: string
+    zip: string
+  }
+  notes?: string
+  createdAt?: string
+  updatedAt?: string
 }

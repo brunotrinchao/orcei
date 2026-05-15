@@ -55,7 +55,8 @@ export default defineEventHandler(async (event) => {
 
       // Retrieve subscription to get the subscription item ID
       const subscription = await stripe.subscriptions.retrieve(profile.stripeSubscriptionId)
-      const subscriptionItemId = subscription.items.data[0].id
+      const subscriptionItemId = subscription.items.data?.[0]?.id
+      if (!subscriptionItemId) throw createError({ statusCode: 500, statusMessage: 'Subscription item not found' })
 
       await stripe.subscriptions.update(profile.stripeSubscriptionId, {
         items: [{

@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import { Cropper } from 'vue-advanced-cropper'
 import 'vue-advanced-cropper/dist/style.css'
+import { SwatchBook, MapPin, Briefcase, FileText, Pencil, Image as PhotoIcon, RefreshCcw, X, Instagram, Youtube, Phone, MessageSquare, Plus, Trash2 } from 'lucide-vue-next'
+import type { ProfileDTO } from '../../../types'
 
-const { data: profile, refresh } = await useFetch('/api/profile')
+const { data: profile, refresh } = await useFetch<ProfileDTO>('/api/profile')
 
 watchEffect(() => {
-  if (profile.value && !profile.value.address) {
-    profile.value.address = {
-      street: '',
-      number: '',
-      neighborhood: '',
-      city: '',
-      state: '',
-      zip: ''
+  if (profile.value) {
+    if (!profile.value.address) {
+      profile.value.address = { street: '', number: '', neighborhood: '', city: '', state: '', zip: '' }
+    }
+    if (!profile.value.company) {
+      profile.value.company = { taxId: '', legalName: '', tradeName: '' }
+    }
+    if (!profile.value.contact) {
+      profile.value.contact = { phones: [{ number: '', isWhatsapp: true }], social: { instagram: '', youtube: '' } }
     }
   }
 })
@@ -41,7 +44,6 @@ async function cropLogo() {
   const { canvas } = cropperRef.value.getResult()
   if (!canvas) return
 
-  // Create a 120x120 canvas for final output
   const finalCanvas = document.createElement('canvas')
   finalCanvas.width = 120
   finalCanvas.height = 120
@@ -53,21 +55,22 @@ async function cropLogo() {
   ctx.drawImage(canvas, 0, 0, 120, 120)
 
   const base64Image = finalCanvas.toDataURL('image/png')
-  
+
   isSaving.value = true
   try {
-    const data = await $fetch('/api/upload/cloudinary', {
-      method: 'POST',
-      body: {
-        image: base64Image,
-        folder: 'orcei/logos'
-      }
-    }) as { url: string }
-    
+  const data = await $fetch<any>('/api/upload/cloudinary', {
+    method: 'POST',
+    body: {
+      image: base64Image,
+      folder: 'orcei/logos'
+    }
+  })
+
+  if (profile.value) {
     profile.value.brandConfig.logoUrl = data.url
-    showCropper.value = false
-    rawImage.value = null
-  } catch (e) {
+  }
+  showCropper.value = false
+  rawImage.value = null  } catch (e) {
     alert('Erro ao fazer upload da imagem')
   } finally {
     isSaving.value = false
@@ -75,20 +78,22 @@ async function cropLogo() {
 }
 
 async function updateProfile() {
+  // Validate mandatory fields
+  const addr = profile.value!.address
+  if (!addr.zip || !addr.street || !addr.neighborhood || !addr.city || !addr.state) {
+    return alert('Todos os campos de endereço são obrigatórios (CEP, Rua, Bairro, Cidade e UF)')
+  }
+
+  const comp = profile.value!.company
+  if (!comp.taxId || !comp.legalName || !comp.tradeName) {
+    return alert('Dados da empresa são obrigatórios (CNPJ, Razão Social e Nome Fantasia)')
+  }
+
   isSaving.value = true
   try {
     await $fetch('/api/profile', {
       method: 'PUT',
-      body: {
-        name: profile.value.name,
-        brandConfig: profile.value.brandConfig,
-        address: profile.value.address,
-        defaultValidityDays: profile.value.defaultValidityDays,
-        defaultInstallments: profile.value.defaultInstallments,
-        defaultCashDiscount: profile.value.defaultCashDiscount,
-        defaultContractTemplate: profile.value.defaultContractTemplate,
-        defaultTermsAndConditions: profile.value.defaultTermsAndConditions
-      }
+      body: profile.value
     })
     alert('Configurações salvas!')
     refresh()
@@ -103,6 +108,7 @@ const activeTab = ref<'contract' | 'terms'>('contract')
 const isSearchingCEP = ref(false)
 
 async function searchCEP() {
+  if (!profile.value) return
   const cep = profile.value.address.zip?.replace(/\D/g, '')
   if (!cep || cep.length !== 8) return
 
@@ -123,21 +129,33 @@ async function searchCEP() {
     isSearchingCEP.value = false
   }
 }
+
+function addPhone() {
+  if (!profile.value) return
+  profile.value.contact.phones.push({ number: '', isWhatsapp: false })
+}
+
+function removePhone(index: number) {
+  if (!profile.value) return
+  if (profile.value.contact.phones.length > 1) {
+    profile.value.contact.phones.splice(index, 1)
+  }
+}
 </script>
 
 <template>
   <div class="max-w-4xl mx-auto pb-40 md:pb-20">
     <header class="mb-12">
       <h1 class="text-4xl font-black text-gray-900 tracking-tight uppercase">Configurações</h1>
-      <p class="text-gray-600 mt-2 text-lg font-medium">Personalize sua identidade e definições automáticas.</p>
+      <p class="text-gray-600 mt-2 text-lg font-medium">Personalize sua identidade corporativa e regras de negócio.</p>
     </header>
 
-    <div v-if="profile" class="space-y-10">
+    <div v-if="profile" class="space-y-12">
       <!-- Card 1: Identidade Visual -->
       <section class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm">
         <div class="flex items-center gap-3 mb-8">
           <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-            <div class="i-heroicons-swatch-20-solid w-5 h-5 text-blue-600"></div>
+            <SwatchBook class="w-5 h-5 text-blue-600" />
           </div>
           <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Identidade Visual</h2>
         </div>
@@ -148,24 +166,19 @@ async function searchCEP() {
               <div class="w-32 h-32 bg-white rounded-3xl border-4 border-white shadow-xl flex items-center justify-center overflow-hidden transition-all group-hover:scale-105 duration-300 ring-1 ring-gray-100">
                 <img v-if="profile.brandConfig.logoUrl" :src="profile.brandConfig.logoUrl" class="w-full h-full object-contain">
                 <div v-else class="text-gray-300 flex flex-col items-center gap-2">
-                  <div class="i-heroicons-photo w-10 h-10 opacity-30"></div>
+                  <PhotoIcon class="w-10 h-10 opacity-30" />
                   <span class="text-[8px] font-black uppercase tracking-widest">Logo 120x120</span>
                 </div>
               </div>
               <label class="absolute -bottom-2 -right-2 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white cursor-pointer shadow-xl hover:bg-blue-700 transition-all hover:rotate-12 border-4 border-white">
-                <div class="i-heroicons-pencil-square-20-solid w-5 h-5"></div>
+                <Pencil class="w-5 h-5" />
                 <input type="file" accept="image/*" @change="onFileChange" class="hidden">
               </label>
             </div>
             <div class="flex-1 text-center md:text-left">
               <h3 class="text-lg font-black text-gray-900 mb-1 uppercase tracking-tight">Logotipo da Marca</h3>
-              <p class="text-sm text-gray-600 font-medium">Recomendado 120x120px. Use o editor interativo para um corte perfeito.</p>
+              <p class="text-sm text-gray-600 font-medium">Recomendado 120x120px. Sua logo aparecerá em todos os orçamentos.</p>
             </div>
-          </div>
-
-          <div class="space-y-3">
-            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Nome Profissional / Empresa</label>
-            <input v-model="profile.name" type="text" placeholder="Ex: Studio Criativo" class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900">
           </div>
 
           <div class="space-y-3">
@@ -181,44 +194,104 @@ async function searchCEP() {
         </div>
       </section>
 
-      <!-- Card 2: Endereço e Contato -->
-      <section v-if="profile.address" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm">
+      <!-- Card: Dados da Empresa -->
+      <section class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm">
+        <div class="flex items-center gap-3 mb-8">
+          <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
+            <Briefcase class="w-5 h-5 text-purple-600" />
+          </div>
+          <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Dados da Empresa</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <BaseInput v-model="profile.company.tradeName" label="Nome Fantasia" required />
+          <BaseInput v-model="profile.company.taxId" label="CNPJ" mask="##.###.###/####-##" required />
+          <div class="md:col-span-2">
+            <BaseInput v-model="profile.company.legalName" label="Razão Social" required />
+          </div>
+        </div>
+      </section>
+
+      <!-- Card: Endereço (Obrigatório) -->
+      <section class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm">
         <div class="flex items-center gap-3 mb-8">
           <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center">
-            <div class="i-heroicons-map-pin-20-solid w-5 h-5 text-orange-600"></div>
+            <MapPin class="w-5 h-5 text-orange-600" />
           </div>
-          <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Endereço e Contato</h2>
+          <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Endereço Comercial</h2>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="space-y-3">
-            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">CEP</label>
+            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">CEP *</label>
             <div class="relative">
               <input v-model="profile.address.zip" @blur="searchCEP" type="text" placeholder="00000-000" class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold">
               <div v-if="isSearchingCEP" class="absolute right-4 top-1/2 -translate-y-1/2">
-                <div class="i-heroicons-arrow-path w-5 h-5 animate-spin text-blue-600"></div>
+                <ArrowPath class="w-5 h-5 animate-spin text-blue-600" />
               </div>
             </div>
           </div>
           <div class="md:col-span-2 space-y-3">
-            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Rua / Logradouro</label>
-            <input v-model="profile.address.street" type="text" placeholder="Ex: Av. Paulista" class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold">
+            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Rua / Logradouro *</label>
+            <input v-model="profile.address.street" type="text" class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold">
           </div>
-          <div class="space-y-3">
-            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Número</label>
-            <input v-model="profile.address.number" type="text" placeholder="Ex: 123" class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold">
+          <BaseInput v-model="profile.address.number" label="Número" />
+          <BaseInput v-model="profile.address.neighborhood" label="Bairro *" required />
+          <BaseInput v-model="profile.address.city" label="Cidade *" required />
+          <BaseInput v-model="profile.address.state" label="Estado (UF) *" required />
+        </div>
+      </section>
+
+      <!-- Card: Contato e Redes Sociais -->
+      <section class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm">
+        <div class="flex items-center gap-3 mb-8">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+            <Phone class="w-5 h-5 text-blue-600" />
           </div>
-          <div class="space-y-3">
-            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Bairro</label>
-            <input v-model="profile.address.neighborhood" type="text" placeholder="Ex: Centro" class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold">
+          <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Contato e Redes Sociais</h2>
+        </div>
+
+        <div class="space-y-8">
+          <!-- Telefones -->
+          <div class="space-y-4">
+            <div class="flex justify-between items-center px-1">
+              <label class="text-xs font-black text-gray-500 uppercase tracking-widest">Telefones</label>
+              <button @click="addPhone" class="text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-1">
+                <Plus class="w-3 h-3" /> Adicionar Telefone
+              </button>
+            </div>
+            <div v-for="(phone, idx) in profile.contact.phones" :key="idx" class="flex flex-col sm:flex-row gap-4 p-6 bg-gray-50/50 rounded-3xl border border-gray-100">
+              <div class="flex-1">
+                <BaseInput v-model="phone.number" label="Número" placeholder="(00) 00000-0000" mask="(##) #####-####" />
+              </div>
+              <div class="flex items-center gap-4 shrink-0">
+                <div class="flex items-center gap-2">
+                  <BaseCheckbox v-model="phone.isWhatsapp" :id="'wa-'+idx" />
+                  <label :for="'wa-'+idx" class="text-[10px] font-black text-gray-400 uppercase tracking-widest cursor-pointer flex items-center gap-1.5">
+                    <MessageSquare class="w-3 h-3 text-green-500" /> WhatsApp
+                  </label>
+                </div>
+                <button v-if="profile.contact.phones.length > 1" @click="removePhone(idx as number)" class="p-2 text-red-400 hover:text-red-600 transition-colors">
+                  <Trash2 class="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           </div>
-          <div class="space-y-3">
-            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Cidade</label>
-            <input v-model="profile.address.city" type="text" placeholder="Ex: São Paulo" class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold">
-          </div>
-          <div class="space-y-3">
-            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Estado (UF)</label>
-            <input v-model="profile.address.state" type="text" placeholder="Ex: SP" class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold">
+
+          <!-- Redes Sociais -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
+            <div class="space-y-3">
+              <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+                <Instagram class="w-3.5 h-3.5" /> Instagram
+              </label>
+              <input v-model="profile.contact.social.instagram" type="text" placeholder="@seuusuario" class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold">
+            </div>
+            <div class="space-y-3">
+              <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+                <Youtube class="w-3.5 h-3.5" /> YouTube
+              </label>
+              <input v-model="profile.contact.social.youtube" type="text" placeholder="Canal" class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold">
+            </div>
           </div>
         </div>
       </section>
@@ -227,7 +300,7 @@ async function searchCEP() {
       <section class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm">
         <div class="flex items-center gap-3 mb-8">
           <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-            <div class="i-heroicons-briefcase-20-solid w-5 h-5 text-emerald-600"></div>
+            <Briefcase class="w-5 h-5 text-emerald-600" />
           </div>
           <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Regras de Negócio</h2>
         </div>
@@ -242,7 +315,7 @@ async function searchCEP() {
           </div>
 
           <div class="space-y-3">
-            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Parcelas Padrão</label>
+            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Parcelamento (Cartão)</label>
             <div class="relative">
               <input v-model.number="profile.defaultInstallments" type="number" class="w-full pl-5 pr-16 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none font-bold">
               <span class="absolute right-5 top-1/2 -translate-y-1/2 text-xs font-black text-gray-400 uppercase">x</span>
@@ -250,7 +323,7 @@ async function searchCEP() {
           </div>
 
           <div class="space-y-3">
-            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Desconto Padrão</label>
+            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Desconto (À Vista)</label>
             <div class="relative">
               <input v-model.number="profile.defaultCashDiscount" type="number" class="w-full pl-5 pr-16 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none font-bold">
               <span class="absolute right-5 top-1/2 -translate-y-1/2 text-xs font-black text-gray-400 uppercase">%</span>
@@ -263,7 +336,7 @@ async function searchCEP() {
       <section class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm">
         <div class="flex items-center gap-3 mb-6">
           <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
-            <div class="i-heroicons-document-text-20-solid w-5 h-5 text-purple-600"></div>
+            <FileText class="w-5 h-5 text-purple-600" />
           </div>
           <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Modelos Legais</h2>
         </div>
@@ -288,7 +361,7 @@ async function searchCEP() {
         <div v-show="activeTab === 'contract'" class="space-y-4">
           <div class="flex items-center justify-between ml-1">
             <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Contrato Padrão</label>
-            <span class="text-[10px] text-blue-600 font-black uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full">Editor Premium</span>
+            <span class="text-[10px] text-blue-600 font-black uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full">Variáveis Suportadas</span>
           </div>
           <RichTextEditor v-model="profile.defaultContractTemplate" class="min-h-[350px] border-2 border-gray-50 rounded-3xl overflow-hidden" />
         </div>
@@ -309,7 +382,7 @@ async function searchCEP() {
           :disabled="isSaving"
           class="w-full md:w-auto bg-gray-900 text-white px-12 py-5 rounded-[2rem] font-black uppercase tracking-widest hover:bg-black transition-all shadow-2xl shadow-gray-200 disabled:opacity-50 flex items-center justify-center gap-3 text-sm"
         >
-          <div v-if="isSaving" class="i-heroicons-arrow-path w-5 h-5 animate-spin"></div>
+          <RefreshCcw v-if="isSaving" class="w-5 h-5 animate-spin" />
           {{ isSaving ? 'Processando...' : 'Salvar Todas as Configurações' }}
         </button>
       </div>
@@ -325,7 +398,7 @@ async function searchCEP() {
               <p class="text-sm text-gray-500 font-bold">Arraste e redimensione para o enquadramento ideal (1:1)</p>
             </div>
             <button @click="showCropper = false" class="p-3 hover:bg-gray-200 rounded-full transition-all">
-              <div class="i-heroicons-x-mark w-6 h-6 text-gray-400"></div>
+              <X class="w-6 h-6 text-gray-400" />
             </button>
           </header>
           
@@ -356,6 +429,10 @@ async function searchCEP() {
 .cropper {
   height: 400px;
   background: #f3f4f6;
+}
+</style>
+
+ground: #f3f4f6;
 }
 </style>
 

@@ -14,10 +14,14 @@ export default defineEventHandler(async (event) => {
   if (!proposal) throw createError({ statusCode: 404, statusMessage: 'Proposal not found' })
 
   // Reenviar e-mail via Resend
-  const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${proposal.slug}`
+  if (!proposal.client?.email) {
+    throw createError({ statusCode: 400, statusMessage: 'Cliente sem e-mail cadastrado' })
+  }
+
+  const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${proposal.slug}?t=${proposal.token}`
   const emailRes = await sendProposalEmail(
     proposal.client.email,
-    proposal.client.name,
+    proposal.client.name || 'Cliente',
     proposalUrl,
     profile.name
   )

@@ -27,6 +27,16 @@ export default defineEventHandler(async (event) => {
     subscription: session.subscription
   })
 
+  // Mapeamento de Planos baseado no .env
+  const getPlanByPriceId = (priceId: string): 'free' | 'starter' | 'premium' | null => {
+    // Compara com os IDs do public runtimeConfig configurados no nuxt.config.ts
+    if (priceId === config.public.stripeStarterPriceId) return 'starter'
+    if (priceId === config.public.stripePremiumPriceId) return 'premium'
+    if (priceId === config.public.stripePriceMonthly) return 'premium'
+    if (priceId === config.public.stripePriceAnnual) return 'premium'
+    return null
+  }
+
   if (stripeEvent.type === 'checkout.session.completed') {
     const customerId = session.customer
     const profileId = session.metadata?.profileId
@@ -40,55 +50,37 @@ export default defineEventHandler(async (event) => {
       const subscription = await stripe.subscriptions.retrieve(subscriptionId as string)
       const priceId = subscription.items.data?.[0]?.price?.id
       if (!priceId) return { received: true }
-      console.log('Retrieved subscription for checkout', { 
-        subscriptionId, 
-        priceId,
-        configStarter: config.stripeStarterPriceId,
-        configPremium: config.stripePremiumPriceId
-      })
       
-      let plan: 'free' | 'starter' | 'premium' | null = null
-      let credits = 0
-
-      if (priceId === config.stripeStarterPriceId) {
-        plan = 'starter'
-        credits = 5
-      } else if (priceId === config.stripePremiumPriceId) {
-        plan = 'premium'
-        credits = 25
-      }
+      const plan = getPlanByPriceId(priceId)
+      // Premium ganha créditos ilimitados (ex: 9999) ou valor específico
+      const credits = plan === 'premium' ? 9999 : (plan === 'starter' ? 5 : 0)
 
       if (plan) {
         const query = profileId ? { _id: profileId } : { stripeCustomerId: customerId }
-        const updatedProfile = await Profile.findOneAndUpdate(
+        await Profile.findOneAndUpdate(
           query,
           { 
             subscriptionPlan: plan, 
             creditsBalance: credits,
             stripeSubscriptionId: subscriptionId,
             stripeCustomerId: customerId
-          },
-          { new: true }
+          }
         )
-        console.log('Profile updated after checkout (subscription)', { plan, profileId: updatedProfile?._id })
+        console.log('Profile updated after checkout (subscription)', { plan, customerId })
       }
     } else if (type === 'credits' && session.mode === 'payment') {
-      // Compra de créditos avulsos
-      let creditsToAdd = 0
-      if (tier === 'credits_5') creditsToAdd = 5
-      else if (tier === 'credits_10') creditsToAdd = 10
-
+      let creditsToAdd = tier === 'single_credit' ? 1 : 0
+      
       if (creditsToAdd > 0) {
         const query = profileId ? { _id: profileId } : { stripeCustomerId: customerId }
-        const updatedProfile = await Profile.findOneAndUpdate(
+        await Profile.findOneAndUpdate(
           query,
           { 
             $inc: { creditsBalance: creditsToAdd },
             stripeCustomerId: customerId
-          },
-          { new: true }
+          }
         )
-        console.log('Profile updated after checkout (credits)', { creditsAdded: creditsToAdd, profileId: updatedProfile?._id })
+        console.log('Profile updated after checkout (credits)', { creditsAdded: creditsToAdd, customerId })
       }
     }
   }
@@ -96,51 +88,31 @@ export default defineEventHandler(async (event) => {
   if (stripeEvent.type === 'invoice.payment_succeeded' || stripeEvent.type === 'customer.subscription.updated') {
     const customerId = session.customer
     const subscriptionId = session.subscription
-    console.log(`Processing ${stripeEvent.type}`, { customerId, subscriptionId })
     
     if (subscriptionId) {
       const subscription = await stripe.subscriptions.retrieve(subscriptionId as string)
       const priceId = subscription.items.data?.[0]?.price?.id
       if (!priceId) return { received: true }
-      console.log('Retrieved subscription for update', { 
-        subscriptionId, 
-        priceId,
-        configStarter: config.stripeStarterPriceId,
-        configPremium: config.stripePremiumPriceId
-      })
       
-      let plan: 'free' | 'starter' | 'premium' | null = null
-      let credits = 0
-
-      if (priceId === config.stripeStarterPriceId) {
-        plan = 'starter'
-        credits = 5
-      } else if (priceId === config.stripePremiumPriceId) {
-        plan = 'premium'
-        credits = 25
-      }
+      const plan = getPlanByPriceId(priceId)
+      const credits = plan === 'premium' ? 9999 : (plan === 'starter' ? 5 : 0)
 
       if (plan) {
-        const updatedProfile = await Profile.findOneAndUpdate(
+        await Profile.findOneAndUpdate(
           { stripeCustomerId: customerId },
           { 
             subscriptionPlan: plan, 
             creditsBalance: credits,
             stripeSubscriptionId: subscriptionId 
-          },
-          { new: true }
+          }
         )
-        console.log('Profile updated after invoice/update', { plan, profileId: updatedProfile?._id })
-      } else {
-        console.warn('Webhook Received with unknown Price ID. No plan update performed.', { priceId })
+        console.log('Profile updated after invoice/update', { plan, customerId })
       }
     }
   }
 
   if (stripeEvent.type === 'customer.subscription.deleted') {
     const customerId = session.customer
-    console.log('Processing customer.subscription.deleted', { customerId })
-    
     await Profile.findOneAndUpdate(
       { stripeCustomerId: customerId },
       { 
@@ -148,7 +120,7 @@ export default defineEventHandler(async (event) => {
         stripeSubscriptionId: null 
       }
     )
-    console.log('Profile reset to free plan')
+    console.log('Profile reset to free plan due to subscription deletion')
   }
 
   return { received: true }

@@ -9,10 +9,20 @@ const container = ref(null)
 onClickOutside(container, () => {
   isMenuOpen.value = false
 })
+const { notify, confirm: confirmAlert } = useAlerts()
+
 async function logout() {
-  await $fetch('/api/auth/logout', { method: 'POST' })
-  await clear()
-  navigateTo('/')
+  confirmAlert({
+    title: 'Sair da Conta',
+    description: 'Tem certeza que deseja encerrar sua sessão?',
+    actionText: 'Sair',
+    variant: 'destructive',
+    onConfirm: async () => {
+      await $fetch('/api/auth/logout', { method: 'POST' })
+      await clear()
+      navigateTo('/')
+    }
+  })
 }
 </script>
 

@@ -230,7 +230,7 @@ function removePhone(index: number) {
             <div class="relative">
               <input v-model="profile.address.zip" @blur="searchCEP" type="text" placeholder="00000-000" class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold">
               <div v-if="isSearchingCEP" class="absolute right-4 top-1/2 -translate-y-1/2">
-                <ArrowPath class="w-5 h-5 animate-spin text-blue-600" />
+                <RefreshCcw class="w-5 h-5 animate-spin text-blue-600" />
               </div>
             </div>
           </div>
@@ -434,8 +434,3 @@ function removePhone(index: number) {
   background: #f3f4f6;
 }
 </style>
-
-ground: #f3f4f6;
-}
-</style>
-

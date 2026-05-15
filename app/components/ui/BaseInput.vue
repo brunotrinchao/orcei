@@ -1,6 +1,4 @@
 <script setup lang="ts">
-// @ts-ignore
-import { vMaska } from "maska"
 defineProps<{
   modelValue: string | number | null
   label?: string

@@ -55,6 +55,13 @@ export default defineNuxtConfig({
     appEnv: process.env.APP_ENVIRONMENT || 'development',
   },
 
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: false,
+    },
+  ],
+
   hooks: {
     'components:extend'(components) {
       const toRemove = ['CldImage', 'CldVideoPlayer', 'CldOgImage', 'CldUploadWidget', 'CldUploadButton']

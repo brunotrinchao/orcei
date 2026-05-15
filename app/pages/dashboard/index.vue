@@ -185,7 +185,7 @@ async function generateAIReport() {
           <div v-for="(client, idx) in stats?.clientRanking" :key="idx" class="flex items-center justify-between p-5 bg-gray-50/50 rounded-3xl border border-gray-100 hover:bg-gray-50 transition-colors group">
             <div class="flex items-center gap-4">
               <div class="w-10 h-10 bg-white rounded-xl border border-gray-200 flex items-center justify-center text-xs font-black text-gray-400 group-hover:border-blue-200 group-hover:text-blue-600 transition-all">
-                #{{ (idx as any) + 1 }}
+                #{{ idx + 1 }}
               </div>
               <div>
                 <p class="font-bold text-gray-900">{{ client.name }}</p>
@@ -207,7 +207,7 @@ async function generateAIReport() {
     </div>
 
     <!-- Modal do Relatório IA -->
-    <BaseDialog v-model:open="!!aiReport" title="Relatório Estratégico IA" size="lg" @close="aiReport = null">
+    <BaseDialog :open="!!aiReport" @update:open="(val) => !val ? aiReport = null : null" title="Relatório Estratégico IA" size="lg" @close="aiReport = null">
       <div class="prose prose-blue max-w-none p-4">
         <div v-html="aiReport ? (useNuxtApp() as any).$markdown?.render(aiReport) || aiReport : ''"></div>
       </div>
@@ -215,8 +215,5 @@ async function generateAIReport() {
         <BaseButton @click="aiReport = null">Entendido</BaseButton>
       </template>
     </BaseDialog>
-  </div>
-</template>
-
   </div>
 </template>

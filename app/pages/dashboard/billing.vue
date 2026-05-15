@@ -183,6 +183,3 @@ const history = ref([
     </section>
   </div>
 </template>
-
-  </div>
-</template>

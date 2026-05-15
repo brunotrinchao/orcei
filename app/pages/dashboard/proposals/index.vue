@@ -11,13 +11,15 @@ const selectedProposal = ref<ProposalDTO | null>(null)
 const isSubmitting = ref(false)
 const isResending = ref<string | null>(null)
 
+const { notify } = useAlerts()
+
 async function resendEmail(proposalId: string) {
   isResending.value = proposalId
   try {
     await $fetch(`/api/proposals/${proposalId}/resend`, { method: 'POST' })
-    alert('E-mail enviado com sucesso!')
+    notify('Sucesso', 'E-mail enviado com sucesso!')
   } catch (e: any) {
-    alert(e.data?.statusMessage || 'Erro ao reenviar e-mail')
+    notify('Erro', e.data?.statusMessage || 'Erro ao reenviar e-mail')
   } finally {
     isResending.value = null
   }
@@ -38,7 +40,7 @@ async function shareProposal(proposal: ProposalDTO) {
     }
   } else {
     copy(url)
-    alert('Link copiado! Seu navegador não suporta compartilhamento nativo.')
+    notify('Sucesso', 'Link copiado! Seu navegador não suporta compartilhamento nativo.')
   }
 }
 
@@ -62,8 +64,9 @@ async function handleProposalSubmit(formData: any) {
     
     isModalOpen.value = false
     refresh()
+    notify('Sucesso', 'Orçamento processado com sucesso!')
   } catch (e: any) {
-    alert(e.data?.statusMessage || 'Erro ao processar orçamento')
+    notify('Erro', e.data?.statusMessage || 'Erro ao processar orçamento')
   } finally {
     isSubmitting.value = false
   }

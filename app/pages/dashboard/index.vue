@@ -27,6 +27,7 @@ const { data: stats, refresh } = await useFetch<any>('/api/dashboard/stats', {
 })
 
 const { loggedIn } = useUserSession()
+const { notify } = useAlerts()
 
 // Status Distribution Chart
 const statusChartData = computed(() => {
@@ -68,7 +69,7 @@ async function generateAIReport() {
     const data: any = await $fetch('/api/ai/analyze')
     aiReport.value = data.text
   } catch (e) {
-    alert('Erro ao gerar relatório estratégico')
+    notify('Erro', 'Erro ao gerar relatório estratégico')
   } finally {
     isAnalyzing.value = false
   }
@@ -214,5 +215,8 @@ async function generateAIReport() {
         <BaseButton @click="aiReport = null">Entendido</BaseButton>
       </template>
     </BaseDialog>
+  </div>
+</template>
+
   </div>
 </template>

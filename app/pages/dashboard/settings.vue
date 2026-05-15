@@ -4,7 +4,9 @@ import 'vue-advanced-cropper/dist/style.css'
 import { SwatchBook, MapPin, Briefcase, FileText, Pencil, Image as PhotoIcon, RefreshCcw, X, Instagram, Youtube, Phone, MessageSquare, Plus, Trash2 } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../../types'
 
-const { data: profile, refresh } = await useFetch<ProfileDTO>('/api/profile')
+const { notify } = useAlerts()
+const { data: profile, refresh } = useFetch<ProfileDTO>('/api/profile')
+
 
 watchEffect(() => {
   if (profile.value) {
@@ -71,22 +73,23 @@ async function cropLogo() {
   }
   showCropper.value = false
   rawImage.value = null  } catch (e) {
-    alert('Erro ao fazer upload da imagem')
+    notify('Erro', 'Não foi possível fazer upload da imagem.')
   } finally {
     isSaving.value = false
   }
 }
 
 async function updateProfile() {
+  if (!profile.value) return
   // Validate mandatory fields
-  const addr = profile.value!.address
+  const addr = profile.value.address
   if (!addr.zip || !addr.street || !addr.neighborhood || !addr.city || !addr.state) {
-    return alert('Todos os campos de endereço são obrigatórios (CEP, Rua, Bairro, Cidade e UF)')
+    return notify('Aviso', 'Todos os campos de endereço são obrigatórios (CEP, Rua, Bairro, Cidade e UF)')
   }
 
-  const comp = profile.value!.company
+  const comp = profile.value.company
   if (!comp.taxId || !comp.legalName || !comp.tradeName) {
-    return alert('Dados da empresa são obrigatórios (CNPJ, Razão Social e Nome Fantasia)')
+    return notify('Aviso', 'Dados da empresa são obrigatórios (CNPJ, Razão Social e Nome Fantasia)')
   }
 
   isSaving.value = true
@@ -95,10 +98,10 @@ async function updateProfile() {
       method: 'PUT',
       body: profile.value
     })
-    alert('Configurações salvas!')
+    notify('Sucesso', 'Configurações salvas com sucesso!')
     refresh()
   } catch (e) {
-    alert('Erro ao salvar configurações')
+    notify('Erro', 'Ocorreu uma falha ao salvar as configurações.')
   } finally {
     isSaving.value = false
   }
@@ -116,7 +119,7 @@ async function searchCEP() {
   try {
     const data: any = await $fetch(`https://viacep.com.br/ws/${cep}/json/`)
     if (data.erro) {
-      alert('CEP não encontrado')
+      notify('CEP não encontrado', 'O CEP informado não foi localizado na base de dados.')
       return
     }
     profile.value.address.street = data.logradouro

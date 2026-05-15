@@ -1,7 +1,32 @@
+<script setup lang="ts">
+const { isOpen, options } = useAlerts()
+
+function handleConfirm() {
+  if (options.value.onConfirm) options.value.onConfirm()
+  isOpen.value = false
+}
+
+function handleCancel() {
+  if (options.value.onCancel) options.value.onCancel()
+  isOpen.value = false
+}
+</script>
+
 <template>
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
+
+  <BaseAlertDialog
+    v-model:open="isOpen"
+    :title="options.title"
+    :description="options.description"
+    :action-text="options.actionText"
+    :cancel-text="options.cancelText"
+    :variant="options.variant"
+    @confirm="handleConfirm"
+    @cancel="handleCancel"
+  />
 </template>
 
 <style>

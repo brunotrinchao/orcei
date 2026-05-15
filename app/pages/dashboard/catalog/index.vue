@@ -6,6 +6,7 @@ import { Plus, Search, Image, Pencil, Trash2, Sparkles, RefreshCcw, X, Package, 
 import type { CatalogItemDTO } from '../../../../types'
 
 const { data: items, refresh } = useFetch<CatalogItemDTO[]>('/api/catalog')
+const { notify, confirm: confirmAlert } = useAlerts()
 
 const showForm = ref(false)
 const selectedItem = ref<CatalogItemDTO | null>(null)
@@ -142,7 +143,7 @@ function openModal(item: CatalogItemDTO | null = null) {
 }
 
 async function generateWithAI() {
-  if (!form.value.name) return alert('Digite o nome do item primeiro')
+  if (!form.value.name) return notify('Aviso', 'Digite o nome do item primeiro')
   isGenerating.value = true
   try {
     const promptTemplate = `Você é um especialista em copywriting corporativo e negociação B2B. 
@@ -166,7 +167,7 @@ Escreva a descrição comercial agora:`
     })
     form.value.description = data.text
   } catch (e) {
-    alert('Erro ao gerar descrição')
+    notify('Erro', 'Erro ao gerar descrição')
   } finally {
     isGenerating.value = false
   }
@@ -185,20 +186,26 @@ async function saveItem() {
     showForm.value = false
     refresh()
   } catch (e: any) {
-    alert(e.data?.message || 'Erro ao salvar item')
+    notify('Erro', e.data?.message || 'Erro ao salvar item')
   } finally {
     isSubmitting.value = false
   }
 }
 
 async function deleteItem(id: string) {
-  if (!confirm('Tem certeza que deseja excluir este item?')) return
-  try {
-    await $fetch(`/api/catalog/${id}`, { method: 'DELETE' as any })
-    refresh()
-  } catch (e) {
-    alert('Erro ao excluir item')
-  }
+  confirmAlert({
+    title: 'Excluir Item',
+    description: 'Tem certeza que deseja excluir este item?',
+    variant: 'destructive',
+    onConfirm: async () => {
+      try {
+        await $fetch(`/api/catalog/${id}`, { method: 'DELETE' as any })
+        refresh()
+      } catch (e) {
+        notify('Erro', 'Erro ao excluir item')
+      }
+    }
+  })
 }
 </script>
 

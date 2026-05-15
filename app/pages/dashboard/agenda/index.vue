@@ -8,6 +8,7 @@ import ptBrLocale from '@fullcalendar/core/locales/pt-br'
 import { Plus, MapPin, Calendar, Clock, FileText, Trash2, X } from 'lucide-vue-next'
 import type { ProposalDTO } from '../../../../types'
 
+const { notify, confirm: confirmAlert } = useAlerts()
 const { data: events, refresh: refreshEvents } = useFetch<any[]>('/api/events')
 const { data: proposals } = useFetch<ProposalDTO[]>('/api/proposals')
 
@@ -126,21 +127,29 @@ async function saveEvent() {
     isModalOpen.value = false
     refreshEvents()
   } catch (e: any) {
-    alert('Erro ao salvar evento')
+    notify('Erro', 'Erro ao salvar evento')
   } finally {
     isSubmitting.value = false
   }
 }
 
 async function deleteEvent() {
-  if (!selectedEvent.value || !confirm('Deseja excluir este compromisso?')) return
-  try {
-    await $fetch(`/api/events/${selectedEvent.value._id}`, { method: 'DELETE' })
-    isModalOpen.value = false
-    refreshEvents()
-  } catch (e) {
-    alert('Erro ao excluir')
-  }
+  if (!selectedEvent.value) return
+  
+  confirmAlert({
+    title: 'Excluir Compromisso',
+    description: 'Deseja excluir este compromisso?',
+    variant: 'destructive',
+    onConfirm: async () => {
+      try {
+        await $fetch(`/api/events/${selectedEvent.value?._id}`, { method: 'DELETE' })
+        isModalOpen.value = false
+        refreshEvents()
+      } catch (e) {
+        notify('Erro', 'Erro ao excluir')
+      }
+    }
+  })
 }
 
 const linkedProposal = computed(() => {

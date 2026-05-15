@@ -4,6 +4,7 @@ definePageMeta({
 })
 
 const { loggedIn } = useUserSession()
+const { notify } = useAlerts()
 
 const mode = ref<'login' | 'register'>('login')
 const form = ref({
@@ -24,7 +25,7 @@ async function handleSubmit() {
     })
     window.location.href = '/dashboard'
   } catch (e: any) {
-    alert(e.data?.statusMessage || 'Erro na autenticação')
+    notify('Erro', e.data?.statusMessage || 'Erro na autenticação')
   } finally {
     isLoading.value = false
   }
@@ -96,5 +97,8 @@ watchEffect(() => {
         </button>
       </p>
     </div>
+  </div>
+</template>
+
   </div>
 </template>

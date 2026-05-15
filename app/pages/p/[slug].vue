@@ -6,6 +6,7 @@ definePageMeta({
   layout: 'blank'
 })
 
+const { notify, confirm: confirmAlert } = useAlerts()
 const route = useRoute()
 const { t: token } = route.query
 const { data: proposal, refresh, error } = useFetch<ProposalDTO>(`/api/proposals/public/${route.params.slug}`, {
@@ -41,24 +42,28 @@ const finalTotal = computed(() => {
 const profile = computed(() => (proposal.value?.profileId as any))
 
 async function handleAccept() {
-  if (!confirm('Ao aceitar este orçamento, você concorda com os termos e condições. Deseja prosseguir?')) return
-  
-  isAccepting.value = true
-  try {
-    await $fetch('/api/proposals/public/accept', {
-      method: 'POST',
-      body: { 
-        slug: route.params.slug,
-        paymentMethod: selectedMethod.value
+  confirmAlert({
+    title: 'Aceitar Orçamento',
+    description: 'Ao aceitar este orçamento, você concorda com os termos e condições. Deseja prosseguir?',
+    onConfirm: async () => {
+      isAccepting.value = true
+      try {
+        await $fetch('/api/proposals/public/accept', {
+          method: 'POST',
+          body: { 
+            slug: route.params.slug,
+            paymentMethod: selectedMethod.value
+          }
+        })
+        await refresh()
+        notify('Sucesso', 'Orçamento aceito com sucesso! O profissional será notificado.')
+      } catch (e: any) {
+        notify('Erro', e.data?.statusMessage || 'Erro ao aceitar orçamento')
+      } finally {
+        isAccepting.value = false
       }
-    })
-    await refresh()
-    alert('Orçamento aceito com sucesso! O profissional será notificado.')
-  } catch (e: any) {
-    alert(e.data?.statusMessage || 'Erro ao aceitar orçamento')
-  } finally {
-    isAccepting.value = false
-  }
+    }
+  })
 }
 
 async function handleAction() {
@@ -76,9 +81,9 @@ async function handleAction() {
     })
     await refresh()
     isActionModalOpen.value = false
-    alert(actionType.value === 'decline' ? 'Orçamento recusado.' : 'Solicitação de alteração enviada!')
+    notify('Sucesso', actionType.value === 'decline' ? 'Orçamento recusado.' : 'Solicitação de alteração enviada!')
   } catch (e: any) {
-    alert('Erro ao processar ação')
+    notify('Erro', 'Erro ao processar ação')
   } finally {
     isSubmittingAction.value = false
   }

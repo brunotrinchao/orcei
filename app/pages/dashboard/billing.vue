@@ -3,6 +3,7 @@ import { CreditCard, History, Zap, CheckCircle2, Loader2, ArrowRight } from 'luc
 import type { ProfileDTO } from '../../../types'
 
 const { data: profile, refresh: refreshProfile } = useFetch<ProfileDTO>('/api/profile')
+const { notify } = useAlerts()
 
 const plans = [
   {
@@ -42,7 +43,7 @@ async function handleAction(tier: string, type: 'subscription' | 'credits' = 'su
     })
     if (url) window.location.href = url
   } catch (e: any) {
-    alert(e.data?.statusMessage || 'Erro ao iniciar checkout')
+    notify('Erro', e.data?.statusMessage || 'Erro ao iniciar checkout')
   } finally {
     isLoading.value = null
   }
@@ -180,5 +181,8 @@ const history = ref([
         </table>
       </div>
     </section>
+  </div>
+</template>
+
   </div>
 </template>

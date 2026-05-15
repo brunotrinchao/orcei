@@ -14,6 +14,7 @@ const emit = defineEmits(['submit'])
 const { data: catalogItems } = useFetch<CatalogItemDTO[]>('/api/catalog')
 const { data: clients } = useFetch<any[]>('/api/clients')
 const { data: profile } = useFetch<ProfileDTO>('/api/profile')
+const { notify } = useAlerts()
 
 const selectedClientId = ref('')
 
@@ -158,14 +159,14 @@ Escreva a descrição comercial agora:`
     })
     item.description = res.text
   } catch (e) {
-    alert('Erro ao gerar descrição')
+    notify('Erro', 'Erro ao gerar descrição')
   } finally {
     generatingIndex.value = null
   }
 }
 
 function handleSubmit(status: string = 'draft') {
-  if (form.value.items.length === 0) return alert('Selecione pelo menos um item do catálogo')
+  if (form.value.items.length === 0) return notify('Aviso', 'Selecione pelo menos um item do catálogo')
   form.value.status = status as any
   emit('submit', { ...form.value })
 }
@@ -411,4 +412,6 @@ function handleSubmit(status: string = 'draft') {
       </div>
     </div>
   </form>
+</template>
+
 </template>

@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { Search, Plus, Pencil, Trash2, RefreshCcw, MapPin, Mail, Phone, ExternalLink } from 'lucide-vue-next'
 import type { ClientDTO } from '../../../../types'
 
+const { notify, confirm: confirmAlert } = useAlerts()
 const { data: clients, refresh } = useFetch<ClientDTO[]>('/api/clients')
 
 const showForm = ref(false)
@@ -112,20 +113,26 @@ async function saveClient() {
     showForm.value = false
     refresh()
   } catch (e: any) {
-    alert(e.data?.message || 'Erro ao salvar cliente')
+    notify('Erro', e.data?.message || 'Erro ao salvar cliente')
   } finally {
     isSubmitting.value = false
   }
 }
 
 async function deleteClient(id: string) {
-  if (!confirm('Tem certeza que deseja excluir este cliente?')) return
-  try {
-    await $fetch(`/api/clients/${id}`, { method: 'DELETE' })
-    refresh()
-  } catch (e) {
-    alert('Erro ao excluir cliente')
-  }
+  confirmAlert({
+    title: 'Excluir Cliente',
+    description: 'Tem certeza que deseja excluir este cliente?',
+    variant: 'destructive',
+    onConfirm: async () => {
+      try {
+        await $fetch(`/api/clients/${id}`, { method: 'DELETE' })
+        refresh()
+      } catch (e) {
+        notify('Erro', 'Erro ao excluir cliente')
+      }
+    }
+  })
 }
 
 // Formatters

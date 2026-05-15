@@ -66,7 +66,18 @@ async function handleAction(tier: string, type: 'subscription' | 'credits' = 'su
 const route = useRoute()
 const success = computed(() => route.query.success === 'true')
 
-const { data: history } = useFetch<any[]>('/api/stripe/invoices')
+watchEffect(() => {
+  if (success.value) {
+    refreshProfile()
+    refreshInvoices()
+    // Limpa a query string após 5 segundos para não ficar mostrando a mensagem de sucesso pra sempre
+    setTimeout(() => {
+      navigateTo('/dashboard/billing', { replace: true })
+    }, 5000)
+  }
+})
+
+const { data: history, refresh: refreshInvoices } = useFetch<any[]>('/api/stripe/invoices')
 </script>
 
 <template>

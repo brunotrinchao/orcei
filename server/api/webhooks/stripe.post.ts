@@ -2,10 +2,16 @@ import { Profile } from '../../models/Profile'
 
 export default defineEventHandler(async (event) => {
   console.log('--- Incoming Stripe Webhook Request ---')
+  
   const body = await readRawBody(event)
   const signature = getHeader(event, 'stripe-signature')
   const config = useRuntimeConfig()
   const stripe = useStripe()
+
+  if (!signature) {
+    console.error('Webhook Error: No stripe-signature found in headers')
+    throw createError({ statusCode: 400, statusMessage: 'No signature' })
+  }
 
   let stripeEvent: any
 
@@ -17,82 +23,73 @@ export default defineEventHandler(async (event) => {
     )
   } catch (err: any) {
     console.error('Stripe Webhook Signature Verification Failed:', err.message)
-    throw createError({ statusCode: 400, statusMessage: 'Webhook Error' })
+    console.log('Secret used:', config.stripeWebhookSecret?.substring(0, 10) + '...')
+    throw createError({ statusCode: 400, statusMessage: `Webhook Error: ${err.message}` })
   }
 
   const session = stripeEvent.data.object as any
-  console.log(`Stripe Webhook Received: ${stripeEvent.type}`, {
+  console.log(`Webhook Event: ${stripeEvent.type}`, {
     eventId: stripeEvent.id,
-    objectType: session.object,
     customerId: session.customer,
-    subscriptionId: session.subscription || session.id // for sub.updated, id is sub id
+    subscriptionId: session.subscription || session.id
   })
 
-  // Mapeamento de Planos baseado no .env
+  // Helper para mapear Plano
   const getPlanByPriceId = (priceId: string): 'free' | 'starter' | 'premium' | null => {
-    console.log('Checking Price ID:', priceId)
-    if (priceId === config.public.stripeStarterPriceId) return 'starter'
-    if (priceId === config.public.stripePremiumPriceId) return 'premium'
-    if (priceId === config.public.stripePriceMonthly) return 'premium'
-    if (priceId === config.public.stripePriceAnnual) return 'premium'
+    const p = config.public
+    console.log('Comparing Price ID:', priceId)
+    console.log('Available IDs:', { 
+      starter: p.stripeStarterPriceId, 
+      premium: p.stripePremiumPriceId, 
+      monthly: p.stripePriceMonthly, 
+      annual: p.stripePriceAnnual 
+    })
+
+    if (priceId === p.stripeStarterPriceId) return 'starter'
+    if (priceId === p.stripePremiumPriceId) return 'premium'
+    if (priceId === p.stripePriceMonthly) return 'premium'
+    if (priceId === p.stripePriceAnnual) return 'premium'
     return null
   }
 
-  // EVENTO: Sessão de Checkout Finalizada
-  if (stripeEvent.type === 'checkout.session.completed') {
-    const customerId = session.customer
-    const profileId = session.metadata?.profileId
-    const type = session.metadata?.type || 'subscription'
-    const tier = session.metadata?.tier
-    
-    console.log('Checkout Metadata:', session.metadata)
-
-    if (type === 'subscription' && session.mode === 'subscription') {
-      const subscriptionId = session.subscription
-      console.log('Retrieving subscription details for:', subscriptionId)
+  try {
+    // 1. Checkout Completo
+    if (stripeEvent.type === 'checkout.session.completed') {
+      const customerId = session.customer
+      const profileId = session.metadata?.profileId
+      const type = session.metadata?.type || 'subscription'
+      const tier = session.metadata?.tier
       
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId as string)
-      const priceId = subscription.items.data?.[0]?.price?.id
-      
-      const plan = getPlanByPriceId(priceId || '')
-      const credits = plan === 'premium' ? 9999 : (plan === 'starter' ? 5 : 0)
+      console.log('Checkout Completed. Metadata:', session.metadata)
 
-      console.log('Determined Plan:', { plan, credits, priceId })
+      if (type === 'subscription' && session.mode === 'subscription') {
+        const subscriptionId = session.subscription
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId as string)
+        const priceId = subscription.items.data?.[0]?.price?.id
+        
+        const plan = getPlanByPriceId(priceId || '')
+        const credits = plan === 'premium' ? 9999 : (plan === 'starter' ? 5 : 0)
 
-      if (plan) {
-        // Tenta achar por profileId primeiro (mais seguro via metadata)
-        // Se não tiver, tenta por email do metadata ou customerId
-        const query = profileId ? { _id: profileId } : { stripeCustomerId: customerId }
-        
-        const updated = await Profile.findOneAndUpdate(
-          query,
-          { 
-            $set: {
-              subscriptionPlan: plan, 
-              creditsBalance: credits,
-              stripeSubscriptionId: subscriptionId,
-              stripeCustomerId: customerId
-            }
-          },
-          { new: true }
-        )
-        
-        if (updated) {
-          console.log('SUCCESS: Profile updated with Subscription ID:', {
-            email: updated.email,
-            plan: updated.subscriptionPlan,
-            subId: updated.stripeSubscriptionId
-          })
-        } else {
-          console.error('ERROR: Profile not found for update!', query)
+        if (plan) {
+          const query = profileId ? { _id: profileId } : { stripeCustomerId: customerId }
+          const updated = await Profile.findOneAndUpdate(
+            query,
+            { 
+              $set: {
+                subscriptionPlan: plan, 
+                creditsBalance: credits,
+                stripeSubscriptionId: subscriptionId,
+                stripeCustomerId: customerId
+              }
+            },
+            { new: true }
+          )
+          console.log('Database Updated (Subscription):', { plan, email: updated?.email, success: !!updated })
         }
-      }
-    } else if (type === 'credits' && session.mode === 'payment') {
-      const creditsToAdd = tier === 'single_credit' ? 1 : 0
-      console.log('Processing Credit Purchase:', { creditsToAdd, tier })
-
-      if (creditsToAdd > 0) {
+      } else if (type === 'credits' && session.mode === 'payment') {
+        const creditsToAdd = tier === 'single_credit' ? 1 : 0
         const query = profileId ? { _id: profileId } : { stripeCustomerId: customerId }
+        
         const updated = await Profile.findOneAndUpdate(
           query,
           { 
@@ -101,51 +98,56 @@ export default defineEventHandler(async (event) => {
           },
           { new: true }
         )
-        console.log('Profile updated after credit purchase', { email: updated?.email, newBalance: updated?.creditsBalance })
+        console.log('Database Updated (Credits):', { creditsToAdd, email: updated?.email, success: !!updated })
       }
     }
-  }
 
-  // EVENTO: Pagamento de Fatura (Renovação)
-  if (stripeEvent.type === 'invoice.payment_succeeded') {
-    const customerId = session.customer
-    const subscriptionId = session.subscription
-    
-    if (subscriptionId) {
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId as string)
-      const priceId = subscription.items.data?.[0]?.price?.id
-      const plan = getPlanByPriceId(priceId || '')
-      const credits = plan === 'premium' ? 9999 : (plan === 'starter' ? 5 : 0)
+    // 2. Pagamento de Renovação
+    if (stripeEvent.type === 'invoice.payment_succeeded') {
+      const customerId = session.customer
+      const subscriptionId = session.subscription
+      
+      if (subscriptionId) {
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId as string)
+        const priceId = subscription.items.data?.[0]?.price?.id
+        const plan = getPlanByPriceId(priceId || '')
+        const credits = plan === 'premium' ? 9999 : (plan === 'starter' ? 5 : 0)
 
-      if (plan) {
-        await Profile.findOneAndUpdate(
-          { stripeCustomerId: customerId },
-          { 
-            $set: {
-              subscriptionPlan: plan, 
-              creditsBalance: credits,
-              stripeSubscriptionId: subscriptionId 
-            }
-          }
-        )
-        console.log('Profile updated via invoice.payment_succeeded', { customerId, plan })
-      }
-    }
-  }
-
-  // EVENTO: Assinatura Cancelada/Deletada
-  if (stripeEvent.type === 'customer.subscription.deleted') {
-    const customerId = session.customer
-    await Profile.findOneAndUpdate(
-      { stripeCustomerId: customerId },
-      { 
-        $set: {
-          subscriptionPlan: 'free',
-          stripeSubscriptionId: null 
+        if (plan) {
+          const updated = await Profile.findOneAndUpdate(
+            { stripeCustomerId: customerId },
+            { 
+              $set: {
+                subscriptionPlan: plan, 
+                creditsBalance: credits,
+                stripeSubscriptionId: subscriptionId 
+              }
+            },
+            { new: true }
+          )
+          console.log('Database Updated (Renewal):', { plan, email: updated?.email })
         }
       }
-    )
-    console.log('Profile reset to free due to subscription deletion', { customerId })
+    }
+
+    // 3. Cancelamento Definitivo
+    if (stripeEvent.type === 'customer.subscription.deleted') {
+      const customerId = session.customer
+      const updated = await Profile.findOneAndUpdate(
+        { stripeCustomerId: customerId },
+        { 
+          $set: {
+            subscriptionPlan: 'free',
+            stripeSubscriptionId: null 
+          }
+        },
+        { new: true }
+      )
+      console.log('Database Updated (Canceled):', { email: updated?.email })
+    }
+
+  } catch (dbErr: any) {
+    console.error('DATABASE UPDATE ERROR IN WEBHOOK:', dbErr.message)
   }
 
   return { received: true }

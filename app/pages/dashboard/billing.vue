@@ -52,10 +52,7 @@ async function handleAction(tier: string, type: 'subscription' | 'credits' = 'su
 const route = useRoute()
 const success = computed(() => route.query.success === 'true')
 
-const history = ref([
-  { id: '1', date: '2026-05-10', amount: 'R$ 19,90', status: 'pago', method: 'Cartão final 4242' },
-  { id: '2', date: '2026-04-10', amount: 'R$ 19,90', status: 'pago', method: 'Cartão final 4242' }
-])
+const { data: history } = useFetch<any[]>('/api/stripe/invoices')
 </script>
 
 <template>
@@ -172,9 +169,28 @@ const history = ref([
             <tr v-for="item in history" :key="item.id" class="hover:bg-gray-50/30 transition-all">
               <td class="px-8 py-6 text-sm font-bold text-gray-600">{{ new Date(item.date).toLocaleDateString('pt-BR') }}</td>
               <td class="px-8 py-6 text-sm font-black text-gray-900">{{ item.amount }}</td>
-              <td class="px-8 py-6 text-xs font-medium text-gray-500">{{ item.method }}</td>
+              <td class="px-8 py-6 text-xs font-medium text-gray-500">
+                <div class="flex items-center gap-2">
+                  {{ item.method }}
+                  <a v-if="item.pdf" :href="item.pdf" target="_blank" class="text-blue-600 hover:underline flex items-center gap-1">
+                    <Download class="w-3 h-3" /> PDF
+                  </a>
+                </div>
+              </td>
               <td class="px-8 py-6 text-right">
-                <span class="bg-green-50 text-green-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-green-100">Pago</span>
+                <span 
+                  :class="[
+                    'px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border',
+                    item.status === 'paid' ? 'bg-green-50 text-green-700 border-green-100' : 'bg-orange-50 text-orange-700 border-orange-100'
+                  ]"
+                >
+                  {{ item.status === 'paid' ? 'Pago' : item.status }}
+                </span>
+              </td>
+            </tr>
+            <tr v-if="!history?.length">
+              <td colspan="4" class="px-8 py-20 text-center text-gray-400 font-medium">
+                Nenhum histórico de cobrança encontrado.
               </td>
             </tr>
           </tbody>

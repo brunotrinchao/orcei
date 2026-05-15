@@ -5,6 +5,12 @@ import 'vue-advanced-cropper/dist/style.css'
 import { Plus, Search, Image, Pencil, Trash2, Sparkles, RefreshCcw, X, Package, ShoppingBag } from 'lucide-vue-next'
 import type { CatalogItemDTO } from '../../../../types'
 
+const { notify, confirm: confirmAlert } = useAlerts()
+
+const searchQuery = ref('')
+const currentPage = ref(1)
+const itemsPerPage = 10
+
 const { data: catalogData, refresh } = useFetch<any>('/api/catalog', {
   query: computed(() => ({
     page: currentPage.value,
@@ -17,12 +23,8 @@ const { data: catalogData, refresh } = useFetch<any>('/api/catalog', {
 const items = computed(() => catalogData.value?.items || [])
 const totalItems = computed(() => catalogData.value?.total || 0)
 
-const { notify, confirm: confirmAlert } = useAlerts()
-
 const showForm = ref(false)
 const selectedItem = ref<CatalogItemDTO | null>(null)
-const currentPage = ref(1)
-const itemsPerPage = 10
 
 const showCropper = ref(false)
 const rawImage = ref<string | null>(null)
@@ -83,7 +85,7 @@ const form = ref({
   type: 'service' as 'product' | 'service',
   name: '',
   description: '',
-  price: 0,
+  price: 0 as any,
   unit: 'UN',
   sku: '',
   imageUrl: ''
@@ -172,11 +174,13 @@ async function saveItem() {
     const endpoint = selectedItem.value ? `/api/catalog/${selectedItem.value._id}` : '/api/catalog'
     
     // Parse price string to number if it's a string from mask
-    const payload = { 
-      ...form.value,
-      price: typeof form.value.price === 'string' 
+    const priceValue = typeof form.value.price === 'string' 
         ? parseFloat(form.value.price.replace(/[R$\s.]/g, '').replace(',', '.')) 
         : form.value.price
+
+    const payload = { 
+      ...form.value,
+      price: priceValue
     }
 
     await $fetch(endpoint, {
@@ -197,6 +201,7 @@ async function deleteItem(id: string) {
     title: 'Excluir Item',
     description: 'Tem certeza que deseja excluir este item?',
     variant: 'destructive',
+    actionText: 'Excluir',
     onConfirm: async () => {
       try {
         await $fetch(`/api/catalog/${id}`, { method: 'DELETE' as any })

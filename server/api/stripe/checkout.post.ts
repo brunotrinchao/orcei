@@ -17,15 +17,15 @@ export default defineEventHandler(async (event) => {
   let mode: 'subscription' | 'payment' = 'subscription'
 
   if (type === 'subscription') {
-    priceId = tier === 'premium_monthly' ? (config.stripePriceMonthly as string)
-            : tier === 'premium_annual' ? (config.stripePriceAnnual as string)
+    priceId = tier === 'premium_monthly' ? 'price_1TX8H8AlVNLVmnhmZ853tG6W'
+            : tier === 'premium_annual' ? 'price_1TX8H8AlVNLVmnhmhSOVeFZO'
             : tier === 'starter' ? (config.stripeStarterPriceId as string)
             : tier === 'premium' ? (config.stripePremiumPriceId as string) : null
     mode = 'subscription'
   } else {
-    priceId = tier === 'single_credit' ? (config.stripePriceSingle as string)
-            : tier === 'credits_5' ? (config.stripeCredits5PriceId as string)
-            : tier === 'credits_10' ? (config.stripeCredits10PriceId as string) : null
+    priceId = tier === 'single_credit' ? 'price_1TX8H9AlVNLVmnhmKAwN6rgY'
+            : tier === 'credits_5' ? 'price_1TWiwPAlVNLVmnhmP6JeWysB'
+            : tier === 'credits_10' ? 'price_1TWixSAlVNLVmnhmvunY9vyK' : null
     mode = 'payment'
   }
 

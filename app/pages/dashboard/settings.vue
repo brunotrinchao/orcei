@@ -167,7 +167,7 @@ function removePhone(index: number) {
           <div class="md:col-span-2 flex flex-col md:flex-row items-center gap-10 p-8 bg-gray-50/50 rounded-3xl border border-gray-200">
             <div class="relative group">
               <div class="w-32 h-32 bg-white rounded-3xl border-4 border-white shadow-xl flex items-center justify-center overflow-hidden transition-all group-hover:scale-105 duration-300 ring-1 ring-gray-100">
-                <img v-if="profile.brandConfig.logoUrl" :src="profile.brandConfig.logoUrl" class="w-full h-full object-contain">
+                <img v-if="profile.brandConfig?.logoUrl" :src="profile.brandConfig.logoUrl" class="w-full h-full object-contain">
                 <div v-else class="text-gray-300 flex flex-col items-center gap-2">
                   <PhotoIcon class="w-10 h-10 opacity-30" />
                   <span class="text-[8px] font-black uppercase tracking-widest">Logo 120x120</span>
@@ -186,7 +186,7 @@ function removePhone(index: number) {
 
           <div class="space-y-3">
             <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Cor Primária</label>
-            <div class="flex gap-3">
+            <div class="flex gap-3" v-if="profile.brandConfig">
               <div class="relative flex-1">
                 <input v-model="profile.brandConfig.primaryColor" type="text" class="w-full pl-14 pr-4 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none uppercase font-black text-sm text-gray-900">
                 <div class="absolute left-4 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg border border-gray-200 shadow-sm" :style="{ backgroundColor: profile.brandConfig.primaryColor }"></div>
@@ -198,7 +198,7 @@ function removePhone(index: number) {
       </section>
 
       <!-- Card: Dados da Empresa -->
-      <section class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm">
+      <section v-if="profile.company" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm">
         <div class="flex items-center gap-3 mb-8">
           <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
             <Briefcase class="w-5 h-5 text-purple-600" />
@@ -216,7 +216,7 @@ function removePhone(index: number) {
       </section>
 
       <!-- Card: Endereço (Obrigatório) -->
-      <section class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm">
+      <section v-if="profile.address" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm">
         <div class="flex items-center gap-3 mb-8">
           <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center">
             <MapPin class="w-5 h-5 text-orange-600" />
@@ -246,7 +246,7 @@ function removePhone(index: number) {
       </section>
 
       <!-- Card: Contato e Redes Sociais -->
-      <section class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm">
+      <section v-if="profile.contact" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm">
         <div class="flex items-center gap-3 mb-8">
           <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
             <Phone class="w-5 h-5 text-blue-600" />
@@ -282,7 +282,7 @@ function removePhone(index: number) {
           </div>
 
           <!-- Redes Sociais -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100" v-if="profile.contact.social">
             <div class="space-y-3">
               <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1 flex items-center gap-2">
                 <Instagram class="w-3.5 h-3.5" /> Instagram

@@ -378,7 +378,7 @@ async function deleteItem(id: string) {
                 </div>
               </td>
               <td class="px-10 py-8 text-right">
-                <div class="flex justify-end gap-3 items-center opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+                <div class="flex justify-end gap-3 items-center">
                   <button @click="openModal(item)" class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all" title="Editar">
                     <Pencil class="w-6 h-6" />
                   </button>

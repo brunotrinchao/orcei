@@ -4,35 +4,25 @@ import { Search, Plus, Pencil, Trash2, RefreshCcw, MapPin, Mail, Phone, External
 import type { ClientDTO } from '../../../../types'
 
 const { notify, confirm: confirmAlert } = useAlerts()
-const { data: clients, refresh } = useFetch<ClientDTO[]>('/api/clients')
 
-const showForm = ref(false)
-const selectedClient = ref<ClientDTO | null>(null)
 const searchQuery = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 10
 
-const filteredClients = computed(() => {
-  if (!clients.value) return []
-  let result = clients.value
-  
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    result = result.filter((c: ClientDTO) => 
-      c.name.toLowerCase().includes(query) || 
-      c.email.toLowerCase().includes(query) ||
-      c.taxId?.includes(query)
-    )
-  }
-  
-  return result
+const { data: clientsData, refresh } = useFetch<any>('/api/clients', {
+  query: computed(() => ({
+    page: currentPage.value,
+    limit: itemsPerPage,
+    search: searchQuery.value
+  })),
+  watch: [currentPage, searchQuery]
 })
 
-const paginatedClients = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage
-  const end = start + itemsPerPage
-  return filteredClients.value.slice(start, end)
-})
+const clients = computed(() => clientsData.value?.items || [])
+const totalClients = computed(() => clientsData.value?.total || 0)
+
+const showForm = ref(false)
+const selectedClient = ref<ClientDTO | null>(null)
 
 const form = ref({
   name: '',
@@ -316,7 +306,7 @@ const formatPhone = (phone: string) => {
             </tr>
           </thead>
           <tbody class="divide-y-2 divide-gray-50">
-            <tr v-for="client in paginatedClients" :key="client._id" class="hover:bg-gray-50/30 transition-all group">
+            <tr v-for="client in clients" :key="client._id" class="hover:bg-gray-50/30 transition-all group">
               <td class="px-10 py-8">
                 <div class="flex flex-col">
                   <span class="font-black text-lg text-gray-900 group-hover:text-blue-600 transition-colors">{{ client.name }}</span>
@@ -354,15 +344,15 @@ const formatPhone = (phone: string) => {
       </div>
       
       <!-- Paginação -->
-      <div v-if="filteredClients.length > itemsPerPage" class="px-10 py-6 border-t-2 border-gray-50 bg-gray-50/20 flex justify-center">
+      <div v-if="totalClients > itemsPerPage" class="px-10 py-6 border-t-2 border-gray-50 bg-gray-50/20 flex justify-center">
         <BasePagination 
-          :total="filteredClients.length" 
+          :total="totalClients" 
           :items-per-page="itemsPerPage" 
           v-model:page="currentPage" 
         />
       </div>
       
-      <div v-if="filteredClients?.length === 0" class="text-center py-32 bg-gray-50/20">
+      <div v-if="clients?.length === 0" class="text-center py-32 bg-gray-50/20">
         <div class="w-24 h-24 bg-white shadow-xl shadow-gray-100 text-gray-200 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8">
           <MapPin class="w-10 h-10" />
         </div>

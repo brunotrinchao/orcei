@@ -3,7 +3,22 @@ import { ref, computed } from 'vue'
 import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, Printer, MoreVertical, RefreshCcw, Loader2, FileText, ExternalLink, Eye } from 'lucide-vue-next'
 import type { ProposalDTO } from '../../../../types'
 
-const { data: proposals, refresh, pending } = useFetch<ProposalDTO[]>('/api/proposals')
+const searchQuery = ref('')
+const currentPage = ref(1)
+const itemsPerPage = 10
+
+const { data: proposalsData, refresh, pending } = useFetch<any>('/api/proposals', {
+  query: computed(() => ({
+    page: currentPage.value,
+    limit: itemsPerPage,
+    search: searchQuery.value
+  })),
+  watch: [currentPage, searchQuery]
+})
+
+const proposals = computed(() => proposalsData.value?.items || [])
+const totalProposals = computed(() => proposalsData.value?.total || 0)
+
 const { copy } = useClipboard()
 
 const isModalOpen = ref(false)
@@ -238,6 +253,15 @@ const formatDate = (date: string) => {
           </tr>
         </tbody>
       </table>
+
+      <!-- Paginação -->
+      <div v-if="totalProposals > itemsPerPage" class="px-8 py-6 border-t border-gray-100 bg-gray-50/20 flex justify-center">
+        <BasePagination 
+          :total="totalProposals" 
+          :items-per-page="itemsPerPage" 
+          v-model:page="currentPage" 
+        />
+      </div>
 
       <div v-if="!pending && proposals?.length === 0" class="text-center py-20">
         <div class="w-16 h-16 bg-gray-50 text-gray-300 rounded-full flex items-center justify-center mx-auto mb-4">

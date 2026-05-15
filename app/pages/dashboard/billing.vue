@@ -30,28 +30,18 @@ const isCanceling = ref(false)
 
 const isPlanActive = computed(() => profile.value?.subscriptionPlan && profile.value.subscriptionPlan !== 'free')
 
-async function handleCancel() {
-  confirmAlert({
-    title: 'Cancelar Assinatura',
-    description: 'Tem certeza que deseja cancelar sua assinatura? Você perderá o acesso ilimitado ao final do período atual.',
-    variant: 'destructive',
-    actionText: 'Sim, Cancelar',
-    onConfirm: async () => {
-      isCanceling.value = true
-      try {
-        await $fetch('/api/stripe/manage', {
-          method: 'POST',
-          body: { action: 'cancel' }
-        })
-        notify('Sucesso', 'Sua assinatura foi cancelada e não será renovada.')
-        refreshProfile()
-      } catch (e: any) {
-        notify('Erro', e.data?.statusMessage || 'Erro ao cancelar assinatura')
-      } finally {
-        isCanceling.value = false
-      }
-    }
-  })
+async function handleManage() {
+  isCanceling.value = true
+  try {
+    const { url } = await $fetch<any>('/api/stripe/portal', {
+      method: 'POST'
+    })
+    if (url) window.location.href = url
+  } catch (e: any) {
+    notify('Erro', e.data?.statusMessage || 'Erro ao abrir portal de gerenciamento')
+  } finally {
+    isCanceling.value = false
+  }
 }
 
 async function handleAction(tier: string, type: 'subscription' | 'credits' = 'subscription') {
@@ -189,12 +179,12 @@ const { data: history } = useFetch<any[]>('/api/stripe/invoices')
         <h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Você possui Plano Ativo</h2>
         <p class="text-gray-600 font-medium mt-2">Sua assinatura <span class="text-blue-600 font-black uppercase">{{ profile?.subscriptionPlan }}</span> garante orçamentos ilimitados e todos os recursos premium liberados.</p>
         <button 
-          @click="handleCancel" 
+          @click="handleManage" 
           :disabled="isCanceling"
-          class="mt-6 text-[10px] font-black text-red-400 hover:text-red-600 uppercase tracking-widest transition-colors flex items-center gap-2 disabled:opacity-50"
+          class="mt-6 text-[10px] font-black text-blue-600 hover:text-blue-800 uppercase tracking-widest transition-colors flex items-center gap-2 disabled:opacity-50"
         >
           <Loader2 v-if="isCanceling" class="w-3 h-3 animate-spin" />
-          Cancelar Assinatura
+          Gerenciar Assinatura ou Cancelar
         </button>
       </div>
       <div class="px-8 py-4 bg-white rounded-2xl border border-blue-100 shadow-sm text-blue-600 font-black uppercase text-[10px] tracking-widest flex items-center gap-2">

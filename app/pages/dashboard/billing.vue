@@ -25,12 +25,20 @@ const plans = [
   }
 ]
 
-const singleBudget = {
-  name: 'Orçamento Avulso',
-  price: 'R$ 5,99',
-  credits: 1,
-  tier: 'single_credit'
-}
+const bundles = [
+  {
+    name: 'Pack 5 Créditos',
+    price: 'R$ 19,90',
+    credits: 5,
+    tier: 'credits_5'
+  },
+  {
+    name: 'Pack 10 Créditos',
+    price: 'R$ 35,90',
+    credits: 10,
+    tier: 'credits_10'
+  }
+]
 
 const isLoading = ref<string | null>(null)
 
@@ -130,21 +138,60 @@ const { data: history } = useFetch<any[]>('/api/stripe/invoices')
       </div>
     </section>
 
-    <!-- Crédito Avulso -->
-    <section class="bg-blue-50/50 p-10 md:p-12 rounded-[3.5rem] border border-blue-100">
-      <div class="flex flex-col md:flex-row justify-between items-center gap-8">
-        <div class="max-w-md text-center md:text-left">
-          <h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Precisa de apenas um orçamento?</h2>
-          <p class="text-gray-600 font-medium mt-2">Compre créditos avulsos por apenas <span class="text-blue-600 font-black">R$ 5,99</span> cada. Sem assinatura, sem mensalidade.</p>
+    <!-- Créditos Avulsos -->
+    <section>
+      <div class="flex items-center gap-3 mb-8">
+        <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Créditos Pré-Pagos</h2>
+        <div class="h-px flex-1 bg-gray-100"></div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- 1 Crédito -->
+        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all group flex flex-col items-center text-center">
+          <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6 group-hover:scale-110 transition-transform">
+            <Zap class="w-6 h-6" />
+          </div>
+          <h3 class="text-lg font-black text-gray-900 uppercase tracking-tight">1 Crédito</h3>
+          <p class="text-gray-500 font-medium text-xs mt-1">Orçamento Único</p>
+          <div class="mt-4 mb-8">
+            <span class="text-3xl font-black text-gray-900">R$ 5,99</span>
+          </div>
+          <BaseButton 
+            @click="handleAction('single_credit', 'credits')"
+            :disabled="!!isLoading"
+            variant="outline"
+            class="w-full rounded-2xl"
+          >
+            <Loader2 v-if="isLoading === 'single_credit'" class="w-4 h-4 animate-spin mr-2" />
+            Comprar
+          </BaseButton>
         </div>
-        <BaseButton 
-          @click="handleAction(singleBudget.tier, 'credits')"
-          :disabled="isLoading === singleBudget.tier"
-          class="px-12 py-5 rounded-[2rem] bg-gray-900 text-white hover:bg-black shadow-2xl"
+
+        <!-- Bundles -->
+        <div 
+          v-for="b in bundles" 
+          :key="b.tier"
+          class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all group flex flex-col items-center text-center"
         >
-          <Loader2 v-if="isLoading === singleBudget.tier" class="w-5 h-5 animate-spin mr-2" />
-          Comprar 1 Crédito (R$ 5,99)
-        </BaseButton>
+          <div class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 mb-6 group-hover:scale-110 transition-transform">
+            <Zap class="w-6 h-6" />
+          </div>
+          <h3 class="text-lg font-black text-gray-900 uppercase tracking-tight">{{ b.credits }} Créditos</h3>
+          <p class="text-gray-500 font-medium text-xs mt-1">Melhor Custo-Benefício</p>
+          <div class="mt-4 mb-8">
+            <span class="text-3xl font-black text-gray-900">{{ b.price }}</span>
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mt-1">R$ {{ (parseFloat(b.price.replace('R$', '').replace(',', '.')) / b.credits).toFixed(2).replace('.', ',') }} / cada</span>
+          </div>
+          <BaseButton 
+            @click="handleAction(b.tier, 'credits')"
+            :disabled="!!isLoading"
+            variant="outline"
+            class="w-full rounded-2xl"
+          >
+            <Loader2 v-if="isLoading === b.tier" class="w-4 h-4 animate-spin mr-2" />
+            Comprar Pack
+          </BaseButton>
+        </div>
       </div>
     </section>
 

@@ -51,7 +51,6 @@ const open = useVModel(props, 'open', emits)
         leave-to-class="opacity-0 scale-95 translate-y-4"
       >
         <DialogContent
-          v-if="open"
           :class="[
             'fixed left-[50%] top-[50%] z-[101] flex flex-col w-full translate-x-[-50%] translate-y-[-50%] bg-white p-8 shadow-2xl rounded-[2.5rem] border-4 border-white max-h-[90vh] overflow-y-auto outline-none',
             size === 'sm' ? 'max-w-sm' : '',

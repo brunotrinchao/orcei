@@ -21,18 +21,14 @@ interface Option {
 }
 
 const props = defineProps<{
-  modelValue?: string
   options: Option[]
   placeholder?: string
   label?: string
   error?: string
+  disabled?: boolean
 }>()
 
-const emit = defineEmits(['update:modelValue'])
-
-const handleUpdate = (value: string) => {
-  emit('update:modelValue', value)
-}
+const modelValue = defineModel<string>()
 </script>
 
 <template>
@@ -41,12 +37,12 @@ const handleUpdate = (value: string) => {
       {{ label }}
     </label>
     
-    <SelectRoot :model-value="modelValue" @update:model-value="handleUpdate">
+    <SelectRoot v-model="modelValue" :disabled="disabled">
       <SelectTrigger
-        class="inline-flex items-center justify-between w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 group"
+        class="inline-flex items-center justify-between w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 group disabled:opacity-50 disabled:cursor-not-allowed"
         :class="{ 'border-red-200 focus:border-red-500 focus:ring-red-500/10': error }"
       >
-        <SelectValue :placeholder="placeholder" />
+        <SelectValue :placeholder="placeholder || 'Selecione...'" />
         <SelectIcon>
           <ChevronDown class="w-4 h-4 text-gray-400 group-hover:text-gray-900 transition-colors" />
         </SelectIcon>
@@ -54,9 +50,14 @@ const handleUpdate = (value: string) => {
 
       <SelectPortal>
         <SelectContent
-          class="z-[100] min-w-[var(--radix-select-trigger-width)] bg-white rounded-2xl border-2 border-gray-100 shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+          class="z-[9999] min-w-[var(--radix-select-trigger-width)] bg-white rounded-2xl border-2 border-gray-100 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
           position="popper"
           :side-offset="8"
+          :avoid-collisions="true"
+          @pointer-down-outside="(e) => {
+            // Prevent closing the parent dialog when clicking outside the select but within the portal
+            if (e.detail.originalEvent.type === 'pointerdown') return;
+          }"
         >
           <SelectScrollUpButton class="flex items-center justify-center h-8 bg-white text-gray-400 cursor-default">
             <ChevronUp class="w-4 h-4" />
@@ -74,6 +75,9 @@ const handleUpdate = (value: string) => {
               </SelectItemIndicator>
               <SelectItemText>{{ option.label }}</SelectItemText>
             </SelectItem>
+            <div v-if="!options || options.length === 0" class="px-8 py-4 text-[10px] font-black text-gray-300 uppercase tracking-[0.2em] text-center">
+              Sem Opções
+            </div>
           </SelectViewport>
 
           <SelectScrollDownButton class="flex items-center justify-center h-8 bg-white text-gray-400 cursor-default">

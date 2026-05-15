@@ -11,13 +11,21 @@ const props = defineProps<{
 
 const emit = defineEmits(['submit'])
 
-const { data: clientsData } = useFetch<any>('/api/clients', {
-  query: { limit: 100 } // Get more clients for the select list
+const { data: clientsData, error: clientsError } = useFetch<any>('/api/clients', {
+  query: { limit: 100 }
 })
 const { data: profile } = useFetch<ProfileDTO>('/api/profile')
 const { notify } = useAlerts()
 
 const clients = computed(() => clientsData.value?.items || [])
+
+onMounted(() => {
+  console.log('ProposalForm Mounted. Clients Initial State:', clients.value)
+})
+
+watch(clientsData, (val) => {
+  console.log('Clients Data Changed:', val)
+}, { immediate: true })
 
 const catalogSearch = ref('')
 const catalogPage = ref(1)
@@ -37,7 +45,8 @@ const totalCatalogItems = computed(() => catalogData.value?.total || 0)
 
 const selectedClientId = ref('')
 
-function onClientSelect(clientId: string) {
+function onClientSelect(clientId: string | undefined) {
+  if (!clientId) return
   const client = clients.value?.find((c: any) => c._id === clientId)
   if (client) {
     form.value.client.name = client.name

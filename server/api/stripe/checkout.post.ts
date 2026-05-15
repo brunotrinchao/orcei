@@ -17,22 +17,22 @@ export default defineEventHandler(async (event) => {
   let mode: 'subscription' | 'payment' = 'subscription'
 
   if (type === 'subscription') {
-    priceId = tier === 'premium_monthly' ? 'price_1TX8H8AlVNLVmnhmZ853tG6W'
-            : tier === 'premium_annual' ? 'price_1TX8H8AlVNLVmnhmhSOVeFZO'
-            : tier === 'starter' ? (config.stripeStarterPriceId as string)
-            : tier === 'premium' ? (config.stripePremiumPriceId as string) : null
+    priceId = tier === 'premium_monthly' ? config.public.stripePriceMonthly
+            : tier === 'premium_annual' ? config.public.stripePriceAnnual
+            : tier === 'starter' ? config.public.stripeStarterPriceId
+            : tier === 'premium' ? config.public.stripePremiumPriceId : null
     mode = 'subscription'
   } else {
-    priceId = tier === 'single_credit' ? 'price_1TX8H9AlVNLVmnhmKAwN6rgY'
-            : tier === 'credits_5' ? 'price_1TWiwPAlVNLVmnhmP6JeWysB'
-            : tier === 'credits_10' ? 'price_1TWixSAlVNLVmnhmvunY9vyK' : null
+    priceId = tier === 'single_credit' ? config.public.stripePriceSingle
+            : tier === 'credits_5' ? config.public.stripeCredits5PriceId
+            : tier === 'credits_10' ? config.public.stripeCredits10PriceId : null
     mode = 'payment'
   }
 
   if (!priceId) {
     throw createError({ 
       statusCode: 400, 
-      statusMessage: `Invalid tier or Price ID not configured for: ${tier}` 
+      statusMessage: `Configuração de preço ausente para o nível: ${tier}. Verifique o arquivo .env` 
     })
   }
 

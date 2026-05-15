@@ -44,16 +44,19 @@ export default defineEventHandler(async (event) => {
       }
 
       const config = useRuntimeConfig()
-      const priceId = tier === 'starter' ? config.stripeStarterPriceId : tier === 'premium' ? config.stripePremiumPriceId : null
+      const priceId = tier === 'starter' ? (config.public.stripeStarterPriceId as string) 
+                    : tier === 'premium' ? (config.public.stripePremiumPriceId as string) 
+                    : tier === 'premium_monthly' ? (config.public.stripePriceMonthly as string)
+                    : tier === 'premium_annual' ? (config.public.stripePriceAnnual as string)
+                    : null
 
       if (!priceId) {
         throw createError({ 
           statusCode: 400, 
-          statusMessage: `Invalid tier or Price ID not configured for: ${tier}` 
-    })
-  }
+          statusMessage: `Configuração de preço ausente para o nível: ${tier}. Verifique o arquivo .env` 
+        })
+      }
 
-      // Retrieve subscription to get the subscription item ID
       const subscription = await stripe.subscriptions.retrieve(profile.stripeSubscriptionId)
       const subscriptionItemId = subscription.items.data?.[0]?.id
       if (!subscriptionItemId) throw createError({ statusCode: 500, statusMessage: 'Subscription item not found' })

@@ -34,13 +34,17 @@ export const ProposalService = {
     const sequenceNumber = counter.lastSequence
     const code = `#ORC-${currentYear}-${String(sequenceNumber).padStart(3, '0')}`
 
+    const profile = await Profile.findById(data.profileId)
+    const validityDays = profile?.defaultValidityDays || 7
+    const expiresAt = new Date()
+    expiresAt.setDate(expiresAt.getDate() + validityDays)
+
     // Se criar já como 'created' e sendMethod for 'auto', consome crédito e envia
     let lastEmailId = undefined
     if (data.status === 'created') {
       await this.consumeCredit(data.profileId)
 
       if (data.sendMethod !== 'manual') {
-        const profile = await Profile.findById(data.profileId)
         if (profile && data.client?.email) {
           const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${slug}?t=${token}`
           const emailRes = await sendProposalEmail(
@@ -61,6 +65,7 @@ export const ProposalService = {
       sequenceNumber,
       code,
       totals,
+      expiresAt,
       lastEmailId
     })
   },

@@ -5,10 +5,28 @@ import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, CategoryScale, L
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement, ArcElement)
 
-const { data: stats } = await useFetch<any>('/api/dashboard/stats')
-const { loggedIn } = useUserSession()
-
 const period = ref('last_30_days')
+
+const { data: stats, refresh } = await useFetch<any>('/api/dashboard/stats', {
+  query: computed(() => {
+    const now = new Date()
+    let start = new Date()
+    
+    if (period.value === 'last_7_days') start.setDate(now.getDate() - 7)
+    else if (period.value === 'last_30_days') start.setDate(now.getDate() - 30)
+    else if (period.value === 'last_90_days') start.setDate(now.getDate() - 90)
+    else if (period.value === 'year') start = new Date(now.getFullYear(), 0, 1)
+    else return {}
+
+    return {
+      start: start.toISOString(),
+      end: now.toISOString()
+    }
+  }),
+  watch: [period]
+})
+
+const { loggedIn } = useUserSession()
 
 // Status Distribution Chart
 const statusChartData = computed(() => {
@@ -80,6 +98,25 @@ async function generateAIReport() {
           {{ isAnalyzing ? 'Analisando...' : 'Gerar Relatório IA' }}
         </BaseButton>
       </div>
+    </div>
+
+    <!-- Filtros de Período -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+      <button 
+        v-for="p in [
+          { label: 'Últimos 7 dias', value: 'last_7_days' },
+          { label: 'Últimos 30 dias', value: 'last_30_days' },
+          { label: 'Últimos 90 dias', value: 'last_90_days' },
+          { label: 'Este Ano', value: 'year' },
+          { label: 'Todo Período', value: 'all' }
+        ]" 
+        :key="p.value"
+        @click="period = p.value"
+        :class="period === p.value ? 'bg-gray-900 text-white shadow-lg' : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-100'"
+        class="px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap"
+      >
+        {{ p.label }}
+      </button>
     </div>
 
     <!-- Stats Grid -->

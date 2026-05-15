@@ -11,9 +11,13 @@ const props = defineProps<{
 
 const emit = defineEmits(['submit'])
 
-const { data: clients } = useFetch<any[]>('/api/clients')
+const { data: clientsData } = useFetch<any>('/api/clients', {
+  query: { limit: 100 } // Get more clients for the select list
+})
 const { data: profile } = useFetch<ProfileDTO>('/api/profile')
 const { notify } = useAlerts()
+
+const clients = computed(() => clientsData.value?.items || [])
 
 const catalogSearch = ref('')
 const catalogPage = ref(1)
@@ -34,7 +38,7 @@ const totalCatalogItems = computed(() => catalogData.value?.total || 0)
 const selectedClientId = ref('')
 
 function onClientSelect(clientId: string) {
-  const client = clients.value?.find(c => c._id === clientId)
+  const client = clients.value?.find((c: any) => c._id === clientId)
   if (client) {
     form.value.client.name = client.name
     form.value.client.email = client.email
@@ -43,7 +47,7 @@ function onClientSelect(clientId: string) {
 }
 
 const clientOptions = computed(() => {
-  return clients.value?.map(c => ({
+  return clients.value?.map((c: any) => ({
     label: c.name,
     value: c._id
   })) || []

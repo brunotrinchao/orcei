@@ -25,24 +25,15 @@ const plans = [
   }
 ]
 
-const bundles = [
-  {
-    name: 'Pack 5 Créditos',
-    price: 'R$ 19,90',
-    credits: 5,
-    tier: 'credits_5'
-  },
-  {
-    name: 'Pack 10 Créditos',
-    price: 'R$ 35,90',
-    credits: 10,
-    tier: 'credits_10'
-  }
-]
-
 const isLoading = ref<string | null>(null)
 
+const isPlanActive = computed(() => profile.value?.subscriptionPlan && profile.value.subscriptionPlan !== 'free')
+
 async function handleAction(tier: string, type: 'subscription' | 'credits' = 'subscription') {
+  if (type === 'credits' && isPlanActive.value) {
+    return notify('Aviso', 'Usuários com plano ativo possuem orçamentos ilimitados.')
+  }
+  
   isLoading.value = tier
   try {
     const { url } = await $fetch('/api/stripe/checkout', {
@@ -139,20 +130,19 @@ const { data: history } = useFetch<any[]>('/api/stripe/invoices')
     </section>
 
     <!-- Créditos Avulsos -->
-    <section>
+    <section v-if="!isPlanActive">
       <div class="flex items-center gap-3 mb-8">
-        <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Créditos Pré-Pagos</h2>
+        <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Orçamento Avulso</h2>
         <div class="h-px flex-1 bg-gray-100"></div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- 1 Crédito -->
+      <div class="max-w-md">
         <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all group flex flex-col items-center text-center">
           <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6 group-hover:scale-110 transition-transform">
             <Zap class="w-6 h-6" />
           </div>
           <h3 class="text-lg font-black text-gray-900 uppercase tracking-tight">1 Crédito</h3>
-          <p class="text-gray-500 font-medium text-xs mt-1">Orçamento Único</p>
+          <p class="text-gray-500 font-medium text-xs mt-1">Gere um orçamento avulso sem assinatura.</p>
           <div class="mt-4 mb-8">
             <span class="text-3xl font-black text-gray-900">R$ 5,99</span>
           </div>
@@ -163,37 +153,21 @@ const { data: history } = useFetch<any[]>('/api/stripe/invoices')
             class="w-full rounded-2xl"
           >
             <Loader2 v-if="isLoading === 'single_credit'" class="w-4 h-4 animate-spin mr-2" />
-            Comprar
-          </BaseButton>
-        </div>
-
-        <!-- Bundles -->
-        <div 
-          v-for="b in bundles" 
-          :key="b.tier"
-          class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all group flex flex-col items-center text-center"
-        >
-          <div class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 mb-6 group-hover:scale-110 transition-transform">
-            <Zap class="w-6 h-6" />
-          </div>
-          <h3 class="text-lg font-black text-gray-900 uppercase tracking-tight">{{ b.credits }} Créditos</h3>
-          <p class="text-gray-500 font-medium text-xs mt-1">Melhor Custo-Benefício</p>
-          <div class="mt-4 mb-8">
-            <span class="text-3xl font-black text-gray-900">{{ b.price }}</span>
-            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mt-1">R$ {{ (parseFloat(b.price.replace('R$', '').replace(',', '.')) / b.credits).toFixed(2).replace('.', ',') }} / cada</span>
-          </div>
-          <BaseButton 
-            @click="handleAction(b.tier, 'credits')"
-            :disabled="!!isLoading"
-            variant="outline"
-            class="w-full rounded-2xl"
-          >
-            <Loader2 v-if="isLoading === b.tier" class="w-4 h-4 animate-spin mr-2" />
-            Comprar Pack
+            Comprar Crédito
           </BaseButton>
         </div>
       </div>
     </section>
+
+    <div v-else class="bg-blue-50/50 p-10 md:p-12 rounded-[3.5rem] border border-blue-100 flex flex-col md:flex-row justify-between items-center gap-8">
+      <div class="max-w-md text-center md:text-left">
+        <h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Você possui Plano Ativo</h2>
+        <p class="text-gray-600 font-medium mt-2">Sua assinatura <span class="text-blue-600 font-black uppercase">{{ profile?.subscriptionPlan }}</span> garante orçamentos ilimitados e todos os recursos premium liberados.</p>
+      </div>
+      <div class="px-8 py-4 bg-white rounded-2xl border border-blue-100 shadow-sm text-blue-600 font-black uppercase text-[10px] tracking-widest flex items-center gap-2">
+        <CheckCircle2 class="w-4 h-4" /> Assinatura Ativa
+      </div>
+    </div>
 
     <!-- Histórico de Pagamento -->
     <section>

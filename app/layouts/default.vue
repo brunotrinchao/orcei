@@ -43,10 +43,17 @@ async function logout() {
 
         <div class="flex items-center gap-4">
           <template v-if="loggedIn">
-            <!-- Credits Display (Refined) -->
-            <div class="hidden sm:flex flex-col items-end mr-4">
-              <span class="text-[8px] uppercase font-bold text-gray-400 tracking-widest">Créditos</span>
-              <span class="text-xs font-semibold text-gray-700">{{ profile?.creditsBalance ?? 0 }}</span>
+            <!-- Credits & Plan Display -->
+            <div class="hidden sm:flex items-center gap-4 bg-gray-50/50 px-4 py-2 rounded-2xl border border-gray-100 mr-2">
+              <div class="flex flex-col items-end">
+                <span class="text-[8px] uppercase font-bold text-gray-400 tracking-widest">Créditos</span>
+                <span class="text-xs font-semibold text-gray-700">{{ profile?.creditsBalance ?? 0 }}</span>
+              </div>
+              <div v-if="profile?.subscriptionPlan && profile.subscriptionPlan !== 'free'" class="h-6 w-px bg-gray-200"></div>
+              <div v-if="profile?.subscriptionPlan && profile.subscriptionPlan !== 'free'" class="flex flex-col items-start">
+                <span class="text-[8px] uppercase font-bold text-blue-400 tracking-widest">Plano</span>
+                <span class="text-[10px] font-black text-blue-600 uppercase">{{ profile.subscriptionPlan }}</span>
+              </div>
             </div>
 
             <!-- User Avatar -->

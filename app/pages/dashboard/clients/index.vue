@@ -191,6 +191,7 @@ const formatPhone = (phone: string) => {
             v-model="form.taxId" 
             label="CPF / CNPJ" 
             placeholder="000.000.000-00" 
+            :mask="form.taxId.length <= 14 ? '###.###.###-##' : '##.###.###/####-##'"
           />
         </div>
 
@@ -207,6 +208,7 @@ const formatPhone = (phone: string) => {
               v-model="form.phone" 
               label="Telefone / Celular" 
               placeholder="(00) 00000-0000" 
+              mask="(##) #####-####"
               required 
             />
             <div class="flex items-center gap-3 ml-2">
@@ -232,7 +234,8 @@ const formatPhone = (phone: string) => {
               v-model="form.address.zip" 
               label="CEP" 
               placeholder="00000-000" 
-              @blur="searchZip"
+              mask="#####-###"
+              @update:model-value="searchZip"
               required
             />
             <div class="md:col-span-2">

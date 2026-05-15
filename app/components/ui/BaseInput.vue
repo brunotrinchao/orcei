@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   modelValue: string | number | null
   label?: string
   mask?: string
@@ -7,15 +7,29 @@ defineProps<{
   error?: string
   type?: string
 }>()
-defineEmits(['update:modelValue'])
+
+const emit = defineEmits(['update:modelValue'])
+
+const onInput = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  let value: string | number = target.value
+
+  if (props.mask === 'currency' || props.mask?.includes('R$')) {
+    // Basic currency cleanup for numeric storage if needed, 
+    // but Maska already handles the visual part.
+    // For simplicity, we emit the raw string and handle conversion if necessary.
+  }
+
+  emit('update:modelValue', value)
+}
 </script>
 <template>
   <div class="space-y-2">
     <label v-if="label" class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">{{ label }}</label>
     <input
       :value="modelValue"
-      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
-      v-maska="mask"
+      @input="onInput"
+      v-maska="mask === 'currency' ? { mask: 'R$ !#*.##0,00', tokens: { '0': { pattern: /[0-9]/, repeated: true } }, reversed: true } : mask"
       :type="type || 'text'"
       :placeholder="placeholder"
       class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-300"

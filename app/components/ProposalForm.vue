@@ -11,10 +11,25 @@ const props = defineProps<{
 
 const emit = defineEmits(['submit'])
 
-const { data: catalogItems } = useFetch<CatalogItemDTO[]>('/api/catalog')
 const { data: clients } = useFetch<any[]>('/api/clients')
 const { data: profile } = useFetch<ProfileDTO>('/api/profile')
 const { notify } = useAlerts()
+
+const catalogSearch = ref('')
+const catalogPage = ref(1)
+const catalogLimit = 6
+
+const { data: catalogData } = useFetch<any>('/api/catalog', {
+  query: computed(() => ({
+    page: catalogPage.value,
+    limit: catalogLimit,
+    search: catalogSearch.value
+  })),
+  watch: [catalogPage, catalogSearch]
+})
+
+const catalogItems = computed(() => catalogData.value?.items || [])
+const totalCatalogItems = computed(() => catalogData.value?.total || 0)
 
 const selectedClientId = ref('')
 
@@ -170,9 +185,20 @@ async function submit() {
       </div>
 
       <div class="space-y-6">
-        <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Itens do Catálogo</label>
-        <div class="bg-white border-2 border-gray-100 rounded-[2.5rem] overflow-hidden">
-          <div class="max-h-[350px] overflow-y-auto divide-y divide-gray-50 scrollbar-hide">
+        <div class="flex items-center justify-between ml-1">
+          <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Itens do Catálogo</label>
+          <div class="relative w-48">
+            <input 
+              v-model="catalogSearch" 
+              type="text" 
+              placeholder="Buscar..." 
+              class="w-full pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-[10px] focus:ring-2 focus:ring-blue-500/20 outline-none"
+            >
+            <Search class="w-3 h-3 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          </div>
+        </div>
+        <div class="bg-white border-2 border-gray-100 rounded-[2.5rem] overflow-hidden flex flex-col">
+          <div class="max-h-[300px] overflow-y-auto divide-y divide-gray-50 scrollbar-hide">
             <div 
               v-for="item in catalogItems" 
               :key="item._id"
@@ -189,13 +215,21 @@ async function submit() {
                 </div>
                 <div>
                   <p class="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{{ item.name }}</p>
-                  <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">R$ {{ item.price.toLocaleString('pt-BR') }} / {{ item.unit }}</p>
+                  <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">R$ {{ (item.price as number).toLocaleString('pt-BR') }} / {{ item.unit }}</p>
                 </div>
               </div>
             </div>
             <div v-if="!catalogItems?.length" class="p-10 text-center text-gray-400 text-sm font-medium">
-              Nenhum item no catálogo.
+              Nenhum item encontrado.
             </div>
+          </div>
+          <!-- Catalog Pagination -->
+          <div v-if="totalCatalogItems > catalogLimit" class="p-4 bg-gray-50/50 border-t border-gray-100 flex justify-center">
+            <BasePagination 
+              :total="totalCatalogItems" 
+              :items-per-page="catalogLimit" 
+              v-model:page="catalogPage" 
+            />
           </div>
         </div>
       </div>

@@ -21,47 +21,27 @@ async function seed() {
     await mongoose.connect(MONGODB_URI)
     console.log('Conectado ao MongoDB para seeding...')
 
-    const testEmail = 'bruno@orcei.com.br' 
+    // Email da conta que você está logado
+    const testEmail = 'brunotrinchao@gmail.com' 
     let profile = await Profile.findOne({ email: testEmail })
 
     if (!profile) {
-      console.log('Criando perfil de teste...')
-      profile = await Profile.create({
-        userId: 'test-user-id-123',
-        name: 'Bruno Trinchão',
-        email: testEmail,
-        brandConfig: { primaryColor: '#3B82F6' },
-        address: {
-          street: 'Av. Paulista',
-          number: '1000',
-          neighborhood: 'Bela Vista',
-          city: 'São Paulo',
-          state: 'SP',
-          zip: '01310-100'
-        },
-        company: {
-          taxId: '00.000.000/0001-00',
-          legalName: 'Bruno Consulting LTDA',
-          tradeName: 'Bruno Consultoria'
-        },
-        contact: {
-          phones: [{ number: '(11) 99999-9999', isWhatsapp: true }],
-          social: { instagram: '@bruno' }
-        },
-        creditsBalance: 50,
-        subscriptionPlan: 'premium'
-      })
+      console.log(`Erro: Perfil com email ${testEmail} não encontrado. Por favor, logue no app primeiro.`)
+      process.exit(1)
     }
 
     const profileId = profile._id
+    console.log(`Usando Perfil: ${profile.email} (ID: ${profileId})`)
 
+    // Limpar apenas os dados deste perfil para não quebrar outros testes
     await Client.deleteMany({ profileId })
     await CatalogItem.deleteMany({ profileId })
     await Proposal.deleteMany({ profileId })
     await Counter.deleteMany({ profileId })
 
-    console.log('Limpando dados anteriores...')
+    console.log('Limpando dados anteriores do perfil...')
 
+    // 2. Criar Clientes (10 clientes)
     const clients = []
     for (let i = 0; i < 10; i++) {
       clients.push(await Client.create({
@@ -81,6 +61,7 @@ async function seed() {
     }
     console.log('10 Clientes criados.')
 
+    // 3. Criar Itens no Catálogo (5 serviços/produtos)
     const catalog = [
       { name: 'Consultoria Estratégica', price: 2500, type: 'service', unit: 'UN' },
       { name: 'Desenvolvimento Web', price: 5000, type: 'service', unit: 'Projeto' },
@@ -99,6 +80,7 @@ async function seed() {
     }
     console.log('5 Itens de catálogo criados.')
 
+    // 4. Criar Orçamentos (1 ano de dados - ~50 orçamentos)
     console.log('Gerando 50 orçamentos ao longo de 1 ano...')
     const statuses = ['draft', 'created', 'pending', 'accepted', 'expired']
     
@@ -151,7 +133,7 @@ async function seed() {
       })
     }
 
-    console.log('50 Orçamentos criados com sucesso!')
+    console.log('50 Orçamentos criados com sucesso para brunotrinchao@gmail.com!')
     process.exit(0)
   } catch (err) {
     console.error('Erro no seeding:', err)

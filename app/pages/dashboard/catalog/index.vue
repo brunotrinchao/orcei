@@ -5,12 +5,22 @@ import 'vue-advanced-cropper/dist/style.css'
 import { Plus, Search, Image, Pencil, Trash2, Sparkles, RefreshCcw, X, Package, ShoppingBag } from 'lucide-vue-next'
 import type { CatalogItemDTO } from '../../../../types'
 
-const { data: items, refresh } = useFetch<CatalogItemDTO[]>('/api/catalog')
+const { data: catalogData, refresh } = useFetch<any>('/api/catalog', {
+  query: computed(() => ({
+    page: currentPage.value,
+    limit: itemsPerPage,
+    search: searchQuery.value
+  })),
+  watch: [currentPage, searchQuery]
+})
+
+const items = computed(() => catalogData.value?.items || [])
+const totalItems = computed(() => catalogData.value?.total || 0)
+
 const { notify, confirm: confirmAlert } = useAlerts()
 
 const showForm = ref(false)
 const selectedItem = ref<CatalogItemDTO | null>(null)
-const searchQuery = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 10
 
@@ -63,29 +73,11 @@ async function cropImage() {
     showCropper.value = false
     rawImage.value = null
   } catch (e) {
-    alert('Erro ao fazer upload da imagem')
+    notify('Erro', 'Não foi possível fazer upload da imagem.')
   } finally {
     isSubmitting.value = false
   }
 }
-
-const filteredItems = computed(() => {
-  if (!items.value) return []
-  if (!searchQuery.value) return items.value
-  
-  const query = searchQuery.value.toLowerCase()
-  return items.value.filter((i: CatalogItemDTO) => 
-    i.name.toLowerCase().includes(query) || 
-    i.description?.toLowerCase().includes(query) ||
-    i.sku?.toLowerCase().includes(query)
-  )
-})
-
-const paginatedItems = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage
-  const end = start + itemsPerPage
-  return filteredItems.value.slice(start, end)
-})
 
 const form = ref({
   type: 'service' as 'product' | 'service',
@@ -179,9 +171,17 @@ async function saveItem() {
     const method = selectedItem.value ? 'PUT' : 'POST'
     const endpoint = selectedItem.value ? `/api/catalog/${selectedItem.value._id}` : '/api/catalog'
     
+    // Parse price string to number if it's a string from mask
+    const payload = { 
+      ...form.value,
+      price: typeof form.value.price === 'string' 
+        ? parseFloat(form.value.price.replace(/[R$\s.]/g, '').replace(',', '.')) 
+        : form.value.price
+    }
+
     await $fetch(endpoint, {
       method,
-      body: form.value
+      body: payload
     })
     showForm.value = false
     refresh()
@@ -300,10 +300,9 @@ async function deleteItem(id: string) {
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <BaseInput 
-            v-model.number="form.price" 
-            type="number" 
-            step="0.01"
+            v-model="form.price" 
             label="Preço Base (R$)" 
+            mask="currency"
             required 
           />
           <BaseSelect 
@@ -344,7 +343,7 @@ async function deleteItem(id: string) {
             </tr>
           </thead>
           <tbody class="divide-y-2 divide-gray-50">
-            <tr v-for="item in paginatedItems" :key="item._id" class="hover:bg-gray-50/30 transition-all group">
+            <tr v-for="item in items" :key="item._id" class="hover:bg-gray-50/30 transition-all group">
               <td class="px-10 py-8">
                 <div class="flex items-center gap-4">
                   <div class="w-12 h-12 rounded-xl bg-gray-100 border border-gray-100 overflow-hidden flex-shrink-0">
@@ -369,7 +368,7 @@ async function deleteItem(id: string) {
               </td>
               <td class="px-10 py-8 text-right">
                 <div class="flex flex-col items-end">
-                  <span class="font-black text-lg text-gray-900">R$ {{ item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+                  <span class="font-black text-lg text-gray-900">R$ {{ (item.price as number).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
                   <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">por {{ item.unit }}</span>
                 </div>
               </td>
@@ -389,15 +388,15 @@ async function deleteItem(id: string) {
       </div>
       
       <!-- Paginação -->
-      <div v-if="filteredItems.length > itemsPerPage" class="px-10 py-6 border-t-2 border-gray-50 bg-gray-50/20 flex justify-center">
+      <div v-if="totalItems > itemsPerPage" class="px-10 py-6 border-t-2 border-gray-50 bg-gray-50/20 flex justify-center">
         <BasePagination 
-          :total="filteredItems.length" 
+          :total="totalItems" 
           :items-per-page="itemsPerPage" 
           v-model:page="currentPage" 
         />
       </div>
       
-      <div v-if="filteredItems?.length === 0" class="text-center py-32 bg-gray-50/20">
+      <div v-if="items.length === 0" class="text-center py-32 bg-gray-50/20">
         <div class="w-24 h-24 bg-white shadow-xl shadow-gray-100 text-gray-200 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8">
           <ShoppingBag class="w-10 h-10" />
         </div>

@@ -98,29 +98,6 @@ async function generateAIReport() {
 
 <template>
   <div class="space-y-12">
-    <!-- Header com Banner IA -->
-    <div class="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 p-12 rounded-[3.5rem] shadow-2xl">
-      <div class="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-      <div class="relative flex flex-col md:flex-row items-center justify-between gap-8">
-        <div class="space-y-4 text-center md:text-left">
-          <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-white text-[10px] font-black uppercase tracking-widest border border-white/10">
-            <Sparkles class="w-3 h-3 text-blue-200" /> Consultoria de IA Ativa
-          </div>
-          <h1 class="text-4xl md:text-5xl font-black text-white leading-tight tracking-tight">Otimize seu negócio<br>com inteligência.</h1>
-          <p class="text-blue-100 font-medium text-lg max-w-xl">Analisamos seus dados de propostas e catálogo para sugerir as melhores estratégias de precificação e conversão.</p>
-        </div>
-        <BaseButton 
-          @click="generateAIReport"
-          :disabled="isAnalyzing"
-          variant="secondary" 
-          class="bg-white text-blue-700 hover:bg-blue-50 px-12 py-5 rounded-[2rem] text-xs shadow-2xl shrink-0"
-        >
-          <Loader2 v-if="isAnalyzing" class="w-4 h-4 animate-spin mr-2" />
-          {{ isAnalyzing ? 'Analisando...' : 'Gerar Relatório IA' }}
-        </BaseButton>
-      </div>
-    </div>
-
     <!-- Filtros de Período -->
     <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
       <button 
@@ -161,7 +138,7 @@ async function generateAIReport() {
           <span class="text-[10px] font-black text-green-500 uppercase tracking-widest bg-green-50 px-2 py-1 rounded-lg">+R$ 2.4k</span>
         </div>
         <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Receita Confirmada</p>
-        <h3 class="text-3xl font-black text-gray-900">R$ {{ stats?.totalRevenue?.toLocaleString('pt-BR') ?? '0,00' }}</h3>
+        <h3 class="text-3xl font-black text-gray-900">R$ {{ (stats?.totalRevenue as number)?.toLocaleString('pt-BR') ?? '0,00' }}</h3>
       </div>
 
       <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group">
@@ -183,6 +160,29 @@ async function generateAIReport() {
         </div>
         <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Ticket Médio</p>
         <h3 class="text-3xl font-black text-gray-900">R$ {{ Math.round(stats?.ticketMedia ?? 0).toLocaleString('pt-BR') }}</h3>
+      </div>
+    </div>
+
+    <!-- Banner IA (Abaixo das Stats, altura reduzida) -->
+    <div class="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 p-8 rounded-[2.5rem] shadow-2xl">
+      <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+      <div class="relative flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="space-y-2 text-center md:text-left">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-white text-[9px] font-black uppercase tracking-widest border border-white/10">
+            <Sparkles class="w-3 h-3 text-blue-200" /> Consultoria de IA Ativa
+          </div>
+          <h1 class="text-2xl md:text-3xl font-black text-white leading-tight tracking-tight">Otimize seu negócio com inteligência.</h1>
+          <p class="text-blue-100 font-medium text-sm max-w-xl">Análise baseada em seus dados comerciais para sugerir estratégias de conversão.</p>
+        </div>
+        <BaseButton 
+          @click="generateAIReport"
+          :disabled="isAnalyzing"
+          variant="secondary" 
+          class="bg-white text-blue-700 hover:bg-blue-50 px-10 py-4 rounded-2xl text-[10px] shadow-2xl shrink-0"
+        >
+          <Loader2 v-if="isAnalyzing" class="w-3.5 h-3.5 animate-spin mr-2" />
+          {{ isAnalyzing ? 'Analisando...' : 'Gerar Relatório IA' }}
+        </BaseButton>
       </div>
     </div>
 

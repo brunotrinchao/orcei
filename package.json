@@ -16,6 +16,7 @@
     "@fullcalendar/timegrid": "^6.1.20",
     "@fullcalendar/vue3": "^6.1.20",
     "@google/generative-ai": "^0.24.1",
+    "@nuxt/content": "^3.13.0",
     "@nuxtjs/cloudinary": "^4.0.0",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@sparticuz/chromium": "^147.0.0",
@@ -29,7 +30,9 @@
     "chart.js": "^4.5.1",
     "cloudinary": "^2.10.0",
     "lucide-vue-next": "^1.0.0",
+    "markdown-it": "^14.1.1",
     "maska": "^3.2.0",
+    "mdi-vue": "^3.0.13",
     "mongoose": "^9.6.2",
     "nanoid": "^5.1.11",
     "nuxt": "^4.4.5",
@@ -43,6 +46,7 @@
     "vue-router": "^5.0.6"
   },
   "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
     "@types/node": "^25.8.0",
     "puppeteer": "^24.43.1",
     "typescript": "^6.0.3",

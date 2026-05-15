@@ -46,6 +46,26 @@ const statusChartData = computed(() => {
   }
 })
 
+// Revenue Evolution Chart
+const revenueChartData = computed(() => {
+  if (!stats.value?.revenueHistory) return { labels: [], datasets: [] }
+
+  return {
+    labels: stats.value.revenueHistory.map((h: any) => h.date),
+    datasets: [{
+      label: 'Faturamento R$',
+      data: stats.value.revenueHistory.map((h: any) => h.amount),
+      borderColor: '#3B82F6',
+      backgroundColor: 'rgba(59, 130, 246, 0.1)',
+      fill: true,
+      tension: 0.4,
+      pointRadius: 4,
+      pointBackgroundColor: '#fff',
+      pointBorderWidth: 2,
+    }]
+  }
+})
+
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -167,25 +187,33 @@ async function generateAIReport() {
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Gráfico de Evolução de Faturamento -->
+      <div class="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm">
+        <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-8">Evolução do Faturamento</h3>
+        <div class="h-80 relative">
+          <Line :data="revenueChartData" :options="{ ...chartOptions, plugins: { ...chartOptions.plugins, legend: { display: false } } }" />
+        </div>
+      </div>
+
       <!-- Gráfico de Status -->
       <div class="lg:col-span-1 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm">
         <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-8">Distribuição de Status</h3>
-        <div class="h-64 relative">
+        <div class="h-80 relative">
           <Doughnut :data="statusChartData" :options="chartOptions" />
         </div>
       </div>
 
       <!-- Ranking de Clientes -->
-      <div class="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm">
+      <div class="lg:col-span-3 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm">
         <div class="flex justify-between items-center mb-8">
           <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Maiores Clientes (Receita)</h3>
           <NuxtLink to="/dashboard/clients" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-800">Ver Todos</NuxtLink>
         </div>
-        <div class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div v-for="(client, idx) in stats?.clientRanking" :key="idx" class="flex items-center justify-between p-5 bg-gray-50/50 rounded-3xl border border-gray-100 hover:bg-gray-50 transition-colors group">
             <div class="flex items-center gap-4">
               <div class="w-10 h-10 bg-white rounded-xl border border-gray-200 flex items-center justify-center text-xs font-black text-gray-400 group-hover:border-blue-200 group-hover:text-blue-600 transition-all">
-                #{{ idx + 1 }}
+                #{{ (idx as number) + 1 }}
               </div>
               <div>
                 <p class="font-bold text-gray-900">{{ client.name }}</p>
@@ -193,23 +221,23 @@ async function generateAIReport() {
               </div>
             </div>
             <div class="text-right">
-              <p class="font-black text-gray-900">R$ {{ client.revenue.toLocaleString('pt-BR') }}</p>
+              <p class="font-black text-gray-900">R$ {{ (client.revenue as number).toLocaleString('pt-BR') }}</p>
               <div class="w-24 h-1.5 bg-gray-100 rounded-full mt-2 overflow-hidden">
-                <div class="h-full bg-blue-600 rounded-full" :style="{ width: (client.revenue / stats.totalRevenue * 100) + '%' }"></div>
+                <div class="h-full bg-blue-600 rounded-full" :style="{ width: ((client.revenue as number) / stats.totalRevenue * 100) + '%' }"></div>
               </div>
             </div>
           </div>
-          <div v-if="!stats?.clientRanking?.length" class="text-center py-12">
-            <p class="text-gray-400 font-medium">Nenhum dado de faturamento disponível.</p>
-          </div>
+        </div>
+        <div v-if="!stats?.clientRanking?.length" class="text-center py-12">
+          <p class="text-gray-400 font-medium">Nenhum dado de faturamento disponível.</p>
         </div>
       </div>
     </div>
 
     <!-- Modal do Relatório IA -->
     <BaseDialog :open="!!aiReport" @update:open="(val) => !val ? aiReport = null : null" title="Relatório Estratégico IA" size="lg" @close="aiReport = null">
-      <div class="prose prose-blue max-w-none p-4">
-        <div v-html="aiReport ? (useNuxtApp() as any).$markdown?.render(aiReport) || aiReport : ''"></div>
+      <div class="prose prose-blue max-w-none p-4 prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tight prose-p:font-medium prose-p:text-gray-600 max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200">
+        <div v-html="aiReport ? $md.render(aiReport) : ''"></div>
       </div>
       <template #footer>
         <BaseButton @click="aiReport = null">Entendido</BaseButton>

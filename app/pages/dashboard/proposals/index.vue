@@ -1,17 +1,23 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, Printer, MoreVertical, RefreshCcw, Loader2, FileText, ExternalLink } from 'lucide-vue-next'
+import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, Printer, MoreVertical, RefreshCcw, Loader2, FileText, ExternalLink, Eye } from 'lucide-vue-next'
 import type { ProposalDTO } from '../../../../types'
 
 const { data: proposals, refresh, pending } = useFetch<ProposalDTO[]>('/api/proposals')
 const { copy } = useClipboard()
 
 const isModalOpen = ref(false)
+const isPreviewOpen = ref(false)
 const selectedProposal = ref<ProposalDTO | null>(null)
 const isSubmitting = ref(false)
 const isResending = ref<string | null>(null)
 
 const { notify } = useAlerts()
+const siteOrigin = ref('')
+
+onMounted(() => {
+  siteOrigin.value = window.location.origin
+})
 
 async function resendEmail(proposalId: string) {
   isResending.value = proposalId
@@ -47,6 +53,11 @@ async function shareProposal(proposal: ProposalDTO) {
 function openModal(proposal: ProposalDTO | null = null) {
   selectedProposal.value = proposal
   isModalOpen.value = true
+}
+
+function openPreview(proposal: ProposalDTO) {
+  selectedProposal.value = proposal
+  isPreviewOpen.value = true
 }
 
 async function handleProposalSubmit(formData: any) {
@@ -181,6 +192,13 @@ const formatDate = (date: string) => {
             <td class="px-8 py-6 text-right">
               <div class="flex justify-end items-center gap-1">
                 <button 
+                  @click="openPreview(proposal)"
+                  class="p-2.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-2xl transition-all"
+                  title="Visualizar Orçamento"
+                >
+                  <Eye class="w-5 h-5" />
+                </button>
+                <button 
                   v-if="proposal.status === 'created' || proposal.status === 'pending'"
                   @click="resendEmail(proposal._id)"
                   :disabled="isResending === proposal._id"
@@ -242,6 +260,30 @@ const formatDate = (date: string) => {
         :is-submitting="isSubmitting"
         @submit="handleProposalSubmit"
       />
+    </BaseDialog>
+
+    <!-- Modal de Preview -->
+    <BaseDialog 
+      v-model:open="isPreviewOpen" 
+      title="Preview do Orçamento" 
+      size="xl"
+      @close="selectedProposal = null"
+    >
+      <div v-if="selectedProposal" class="flex flex-col h-[75vh]">
+        <div class="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center shrink-0 rounded-t-3xl">
+          <div class="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+            <LinkIcon class="w-3 h-3" /> Link do Cliente:
+            <span class="text-blue-600 lowercase font-bold select-all">{{ siteOrigin }}/p/{{ selectedProposal.slug }}</span>
+          </div>
+          <BaseButton size="sm" variant="outline" @click="shareProposal(selectedProposal)">Copiar Link</BaseButton>
+        </div>
+        <div class="flex-1 bg-white overflow-hidden rounded-b-3xl">
+          <iframe 
+            :src="`/p/${selectedProposal.slug}?t=${selectedProposal.token}&preview=true`" 
+            class="w-full h-full border-none"
+          ></iframe>
+        </div>
+      </div>
     </BaseDialog>
 
   </div>

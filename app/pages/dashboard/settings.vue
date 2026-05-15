@@ -238,7 +238,7 @@ function removePhone(index: number) {
             <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Rua / Logradouro *</label>
             <input v-model="profile.address.street" type="text" class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold">
           </div>
-          <BaseInput v-model="profile.address.number" label="Número" />
+          <BaseInput v-model="(profile.address.number as any)" label="Número" />
           <BaseInput v-model="profile.address.neighborhood" label="Bairro *" required />
           <BaseInput v-model="profile.address.city" label="Cidade *" required />
           <BaseInput v-model="profile.address.state" label="Estado (UF) *" required />

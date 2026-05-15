@@ -10,9 +10,9 @@ export default defineNuxtConfig({
     pageTransition: { name: 'page', mode: 'out-in' }
   },
 
-  // future: {
-  //   compatibilityVersion: 4
-  // },
+  future: {
+    compatibilityVersion: 4
+  },
 
   build: {
     transpile: ['@nuxtjs/cloudinary']

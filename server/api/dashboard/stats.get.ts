@@ -33,6 +33,21 @@ export default defineEventHandler(async (event) => {
   const ticketMedia = acceptedCount > 0 ? totalRevenue / acceptedCount : 0
   const approvalRate = proposalsCount > 0 ? (acceptedCount / proposalsCount) * 100 : 0
 
+  // Revenue History (last 30 days or period)
+  const revenueHistoryMap = acceptedProposals.reduce((acc: any, p) => {
+    const date = new Date(p.createdAt).toLocaleDateString('pt-BR')
+    acc[date] = (acc[date] || 0) + (p.totals?.final || 0)
+    return acc
+  }, {})
+
+  const revenueHistory = Object.entries(revenueHistoryMap)
+    .map(([date, amount]) => ({ date, amount }))
+    .sort((a, b) => {
+      const dateA = new Date(a.date.split('/').reverse().join('-')).getTime()
+      const dateB = new Date(b.date.split('/').reverse().join('-')).getTime()
+      return dateA - dateB
+    })
+
   // Status Distribution
   const statusDistribution = proposals.reduce((acc: any, p) => {
     acc[p.status] = (acc[p.status] || 0) + 1
@@ -59,6 +74,7 @@ export default defineEventHandler(async (event) => {
     totalRevenue,
     ticketMedia,
     approvalRate,
+    revenueHistory,
     statusDistribution,
     clientRanking
   }

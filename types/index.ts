@@ -59,6 +59,7 @@ export interface CatalogItemDTO {
 export type ServiceDTO = CatalogItemDTO
 
 export interface ProposalItemDTO {
+  _id?: string
   catalogItemId?: string
   name: string
   description: string
@@ -95,6 +96,7 @@ export interface ProposalDTO {
   }
   contractText: string
   termsAndConditions: string
+  expiresAt: string | Date
   createdAt: string
   updatedAt: string
 }

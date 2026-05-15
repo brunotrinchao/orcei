@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Phone, MessageCircle, CheckCircle2, Download, ExternalLink, MapPin, X, Loader2, AlertCircle, PencilLine, ThumbsDown } from 'lucide-vue-next'
+import { Phone, MessageCircle, CheckCircle2, Download, ExternalLink, MapPin, X, Loader2, AlertCircle, PencilLine, ThumbsDown, Eye } from 'lucide-vue-next'
 import type { ProposalDTO } from '../../../types'
 
 definePageMeta({
@@ -8,7 +8,8 @@ definePageMeta({
 
 const { notify, confirm: confirmAlert } = useAlerts()
 const route = useRoute()
-const { t: token } = route.query
+const { t: token, preview } = route.query
+const isPreview = computed(() => preview === 'true')
 const { data: proposal, refresh, error } = useFetch<ProposalDTO>(`/api/proposals/public/${route.params.slug}`, {
   query: { t: token }
 })
@@ -22,209 +23,182 @@ const isSubmittingAction = ref(false)
 
 const selectedMethod = ref<'cash' | 'credit_card'>('cash')
 
-watchEffect(() => {
-  if (proposal.value) {
-    selectedMethod.value = proposal.value.paymentConfig?.method || 'cash'
-  }
-})
-
 const finalTotal = computed(() => {
   if (!proposal.value) return 0
-  const subtotal = proposal.value.totals.subtotal
-  const baseTotal = subtotal + (proposal.value.totals.additional || 0) - (proposal.value.totals.discount || 0)
-  
+  const base = proposal.value.totals.subtotal + (proposal.value.totals.additional || 0) - (proposal.value.totals.discount || 0)
   if (selectedMethod.value === 'cash') {
-    return baseTotal * (1 - (proposal.value.paymentConfig.cashDiscount / 100))
+    return base * (1 - (proposal.value.paymentConfig.cashDiscount / 100))
   }
-  return baseTotal
+  return base
 })
 
-const profile = computed(() => (proposal.value?.profileId as any))
-
 async function handleAccept() {
-  confirmAlert({
-    title: 'Aceitar Orçamento',
-    description: 'Ao aceitar este orçamento, você concorda com os termos e condições. Deseja prosseguir?',
-    onConfirm: async () => {
-      isAccepting.value = true
-      try {
-        await $fetch('/api/proposals/public/accept', {
-          method: 'POST',
-          body: { 
-            slug: route.params.slug,
-            paymentMethod: selectedMethod.value
-          }
-        })
-        await refresh()
-        notify('Sucesso', 'Orçamento aceito com sucesso! O profissional será notificado.')
-      } catch (e: any) {
-        notify('Erro', e.data?.statusMessage || 'Erro ao aceitar orçamento')
-      } finally {
-        isAccepting.value = false
-      }
-    }
-  })
-}
-
-async function handleAction() {
-  if (!actionType.value) return
-  
-  isSubmittingAction.value = true
+  if (isPreview.value) return
+  isAccepting.value = true
   try {
-    await $fetch('/api/proposals/public/action', {
+    await $fetch(`/api/proposals/public/accept`, {
       method: 'POST',
       body: { 
         slug: route.params.slug,
-        action: actionType.value,
-        notes: actionNotes.value
+        token: token,
+        paymentMethod: selectedMethod.value
       }
     })
     await refresh()
+    notify('Sucesso', 'Orçamento aceito com sucesso!')
+  } catch (e: any) {
+    notify('Erro', e.data?.statusMessage || 'Erro ao aceitar orçamento')
+  } finally {
+    isAccepting.value = false
+  }
+}
+
+function openActionModal(type: 'decline' | 'request_changes') {
+  if (isPreview.value) return
+  actionType.value = type
+  actionNotes.value = ''
+  isActionModalOpen.value = true
+}
+
+async function handleAction() {
+  if (isPreview.value) return
+  if (!actionNotes.value) return notify('Aviso', 'Por favor, escreva uma mensagem.')
+  
+  isSubmittingAction.value = true
+  try {
+    await $fetch(`/api/proposals/public/action`, {
+      method: 'POST',
+      body: {
+        slug: route.params.slug,
+        token: token,
+        type: actionType.value,
+        notes: actionNotes.value
+      }
+    })
     isActionModalOpen.value = false
     notify('Sucesso', actionType.value === 'decline' ? 'Orçamento recusado.' : 'Solicitação de alteração enviada!')
-  } catch (e: any) {
+    await refresh()
+  } catch (e) {
     notify('Erro', 'Erro ao processar ação')
   } finally {
     isSubmittingAction.value = false
   }
 }
 
-const openActionModal = (type: 'decline' | 'request_changes') => {
-  actionType.value = type
-  actionNotes.value = ''
-  isActionModalOpen.value = true
+const formatDate = (date: any) => {
+  return new Date(date).toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric'
+  })
 }
 
-const openWhatsApp = () => {
-  if (!profile.value?.contact?.phones?.[0]?.number) return
-  const phone = profile.value.contact.phones[0].number.replace(/\D/g, '')
-  const text = encodeURIComponent(`Olá, estou visualizando o orçamento "${proposal.value?.title}" e gostaria de tirar algumas dúvidas.`)
-  window.open(`https://wa.me/55${phone}?text=${text}`, '_blank')
+const statusMap: any = {
+  draft: { label: 'Rascunho', class: 'bg-gray-100 text-gray-600' },
+  created: { label: 'Enviado', class: 'bg-blue-100 text-blue-600' },
+  pending: { label: 'Pendente', class: 'bg-orange-100 text-orange-600' },
+  accepted: { label: 'Aceito', class: 'bg-green-100 text-green-600' },
+  expired: { label: 'Expirado', class: 'bg-red-100 text-red-600' }
 }
 </script>
 
 <template>
-  <div v-if="error" class="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-    <div class="text-center max-w-md">
-      <div class="w-20 h-20 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
-        <X class="w-10 h-10" />
-      </div>
-      <h1 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Link Expirado ou Inválido</h1>
-      <p class="text-gray-500 mt-2 font-medium">Este link de orçamento não está mais disponível ou o token de segurança é inválido.</p>
-      <BaseButton to="/" variant="secondary" class="mt-8">Ir para Home</BaseButton>
-    </div>
-  </div>
-
-  <div v-else-if="proposal" class="min-h-screen bg-gray-50 pb-20">
-    <!-- Header Premium -->
-    <header 
-      class="text-white py-12 px-6 sm:py-20 sm:px-10 transition-colors"
-      :class="{
-        'bg-blue-600': proposal.status === 'pending' || proposal.status === 'created',
-        'bg-green-600': proposal.status === 'accepted',
-        'bg-gray-600': proposal.status === 'expired'
-      }"
-    >
-      <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6">
-        <div>
-          <div class="flex items-center gap-3 mb-4">
-            <span class="bg-white/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/30">
-              #{{ proposal.code || 'ORC' }}
-            </span>
+  <div v-if="proposal" class="min-h-screen bg-gray-50/50 pb-32">
+    <!-- Top Bar -->
+    <header class="bg-white border-b border-gray-100 py-4 px-6 sticky top-0 z-30 backdrop-blur-md bg-white/80">
+      <div class="max-w-5xl mx-auto flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-100">
+            <span class="font-black text-xl italic">O.</span>
           </div>
-          <h1 class="text-3xl sm:text-4xl font-bold">{{ proposal.title }}</h1>
-          <p class="mt-2 opacity-90 text-sm sm:text-base">Orçamento preparado para <span class="font-bold">{{ proposal.client.name }}</span></p>
+          <div>
+            <h1 class="font-black text-gray-900 uppercase tracking-tighter leading-none">{{ proposal.title }}</h1>
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Orçamento #{{ proposal.code }}</p>
+          </div>
         </div>
-        <div class="text-left sm:text-right">
-          <p class="text-xs font-bold uppercase tracking-widest opacity-70 mb-1">Status</p>
-          <p class="text-xl sm:text-2xl font-bold">
-            {{ proposal.status === 'accepted' ? 'Aceito' : (proposal.status === 'expired' ? 'Recusado' : 'Pendente') }}
-          </p>
+        <div class="flex items-center gap-4">
+          <BaseBadge :variant="proposal.status === 'accepted' ? 'success' : proposal.status === 'expired' ? 'error' : 'info'">
+            {{ statusMap[proposal.status]?.label }}
+          </BaseBadge>
         </div>
       </div>
     </header>
 
-    <main class="max-w-4xl mx-auto -mt-10 px-4">
-      <!-- Info Freelancer -->
-      <div class="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div class="flex items-center gap-4 text-center sm:text-left flex-col sm:flex-row">
-          <div v-if="profile?.brandConfig?.logoUrl" class="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-50 bg-white">
-            <img :src="profile.brandConfig.logoUrl" class="w-full h-full object-contain">
-          </div>
-          <div v-else class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center font-bold text-xl uppercase">
-            {{ profile?.name?.charAt(0) }}
-          </div>
-          <div>
-            <p class="text-lg font-bold text-gray-900">{{ profile?.name }}</p>
-            <p class="text-sm text-gray-500">{{ profile?.email }}</p>
-            <p v-if="profile?.address?.street" class="text-xs text-gray-400 mt-1">
-              {{ profile.address.street }}, {{ profile.address.number || '' }} - {{ profile.address.neighborhood || '' }}<br>
-              {{ profile.address.city || '' }}/{{ profile.address.state || '' }} - {{ profile.address.zip || '' }}
-            </p>
-          </div>
-        </div>
-        <div class="flex flex-col items-center sm:items-end gap-3">
-          <button 
-            v-if="profile?.contact?.phones?.[0]"
-            @click="openWhatsApp"
-            class="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-green-100"
-          >
-            <MessageCircle class="w-4 h-4" /> Falar no WhatsApp
-          </button>
-          <div class="text-center sm:text-right">
-            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Emitido em</p>
-            <p class="text-sm font-medium text-gray-700">{{ new Date(proposal.createdAt).toLocaleDateString('pt-BR') }}</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Itens do Orçamento -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
-        <div class="p-6 sm:p-8 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center">
-          <h2 class="text-xl font-bold text-gray-900">Escopo dos Serviços</h2>
-          <div class="flex gap-2">
-            <a :href="`/api/proposals/public/${route.params.slug}/pdf`" target="_blank" class="p-2 text-gray-400 hover:text-gray-900 transition-colors">
-              <Download class="w-5 h-5" />
-            </a>
-          </div>
-        </div>
-        <div class="divide-y divide-gray-50">
-          <div v-for="item in proposal.items" :key="item.name" class="p-6 sm:p-8 hover:bg-gray-50/20 transition-colors">
-            <div class="flex flex-col sm:flex-row justify-between items-start gap-4">
-              <div class="flex-1">
-                <h3 class="font-bold text-gray-900 text-lg mb-2">{{ item.name }}</h3>
-                <p class="text-gray-600 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">{{ item.description }}</p>
+    <main class="max-w-5xl mx-auto px-6 py-12">
+      <!-- Grid Principal -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
+        <!-- Coluna Esquerda: Dados -->
+        <div class="lg:col-span-2 space-y-8">
+          <section class="bg-white p-8 sm:p-10 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full translate-x-1/2 -translate-y-1/2 opacity-50"></div>
+            
+            <div class="relative z-10">
+              <h2 class="text-xs font-black text-blue-600 uppercase tracking-[0.2em] mb-8">Escopo do Projeto</h2>
+              
+              <div class="space-y-10">
+                <div v-for="item in proposal.items" :key="item._id" class="group">
+                  <div class="flex justify-between items-start mb-3">
+                    <h3 class="font-black text-gray-900 text-xl tracking-tight">{{ item.name }}</h3>
+                    <span class="font-black text-gray-900">R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+                  </div>
+                  <p class="text-gray-500 font-medium leading-relaxed max-w-2xl">{{ item.description }}</p>
+                  <div class="mt-4 flex items-center gap-2">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-3 py-1 rounded-full">
+                      Quantidade: {{ item.quantity }}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div class="text-left sm:text-right shrink-0 bg-blue-50 sm:bg-transparent p-3 sm:p-0 rounded-xl w-full sm:w-auto">
-                <p class="text-xs font-bold text-blue-600 sm:text-gray-400 uppercase tracking-widest mb-1">Investimento</p>
-                <p class="text-xl font-black text-blue-700 sm:text-gray-900">R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
-                <p v-if="item.quantity > 1" class="text-xs text-gray-500 mt-1">{{ item.quantity }}x R$ {{ item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
+
+              <div class="mt-12 pt-10 border-t border-gray-100 flex justify-between items-center">
+                <span class="text-sm font-bold text-gray-400 uppercase tracking-widest">Subtotal Bruto</span>
+                <span class="font-bold text-gray-500">R$ {{ proposal.totals.subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Coluna Direita: Sidebar -->
+        <aside class="space-y-6">
+          <!-- Card Cliente -->
+          <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+            <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Preparado para</h3>
+            <div class="flex items-center gap-4 mb-6">
+              <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 font-black">
+                {{ proposal.client.name.charAt(0) }}
+              </div>
+              <div>
+                <p class="font-black text-gray-900 leading-tight">{{ proposal.client.name }}</p>
+                <p class="text-xs font-medium text-gray-500">{{ proposal.client.email }}</p>
+              </div>
+            </div>
+            <div class="pt-6 border-t border-gray-50 space-y-4">
+              <div class="flex items-center gap-3 text-gray-600">
+                <Clock class="w-4 h-4" />
+                <span class="text-xs font-bold uppercase tracking-tight">Válido até {{ formatDate(proposal.expiresAt) }}</span>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Ajustes Financeiros Exibidos -->
-        <div v-if="proposal.totals.additional || proposal.totals.discount" class="p-6 sm:p-8 bg-gray-50/30 border-t border-gray-50 space-y-2">
-          <div v-if="proposal.totals.additional" class="flex justify-between text-sm">
-            <span class="font-bold text-gray-500 uppercase tracking-widest text-[10px]">Taxas Adicionais</span>
-            <span class="font-black text-gray-900">+ R$ {{ proposal.totals.additional.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+          <!-- Botões de Contato -->
+          <div class="grid grid-cols-2 gap-4">
+            <a :href="`mailto:${proposal.client.email}`" class="flex flex-col items-center justify-center p-6 bg-white rounded-3xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all group">
+              <Mail class="w-6 h-6 text-gray-400 group-hover:text-blue-600 mb-2" />
+              <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-blue-600">E-mail</span>
+            </a>
+            <a v-if="proposal.client.phone" :href="`https://wa.me/${proposal.client.phone.replace(/\D/g, '')}`" target="_blank" class="flex flex-col items-center justify-center p-6 bg-white rounded-3xl border border-gray-100 hover:border-green-200 hover:bg-green-50/30 transition-all group">
+              <MessageCircle class="w-6 h-6 text-gray-400 group-hover:text-green-600 mb-2" />
+              <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-green-600">WhatsApp</span>
+            </a>
           </div>
-          <div v-if="proposal.totals.discount" class="flex justify-between text-sm">
-            <span class="font-bold text-gray-500 uppercase tracking-widest text-[10px]">Desconto Especial</span>
-            <span class="font-black text-emerald-600">- R$ {{ proposal.totals.discount.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-          </div>
-        </div>
+        </aside>
       </div>
 
-      <!-- Escolha da Forma de Pagamento (Client Choice) -->
-      <div v-if="!['accepted', 'expired'].includes(proposal.status)" class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-8 p-6 sm:p-8">
-        <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-          <CreditCard class="w-6 h-6 text-blue-600" />
-          Escolha a Forma de Pagamento
-        </h2>
+      <!-- Métodos de Pagamento -->
+      <section v-if="!['accepted', 'expired'].includes(proposal.status)" class="mb-12">
+        <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-8 text-center">Escolha a Forma de Pagamento</h2>
         
-        <div class="flex flex-col sm:flex-row gap-4">
+        <div class="flex flex-col md:flex-row gap-6">
           <button 
             @click="selectedMethod = 'cash'"
             :class="{
@@ -234,18 +208,18 @@ const openWhatsApp = () => {
             }"
           >
             <div class="flex justify-between items-center mb-3">
-              <span class="font-bold text-gray-900 text-lg">À Vista</span>
+              <span class="font-bold text-gray-900 text-lg">À Vista (Pix/Transferência)</span>
               <div v-if="selectedMethod === 'cash'" class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center shadow-lg text-white">
                 <CheckCircle2 class="w-4 h-4" />
               </div>
               <div v-else class="w-6 h-6 border-2 border-gray-200 rounded-full"></div>
             </div>
             <p class="text-sm text-gray-600 leading-relaxed">
-              {{ proposal.paymentConfig.cashDiscount > 0 ? `Economize ${proposal.paymentConfig.cashDiscount}% pagando via PIX ou Boleto.` : 'Pagamento integral no ato da contratação.' }}
+              Pagamento integral na aprovação. Você ganha <strong>{{ proposal.paymentConfig.cashDiscount }}% de desconto</strong> sobre o valor total.
             </p>
             <div class="mt-4 pt-4 border-t border-gray-100 flex items-baseline gap-2">
               <span class="text-xs font-bold text-gray-400 uppercase">Total</span>
-              <span class="text-xl font-black text-blue-700">R$ {{ (finalTotal).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+              <span class="text-xl font-black text-blue-700">R$ {{ (proposal.totals.subtotal * (1 - proposal.paymentConfig.cashDiscount / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
             </div>
           </button>
 
@@ -273,7 +247,7 @@ const openWhatsApp = () => {
             </div>
           </button>
         </div>
-      </div>
+      </section>
 
       <!-- Contrato -->
       <div v-if="proposal.contractText" class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-8 overflow-hidden">
@@ -285,7 +259,7 @@ const openWhatsApp = () => {
         </div>
       </div>
 
-      <!-- Footer de Decisão -->
+      <!-- Decision Footer -->
       <div class="bg-gray-900 text-white p-8 sm:p-12 rounded-3xl shadow-2xl flex flex-col sm:flex-row justify-between items-center gap-8 overflow-hidden relative">
         <div v-if="proposal.status === 'accepted'" class="absolute inset-0 bg-green-600 flex items-center justify-center gap-4 animate-in fade-in zoom-in duration-500">
           <CheckCircle2 class="w-12 h-12" />
@@ -297,53 +271,37 @@ const openWhatsApp = () => {
           <p class="text-4xl sm:text-5xl font-black">R$ {{ finalTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
           <p v-if="!['accepted', 'expired'].includes(proposal.status)" class="text-sm font-bold text-blue-400 mt-2 uppercase tracking-tight">
             {{ selectedMethod === 'cash' ? 'À Vista' : 'Cartão de Crédito' }} 
-            — 
-            <span v-if="selectedMethod === 'cash'">
-              {{ proposal.paymentConfig.cashDiscount > 0 ? `${proposal.paymentConfig.cashDiscount}% de desconto` : 'Preço integral' }}
-            </span>
-            <span v-else>
-              {{ proposal.paymentConfig.installments }}x de R$ {{ (proposal.totals.subtotal / proposal.paymentConfig.installments).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
-            </span>
+            <span v-if="selectedMethod === 'cash'">({{ proposal.paymentConfig.cashDiscount }}% OFF)</span>
+            <span v-else>(em até {{ proposal.paymentConfig.installments }}x)</span>
           </p>
         </div>
-        
-        <div v-if="!['accepted', 'expired'].includes(proposal.status)" class="flex flex-col sm:flex-row gap-4 items-center relative z-10">
-          <div class="flex flex-col gap-2">
-            <button 
-              @click="handleAccept"
-              :disabled="isAccepting"
-              class="bg-blue-600 hover:bg-blue-500 text-white px-10 py-4 rounded-2xl font-bold text-lg transition shadow-xl shadow-blue-900/20 disabled:opacity-50 flex items-center justify-center gap-3 min-w-[240px]"
-            >
-              <Loader2 v-if="isAccepting" class="animate-spin h-5 w-5" />
-              {{ isAccepting ? 'Processando...' : 'Aceitar Orçamento' }}
+
+        <div v-if="['pending', 'created'].includes(proposal.status)" class="flex flex-col sm:flex-row gap-4 relative z-10 w-full sm:w-auto">
+          <template v-if="!isPreview">
+            <button @click="openActionModal('request_changes')" class="px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest border-2 border-white/10 hover:bg-white/10 transition-all">Solicitar Alteração</button>
+            <button @click="handleAccept" :disabled="isAccepting" class="px-10 py-5 bg-blue-600 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-blue-500/20 hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
+              <Loader2 v-if="isAccepting" class="w-4 h-4 animate-spin" />
+              Aceitar Orçamento
             </button>
-            
-            <div class="flex gap-2">
-              <button 
-                @click="openActionModal('request_changes')"
-                class="flex-1 bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/10 flex items-center justify-center gap-2"
-              >
-                <PencilLine class="w-3.5 h-3.5" /> Pedir Alteração
-              </button>
-              <button 
-                @click="openActionModal('decline')"
-                class="flex-1 bg-red-500/20 hover:bg-red-500/40 text-red-400 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-red-500/20 flex items-center justify-center gap-2"
-              >
-                <ThumbsDown class="w-3.5 h-3.5" /> Recusar
-              </button>
-            </div>
+          </template>
+          <div v-else class="px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest bg-white/5 text-gray-400 border border-white/10">
+            Modo Visualização
           </div>
         </div>
       </div>
 
-      <!-- Footer Corporativo -->
-      <footer class="mt-20 pt-12 border-t border-gray-200 text-center space-y-6">
-        <div class="flex flex-col items-center gap-2">
-          <h4 class="font-black text-gray-900 uppercase tracking-widest text-sm">{{ profile?.company?.tradeName || profile?.name }}</h4>
-          <p v-if="profile?.company?.legalName" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{{ profile.company.legalName }} • CNPJ: {{ profile.company.taxId }}</p>
+      <div v-if="isPreview" class="mt-8 p-6 bg-blue-50 rounded-3xl border border-blue-100 flex items-center gap-4">
+        <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm shrink-0">
+          <Eye class="w-6 h-6 text-blue-600" />
         </div>
-        
-        <div v-if="proposal.termsAndConditions" class="max-w-2xl mx-auto">
+        <div>
+          <h4 class="font-bold text-blue-900 uppercase text-xs tracking-widest">Você está em modo de preview</h4>
+          <p class="text-blue-700 text-sm font-medium mt-0.5">Esta é a visão exata do seu cliente. As ações de aceite e alteração estão desabilitadas.</p>
+        </div>
+      </div>
+
+      <footer class="mt-12 text-center pb-20">
+        <div class="flex flex-col items-center gap-6">
           <button 
             @click="isTermsOpen = true"
             class="text-gray-400 hover:text-gray-600 text-[10px] font-black uppercase tracking-[0.2em] underline decoration-dotted underline-offset-8"
@@ -405,7 +363,7 @@ const openWhatsApp = () => {
     </BaseDialog>
 
     <!-- Floating Action Button Mobile -->
-    <div v-if="!['accepted', 'expired'].includes(proposal.status)" class="fixed bottom-6 left-6 right-6 sm:hidden z-50">
+    <div v-if="!['accepted', 'expired'].includes(proposal.status) && !isPreview" class="fixed bottom-6 left-6 right-6 sm:hidden z-50">
       <button 
         @click="handleAccept"
         :disabled="isAccepting"

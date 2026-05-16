@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, Printer, MoreVertical, RefreshCcw, Loader2, FileText, ExternalLink, Eye } from 'lucide-vue-next'
+import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote } from 'lucide-vue-next'
 import type { ProposalDTO } from '../../../../types'
 
 const searchQuery = ref('')
@@ -23,9 +23,11 @@ const { copy } = useClipboard()
 
 const isModalOpen = ref(false)
 const isPreviewOpen = ref(false)
+const isAcceptedModalOpen = ref(false)
 const selectedProposal = ref<ProposalDTO | null>(null)
 const isSubmitting = ref(false)
 const isResending = ref<string | null>(null)
+const proposalFormRef = ref<any>(null)
 
 const { notify } = useAlerts()
 const siteOrigin = ref('')
@@ -72,7 +74,15 @@ function openModal(proposal: ProposalDTO | null = null) {
 
 function openPreview(proposal: ProposalDTO) {
   selectedProposal.value = proposal
-  isPreviewOpen.value = true
+  if (proposal.status === 'accepted') {
+    isAcceptedModalOpen.value = true
+  } else {
+    isPreviewOpen.value = true
+  }
+}
+
+function whatsappLink(phone: string) {
+  return `https://wa.me/55${phone.replace(/\D/g, '')}`
 }
 
 async function handleProposalSubmit(formData: any) {
@@ -92,7 +102,8 @@ async function handleProposalSubmit(formData: any) {
     refresh()
     notify('Sucesso', 'Orçamento processado com sucesso!')
   } catch (e: any) {
-    notify('Erro', e.data?.statusMessage || 'Erro ao processar orçamento')
+    const html = parseApiErrors(e)
+    notify(html ? 'Dados inválidos' : 'Erro', html ?? (e.data?.statusMessage || 'Erro ao processar orçamento'))
   } finally {
     isSubmitting.value = false
   }
@@ -113,19 +124,25 @@ const formatDate = (date: string) => {
 
 <template>
   <div class="max-w-6xl mx-auto px-4 sm:px-6">
-    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
-      <div>
-        <h1 class="text-4xl font-black text-gray-900 tracking-tight uppercase">Seus Orçamentos</h1>
-        <p class="text-gray-600 mt-2 text-lg font-medium">Acompanhe e gerencie seus orçamentos comerciais.</p>
-      </div>
-      <BaseButton 
-        @click="openModal()"
-        class="w-full sm:w-auto px-10 py-4 shadow-2xl shadow-gray-200"
-      >
+    <PageHeader title="Seus Orçamentos" subtitle="Acompanhe e gerencie seus orçamentos comerciais.">
+      <BaseButton @click="openModal()" class="w-full sm:w-auto shadow-2xl shadow-gray-200">
         <Plus class="w-5 h-5 mr-2" />
         Novo Orçamento
       </BaseButton>
-    </header>
+    </PageHeader>
+
+    <!-- Busca -->
+    <div class="mb-10 relative max-w-xl">
+      <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="Buscar por título, cliente ou código..."
+        class="w-full pl-14 pr-6 py-5 bg-white border-2 border-gray-100 rounded-[2rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-300 shadow-sm"
+      >
+      <div class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300">
+        <Search class="w-6 h-6" />
+      </div>
+    </div>
 
     <!-- Listagem -->
     <div class="bg-white rounded-[2.5rem] border border-gray-200 shadow-sm overflow-hidden">
@@ -273,21 +290,146 @@ const formatDate = (date: string) => {
     </div>
 
     <!-- Modal de Orçamento -->
-    <BaseDialog 
-      v-model:open="isModalOpen" 
-      :title="selectedProposal ? 'Editar Orçamento' : 'Novo Orçamento'" 
+    <BaseDialog
+      v-model:open="isModalOpen"
+      :title="selectedProposal ? 'Editar Orçamento' : 'Novo Orçamento'"
       size="xl"
     >
       <ProposalForm
+        ref="proposalFormRef"
         :initial-data="selectedProposal || undefined"
         :is-editing="!!selectedProposal"
         :is-submitting="isSubmitting"
         @submit="handleProposalSubmit"
       />
+
+      <template #footer>
+        <!-- Editando não-rascunho: salvar único -->
+        <template v-if="selectedProposal && selectedProposal.status !== 'draft'">
+          <BaseButton type="button" :disabled="isSubmitting" :loading="isSubmitting" @click="proposalFormRef?.submit()">
+            Salvar Alterações
+          </BaseButton>
+        </template>
+        <!-- Novo ou rascunho: dois botões -->
+        <template v-else>
+          <BaseButton type="button" variant="outline" :disabled="isSubmitting" @click="proposalFormRef?.submit('draft')">
+            <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin mr-2" />
+            Rascunho
+          </BaseButton>
+          <BaseButton type="button" :disabled="isSubmitting" @click="proposalFormRef?.submit('created')">
+            <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin mr-2" />
+            Criar e Enviar
+          </BaseButton>
+        </template>
+      </template>
+    </BaseDialog>
+
+    <!-- Modal Proposta Aceita -->
+    <BaseDialog
+      v-model:open="isAcceptedModalOpen"
+      title="Proposta Aceita"
+      size="xl"
+      @close="selectedProposal = null"
+    >
+      <div v-if="selectedProposal" class="space-y-0">
+        <!-- Header verde -->
+        <div class="bg-green-500 rounded-2xl p-6 flex items-center gap-4 mb-6">
+          <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
+            <CheckCircle2 class="w-8 h-8 text-white" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-[10px] font-black text-green-100 uppercase tracking-widest mb-1">Orçamento Aceito</p>
+            <h3 class="text-xl font-black text-white tracking-tight truncate">{{ selectedProposal.title || selectedProposal.code }}</h3>
+            <p class="text-sm text-green-100 font-medium mt-0.5">{{ selectedProposal.code }}</p>
+          </div>
+          <div class="text-right shrink-0">
+            <p class="text-[10px] font-black text-green-100 uppercase tracking-widest mb-1">Total</p>
+            <p class="text-2xl font-black text-white">R$ {{ selectedProposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
+          </div>
+        </div>
+
+        <!-- Cliente + Contato -->
+        <div class="bg-gray-50 rounded-2xl p-6 mb-4">
+          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Cliente</p>
+          <div class="flex items-center justify-between gap-4 flex-wrap">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 font-black text-lg">
+                {{ selectedProposal.client.name.charAt(0) }}
+              </div>
+              <div>
+                <p class="font-black text-gray-900">{{ selectedProposal.client.name }}</p>
+                <p class="text-xs text-gray-500 font-medium">{{ selectedProposal.client.email }}</p>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <a
+                :href="`mailto:${selectedProposal.client.email}`"
+                class="flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-gray-100 hover:border-blue-200 hover:text-blue-600 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-gray-600"
+              >
+                <Mail class="w-4 h-4" /> E-mail
+              </a>
+              <a
+                v-if="selectedProposal.client.phone"
+                :href="whatsappLink(selectedProposal.client.phone)"
+                target="_blank"
+                class="flex items-center gap-2 px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-green-100"
+              >
+                <MessageCircle class="w-4 h-4" /> WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Forma de Pagamento -->
+        <div class="flex items-center gap-3 px-4 py-3 bg-blue-50 rounded-2xl mb-4">
+          <CreditCard v-if="selectedProposal.paymentConfig?.method === 'credit_card'" class="w-5 h-5 text-blue-600 shrink-0" />
+          <Banknote v-else class="w-5 h-5 text-blue-600 shrink-0" />
+          <p class="text-sm font-black text-blue-900">
+            {{ selectedProposal.paymentConfig?.method === 'credit_card'
+              ? `Cartão de Crédito — ${selectedProposal.paymentConfig.installments}x`
+              : `À Vista (${selectedProposal.paymentConfig?.cashDiscount}% desconto)` }}
+          </p>
+        </div>
+
+        <!-- Itens -->
+        <div class="border border-gray-100 rounded-2xl overflow-hidden mb-4">
+          <div class="px-5 py-3 bg-gray-50 border-b border-gray-100">
+            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Itens do Orçamento</p>
+          </div>
+          <div class="divide-y divide-gray-50">
+            <div v-for="item in selectedProposal.items" :key="item._id" class="flex justify-between items-start px-5 py-4 gap-4">
+              <div class="flex-1 min-w-0">
+                <p class="font-black text-gray-900 text-sm">{{ item.name }}</p>
+                <p class="text-xs text-gray-400 font-medium mt-0.5 truncate">{{ item.description }}</p>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="font-black text-gray-900 text-sm">R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
+                <p class="text-[10px] text-gray-400 font-bold">{{ item.quantity }}x R$ {{ item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-between items-center px-5 py-4 border-t border-gray-100 bg-gray-50/50">
+            <span class="text-xs font-black text-gray-500 uppercase tracking-widest">Total Final</span>
+            <span class="font-black text-green-600 text-lg">R$ {{ selectedProposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+          </div>
+        </div>
+
+      </div>
+
+      <template #footer>
+        <NuxtLink
+          :to="selectedProposal ? `/p/${selectedProposal.slug}` : '#'"
+          target="_blank"
+          class="mr-auto flex items-center gap-2 text-xs font-black text-gray-400 hover:text-blue-600 uppercase tracking-widest transition-colors"
+        >
+          <ExternalLink class="w-4 h-4" /> Ver link público
+        </NuxtLink>
+        <BaseButton variant="secondary" size="sm" @click="isAcceptedModalOpen = false">Fechar</BaseButton>
+      </template>
     </BaseDialog>
 
     <!-- Modal de Preview -->
-    <BaseDialog 
+    <BaseDialog
       v-model:open="isPreviewOpen" 
       title="Preview do Orçamento" 
       size="xl"
@@ -302,8 +444,8 @@ const formatDate = (date: string) => {
           <BaseButton size="sm" variant="outline" @click="shareProposal(selectedProposal)">Copiar Link</BaseButton>
         </div>
         <div class="flex-1 bg-white overflow-hidden rounded-b-3xl">
-          <iframe 
-            :src="`/p/${selectedProposal.slug}?t=${selectedProposal.token}&preview=true`" 
+          <iframe
+            :src="`/p/${selectedProposal.slug}?preview=true`"
             class="w-full h-full border-none"
           ></iframe>
         </div>

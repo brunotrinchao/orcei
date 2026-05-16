@@ -1,5 +1,8 @@
 <script setup lang="ts">
 const { isOpen, options } = useAlerts()
+const { initTracking } = useCookieConsent()
+
+onMounted(() => initTracking())
 
 function handleConfirm() {
   if (options.value.onConfirm) options.value.onConfirm()
@@ -16,6 +19,8 @@ function handleCancel() {
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
+
+  <CookieConsent />
 
   <BaseAlertDialog
     v-model:open="isOpen"

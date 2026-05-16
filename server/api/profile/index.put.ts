@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
       defaultContractTemplate: body.defaultContractTemplate,
       defaultTermsAndConditions: body.defaultTermsAndConditions
     },
-    { new: true, runValidators: true }
+    { returnDocument: 'after', runValidators: true }
   )
 
   if (!profile) {

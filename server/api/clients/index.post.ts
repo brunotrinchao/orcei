@@ -1,5 +1,6 @@
 import { ProfileService } from '../../services/ProfileService'
 import { ClientService } from '../../services/ClientService'
+import { validateClient, throwIfInvalid } from '../../utils/validate'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -9,5 +10,7 @@ export default defineEventHandler(async (event) => {
   if (!profile) throw createError({ statusCode: 404 })
 
   const body = await readBody(event)
+  throwIfInvalid(validateClient(body))
+
   return await ClientService.create({ ...body, profileId: profile._id })
 })

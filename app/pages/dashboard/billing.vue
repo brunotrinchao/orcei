@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { CreditCard, History, Zap, CheckCircle2, Loader2, ArrowRight } from 'lucide-vue-next'
+import { CreditCard, History, Zap, CheckCircle2, Loader2, ArrowRight, Download, AlertTriangle } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../../types'
 
 const { data: profile, refresh: refreshProfile } = useFetch<ProfileDTO>('/api/profile')
-const { notify, confirm: confirmAlert } = useAlerts()
+const { notify } = useAlerts()
 
 const plans = [
   {
@@ -29,6 +29,12 @@ const isLoading = ref<string | null>(null)
 const isCanceling = ref(false)
 
 const isPlanActive = computed(() => profile.value?.subscriptionPlan && profile.value.subscriptionPlan !== 'free')
+const isCancelScheduled = computed(() => !!profile.value?.cancelAtPeriodEnd)
+
+const cancelEndDate = computed(() => {
+  if (!profile.value?.subscriptionEndsAt) return null
+  return new Date(profile.value.subscriptionEndsAt).toLocaleDateString('pt-BR')
+})
 
 async function handleManage() {
   isCanceling.value = true
@@ -48,7 +54,7 @@ async function handleAction(tier: string, type: 'subscription' | 'credits' = 'su
   if (type === 'credits' && isPlanActive.value) {
     return notify('Aviso', 'Usuários com plano ativo possuem orçamentos ilimitados.')
   }
-  
+
   isLoading.value = tier
   try {
     const { url } = await $fetch('/api/stripe/checkout', {
@@ -70,14 +76,43 @@ watchEffect(() => {
   if (success.value) {
     refreshProfile()
     refreshInvoices()
-    // Limpa a query string após 5 segundos para não ficar mostrando a mensagem de sucesso pra sempre
     setTimeout(() => {
       navigateTo('/dashboard/billing', { replace: true })
     }, 5000)
   }
 })
 
+const portal = computed(() => route.query.portal === 'true')
+
+watchEffect(() => {
+  if (portal.value) {
+    // Retry profile refresh to handle webhook race condition
+    refreshProfile()
+    setTimeout(() => { refreshProfile(); refreshInvoices() }, 2000)
+    setTimeout(() => {
+      refreshProfile()
+      refreshInvoices()
+      navigateTo('/dashboard/billing', { replace: true })
+    }, 5000)
+  }
+})
+
 const { data: history, refresh: refreshInvoices } = useFetch<any[]>('/api/stripe/invoices')
+
+// Refresh profile when user returns from Stripe Portal (e.g. after cancellation)
+onMounted(() => {
+  refreshProfile()
+  refreshInvoices()
+
+  const onVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+      refreshProfile()
+      refreshInvoices()
+    }
+  }
+  document.addEventListener('visibilitychange', onVisibilityChange)
+  onBeforeUnmount(() => document.removeEventListener('visibilitychange', onVisibilityChange))
+})
 </script>
 
 <template>
@@ -104,10 +139,35 @@ const { data: history, refresh: refreshInvoices } = useFetch<any[]>('/api/stripe
       <p class="font-bold">Pagamento processado com sucesso! Seus benefícios foram atualizados.</p>
     </div>
 
+    <!-- Cancellation scheduled banner -->
+    <div
+      v-if="isCancelScheduled"
+      class="bg-amber-50 border-2 border-amber-200 p-6 rounded-3xl flex flex-col md:flex-row items-start md:items-center gap-4 text-amber-800"
+    >
+      <AlertTriangle class="w-6 h-6 shrink-0 text-amber-500" />
+      <div class="flex-1">
+        <p class="font-bold">
+          Sua assinatura será cancelada em {{ cancelEndDate }}.
+        </p>
+        <p class="text-sm font-medium opacity-80">
+          Você continuará com acesso premium até essa data. Reative para manter o plano.
+        </p>
+      </div>
+      <BaseButton
+        @click="handleManage"
+        :disabled="isCanceling"
+        variant="primary"
+        class="rounded-2xl shrink-0"
+      >
+        <Loader2 v-if="isCanceling" class="w-4 h-4 animate-spin mr-2" />
+        Reativar Plano
+      </BaseButton>
+    </div>
+
     <!-- Planos de Assinatura -->
     <section>
       <div class="flex items-center gap-3 mb-8">
-        <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Assinatura Ilimitada</h2>
+        <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Assinaturas</h2>
         <div class="h-px flex-1 bg-gray-100"></div>
       </div>
       
@@ -189,17 +249,22 @@ const { data: history, refresh: refreshInvoices } = useFetch<any[]>('/api/stripe
       <div class="max-w-md text-center md:text-left">
         <h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Você possui Plano Ativo</h2>
         <p class="text-gray-600 font-medium mt-2">Sua assinatura <span class="text-blue-600 font-black uppercase">{{ profile?.subscriptionPlan }}</span> garante orçamentos ilimitados e todos os recursos premium liberados.</p>
-        <button 
-          @click="handleManage" 
+        <button
+          @click="handleManage"
           :disabled="isCanceling"
           class="mt-6 text-[10px] font-black text-blue-600 hover:text-blue-800 uppercase tracking-widest transition-colors flex items-center gap-2 disabled:opacity-50"
         >
           <Loader2 v-if="isCanceling" class="w-3 h-3 animate-spin" />
-          Gerenciar Assinatura ou Cancelar
+          {{ isCancelScheduled ? 'Reativar via Portal Stripe' : 'Gerenciar Assinatura ou Cancelar' }}
         </button>
       </div>
-      <div class="px-8 py-4 bg-white rounded-2xl border border-blue-100 shadow-sm text-blue-600 font-black uppercase text-[10px] tracking-widest flex items-center gap-2">
-        <CheckCircle2 class="w-4 h-4" /> Assinatura Ativa
+      <div :class="[
+        'px-8 py-4 rounded-2xl border shadow-sm font-black uppercase text-[10px] tracking-widest flex items-center gap-2',
+        isCancelScheduled
+          ? 'bg-amber-50 text-amber-700 border-amber-100'
+          : 'bg-white text-blue-600 border-blue-100'
+      ]">
+        <CheckCircle2 class="w-4 h-4" /> {{ isCancelScheduled ? 'Cancelamento Agendado' : 'Assinatura Ativa' }}
       </div>
     </div>
 

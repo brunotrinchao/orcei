@@ -18,6 +18,7 @@ export const ProfileService = {
       userId: user.id,
       name: user.name,
       email: user.email,
+      avatar: user.avatar,
       creditsBalance: 1, // Default inicial
       stripeCustomerId: customer.id,
       subscriptionPlan: 'free'

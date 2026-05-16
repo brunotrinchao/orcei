@@ -15,7 +15,11 @@ const emit = defineEmits(['update:modelValue'])
 const editor = useEditor({
   content: props.modelValue,
   extensions: [
-    StarterKit,
+    // StarterKit v3 includes link + underline — disable to avoid duplicate warning
+    StarterKit.configure({
+      link: false,
+      underline: false,
+    } as any),
     Underline,
     Link.configure({
       openOnClick: false,

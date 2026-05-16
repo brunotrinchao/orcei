@@ -47,7 +47,23 @@ const isSearchingZip = ref(false)
 function openModal(client: ClientDTO | null = null) {
   if (client) {
     selectedClient.value = client
-    form.value = JSON.parse(JSON.stringify(client))
+    // Normalize all fields: undefined → '' to avoid prop type errors on BaseInput
+    form.value = {
+      name: client.name ?? '',
+      taxId: client.taxId ?? '',
+      email: client.email ?? '',
+      phone: client.phone ?? '',
+      isWhatsapp: client.isWhatsapp ?? true,
+      address: {
+        street: client.address?.street ?? '',
+        number: client.address?.number ?? '',
+        neighborhood: client.address?.neighborhood ?? '',
+        city: client.address?.city ?? '',
+        state: client.address?.state ?? '',
+        zip: client.address?.zip ?? ''
+      },
+      notes: client.notes ?? ''
+    }
   } else {
     selectedClient.value = null
     form.value = {
@@ -103,7 +119,8 @@ async function saveClient() {
     showForm.value = false
     refresh()
   } catch (e: any) {
-    notify('Erro', e.data?.message || 'Erro ao salvar cliente')
+    const html = parseApiErrors(e)
+    notify(html ? 'Dados inválidos' : 'Erro', html ?? (e.data?.statusMessage || 'Erro ao salvar cliente'))
   } finally {
     isSubmitting.value = false
   }
@@ -139,16 +156,12 @@ const formatPhone = (phone: string) => {
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
-      <div>
-        <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tight">Seus Clientes</h1>
-        <p class="text-gray-500 font-medium mt-1">Gerencie seus contatos e acelere seus orçamentos.</p>
-      </div>
-      <BaseButton @click="openModal()" class="w-full md:w-auto px-10 py-5 rounded-[2rem] shadow-2xl shadow-blue-100">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <PageHeader title="Seus Clientes" subtitle="Gerencie seus contatos e acelere seus orçamentos.">
+      <BaseButton @click="openModal()" class="w-full sm:w-auto shadow-2xl shadow-blue-100">
         Cadastrar Novo Cliente
       </BaseButton>
-    </header>
+    </PageHeader>
 
     <!-- Filtros -->
     <div class="mb-10 relative max-w-xl">
@@ -169,7 +182,7 @@ const formatPhone = (phone: string) => {
       :title="selectedClient ? 'Editar Cliente' : 'Novo Cliente'" 
       size="lg"
     >
-      <form @submit.prevent="saveClient" class="space-y-8 py-4">
+      <form id="client-form" @submit.prevent="saveClient" class="space-y-8 py-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <BaseInput 
             v-model="form.name" 
@@ -280,17 +293,13 @@ const formatPhone = (phone: string) => {
           ></textarea>
         </div>
 
-        <div class="flex justify-end pt-6">
-          <BaseButton 
-            type="submit" 
-            :disabled="isSubmitting"
-            class="w-full md:w-auto px-12 py-5 rounded-[2rem] shadow-xl shadow-blue-100"
-          >
-            <RefreshCcw v-if="isSubmitting" class="w-5 h-5 animate-spin mr-3" />
-            {{ isSubmitting ? 'Salvando...' : (selectedClient ? 'Atualizar Dados' : 'Cadastrar Cliente') }}
-          </BaseButton>
-        </div>
       </form>
+
+      <template #footer>
+        <BaseButton type="button" :disabled="isSubmitting" :loading="isSubmitting" @click="saveClient">
+          {{ selectedClient ? 'Atualizar Dados' : 'Cadastrar Cliente' }}
+        </BaseButton>
+      </template>
     </BaseDialog>
 
     <!-- Listagem -->
@@ -358,7 +367,7 @@ const formatPhone = (phone: string) => {
         </div>
         <h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight">{{ searchQuery ? 'Nada encontrado' : 'Lista Vazia' }}</h3>
         <p class="text-gray-400 font-bold mt-2 px-6 max-w-sm mx-auto">{{ searchQuery ? 'Não encontramos nenhum cliente com esses termos.' : 'Sua lista de clientes aparecerá aqui. Comece cadastrando o primeiro.' }}</p>
-        <BaseButton v-if="!searchQuery" @click="openModal()" class="mt-10 px-12 py-5 rounded-[2rem] shadow-xl shadow-blue-100">Cadastrar Primeiro Cliente</BaseButton>
+        <BaseButton v-if="!searchQuery" @click="openModal()" class="mt-10 shadow-xl shadow-blue-100">Cadastrar Primeiro Cliente</BaseButton>
         <button v-else @click="searchQuery = ''" class="mt-10 text-blue-600 font-black uppercase tracking-widest text-xs hover:underline decoration-2 underline-offset-8">Limpar Filtros de Busca</button>
       </div>
     </div>

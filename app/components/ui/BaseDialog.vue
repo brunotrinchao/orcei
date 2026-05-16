@@ -52,7 +52,7 @@ const open = useVModel(props, 'open', emits)
       >
         <DialogContent
           :class="[
-            'fixed left-[50%] top-[50%] z-[101] flex flex-col w-full translate-x-[-50%] translate-y-[-50%] bg-white p-8 shadow-2xl rounded-[2.5rem] border-4 border-white max-h-[90vh] overflow-y-auto outline-none',
+            'fixed left-[50%] top-[50%] z-[101] flex flex-col w-full translate-x-[-50%] translate-y-[-50%] bg-white shadow-2xl rounded-[2.5rem] border-4 border-white max-h-[90vh] overflow-hidden outline-none',
             size === 'sm' ? 'max-w-sm' : '',
             size === 'md' ? 'max-w-lg' : '',
             size === 'lg' ? 'max-w-2xl' : '',
@@ -61,27 +61,32 @@ const open = useVModel(props, 'open', emits)
             !size ? 'max-w-lg' : ''
           ]"
         >
-          <div class="flex flex-col space-y-2 text-center sm:text-left mb-6">
-            <DialogTitle v-if="title" class="text-xl font-black text-gray-900 uppercase tracking-widest">
-              {{ title }}
-            </DialogTitle>
-            <DialogDescription v-if="description" class="text-sm font-bold text-gray-400">
-              {{ description }}
-            </DialogDescription>
+          <!-- Header fixo -->
+          <div class="flex-shrink-0 flex items-start justify-between px-8 pt-8 pb-6 border-b border-gray-100">
+            <div class="space-y-1">
+              <DialogTitle v-if="title" class="text-xl font-black text-gray-900 uppercase tracking-widest">
+                {{ title }}
+              </DialogTitle>
+              <!-- Always rendered: satisfies Radix aria requirement; visually hidden when no description -->
+              <DialogDescription :class="description ? 'text-sm font-bold text-gray-400' : 'sr-only'">
+                {{ description || title }}
+              </DialogDescription>
+            </div>
+            <DialogClose
+              class="ml-4 flex-shrink-0 rounded-xl p-2 text-gray-400 opacity-70 transition-all hover:bg-gray-50 hover:text-gray-900 hover:opacity-100 outline-none focus:ring-4 focus:ring-gray-100"
+            >
+              <X class="h-5 w-5" />
+              <span class="sr-only">Fechar</span>
+            </DialogClose>
           </div>
 
-          <div class="flex-1">
+          <!-- Conteúdo rolável -->
+          <div class="flex-1 overflow-y-auto px-8 py-6">
             <slot />
           </div>
 
-          <DialogClose
-            class="absolute right-6 top-6 rounded-xl p-2 text-gray-400 opacity-70 transition-all hover:bg-gray-50 hover:text-gray-900 hover:opacity-100 outline-none focus:ring-4 focus:ring-gray-100"
-          >
-            <X class="h-5 w-5" />
-            <span class="sr-only">Fechar</span>
-          </DialogClose>
-
-          <div v-if="$slots.footer" class="mt-8 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-4">
+          <!-- Footer fixo -->
+          <div v-if="$slots.footer" class="flex-shrink-0 px-8 py-6 border-t border-gray-100 bg-white flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
             <slot name="footer" />
           </div>
         </DialogContent>

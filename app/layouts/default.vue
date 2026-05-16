@@ -1,15 +1,16 @@
 <script setup lang="ts">
+import { onClickOutside } from '@vueuse/core'
 import type { ProfileDTO } from '../../types'
 const { loggedIn, user, clear } = useUserSession()
-const { data: profile } = useFetch<ProfileDTO>('/api/profile')
+const { data: profile, refresh: refreshLayoutProfile } = useFetch<ProfileDTO>('/api/profile')
 
 const isMenuOpen = ref(false)
-const container = ref(null)
 
-onClickOutside(container, () => {
-  isMenuOpen.value = false
-})
+function toggleMenu() {
+  isMenuOpen.value = !isMenuOpen.value
+}
 const { notify, confirm: confirmAlert } = useAlerts()
+const { resetConsent } = useCookieConsent()
 
 async function logout() {
   confirmAlert({
@@ -24,6 +25,12 @@ async function logout() {
     }
   })
 }
+
+onMounted(() => {
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) refreshLayoutProfile()
+  })
+})
 </script>
 
 <template>
@@ -32,56 +39,71 @@ async function logout() {
     <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100">
       <nav class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <div class="flex items-center gap-12">
-          <NuxtLink to="/" class="text-xl font-bold tracking-tight text-gray-900">orcei</NuxtLink>
+          <NuxtLink to="/"><AppLogo size="sm" /></NuxtLink>
           <div v-if="loggedIn" class="hidden md:flex gap-8">
             <NuxtLink to="/dashboard" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Dashboard</NuxtLink>
             <NuxtLink to="/dashboard/clients" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Clientes</NuxtLink>
             <NuxtLink to="/dashboard/catalog" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Catálogo</NuxtLink>
             <NuxtLink to="/dashboard/proposals" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Orçamentos</NuxtLink>
           </div>
+          <div v-else class="hidden md:flex gap-8">
+            <a href="#features" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Funcionalidades</a>
+            <a href="#como-funciona" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Como Funciona</a>
+          </div>
         </div>
 
         <div class="flex items-center gap-4">
           <template v-if="loggedIn">
             <!-- Credits & Plan Display -->
-            <div class="hidden sm:flex items-center gap-4 bg-gray-50/50 px-4 py-2 rounded-2xl border border-gray-100 mr-2">
+            <div class="flex items-center gap-3 bg-gray-50/50 px-3 py-1.5 rounded-2xl border border-gray-100 mr-1">
               <div class="flex flex-col items-end">
                 <span class="text-[8px] uppercase font-bold text-gray-400 tracking-widest">Créditos</span>
                 <span class="text-xs font-semibold text-gray-700">{{ profile?.creditsBalance ?? 0 }}</span>
               </div>
               <div v-if="profile?.subscriptionPlan && profile.subscriptionPlan !== 'free'" class="h-6 w-px bg-gray-200"></div>
               <div v-if="profile?.subscriptionPlan && profile.subscriptionPlan !== 'free'" class="flex flex-col items-start">
-                <span class="text-[8px] uppercase font-bold text-blue-400 tracking-widest">Plano</span>
-                <span class="text-[10px] font-black text-blue-600 uppercase">{{ profile.subscriptionPlan }}</span>
+                <span :class="[
+                  'text-[8px] uppercase font-bold tracking-widest',
+                  profile.cancelAtPeriodEnd ? 'text-amber-400' : 'text-blue-400'
+                ]">{{ profile.cancelAtPeriodEnd ? 'Cancela em breve' : 'Plano' }}</span>
+                <span :class="[
+                  'text-[10px] font-black uppercase',
+                  profile.cancelAtPeriodEnd ? 'text-amber-600' : 'text-blue-600'
+                ]">{{ profile.subscriptionPlan }}</span>
               </div>
             </div>
 
             <!-- User Avatar -->
-            <div class="relative" ref="container">
-              <button @click="isMenuOpen = !isMenuOpen" class="w-10 h-10 rounded-2xl bg-gray-100 flex items-center justify-center overflow-hidden hover:ring-4 ring-gray-100 transition-all border-2 border-white shadow-sm">
-                <img v-if="(user as any)?.avatar" :src="(user as any).avatar" class="w-full h-full object-cover">
-                <span v-else class="text-sm font-black text-gray-900">{{ (user as any)?.name?.charAt(0).toUpperCase() }}</span>
+            <div class="relative">
+              <button @click.stop="toggleMenu" class="w-10 h-10 rounded-2xl bg-gray-100 flex items-center justify-center overflow-hidden hover:ring-4 ring-gray-100 transition-all border-2 border-white shadow-sm relative z-[60]">
+                <img v-if="(user as any)?.avatar || profile?.avatar" :src="(user as any)?.avatar || profile?.avatar" class="w-full h-full object-cover">
+                <span v-else class="text-sm font-black text-gray-900">{{ (user as any)?.name?.charAt(0).toUpperCase() || profile?.name?.charAt(0).toUpperCase() }}</span>
               </button>
 
               <!-- Dropdown (Minimalist) -->
-              <Transition
-                enter-active-class="transition duration-100 ease-out"
-                enter-from-class="transform scale-95 opacity-0"
-                enter-to-class="transform scale-100 opacity-100"
-                leave-active-class="transition duration-75 ease-in"
-                leave-from-class="transform scale-100 opacity-100"
-                leave-to-class="transform scale-95 opacity-0"
-              >
-                <div v-if="isMenuOpen" class="absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 overflow-hidden ring-1 ring-black/5">
-                  <div class="px-4 py-2 border-b border-gray-50">
-                    <p class="text-xs font-bold text-gray-900 truncate">{{ (user as any)?.name }}</p>
+              <div v-if="isMenuOpen" class="absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 overflow-hidden ring-1 ring-black/5 z-[70]">
+                <div class="px-4 py-2 border-b border-gray-50 flex items-center gap-3">
+                  <div class="w-6 h-6 rounded-lg overflow-hidden bg-gray-100 shrink-0">
+                    <img v-if="(user as any)?.avatar || profile?.avatar" :src="(user as any)?.avatar || profile?.avatar" class="w-full h-full object-cover">
                   </div>
-                  <NuxtLink to="/dashboard/settings" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 transition">Configurações</NuxtLink>
-                  <NuxtLink to="/dashboard/billing" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 transition">Plano</NuxtLink>
-                  <button @click="logout" class="w-full text-left px-4 py-2 text-xs text-red-500 hover:bg-red-50 transition border-t border-gray-50 mt-1">Sair</button>
+                  <p class="text-xs font-bold text-gray-900 truncate">{{ (user as any)?.name || profile?.name }}</p>
                 </div>
-              </Transition>
+                <NuxtLink to="/dashboard/settings" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 transition">Configurações</NuxtLink>
+                <NuxtLink to="/dashboard/billing" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 transition">Plano</NuxtLink>
+                <button @click="logout" class="w-full text-left px-4 py-2 text-xs text-red-500 hover:bg-red-50 transition border-t border-gray-50 mt-1">Sair</button>
+              </div>
+
+              <!-- Click Overlay to close -->
+              <div v-if="isMenuOpen" @click="isMenuOpen = false" class="fixed inset-0 z-[55]"></div>
             </div>
+          </template>
+          <template v-else>
+            <NuxtLink
+              to="/auth/login"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition shadow-sm shadow-blue-100"
+            >
+              Entrar
+            </NuxtLink>
           </template>
         </div>
       </nav>
@@ -98,7 +120,7 @@ async function logout() {
       <div class="max-w-7xl mx-auto">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div class="md:col-span-2 space-y-6">
-            <h2 class="text-2xl font-black tracking-tighter text-gray-900 uppercase">orcei</h2>
+            <AppLogo size="md" />
             <p class="text-sm text-gray-500 font-medium max-w-sm leading-relaxed">
               Transformando a gestão comercial de freelancers e pequenas empresas através de inteligência artificial e processos automatizados.
             </p>
@@ -120,8 +142,9 @@ async function logout() {
           <div class="space-y-4">
             <h3 class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Suporte & Legal</h3>
             <nav class="flex flex-col gap-3">
-              <a href="#" class="text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">Termos de Uso</a>
-              <a href="#" class="text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">Privacidade</a>
+              <NuxtLink to="/terms" class="text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">Termos de Uso</NuxtLink>
+              <NuxtLink to="/privacy" class="text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">Privacidade</NuxtLink>
+              <button @click="resetConsent" class="text-left text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">Gerenciar Cookies</button>
               <a href="mailto:contato@orcei.com.br" class="text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">contato@orcei.com.br</a>
             </nav>
           </div>

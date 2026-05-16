@@ -6,28 +6,30 @@ import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, CategoryScale, L
 ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement, ArcElement)
 
 const period = ref('last_30_days')
-
-const { data: stats, refresh } = await useFetch<any>('/api/dashboard/stats', {
-  query: computed(() => {
-    const now = new Date()
-    let start = new Date()
-    
-    if (period.value === 'last_7_days') start.setDate(now.getDate() - 7)
-    else if (period.value === 'last_30_days') start.setDate(now.getDate() - 30)
-    else if (period.value === 'last_90_days') start.setDate(now.getDate() - 90)
-    else if (period.value === 'year') start = new Date(now.getFullYear(), 0, 1)
-    else return {}
-
-    return {
-      start: start.toISOString(),
-      end: now.toISOString()
-    }
-  }),
-  watch: [period]
-})
-
 const { loggedIn } = useUserSession()
 const { notify } = useAlerts()
+
+const fetchQuery = computed(() => {
+  const now = new Date()
+  let start = new Date()
+  
+  if (period.value === 'last_7_days') start.setDate(now.getDate() - 7)
+  else if (period.value === 'last_30_days') start.setDate(now.getDate() - 30)
+  else if (period.value === 'last_90_days') start.setDate(now.getDate() - 90)
+  else if (period.value === 'year') start = new Date(now.getFullYear(), 0, 1)
+  else return {}
+
+  return {
+    start: start.toISOString(),
+    end: now.toISOString()
+  }
+})
+
+const { data: stats, refresh, status } = useFetch<any>('/api/dashboard/stats', {
+  key: 'dashboard-stats',
+  query: fetchQuery,
+  watch: [period]
+})
 
 // Status Distribution Chart
 const statusChartData = computed(() => {
@@ -97,7 +99,14 @@ async function generateAIReport() {
 </script>
 
 <template>
-  <div class="space-y-12">
+  <div class="space-y-12 relative">
+    <div v-if="status === 'pending' && !stats" class="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-center justify-center rounded-[3rem]">
+      <div class="flex flex-col items-center gap-4">
+        <Loader2 class="w-10 h-10 animate-spin text-blue-600" />
+        <p class="text-xs font-black text-gray-400 uppercase tracking-widest">Carregando Dados...</p>
+      </div>
+    </div>
+
     <!-- Filtros de Período -->
     <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
       <button 

@@ -4,6 +4,7 @@ const profileSchema = new Schema({
   userId: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
+  avatar: String,
   brandConfig: {
     logoUrl: String,
     primaryColor: { type: String, default: '#3B82F6' }
@@ -36,8 +37,14 @@ const profileSchema = new Schema({
   subscriptionPlan: { type: String, enum: ['free', 'starter', 'premium'], default: 'free' },
   stripeCustomerId: String,
   stripeSubscriptionId: String,
-  password: { type: String, select: false },
-  isEmailVerified: { type: Boolean, default: false },
+  subscriptionStatus: {
+    type: String,
+    enum: ['active', 'trialing', 'past_due', 'canceled', 'incomplete', 'incomplete_expired', 'unpaid', 'paused', null],
+    default: null
+  },
+  subscriptionEndsAt: { type: Date, default: null },
+  cancelAtPeriodEnd: { type: Boolean, default: false },
+  stripePriceId: { type: String, default: null },
   defaultValidityDays: { type: Number, default: 7 },
   defaultInstallments: { type: Number, default: 1 },
   defaultCashDiscount: { type: Number, default: 0 },

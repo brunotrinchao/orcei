@@ -29,6 +29,7 @@
     "@vueuse/nuxt": "^14.3.0",
     "chart.js": "^4.5.1",
     "cloudinary": "^2.10.0",
+    "imask": "^7.6.1",
     "lucide-vue-next": "^1.0.0",
     "markdown-it": "^14.1.1",
     "maska": "^3.2.0",
@@ -39,18 +40,25 @@
     "nuxt-auth-utils": "^0.5.29",
     "puppeteer-core": "^24.43.1",
     "radix-vue": "^1.9.17",
+    "resend": "^6.12.3",
     "stripe": "^22.1.1",
     "vue": "^3.5.34",
     "vue-advanced-cropper": "^2.8.9",
     "vue-chartjs": "^5.3.3",
+    "vue-imask": "^7.6.1",
     "vue-router": "^5.0.6"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.4.0",
+    "@nuxt/test-utils": "^4.0.3",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^25.8.0",
+    "@vue/test-utils": "^2.4.10",
+    "happy-dom": "^20.9.0",
+    "jsdom": "^29.1.1",
     "puppeteer": "^24.43.1",
     "typescript": "^6.0.3",
+    "vitest": "^4.1.6",
     "vue-tsc": "^3.2.9"
   }
 }

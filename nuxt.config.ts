@@ -26,7 +26,14 @@ export default defineNuxtConfig({
         '@nuxtjs/cloudinary',
         'lucide-vue-next',
         'radix-vue',
-        'maska'
+        'imask',
+        'vue-imask',
+        'vue-advanced-cropper',
+        '@tiptap/vue-3',
+        '@tiptap/starter-kit',
+        '@tiptap/extension-underline',
+        '@tiptap/extension-link',
+        'markdown-it'
       ]
     }
   },
@@ -54,6 +61,8 @@ export default defineNuxtConfig({
       stripePriceSingle: process.env.STRIPE_PRICE_SINGLE,
       stripeCredits5PriceId: process.env.STRIPE_CREDITS_5_PRICE_ID,
       stripeCredits10PriceId: process.env.STRIPE_CREDITS_10_PRICE_ID,
+      gtmId: process.env.NUXT_PUBLIC_GTM_ID || '',
+      appName: process.env.APP_NAME || 'Orcei',
     }
   },
 

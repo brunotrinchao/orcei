@@ -28,7 +28,7 @@ export const ProposalService = {
     const counter = await Counter.findOneAndUpdate(
       { profileId: data.profileId, year: currentYear },
       { $inc: { lastSequence: 1 } },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: 'after' }
     )
 
     const sequenceNumber = counter.lastSequence
@@ -60,6 +60,7 @@ export const ProposalService = {
 
     return await Proposal.create({
       ...data,
+      title: data.title?.trim() || code,
       slug,
       token,
       sequenceNumber,
@@ -100,7 +101,7 @@ export const ProposalService = {
     return await Proposal.findOneAndUpdate(
       { _id: id, profileId },
       { ...data, totals, lastEmailId },
-      { new: true }
+      { returnDocument: 'after' }
     )
   },
 
@@ -108,10 +109,14 @@ export const ProposalService = {
     const profile = await Profile.findById(profileId)
     if (!profile) return
 
-    if (profile.creditsUsed >= profile.creditsBalance) {
-      throw createError({ 
-        statusCode: 403, 
-        statusMessage: 'Créditos insuficientes. Faça um upgrade do seu plano.' 
+    const hasActiveSubscription =
+      profile.subscriptionPlan !== 'free' &&
+      (profile.subscriptionStatus === 'active' || profile.subscriptionStatus === 'trialing')
+
+    if (!hasActiveSubscription && profile.creditsUsed >= profile.creditsBalance) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'Créditos insuficientes. Faça um upgrade do seu plano.'
       })
     }
 
@@ -119,7 +124,7 @@ export const ProposalService = {
   },
 
   async updateStatus(slug: string, status: 'draft' | 'pending' | 'accepted' | 'expired' | 'created') {
-    return await Proposal.findOneAndUpdate({ slug }, { status }, { new: true })
+    return await Proposal.findOneAndUpdate({ slug }, { status }, { returnDocument: 'after' })
   },
 
   async acceptProposal(slug: string, paymentMethod: 'cash' | 'credit_card') {
@@ -139,17 +144,17 @@ export const ProposalService = {
         'paymentConfig.method': paymentMethod,
         totals
       }, 
-      { new: true }
+      { returnDocument: 'after' }
     )
   },
 
   async declineProposal(slug: string) {
-    return await Proposal.findOneAndUpdate({ slug }, { status: 'expired' }, { new: true })
+    return await Proposal.findOneAndUpdate({ slug }, { status: 'expired' }, { returnDocument: 'after' })
   },
 
   async requestChanges(slug: string, notes?: string) {
     // Optionally log notes to a history field if we had one
-    return await Proposal.findOneAndUpdate({ slug }, { status: 'pending' }, { new: true })
+    return await Proposal.findOneAndUpdate({ slug }, { status: 'pending' }, { returnDocument: 'after' })
   },
 
   calculateTotals(items: any[], additional: number = 0, discount: number = 0, paymentConfig: any = {}) {

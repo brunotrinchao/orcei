@@ -13,7 +13,7 @@ export const EventService = {
     return await Event.findOneAndUpdate(
       { _id: id, profileId },
       data,
-      { new: true }
+      { returnDocument: 'after' }
     )
   },
 

@@ -14,7 +14,7 @@ export const ClientService = {
     return await Client.findOneAndUpdate(
       { _id: id, profileId },
       { $set: data },
-      { new: true }
+      { returnDocument: 'after' }
     )
   },
 

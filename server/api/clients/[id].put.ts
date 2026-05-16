@@ -1,5 +1,6 @@
 import { ProfileService } from '../../services/ProfileService'
 import { ClientService } from '../../services/ClientService'
+import { validateClient, throwIfInvalid } from '../../utils/validate'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -12,5 +13,7 @@ export default defineEventHandler(async (event) => {
   if (!id) throw createError({ statusCode: 400, message: 'Missing client id' })
 
   const body = await readBody(event)
+  throwIfInvalid(validateClient(body))
+
   return await ClientService.update(id, profile._id as any, body)
 })

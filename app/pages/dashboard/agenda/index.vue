@@ -166,17 +166,13 @@ const proposalOptions = computed(() => {
 </script>
 
 <template>
-  <div class="space-y-8">
-    <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-      <div>
-        <h1 class="text-4xl font-black text-gray-900 tracking-tight uppercase">Sua Agenda</h1>
-        <p class="text-gray-500 font-medium">Organize seus serviços e reuniões de forma integrada.</p>
-      </div>
-      <BaseButton @click="isModalOpen = true" class="shadow-xl shadow-blue-100">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 space-y-8">
+    <PageHeader title="Sua Agenda" subtitle="Organize seus serviços e reuniões de forma integrada.">
+      <BaseButton @click="isModalOpen = true" class="w-full sm:w-auto shadow-xl shadow-blue-100">
         <Plus class="w-5 h-5 mr-2" />
         Novo Compromisso
       </BaseButton>
-    </header>
+    </PageHeader>
 
     <div class="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm">
       <FullCalendar :options="calendarOptions" />
@@ -184,7 +180,7 @@ const proposalOptions = computed(() => {
 
     <!-- Modal de Evento -->
     <BaseDialog v-model:open="isModalOpen" :title="selectedEvent ? 'Detalhes do Compromisso' : 'Novo Compromisso'" size="lg">
-      <form @submit.prevent="saveEvent" class="space-y-6 py-4">
+      <form id="event-form" @submit.prevent="saveEvent" class="space-y-6 py-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="md:col-span-2">
             <BaseInput v-model="form.title" label="Título" placeholder="Ex: Entrega do Projeto X" required />
@@ -239,25 +235,22 @@ const proposalOptions = computed(() => {
           ></textarea>
         </div>
 
-        <div class="flex justify-between items-center pt-6">
-          <button 
-            v-if="selectedEvent" 
-            type="button" 
-            @click="deleteEvent"
-            class="text-red-500 hover:text-red-700 text-xs font-black uppercase tracking-widest flex items-center gap-2"
-          >
-            <Trash2 class="w-4 h-4" /> Excluir
-          </button>
-          <div v-else></div>
-
-          <div class="flex gap-4">
-            <BaseButton type="button" variant="secondary" @click="isModalOpen = false">Cancelar</BaseButton>
-            <BaseButton type="submit" :disabled="isSubmitting">
-              {{ isSubmitting ? 'Salvando...' : (selectedEvent ? 'Atualizar' : 'Agendar') }}
-            </BaseButton>
-          </div>
-        </div>
       </form>
+
+      <template #footer>
+        <button
+          v-if="selectedEvent"
+          type="button"
+          @click="deleteEvent"
+          class="mr-auto flex items-center gap-2 text-xs font-black text-red-500 hover:text-red-700 uppercase tracking-widest transition-colors"
+        >
+          <Trash2 class="w-4 h-4" /> Excluir
+        </button>
+        <BaseButton type="button" variant="secondary" @click="isModalOpen = false">Cancelar</BaseButton>
+        <BaseButton type="button" :disabled="isSubmitting" :loading="isSubmitting" @click="saveEvent">
+          {{ selectedEvent ? 'Atualizar' : 'Agendar' }}
+        </BaseButton>
+      </template>
     </BaseDialog>
   </div>
 </template>

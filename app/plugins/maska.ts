@@ -1,9 +1,3 @@
-import * as maska from "maska"
-
-export default defineNuxtPlugin((nuxtApp) => {
-  // @ts-ignore
-  const vMaska = maska.vMaska || (maska.default ? maska.default.vMaska : undefined)
-  if (vMaska) {
-    nuxtApp.vueApp.directive("maska", vMaska)
-  }
-})
+// Maska replaced by vue-imask (IMaskDirective) — used directly in BaseInput.vue
+// This file intentionally left blank to avoid breaking existing plugin imports
+export default defineNuxtPlugin(() => {})

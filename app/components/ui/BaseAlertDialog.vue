@@ -40,7 +40,7 @@ const emit = defineEmits(['update:open', 'confirm', 'cancel'])
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <AlertDialogOverlay class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100]" />
+        <AlertDialogOverlay class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[300]" />
       </Transition>
 
       <Transition
@@ -52,15 +52,13 @@ const emit = defineEmits(['update:open', 'confirm', 'cancel'])
         leave-to-class="opacity-0 scale-95 translate-y-4"
       >
         <AlertDialogContent 
-          class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md bg-white rounded-[2.5rem] p-8 shadow-2xl z-[101] focus:outline-none border border-gray-100"
+          class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md bg-white rounded-[2.5rem] p-8 shadow-2xl z-[301] focus:outline-none border border-gray-100"
         >
           <AlertDialogTitle class="text-xl font-black text-gray-900 uppercase tracking-tight mb-2">
             {{ title }}
           </AlertDialogTitle>
           
-          <AlertDialogDescription v-if="description" class="text-sm text-gray-500 font-medium leading-relaxed mb-8">
-            {{ description }}
-          </AlertDialogDescription>
+          <AlertDialogDescription v-if="description" class="text-sm text-gray-500 font-medium leading-relaxed mb-8" v-html="description" />
 
           <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
             <AlertDialogCancel 

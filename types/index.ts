@@ -8,6 +8,7 @@ export interface ProfileDTO {
   userId: string
   name: string
   email: string
+  avatar?: string
   brandConfig: BrandConfig
   address: {
     street: string
@@ -37,6 +38,10 @@ export interface ProfileDTO {
   subscriptionPlan: 'free' | 'starter' | 'premium'
   stripeCustomerId?: string
   stripeSubscriptionId?: string
+  subscriptionStatus?: 'active' | 'trialing' | 'past_due' | 'canceled' | 'incomplete' | 'incomplete_expired' | 'unpaid' | 'paused' | null
+  subscriptionEndsAt?: string | null
+  cancelAtPeriodEnd?: boolean
+  stripePriceId?: string | null
   defaultValidityDays: number
   defaultInstallments: number
   defaultCashDiscount: number

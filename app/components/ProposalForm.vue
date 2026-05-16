@@ -169,10 +169,14 @@ const finalTotal = computed(() => {
   return baseTotal
 })
 
-async function submit() {
+async function submit(status: 'draft' | 'created' = 'draft') {
   if (form.value.items.length === 0) return notify('Aviso', 'Selecione pelo menos um item do catálogo')
-  emit('submit', form.value)
+  const keepStatus = props.isEditing && props.initialData?.status !== 'draft'
+  const payload = keepStatus ? form.value : { ...form.value, status }
+  emit('submit', payload)
 }
+
+defineExpose({ submit, isEditingNonDraft: computed(() => props.isEditing && props.initialData?.status !== 'draft') })
 </script>
 
 <template>
@@ -192,7 +196,7 @@ async function submit() {
           <div class="p-6 bg-gray-50 rounded-3xl border border-gray-100 grid grid-cols-1 gap-4">
             <BaseInput v-model="form.client.name" label="Nome do Cliente" required />
             <BaseInput v-model="form.client.email" label="E-mail" required />
-            <BaseInput v-model="form.client.phone" label="WhatsApp (Opcional)" mask="(##) #####-####" />
+            <BaseInput v-model="form.client.phone" label="WhatsApp (Opcional)" mask="phone" />
           </div>
         </div>
       </div>
@@ -228,7 +232,7 @@ async function submit() {
                 </div>
                 <div>
                   <p class="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{{ item.name }}</p>
-                  <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">R$ {{ (item.price as number).toLocaleString('pt-BR') }} / {{ item.unit }}</p>
+                  <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">R$ {{ ((item.price ?? 0) as number).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }} / {{ item.unit }}</p>
                 </div>
               </div>
             </div>
@@ -365,14 +369,6 @@ async function submit() {
           </div>
         </div>
 
-        <BaseButton 
-          type="submit" 
-          :disabled="isSubmitting"
-          class="w-full py-6 rounded-[2rem] text-sm shadow-2xl shadow-blue-100"
-        >
-          <Loader2 v-if="isSubmitting" class="w-5 h-5 animate-spin mr-3" />
-          {{ isEditing ? 'SALVAR ALTERAÇÕES' : 'GERAR ORÇAMENTO AGORA' }}
-        </BaseButton>
       </div>
     </div>
   </form>

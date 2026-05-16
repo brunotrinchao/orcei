@@ -1,5 +1,6 @@
 import { ProfileService } from '../../services/ProfileService'
 import { CatalogService } from '../../services/CatalogService'
+import { validateCatalogItem, throwIfInvalid } from '../../utils/validate'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -9,5 +10,7 @@ export default defineEventHandler(async (event) => {
   if (!profile) throw createError({ statusCode: 404 })
 
   const body = await readBody(event)
+  throwIfInvalid(validateCatalogItem(body))
+
   return await CatalogService.create({ ...body, profileId: profile._id })
 })

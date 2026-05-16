@@ -2,19 +2,18 @@ import { ProfileService } from '../../services/ProfileService'
 
 export default defineOAuthGoogleEventHandler({
   async onSuccess(event, { user }) {
-    // Vincular/Criar perfil no MongoDB
-    await ProfileService.createForUser({
+    const userData = {
       id: user.id || user.sub,
       name: user.name,
-      email: user.email
-    })
+      email: user.email,
+      avatar: user.picture
+    }
+
+    // Vincular/Criar perfil no MongoDB
+    await ProfileService.createForUser(userData)
 
     await setUserSession(event, {
-      user: {
-        id: user.id || user.sub,
-        name: user.name,
-        email: user.email
-      }
+      user: userData
     })
     return sendRedirect(event, '/dashboard')
   },

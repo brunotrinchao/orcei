@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { Cropper } from 'vue-advanced-cropper'
 import 'vue-advanced-cropper/dist/style.css'
-import { Plus, Search, Image, Pencil, Trash2, Sparkles, RefreshCcw, X, Package, ShoppingBag } from 'lucide-vue-next'
+import { Plus, Search, Image, Pencil, Trash2, Sparkles, RefreshCcw, Package, ShoppingBag } from 'lucide-vue-next'
 import type { CatalogItemDTO } from '../../../../types'
 
 const { notify, confirm: confirmAlert } = useAlerts()
@@ -45,7 +45,7 @@ function onFileChange(event: Event) {
 
 async function cropImage() {
   if (!cropperRef.value) return
-  
+
   const { canvas } = cropperRef.value.getResult()
   if (!canvas) return
 
@@ -60,21 +60,20 @@ async function cropImage() {
   ctx.drawImage(canvas, 0, 0, 400, 400)
 
   const base64Image = finalCanvas.toDataURL('image/jpeg', 0.8)
-  
+
   isSubmitting.value = true
   try {
     const data = await ($fetch as any)('/api/upload/cloudinary', {
       method: 'POST',
-      body: {
-        image: base64Image,
-        folder: 'orcei/catalog'
-      }
+      body: { image: base64Image, folder: 'catalog' }
     }) as { url: string }
-    
+
+    if (!data?.url) throw new Error('URL não retornada pelo Cloudinary')
     form.value.imageUrl = data.url
     showCropper.value = false
     rawImage.value = null
   } catch (e) {
+    console.error('[Catalog] Image upload failed:', e)
     notify('Erro', 'Não foi possível fazer upload da imagem.')
   } finally {
     isSubmitting.value = false
@@ -93,6 +92,8 @@ const form = ref({
 
 const isSubmitting = ref(false)
 const isGenerating = ref(false)
+const showAIDialog = ref(false)
+const aiPromptText = ref('')
 
 const unitOptions = [
   { label: 'Unidade (UN)', value: 'UN' },
@@ -136,35 +137,39 @@ function openModal(item: CatalogItemDTO | null = null) {
   showForm.value = true
 }
 
-async function generateWithAI() {
+function generateWithAI() {
   if (!form.value.name) return notify('Aviso', 'Digite o nome do item primeiro')
+  if (form.value.type === 'service') {
+    aiPromptText.value = ''
+    showAIDialog.value = true
+  } else {
+    runAIGenerate('')
+  }
+}
+
+async function runAIGenerate(context: string) {
   isGenerating.value = true
   try {
-    const promptTemplate = `Você é um especialista em copywriting corporativo e negociação B2B. 
-Sua tarefa é transformar um nome de ${form.value.type === 'product' ? 'produto' : 'serviço'} e alguns tópicos curtos em uma descrição comercial altamente persuasiva, profissional e clara.
-
-REGRA DE SAÍDA ESTILIZADA:
-1. O texto deve ser conciso (máximo 150 caracteres).
-2. Foque no valor e benefícios.
-3. Não inclua saudações ou introduções.
-4. O tom deve ser direto e premium.
-
-DADOS:
-- Nome: ${form.value.name}
-- Detalhes: ${form.value.description || 'Não informado'}
-
-Escreva a descrição comercial agora:`
-
-    const data: any = await $fetch('/api/ai/generate', {
+    const data: any = await $fetch('/api/ai/catalog-suggest', {
       method: 'POST',
-      body: { prompt: promptTemplate }
+      body: { name: form.value.name, type: form.value.type, context: context || undefined }
     })
-    form.value.description = data.text
+
+    if (data.description) form.value.description = data.description
+    if (data.price) form.value.price = data.price
+    if (data.unit) form.value.unit = data.unit
+
+    notify('IA aplicada', 'Descrição, preço e unidade sugeridos. Revise antes de salvar.')
   } catch (e) {
-    notify('Erro', 'Erro ao gerar descrição')
+    notify('Erro', 'Erro ao gerar sugestões com IA')
   } finally {
     isGenerating.value = false
   }
+}
+
+function confirmAIGenerate() {
+  showAIDialog.value = false
+  runAIGenerate(aiPromptText.value)
 }
 
 async function saveItem() {
@@ -172,16 +177,21 @@ async function saveItem() {
   try {
     const method = selectedItem.value ? 'PUT' : 'POST'
     const endpoint = selectedItem.value ? `/api/catalog/${selectedItem.value._id}` : '/api/catalog'
-    
-    // Parse price string to number if it's a string from mask
-    const priceValue = typeof form.value.price === 'string' 
-        ? parseFloat(form.value.price.replace(/[R$\s.]/g, '').replace(',', '.')) 
-        : form.value.price
 
-    const payload = { 
-      ...form.value,
-      price: priceValue
+    const priceValue = typeof form.value.price === 'string'
+      ? parseFloat(form.value.price.replace(/[R$\s.]/g, '').replace(',', '.'))
+      : form.value.price
+
+    const payload = {
+      type: form.value.type,
+      name: form.value.name,
+      description: form.value.description,
+      price: priceValue,
+      unit: form.value.unit,
+      sku: form.value.sku,
+      imageUrl: form.value.imageUrl || undefined
     }
+    console.log('[Catalog] saveItem payload:', JSON.stringify({ ...payload, imageUrl: payload.imageUrl ? '(set)' : '(empty)' }))
 
     await $fetch(endpoint, {
       method,
@@ -190,7 +200,8 @@ async function saveItem() {
     showForm.value = false
     refresh()
   } catch (e: any) {
-    notify('Erro', e.data?.message || 'Erro ao salvar item')
+    const html = parseApiErrors(e)
+    notify(html ? 'Dados inválidos' : 'Erro', html ?? (e.data?.statusMessage || 'Erro ao salvar item'))
   } finally {
     isSubmitting.value = false
   }
@@ -215,16 +226,12 @@ async function deleteItem(id: string) {
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
-      <div>
-        <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tight">Seu Catálogo</h1>
-        <p class="text-gray-500 font-medium mt-1">Unifique seus produtos e serviços em um só lugar.</p>
-      </div>
-      <BaseButton @click="openModal()" class="w-full md:w-auto px-10 py-5 rounded-[2rem] shadow-2xl shadow-blue-100">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <PageHeader title="Seu Catálogo" subtitle="Unifique seus produtos e serviços em um só lugar.">
+      <BaseButton @click="openModal()" class="w-full sm:w-auto shadow-2xl shadow-blue-100">
         Novo Item do Catálogo
       </BaseButton>
-    </header>
+    </PageHeader>
 
     <!-- Filtros -->
     <div class="mb-10 relative max-w-xl">
@@ -240,12 +247,29 @@ async function deleteItem(id: string) {
     </div>
 
     <!-- Modal de Formulário -->
-    <BaseDialog 
-      v-model:open="showForm" 
-      :title="selectedItem ? 'Editar Item' : 'Novo Item'" 
+    <BaseDialog
+      v-model:open="showForm"
+      :title="showCropper ? 'Ajustar Imagem' : (selectedItem ? 'Editar Item' : 'Novo Item')"
       size="lg"
     >
-      <form @submit.prevent="saveItem" class="space-y-8 py-4">
+      <!-- Cropper view (inline, sem Teleport extra) -->
+      <div v-if="showCropper" class="flex flex-col gap-6">
+        <p class="text-sm text-gray-500 font-bold">Arraste e redimensione para o enquadramento ideal (1:1)</p>
+        <div class="bg-gray-100 rounded-3xl overflow-hidden min-h-[400px]">
+          <Cropper
+            ref="cropperRef"
+            :src="rawImage"
+            :stencil-props="{
+              aspectRatio: 1/1,
+              movable: true,
+              resizable: true
+            }"
+            class="w-full h-[400px]"
+          />
+        </div>
+      </div>
+
+      <form v-else id="catalog-form" @submit.prevent="saveItem" class="space-y-8">
         <div class="flex items-center gap-6 p-6 bg-gray-50/50 rounded-3xl border border-gray-100">
           <div class="relative group">
             <div class="w-24 h-24 bg-white rounded-2xl border-2 border-gray-100 shadow-sm flex items-center justify-center overflow-hidden">
@@ -285,14 +309,15 @@ async function deleteItem(id: string) {
         <div class="space-y-3">
           <div class="flex justify-between items-center px-1">
             <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Descrição Comercial</label>
-            <button 
+            <button
               type="button"
               @click="generateWithAI"
-              :disabled="isGenerating"
-              class="text-[10px] font-black text-blue-600 hover:text-blue-800 flex items-center gap-2 disabled:opacity-50 uppercase tracking-widest transition-colors"
+              :disabled="isGenerating || !form.name"
+              class="text-[10px] font-black text-blue-600 hover:text-blue-800 flex items-center gap-2 disabled:opacity-40 uppercase tracking-widest transition-colors"
+              title="Gera descrição, preço e unidade sugeridos pela IA"
             >
               <Sparkles class="w-4 h-4" />
-              {{ isGenerating ? 'Gerando...' : 'Melhorar com IA' }}
+              {{ isGenerating ? 'Gerando...' : 'Sugestão IA (descrição, preço, unidade)' }}
             </button>
           </div>
           <textarea 
@@ -322,17 +347,23 @@ async function deleteItem(id: string) {
           />
         </div>
 
-        <div class="flex justify-end pt-6">
-          <BaseButton 
-            type="submit" 
-            :disabled="isSubmitting"
-            class="w-full md:w-auto px-12 py-5 rounded-[2rem] shadow-xl shadow-blue-100"
-          >
-            <RefreshCcw v-if="isSubmitting" class="w-5 h-5 animate-spin mr-3" />
+      </form>
+
+      <template #footer>
+        <template v-if="showCropper">
+          <button type="button" @click="showCropper = false" class="px-8 py-3 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-900 transition-all">Cancelar</button>
+          <BaseButton type="button" @click="cropImage" :disabled="isSubmitting">
+            <RefreshCcw v-if="isSubmitting" class="w-4 h-4 animate-spin mr-2" />
+            Confirmar Corte
+          </BaseButton>
+        </template>
+        <template v-else>
+          <BaseButton type="button" @click="saveItem" :disabled="isSubmitting">
+            <RefreshCcw v-if="isSubmitting" class="w-4 h-4 animate-spin mr-2" />
             {{ isSubmitting ? 'Salvando...' : (selectedItem ? 'Atualizar Item' : 'Salvar no Catálogo') }}
           </BaseButton>
-        </div>
-      </form>
+        </template>
+      </template>
     </BaseDialog>
 
     <!-- Listagem -->
@@ -373,7 +404,7 @@ async function deleteItem(id: string) {
               </td>
               <td class="px-10 py-8 text-right">
                 <div class="flex flex-col items-end">
-                  <span class="font-black text-lg text-gray-900">R$ {{ (item.price as number).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+                  <span class="font-black text-lg text-gray-900">R$ {{ (item.price ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
                   <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">por {{ item.unit }}</span>
                 </div>
               </td>
@@ -407,45 +438,36 @@ async function deleteItem(id: string) {
         </div>
         <h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight">{{ searchQuery ? 'Item não encontrado' : 'Catálogo Vazio' }}</h3>
         <p class="text-gray-400 font-bold mt-2 px-6 max-w-sm mx-auto">{{ searchQuery ? 'Não encontramos nenhum item com esses termos.' : 'Sua lista de serviços e produtos aparecerá aqui.' }}</p>
-        <BaseButton v-if="!searchQuery" @click="openModal()" class="mt-10 px-12 py-5 rounded-[2rem] shadow-xl shadow-blue-100">Adicionar Primeiro Item</BaseButton>
+        <BaseButton v-if="!searchQuery" @click="openModal()" class="mt-10 shadow-xl shadow-blue-100">Adicionar Primeiro Item</BaseButton>
         <button v-else @click="searchQuery = ''" class="mt-10 text-blue-600 font-black uppercase tracking-widest text-xs hover:underline decoration-2 underline-offset-8">Ver Catálogo Completo</button>
       </div>
     </div>
 
-    <!-- Modal do Cropper -->
-    <Teleport to="body">
-      <div v-if="showCropper" class="fixed inset-0 bg-gray-900/90 backdrop-blur-xl z-[200] flex items-center justify-center p-6">
-        <div class="bg-white rounded-[3rem] w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col border-8 border-white">
-          <header class="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-            <div>
-              <h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Ajustar Imagem</h2>
-              <p class="text-sm text-gray-500 font-bold">Arraste e redimensione para o enquadramento ideal (1:1)</p>
-            </div>
-            <button @click="showCropper = false" class="p-3 hover:bg-gray-200 rounded-full transition-all">
-              <X class="w-6 h-6 text-gray-400" />
-            </button>
-          </header>
-          
-          <div class="p-8 bg-gray-100 flex-1 min-h-[400px]">
-            <Cropper
-              ref="cropperRef"
-              :src="rawImage"
-              :stencil-props="{
-                aspectRatio: 1/1,
-                movable: true,
-                resizable: true
-              }"
-              class="w-full h-[400px]"
-            />
-          </div>
-
-          <footer class="p-8 border-t border-gray-100 bg-white flex justify-end gap-4">
-            <button @click="showCropper = false" class="px-8 py-4 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-900 transition-all">Cancelar</button>
-            <button @click="cropImage" class="px-10 py-4 bg-blue-600 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-blue-700 transition-all shadow-xl shadow-blue-100">Confirmar Corte</button>
-          </footer>
-        </div>
+    <!-- Dialog: Contexto IA para Serviço -->
+    <BaseDialog v-model:open="showAIDialog" title="Sugestão com IA" size="sm">
+      <div class="space-y-4">
+        <p class="text-sm text-gray-500 font-bold">
+          Descreva brevemente o serviço <span class="text-gray-900">{{ form.name }}</span> para a IA gerar uma sugestão mais precisa.
+        </p>
+        <textarea
+          v-model="aiPromptText"
+          rows="4"
+          placeholder="Ex: Criação de identidade visual completa para pequenas empresas, incluindo logo, paleta de cores e tipografia..."
+          class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400 text-sm resize-none"
+          @keydown.enter.ctrl="confirmAIGenerate"
+        />
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Ctrl+Enter para confirmar</p>
       </div>
-    </Teleport>
+
+      <template #footer>
+        <button type="button" @click="showAIDialog = false" class="px-6 py-3 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-900 transition-all">Cancelar</button>
+        <BaseButton type="button" @click="confirmAIGenerate" :disabled="isGenerating">
+          <Sparkles class="w-4 h-4 mr-2" />
+          {{ isGenerating ? 'Gerando...' : 'Gerar Sugestão' }}
+        </BaseButton>
+      </template>
+    </BaseDialog>
+
   </div>
 </template>
 

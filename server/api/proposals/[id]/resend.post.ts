@@ -1,5 +1,6 @@
 import { ProfileService } from '../../../services/ProfileService'
 import { ProposalService } from '../../../services/ProposalService'
+import { Proposal } from '../../../models/Proposal'
 import { sendProposalEmail } from '../../../utils/email'
 
 export default defineEventHandler(async (event) => {
@@ -18,7 +19,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Cliente sem e-mail cadastrado' })
   }
 
-  const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${proposal.slug}?t=${proposal.token}`
+  const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcfacil.com.br'}/p/${proposal.slug}?t=${proposal.token}`
   const emailRes = await sendProposalEmail(
     proposal.client.email,
     proposal.client.name || 'Cliente',
@@ -27,16 +28,14 @@ export default defineEventHandler(async (event) => {
   )
 
   if (!emailRes) {
-    throw createError({ 
-      statusCode: 500, 
-      statusMessage: 'Erro ao enviar e-mail. Verifique sua chave da API do Resend.' 
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Erro ao enviar e-mail via Resend. Verifique os logs do servidor para detalhes.'
     })
   }
 
-  // Atualizar o ID do último e-mail enviado
-  await ProposalService.update(id!, profile._id.toString(), {
-    lastEmailId: emailRes.id
-  })
+  // Atualizar só o lastEmailId — update direto evita recalcular totals
+  await Proposal.findByIdAndUpdate(id, { lastEmailId: emailRes.id })
 
   return { success: true, emailId: emailRes.id }
 })

@@ -1,5 +1,6 @@
 import { ProfileService } from '../../services/ProfileService'
 import { CatalogService } from '../../services/CatalogService'
+import { validateCatalogItem, throwIfInvalid } from '../../utils/validate'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -11,7 +12,10 @@ export default defineEventHandler(async (event) => {
   const profile = await ProfileService.getByUserId((session.user as any).id)
   if (!profile) throw createError({ statusCode: 404 })
 
-  // Note: CatalogService should validate if the item belongs to the logged profile
-  // For now we assume the ID is unique and the service handles it or we can add a check here
-  return await CatalogService.update(id!, body)
+  throwIfInvalid(validateCatalogItem(body))
+
+  const item = await CatalogService.update(id!, profile._id.toString(), body)
+  if (!item) throw createError({ statusCode: 404, statusMessage: 'Item não encontrado ou sem permissão' })
+
+  return item
 })

@@ -22,7 +22,7 @@ export const CatalogService = {
     return await CatalogItem.findOneAndDelete({ _id: id, profileId })
   },
 
-  async update(id: string, data: any) {
-    return await CatalogItem.findByIdAndUpdate(id, data, { new: true })
+  async update(id: string, profileId: string, data: any) {
+    return await CatalogItem.findOneAndUpdate({ _id: id, profileId }, data, { returnDocument: 'after' })
   }
 }

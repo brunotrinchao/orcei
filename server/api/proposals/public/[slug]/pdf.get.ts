@@ -4,10 +4,17 @@ import { generateProposalHtml } from '../../../../utils/pdf'
 
 export default defineEventHandler(async (event) => {
   const { slug } = event.context.params as { slug: string }
+  const query = getQuery(event)
+  const token = query.t as string | undefined
 
   const proposal = await Proposal.findOne({ slug }).populate('profileId').lean()
   if (!proposal) {
     throw createError({ statusCode: 404, statusMessage: 'Proposta não encontrada' })
+  }
+
+  // Validate token — same logic as [slug].get.ts
+  if (!token || (proposal as any).token !== token) {
+    throw createError({ statusCode: 403, statusMessage: 'Token inválido ou ausente' })
   }
 
   const profile = (proposal as any).profileId
@@ -25,6 +32,6 @@ export default defineEventHandler(async (event) => {
 
   event.node.res.setHeader('Content-Type', 'application/pdf')
   event.node.res.setHeader('Content-Disposition', `attachment; filename=proposta-${proposal.slug}.pdf`)
-  
+
   return pdf
 })

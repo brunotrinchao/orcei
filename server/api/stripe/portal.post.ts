@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
   try {
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: profile.stripeCustomerId,
-      return_url: `${process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/billing`,
+      return_url: `${process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/billing?portal=true`,
     })
 
     return { url: portalSession.url }

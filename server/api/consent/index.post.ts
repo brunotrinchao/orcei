@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
   await Consent.findOneAndUpdate(
     { sessionId },
     { sessionId, status, ip, userAgent, profileId },
-    { upsert: true, new: true }
+    { upsert: true, returnDocument: 'after' }
   )
 
   return { ok: true }

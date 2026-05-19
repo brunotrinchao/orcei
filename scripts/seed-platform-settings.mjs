@@ -81,7 +81,7 @@ async function seedSettings() {
           'landingPage.heroSubtitle': 'Crie orçamentos profissionais em segundos com IA, envie contratos automáticos e receba aprovações online. Simples assim.'
         }
       },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: 'after' }
     )
 
     console.log('Funcionalidades da Landing Page cadastradas com sucesso!')

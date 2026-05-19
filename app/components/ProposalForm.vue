@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, watchEffect } from 'vue'
+import { ref, computed, watch, watchEffect, nextTick } from 'vue'
 import { Plus, Trash2, Sparkles, Loader2, Search } from 'lucide-vue-next'
 import type { CatalogItemDTO, ProfileDTO, ProposalDTO } from '../../types'
 
@@ -46,7 +46,12 @@ function onClientSelect(clientId: string | undefined) {
   if (client) {
     form.value.client.name = client.name
     form.value.client.email = client.email
-    form.value.client.phone = client.phone || ''
+    
+    // Reset phone first to trigger reactivity properly in masked inputs
+    form.value.client.phone = ''
+    nextTick(() => {
+      form.value.client.phone = client.phone || ''
+    })
   }
 }
 

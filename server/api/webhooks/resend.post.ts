@@ -3,6 +3,7 @@ import { Proposal } from '../../models/Proposal'
 import { ProposalHistory } from '../../models/ProposalHistory'
 
 export default defineEventHandler(async (event) => {
+  setResponseStatus(event, 200)
   const body = await readRawBody(event)
   const headers = getHeaders(event)
   const config = useRuntimeConfig()

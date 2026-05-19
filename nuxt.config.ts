@@ -99,6 +99,10 @@ export default defineNuxtConfig({
     }
   },
 
+  nitro: {
+    trailingSlash: false
+  },
+
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true }
 })

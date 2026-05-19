@@ -98,6 +98,15 @@ export default defineNuxtConfig({
     }
   },
 
+  nitro: {
+    serverAssets: [
+      {
+        baseName: 'templates',
+        dir: './server/templates'
+      }
+    ]
+  },
+
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true }
 })

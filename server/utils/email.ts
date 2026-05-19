@@ -1,6 +1,4 @@
 import { Resend } from 'resend'
-import fs from 'node:fs'
-import path from 'node:path'
 
 export const sendProposalEmail = async (
   clientEmail: string,
@@ -17,9 +15,16 @@ export const sendProposalEmail = async (
   const resend = new Resend(apiKey)
 
   try {
-    // Carregar template
-    const templatePath = path.resolve('server/templates/email/proposal.html')
-    let html = fs.readFileSync(templatePath, 'utf-8')
+    // Carregar template via Nitro Storage
+    const storage = useStorage('assets:templates')
+    const htmlTemplate = await storage.getItem('email/proposal.html')
+    
+    if (!htmlTemplate) {
+      console.error('[Resend] Template not found in storage')
+      return null
+    }
+
+    let html = htmlTemplate.toString()
 
     const config = useRuntimeConfig()
     const appName = config.appName || 'Orcei'
@@ -39,14 +44,7 @@ export const sendProposalEmail = async (
       from: `${appName} <onboarding@resend.dev>`,
       to: recipient,
       subject: `${professionalName} preparou um orçamento para você`,
-      template: {
-        id: 'proposta', // ID do seu template
-        variables: {
-          clientName: clientName,
-          professionalName: professionalName,
-          proposalUrl: proposalUrl
-        },
-      },
+      html // Usando o HTML carregado e processado
     })
 
     if (error) {

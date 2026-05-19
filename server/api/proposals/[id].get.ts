@@ -13,5 +13,10 @@ export default defineEventHandler(async (event) => {
   
   if (!proposal) throw createError({ statusCode: 404 })
 
-  return proposal
+  const history = await ProposalService.getHistory(proposal._id as any)
+
+  return {
+    ...proposal.toObject(),
+    history
+  }
 })

@@ -22,5 +22,30 @@ export default defineEventHandler(async (event) => {
     proposal.termsAndConditions = processVariables(proposal.termsAndConditions || '', proposal as any, profile as any)
   }
 
+  // Log view event
+  if (!isPreview) {
+    const headers = getHeaders(event)
+    await ProposalService.logHistory(proposal._id as any, 'viewed', 'system', {
+      ip: headers['x-forwarded-for'] || headers['x-real-ip'],
+      userAgent: headers['user-agent']
+    })
+
+    // If it was just created or sent/delivered, move to viewed
+    const statusHierarchy: Record<string, number> = {
+      'created': 0,
+      'sent': 1,
+      'delivered': 2,
+      'viewed': 3,
+      'opened': 4,
+      'clicked': 5
+    }
+    const currentStatusLevel = statusHierarchy[proposal.status] || 0
+    const viewedLevel = statusHierarchy['viewed']
+    
+    if (viewedLevel > currentStatusLevel) {
+      await ProposalService.updateStatus(proposal.slug, 'viewed')
+    }
+  }
+
   return proposal
 })

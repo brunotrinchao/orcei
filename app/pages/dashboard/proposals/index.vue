@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote } from 'lucide-vue-next'
+import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles } from 'lucide-vue-next'
 import type { ProposalDTO } from '../../../../types'
 
 const searchQuery = ref('')
@@ -24,10 +24,13 @@ const { copy } = useClipboard()
 const isModalOpen = ref(false)
 const isAIWizardOpen = ref(false)
 const isPreviewOpen = ref(false)
+const isHistoryOpen = ref(false)
 const isAcceptedModalOpen = ref(false)
 const isSuccessModalOpen = ref(false)
 const lastCreatedProposal = ref<ProposalDTO | null>(null)
 const selectedProposal = ref<ProposalDTO | null>(null)
+const selectedProposalHistory = ref<any[]>([])
+const isLoadingHistory = ref(false)
 const prefilledItems = ref<any[] | null>(null)
 const isSubmitting = ref(false)
 const isResending = ref<string | null>(null)
@@ -39,6 +42,20 @@ const siteOrigin = ref('')
 onMounted(() => {
   siteOrigin.value = window.location.origin
 })
+
+async function openHistory(proposal: ProposalDTO) {
+  selectedProposal.value = proposal
+  isHistoryOpen.value = true
+  isLoadingHistory.value = true
+  try {
+    const data: any = await $fetch(`/api/proposals/${proposal._id}`)
+    selectedProposalHistory.value = data.history || []
+  } catch (e) {
+    notify('Erro', 'Não foi possível carregar o histórico')
+  } finally {
+    isLoadingHistory.value = false
+  }
+}
 
 function sendWhatsapp(proposal: ProposalDTO) {
   if (!proposal.client.phone) return
@@ -151,10 +168,33 @@ async function handleProposalSubmit(formData: Partial<ProposalDTO>) {
 
 const statusMap: any = {
   draft: { label: 'Rascunho', color: 'bg-gray-100 text-gray-800' },
-  created: { label: 'Criado', color: 'bg-blue-100 text-blue-800' },
+  created: { label: 'Criado', color: 'bg-blue-50 text-blue-700' },
+  sent: { label: 'Enviado', color: 'bg-blue-100 text-blue-800' },
+  delivered: { label: 'Entregue', color: 'bg-green-100 text-green-800' },
+  opened: { label: 'Aberto', color: 'bg-purple-100 text-purple-800' },
+  clicked: { label: 'Clicado', color: 'bg-orange-100 text-orange-800' },
   pending: { label: 'Pendente', color: 'bg-yellow-100 text-yellow-800' },
-  accepted: { label: 'Aceito', color: 'bg-green-100 text-green-800' },
-  expired: { label: 'Expirado', color: 'bg-red-100 text-red-800' }
+  accepted: { label: 'Aceito', color: 'bg-green-600 text-white' },
+  expired: { label: 'Expirado', color: 'bg-red-100 text-red-800' },
+  bounced: { label: 'Erro Envio', color: 'bg-red-600 text-white' },
+  viewed: { label: 'Visualizado', color: 'bg-indigo-100 text-indigo-800' }
+}
+
+const getStatusVariant = (status: string): 'default' | 'success' | 'warning' | 'error' | 'info' => {
+  const map: Record<string, any> = {
+    draft: 'default',
+    created: 'info',
+    sent: 'info',
+    delivered: 'success',
+    viewed: 'info',
+    opened: 'info',
+    clicked: 'warning',
+    pending: 'warning',
+    accepted: 'success',
+    expired: 'error',
+    bounced: 'error'
+  }
+  return map[status] || 'default'
 }
 
 const formatDate = (date: string) => {
@@ -205,7 +245,7 @@ const formatDate = (date: string) => {
                 <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ formatDate(proposal.createdAt) }}</span>
               </div>
             </div>
-            <BaseBadge :variant="proposal.status === 'accepted' ? 'success' : proposal.status === 'expired' ? 'error' : proposal.status === 'pending' ? 'warning' : proposal.status === 'created' ? 'info' : 'default'" class="shrink-0">
+            <BaseBadge :variant="getStatusVariant(proposal.status)" class="shrink-0">
               {{ statusMap[proposal.status]?.label }}
             </BaseBadge>
           </div>
@@ -214,6 +254,14 @@ const formatDate = (date: string) => {
           <div class="flex justify-between items-center pt-2 border-t border-gray-50">
             <span class="font-black text-gray-900 text-lg tracking-tight">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
             <div class="flex items-center gap-1">
+              <button 
+                @click="openHistory(proposal)"
+                class="p-2 text-gray-400 hover:text-blue-600 bg-gray-50 rounded-lg transition-all"
+                title="Histórico"
+                aria-label="Ver histórico do orçamento"
+              >
+                <History class="w-4 h-4" />
+              </button>
               <button 
                 @click="openPreview(proposal)"
                 class="p-2 text-gray-400 hover:text-gray-900 bg-gray-50 rounded-lg transition-all"
@@ -277,7 +325,7 @@ const formatDate = (date: string) => {
               {{ formatDate(proposal.createdAt) }}
             </td>
             <td class="px-8 py-6">
-              <BaseBadge :variant="proposal.status === 'accepted' ? 'success' : proposal.status === 'expired' ? 'error' : proposal.status === 'pending' ? 'warning' : proposal.status === 'created' ? 'info' : 'default'">
+              <BaseBadge :variant="getStatusVariant(proposal.status)">
                 {{ statusMap[proposal.status]?.label }}
               </BaseBadge>
             </td>
@@ -294,6 +342,14 @@ const formatDate = (date: string) => {
                   aria-label="Enviar via WhatsApp"
                 >
                   <MessageCircle class="w-5 h-5" />
+                </button>
+                <button 
+                  @click="openHistory(proposal)"
+                  class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all"
+                  title="Ver Histórico"
+                  aria-label="Ver histórico do orçamento"
+                >
+                  <History class="w-5 h-5" />
                 </button>
                 <button 
                   @click="openPreview(proposal)"
@@ -548,6 +604,38 @@ const formatDate = (date: string) => {
           </BaseButton>
         </div>
       </div>
+    </BaseDialog>
+
+    <!-- Modal de Histórico -->
+    <BaseDialog
+      v-model:open="isHistoryOpen"
+      title="Ciclo de Vida do Orçamento"
+      size="lg"
+    >
+      <div v-if="selectedProposal" class="p-6">
+        <div class="mb-8 flex items-center justify-between">
+          <div>
+            <h3 class="text-xl font-black text-gray-900 tracking-tight">{{ selectedProposal.title }}</h3>
+            <p class="text-sm text-gray-500 font-medium">{{ selectedProposal.client.name }} • {{ selectedProposal.code }}</p>
+          </div>
+          <BaseBadge :variant="getStatusVariant(selectedProposal.status)">
+            {{ statusMap[selectedProposal.status]?.label }}
+          </BaseBadge>
+        </div>
+
+        <div v-if="isLoadingHistory" class="py-20 flex flex-col items-center justify-center space-y-4">
+          <Loader2 class="w-10 h-10 text-blue-600 animate-spin" />
+          <p class="text-sm text-gray-500 font-bold animate-pulse">Carregando histórico...</p>
+        </div>
+        <ProposalTimeline v-else :history="selectedProposalHistory" />
+
+        <div v-if="!isLoadingHistory && selectedProposalHistory.length === 0" class="py-10 text-center">
+          <p class="text-gray-400 text-sm italic">Nenhum evento registrado ainda.</p>
+        </div>
+      </div>
+      <template #footer>
+        <BaseButton variant="secondary" size="sm" @click="isHistoryOpen = false">Fechar</BaseButton>
+      </template>
     </BaseDialog>
 
     <!-- Modal de Preview -->

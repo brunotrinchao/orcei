@@ -22,7 +22,7 @@ const proposalSchema = new Schema({
     phone: String
   },
   slug: { type: String, required: true, unique: true },
-  status: { type: String, enum: ['draft', 'pending', 'accepted', 'expired', 'created'], default: 'draft' },
+  status: { type: String, enum: ['draft', 'pending', 'accepted', 'expired', 'created', 'sent', 'delivered', 'opened', 'clicked', 'bounced', 'viewed', 'scheduled', 'received', 'delayed', 'failed', 'suppressed'], default: 'draft' },
   items: [itemSnapshotSchema],
   upsellItems: [itemSnapshotSchema],
   totals: {

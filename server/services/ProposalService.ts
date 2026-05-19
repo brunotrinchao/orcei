@@ -1,6 +1,7 @@
 import { Proposal } from '../models/Proposal'
 import { Profile } from '../models/Profile'
 import { Counter } from '../models/Counter'
+import { ProposalHistory } from '../models/ProposalHistory'
 import { nanoid } from 'nanoid'
 import { sendProposalEmail } from '../utils/email'
 
@@ -16,6 +17,24 @@ export const ProposalService = {
   async getBySlug(slug: string) {
     // Populamos o profileId para que o cliente veja o nome/marca do freelancer
     return await Proposal.findOne({ slug }).populate('profileId')
+  },
+
+  async logHistory(proposalId: any, action: string, type: 'system' | 'email' = 'system', details?: any) {
+    try {
+      await ProposalHistory.create({
+        proposalId,
+        type,
+        action,
+        details,
+        timestamp: new Date()
+      })
+    } catch (err) {
+      console.error('[ProposalService] Failed to log history:', err)
+    }
+  },
+
+  async getHistory(proposalId: string) {
+    return await ProposalHistory.find({ proposalId }).sort({ timestamp: -1 })
   },
 
   async create(data: any) {
@@ -58,7 +77,7 @@ export const ProposalService = {
       }
     }
 
-    return await Proposal.create({
+    const proposal = await Proposal.create({
       ...data,
       title: data.title?.trim() || code,
       slug,
@@ -69,6 +88,13 @@ export const ProposalService = {
       expiresAt,
       lastEmailId
     })
+
+    await this.logHistory(proposal._id, 'created')
+    if (lastEmailId) {
+      await this.logHistory(proposal._id, 'sent', 'email', { emailId: lastEmailId })
+    }
+
+    return proposal
   },
 
   async update(id: string, profileId: string, data: any) {
@@ -77,6 +103,8 @@ export const ProposalService = {
     if (oldProposal.status === 'accepted') return null
 
     let lastEmailId = oldProposal.lastEmailId
+    let emailSent = false
+
     // Consome crédito se mudar de draft para created/pending/etc
     if (oldProposal.status === 'draft' && data.status !== 'draft') {
       await this.consumeCredit(profileId)
@@ -92,17 +120,26 @@ export const ProposalService = {
             proposalUrl,
             profile.name
           )
-          if (emailRes) lastEmailId = emailRes.id
+          if (emailRes) {
+            lastEmailId = emailRes.id
+            emailSent = true
+          }
         }
       }
     }
 
     const totals = this.calculateTotals(data.items, data.totals?.additional || 0, data.totals?.discount || 0, data.paymentConfig)
-    return await Proposal.findOneAndUpdate(
+    const updated = await Proposal.findOneAndUpdate(
       { _id: id, profileId },
       { ...data, totals, lastEmailId },
       { returnDocument: 'after' }
     )
+
+    if (updated && emailSent) {
+      await this.logHistory(updated._id, 'sent', 'email', { emailId: lastEmailId })
+    }
+
+    return updated
   },
 
   async consumeCredit(profileId: string) {
@@ -123,8 +160,19 @@ export const ProposalService = {
     await Profile.findByIdAndUpdate(profileId, { $inc: { creditsUsed: 1 } })
   },
 
-  async updateStatus(slug: string, status: 'draft' | 'pending' | 'accepted' | 'expired' | 'created') {
-    return await Proposal.findOneAndUpdate({ slug }, { status }, { returnDocument: 'after' })
+  async updateStatus(slug: string, status: string) {
+    const updated = await Proposal.findOneAndUpdate({ slug }, { status }, { returnDocument: 'after' })
+    if (updated) {
+      // Map system status updates to history actions
+      const actionMap: Record<string, string> = {
+        'created': 'created',
+        'accepted': 'accepted',
+        'expired': 'declined',
+        'viewed': 'viewed'
+      }
+      await this.logHistory(updated._id, actionMap[status] || status)
+    }
+    return updated
   },
 
   async acceptProposal(slug: string, paymentMethod: 'cash' | 'credit_card') {
@@ -137,7 +185,7 @@ export const ProposalService = {
       method: paymentMethod
     })
 
-    return await Proposal.findOneAndUpdate(
+    const updated = await Proposal.findOneAndUpdate(
       { slug }, 
       { 
         status: 'accepted',
@@ -146,15 +194,28 @@ export const ProposalService = {
       }, 
       { returnDocument: 'after' }
     )
+
+    if (updated) {
+      await this.logHistory(updated._id, 'accepted', 'system', { paymentMethod })
+    }
+
+    return updated
   },
 
   async declineProposal(slug: string) {
-    return await Proposal.findOneAndUpdate({ slug }, { status: 'expired' }, { returnDocument: 'after' })
+    const updated = await Proposal.findOneAndUpdate({ slug }, { status: 'expired' }, { returnDocument: 'after' })
+    if (updated) {
+      await this.logHistory(updated._id, 'declined')
+    }
+    return updated
   },
 
   async requestChanges(slug: string, notes?: string) {
-    // Optionally log notes to a history field if we had one
-    return await Proposal.findOneAndUpdate({ slug }, { status: 'pending' }, { returnDocument: 'after' })
+    const updated = await Proposal.findOneAndUpdate({ slug }, { status: 'pending' }, { returnDocument: 'after' })
+    if (updated) {
+      await this.logHistory(updated._id, 'viewed', 'system', { notes })
+    }
+    return updated
   },
 
   calculateTotals(items: any[], additional: number = 0, discount: number = 0, paymentConfig: any = {}) {

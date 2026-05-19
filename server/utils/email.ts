@@ -16,8 +16,7 @@ export const sendProposalEmail = async (
 
   try {
     // Carregar template via Nitro Storage
-    const storage = useStorage('assets:templates')
-    const htmlTemplate = await storage.getItem('email/proposal.html')
+    const htmlTemplate = await useStorage().getItem('assets:templates:email:proposal.html')
     
     if (!htmlTemplate) {
       console.error('[Resend] Template not found in storage')

@@ -142,10 +142,18 @@ export default defineEventHandler(async (event) => {
         { $set: updateFields },
         { returnDocument: 'after' }
       )
+      
       console.log('Profile updated (subscription.updated):', {
         email: updated?.email,
-        status: sub.status
+        status: sub.status,
+        cancelAtPeriodEnd: !!sub.cancel_at_period_end
       })
+
+      // Se o usuário cancelou o cancelamento (reativou)
+      if (updated && !sub.cancel_at_period_end && sub.status === 'active') {
+        // Opcional: registrar em log ou histórico que foi reativado
+        console.log('Subscription re-activated for:', updated.email)
+      }
     }
 
     // 3. Renewal Payment

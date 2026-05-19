@@ -1,6 +1,7 @@
 import { ProfileService } from '../../services/ProfileService'
 import { Proposal } from '../../models/Proposal'
 import { CatalogItem } from '../../models/CatalogItem'
+import { Report } from '../../models/Report'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -19,9 +20,13 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const [proposals, itemsCount] = await Promise.all([
+  const startOfToday = new Date()
+  startOfToday.setHours(0, 0, 0, 0)
+
+  const [proposals, itemsCount, reportCount] = await Promise.all([
     Proposal.find(query),
-    CatalogItem.countDocuments({ profileId: profile._id })
+    CatalogItem.countDocuments({ profileId: profile._id }),
+    Report.countDocuments({ profileId: profile._id, date: { $gte: startOfToday } })
   ])
 
   const proposalsCount = proposals.length
@@ -49,8 +54,17 @@ export default defineEventHandler(async (event) => {
     })
 
   // Status Distribution
+  const statusLabels: any = {
+    draft: 'Rascunho',
+    created: 'Criado',
+    pending: 'Pendente',
+    accepted: 'Aceito',
+    expired: 'Expirado'
+  }
+
   const statusDistribution = proposals.reduce((acc: any, p) => {
-    acc[p.status] = (acc[p.status] || 0) + 1
+    const label = statusLabels[p.status] || p.status
+    acc[label] = (acc[label] || 0) + 1
     return acc
   }, {})
 
@@ -76,6 +90,7 @@ export default defineEventHandler(async (event) => {
     approvalRate,
     revenueHistory,
     statusDistribution,
-    clientRanking
+    clientRanking,
+    hasGeneratedReportToday: reportCount >= 1
   }
 })

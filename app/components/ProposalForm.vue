@@ -1,31 +1,26 @@
 <script setup lang="ts">
 import { ref, computed, watch, watchEffect } from 'vue'
-import { Plus, Trash2, Sparkles, Loader2 } from 'lucide-vue-next'
+import { Plus, Trash2, Sparkles, Loader2, Search } from 'lucide-vue-next'
 import type { CatalogItemDTO, ProfileDTO, ProposalDTO } from '../../types'
 
 const props = defineProps<{
   initialData?: ProposalDTO
+  prefilledItems?: any[]
   isEditing?: boolean
   isSubmitting?: boolean
 }>()
 
 const emit = defineEmits(['submit'])
 
-const { data: clientsData, error: clientsError } = useFetch<any>('/api/clients', {
-  query: { limit: 100 }
+const { data: clientsData } = useLazyFetch<any>('/api/clients', {
+  key: 'clients-list',
+  query: { limit: 100 },
+  server: false
 })
 const { data: profile } = useFetch<ProfileDTO>('/api/profile')
 const { notify } = useAlerts()
 
 const clients = computed(() => clientsData.value?.items || [])
-
-onMounted(() => {
-  console.log('ProposalForm Mounted. Clients Initial State:', clients.value)
-})
-
-watch(clientsData, (val) => {
-  console.log('Clients Data Changed:', val)
-}, { immediate: true })
 
 const catalogSearch = ref('')
 const catalogPage = ref(1)
@@ -70,7 +65,9 @@ const form = ref({
     email: props.initialData?.client?.email || '',
     phone: props.initialData?.client?.phone || ''
   },
-  items: props.initialData?.items ? [...props.initialData.items] : [] as any[],
+  items: props.initialData?.items 
+    ? [...props.initialData.items] 
+    : (props.prefilledItems ? [...props.prefilledItems] : []) as any[],
   totals: {
     additional: props.initialData?.totals?.additional || 0,
     discount: props.initialData?.totals?.discount || 0
@@ -123,6 +120,15 @@ watch(() => props.initialData, (newVal) => {
   }
 }, { deep: true })
 
+watch(() => props.prefilledItems, (newVal) => {
+  if (newVal && !props.initialData) {
+    form.value.items = [...newVal]
+    if (newVal.length > 0 && !form.value.title) {
+      form.value.title = `Orçamento para ${newVal[0].name}`
+    }
+  }
+}, { deep: true })
+
 function toggleItem(item: CatalogItemDTO) {
   const index = form.value.items.findIndex((i: any) => i.catalogItemId === item._id)
   if (index > -1) {
@@ -170,7 +176,30 @@ const finalTotal = computed(() => {
 })
 
 async function submit(status: 'draft' | 'created' = 'draft') {
+  // Validação
+  if (!form.value.title.trim()) return notify('Aviso', 'Título do orçamento é obrigatório')
+  if (!form.value.client.name.trim()) return notify('Aviso', 'Nome do cliente é obrigatório')
+  if (!form.value.client.email.trim()) return notify('Aviso', 'E-mail do cliente é obrigatório')
+  
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(form.value.client.email)) return notify('Aviso', 'E-mail informado é inválido')
+
   if (form.value.items.length === 0) return notify('Aviso', 'Selecione pelo menos um item do catálogo')
+  
+  for (const item of form.value.items) {
+    if (!item.name.trim()) return notify('Aviso', 'Todos os itens no escopo precisam de um nome')
+    if (item.price < 0) return notify('Aviso', 'O preço de um item não pode ser negativo')
+    if (item.quantity <= 0) return notify('Aviso', 'A quantidade de um item deve ser maior que zero')
+  }
+
+  if (form.value.paymentConfig.installments < 1 || form.value.paymentConfig.installments > 12) {
+    return notify('Aviso', 'O número de parcelas deve ser entre 1 e 12')
+  }
+
+  if (form.value.paymentConfig.cashDiscount < 0 || form.value.paymentConfig.cashDiscount > 100) {
+    return notify('Aviso', 'O desconto deve estar entre 0% e 100%')
+  }
+
   const keepStatus = props.isEditing && props.initialData?.status !== 'draft'
   const payload = keepStatus ? form.value : { ...form.value, status }
   emit('submit', payload)
@@ -240,7 +269,6 @@ defineExpose({ submit, isEditingNonDraft: computed(() => props.isEditing && prop
               Nenhum item encontrado.
             </div>
           </div>
-          <!-- Catalog Pagination -->
           <div v-if="totalCatalogItems > catalogLimit" class="p-4 bg-gray-50/50 border-t border-gray-100 flex justify-center">
             <BasePagination 
               :total="totalCatalogItems" 
@@ -368,7 +396,6 @@ defineExpose({ submit, isEditingNonDraft: computed(() => props.isEditing && prop
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </form>

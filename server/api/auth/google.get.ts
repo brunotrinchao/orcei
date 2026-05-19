@@ -2,6 +2,13 @@ import { ProfileService } from '../../services/ProfileService'
 
 export default defineOAuthGoogleEventHandler({
   async onSuccess(event, { user }) {
+    if (!user.email) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Email não fornecido pela conta Google. Verifique suas configurações de privacidade.'
+      })
+    }
+
     const userData = {
       id: user.id || user.sub,
       name: user.name,
@@ -10,10 +17,14 @@ export default defineOAuthGoogleEventHandler({
     }
 
     // Vincular/Criar perfil no MongoDB
-    await ProfileService.createForUser(userData)
+    const profile = await ProfileService.createForUser(userData)
 
     await setUserSession(event, {
-      user: userData
+      user: {
+        ...userData,
+        role: profile.role,
+        creditsBalance: profile.creditsBalance
+      }
     })
     return sendRedirect(event, '/dashboard')
   },

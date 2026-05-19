@@ -2,5 +2,7 @@ export interface UserDTO {
   id: string
   name: string
   email: string
-  creditsBalance: number
+  avatar?: string
+  role?: 'user' | 'admin'
+  creditsBalance?: number
 }

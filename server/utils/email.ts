@@ -21,16 +21,22 @@ export const sendProposalEmail = async (
     const templatePath = path.resolve('server/templates/email/proposal.html')
     let html = fs.readFileSync(templatePath, 'utf-8')
 
+    const config = useRuntimeConfig()
+    const appName = config.appName || 'Orcei'
+    const appLogo = config.appDocumentLogo
+
     // Substituir variáveis
     html = html
       .replace(/{{clientName}}/g, clientName)
       .replace(/{{professionalName}}/g, professionalName)
       .replace(/{{proposalUrl}}/g, proposalUrl)
+      .replace(/{{appName}}/g, appName)
+      .replace(/{{appLogo}}/g, appLogo || '')
 
     const recipient = process.env.RESEND_TEST_TO || clientEmail
 
     const { data, error } = await resend.emails.send({
-      from: 'Orcei <onboarding@resend.dev>',
+      from: `${appName} <onboarding@resend.dev>`,
       to: recipient,
       subject: `${professionalName} preparou um orçamento para você`,
       template: {

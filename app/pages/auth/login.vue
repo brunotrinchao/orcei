@@ -4,6 +4,7 @@ definePageMeta({
 })
 
 const { loggedIn } = useUserSession()
+const { data: systemInfo } = useFetch<any>('/api/system/status')
 
 // Redirect authenticated users to dashboard
 watchEffect(() => {
@@ -30,7 +31,7 @@ watchEffect(() => {
       </a>
 
       <p class="mt-8 text-center text-xs text-gray-400 font-medium">
-        Ao entrar, você concorda com os termos de uso do Orcei.
+        Ao entrar, você concorda com os termos de uso do {{ systemInfo?.landingPage?.appName || 'Orcei' }}.
       </p>
     </div>
   </div>

@@ -2,6 +2,9 @@
 definePageMeta({ layout: 'blank' })
 const { public: { appName } } = useRuntimeConfig()
 useHead({ title: `Termos de Uso — ${appName}` })
+
+const { data: systemInfo } = useFetch<any>('/api/system/status')
+const dynamicAppName = computed(() => systemInfo.value?.landingPage?.appName || appName)
 </script>
 
 <template>
@@ -20,7 +23,7 @@ useHead({ title: `Termos de Uso — ${appName}` })
         <p class="text-xs font-black text-blue-600 uppercase tracking-widest mb-3">Última atualização: Janeiro de 2026</p>
         <h1 class="text-4xl font-black text-gray-900 tracking-tight uppercase mb-4">Termos de Uso</h1>
         <p class="text-gray-500 font-medium leading-relaxed">
-          Ao utilizar a plataforma Orcei, você concorda com os presentes Termos de Uso.
+          Ao utilizar a plataforma {{ dynamicAppName }}, você concorda com os presentes Termos de Uso.
           Leia atentamente antes de acessar ou utilizar os serviços.
         </p>
       </div>
@@ -30,7 +33,7 @@ useHead({ title: `Termos de Uso — ${appName}` })
         <section>
           <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">1. Aceitação dos Termos</h2>
           <p class="text-gray-700 font-medium leading-relaxed">
-            O uso da plataforma Orcei implica a aceitação integral destes Termos de Uso e da nossa
+            O uso da plataforma {{ dynamicAppName }} implica a aceitação integral destes Termos de Uso e da nossa
             Política de Privacidade. Se você não concorda com algum dos termos, não utilize os serviços.
           </p>
         </section>
@@ -38,7 +41,7 @@ useHead({ title: `Termos de Uso — ${appName}` })
         <section>
           <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">2. Descrição do Serviço</h2>
           <p class="text-gray-700 font-medium leading-relaxed mb-4">
-            A Orcei é uma plataforma SaaS (Software as a Service) de gestão comercial que oferece:
+            A {{ dynamicAppName }} é uma plataforma SaaS (Software as a Service) de gestão comercial que oferece:
           </p>
           <ul class="space-y-2">
             <li v-for="feature in features" :key="feature" class="flex gap-3 text-sm text-gray-700 font-medium">
@@ -52,7 +55,7 @@ useHead({ title: `Termos de Uso — ${appName}` })
           <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">3. Cadastro e Conta</h2>
           <p class="text-gray-700 font-medium leading-relaxed">
             O acesso à plataforma é feito via autenticação Google OAuth. Você é responsável pela
-            segurança da sua conta e por todas as atividades realizadas através dela. A Orcei não
+            segurança da sua conta e por todas as atividades realizadas através dela. A {{ dynamicAppName }} não
             se responsabiliza por acessos não autorizados decorrentes de negligência do usuário.
           </p>
         </section>
@@ -61,7 +64,7 @@ useHead({ title: `Termos de Uso — ${appName}` })
           <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">4. Planos e Pagamento</h2>
           <div class="space-y-4">
             <p class="text-gray-700 font-medium leading-relaxed">
-              A Orcei oferece planos gratuitos (com créditos limitados) e planos pagos via assinatura mensal/anual.
+              A {{ dynamicAppName }} oferece planos gratuitos (com créditos limitados) e planos pagos via assinatura mensal/anual.
               Os pagamentos são processados pela Stripe de forma segura.
             </p>
             <p class="text-gray-700 font-medium leading-relaxed">
@@ -74,7 +77,7 @@ useHead({ title: `Termos de Uso — ${appName}` })
 
         <section>
           <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">5. Uso Permitido</h2>
-          <p class="text-gray-700 font-medium leading-relaxed mb-4">É vedado utilizar a Orcei para:</p>
+          <p class="text-gray-700 font-medium leading-relaxed mb-4">É vedado utilizar a {{ dynamicAppName }} para:</p>
           <ul class="space-y-2">
             <li v-for="forbidden in forbiddenUses" :key="forbidden" class="flex gap-3 text-sm text-gray-700 font-medium">
               <span class="text-red-400 font-black shrink-0">✗</span>
@@ -86,7 +89,7 @@ useHead({ title: `Termos de Uso — ${appName}` })
         <section>
           <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">6. Propriedade Intelectual</h2>
           <p class="text-gray-700 font-medium leading-relaxed">
-            Todo o código, design, marca e conteúdo da plataforma Orcei são de propriedade exclusiva
+            Todo o código, design, marca e conteúdo da plataforma {{ dynamicAppName }} são de propriedade exclusiva
             dos seus desenvolvedores. O usuário recebe uma licença de uso limitada, não exclusiva e
             intransferível. Os dados e orçamentos criados pelo usuário permanecem de sua propriedade.
           </p>
@@ -95,7 +98,7 @@ useHead({ title: `Termos de Uso — ${appName}` })
         <section>
           <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">7. Limitação de Responsabilidade</h2>
           <p class="text-gray-700 font-medium leading-relaxed">
-            A Orcei não se responsabiliza por: (i) perdas de receita ou dados resultantes de falhas
+            A {{ dynamicAppName }} não se responsabiliza por: (i) perdas de receita ou dados resultantes de falhas
             técnicas imprevisíveis; (ii) conteúdo das propostas criadas pelos usuários; (iii) relações
             comerciais entre o usuário e seus clientes. O serviço é fornecido "como está", com esforço
             razoável de disponibilidade mas sem garantia de 100% de uptime.
@@ -108,14 +111,14 @@ useHead({ title: `Termos de Uso — ${appName}` })
             O tratamento de dados pessoais é regido pela nossa
             <NuxtLink to="/privacy" class="text-blue-600 underline font-black">Política de Privacidade</NuxtLink>,
             em conformidade com a LGPD. Você pode solicitar a exclusão da sua conta e de todos os
-            dados associados a qualquer momento via <strong>privacidade@orcei.com.br</strong>.
+            dados associados a qualquer momento via <strong>privacidade@{{ dynamicAppName.toLowerCase() }}.com.br</strong>.
           </p>
         </section>
 
         <section>
           <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">9. Alterações nos Termos</h2>
           <p class="text-gray-700 font-medium leading-relaxed">
-            A Orcei reserva o direito de atualizar estes Termos a qualquer momento. Alterações
+            A {{ dynamicAppName }} reserva o direito de atualizar estes Termos a qualquer momento. Alterações
             significativas serão comunicadas por e-mail com antecedência mínima de 30 dias. O uso
             continuado da plataforma após o prazo implica aceitação dos novos Termos.
           </p>
@@ -133,7 +136,7 @@ useHead({ title: `Termos de Uso — ${appName}` })
         <section>
           <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">11. Contato</h2>
           <p class="text-gray-700 font-medium leading-relaxed">
-            Dúvidas sobre estes Termos: <strong>contato@orcei.com.br</strong>
+            Dúvidas sobre estes Termos: <strong>contato@{{ dynamicAppName.toLowerCase() }}.com.br</strong>
           </p>
         </section>
 
@@ -143,7 +146,7 @@ useHead({ title: `Termos de Uso — ${appName}` })
     <!-- Footer -->
     <footer class="border-t border-gray-100 bg-white py-8">
       <div class="max-w-3xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p class="text-xs text-gray-400 font-medium">© 2026 Orcei · Todos os direitos reservados</p>
+        <p class="text-xs text-gray-400 font-medium">© 2026 {{ dynamicAppName }} · Todos os direitos reservados</p>
         <div class="flex gap-6">
           <NuxtLink to="/privacy" class="text-xs font-black text-gray-400 hover:text-gray-900 uppercase tracking-widest transition-colors">Privacidade</NuxtLink>
           <NuxtLink to="/" class="text-xs font-black text-gray-400 hover:text-gray-900 uppercase tracking-widest transition-colors">Voltar ao Início</NuxtLink>

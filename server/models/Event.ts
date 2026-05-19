@@ -11,4 +11,8 @@ const eventSchema = new Schema({
   color: { type: String, default: '#3B82F6' }
 }, { timestamps: true })
 
+eventSchema.index({ profileId: 1 })
+eventSchema.index({ start: 1, end: 1 })
+eventSchema.index({ proposalId: 1 })
+
 export const Event = model('Event', eventSchema)

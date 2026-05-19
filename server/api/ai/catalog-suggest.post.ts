@@ -1,11 +1,15 @@
 import { CatalogItem } from '../../models/CatalogItem'
 import { AIService } from '../../services/AIService'
+import { checkRateLimit } from '../../utils/rate-limit'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
   if (!session.user) {
     throw createError({ statusCode: 401, statusMessage: 'Não autorizado' })
   }
+
+  // Rate Limit: 5 requests per 1 minute for AI
+  checkRateLimit(event, { max: 5, windowMs: 60 * 1000, keyPrefix: 'ai-catalog' })
 
   const { name, type, context } = await readBody(event)
   if (!name) {
@@ -21,7 +25,9 @@ export default defineEventHandler(async (event) => {
   let similarItems: any[] = []
 
   if (keywords.length > 0) {
-    const regexParts = keywords.map((k: string) => `(?=.*${k})`).join('')
+    // Escape keywords to prevent ReDoS
+    const escapedKeywords = keywords.map((k: string) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    const regexParts = escapedKeywords.map((k: string) => `(?=.*${k})`).join('')
     const regex = new RegExp(regexParts, 'i')
 
     similarItems = await CatalogItem.find({
@@ -36,7 +42,8 @@ export default defineEventHandler(async (event) => {
 
   // Fallback: busca mais ampla se não achou nada
   if (similarItems.length === 0 && keywords.length > 0) {
-    const firstKeyword = new RegExp(keywords[0], 'i')
+    const escapedFirst = keywords[0].replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const firstKeyword = new RegExp(escapedFirst, 'i')
     similarItems = await CatalogItem.find({
       type,
       name: { $regex: firstKeyword },
@@ -88,9 +95,10 @@ Regras:
       similarCount: similarItems.length
     }
   } catch (e: any) {
+    console.error('AI Catalog Suggest Error:', e)
     throw createError({
       statusCode: 500,
-      statusMessage: e.message || 'Erro ao gerar sugestão com IA'
+      statusMessage: 'Erro ao processar sugestão com IA. Tente novamente.'
     })
   }
 })

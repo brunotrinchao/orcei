@@ -10,12 +10,11 @@ const itemSnapshotSchema = new Schema({
     type: { type: String, enum: ['percent', 'fixed'], default: 'percent' }
   }
 })
-
 const proposalSchema = new Schema({
   profileId: { type: Schema.Types.ObjectId, ref: 'Profile', required: true },
   title: { type: String, required: true },
-  sequenceNumber: { type: Number },
-  code: { type: String },
+  sequenceNumber: { type: Number, required: true },
+  code: { type: String, required: true },
   token: { type: String },
   client: {
     name: { type: String, required: true },
@@ -43,5 +42,8 @@ const proposalSchema = new Schema({
   expiresAt: Date,
   lastEmailId: String
 }, { timestamps: true })
+
+proposalSchema.index({ profileId: 1 })
+proposalSchema.index({ profileId: 1, status: 1 })
 
 export const Proposal = model('Proposal', proposalSchema)

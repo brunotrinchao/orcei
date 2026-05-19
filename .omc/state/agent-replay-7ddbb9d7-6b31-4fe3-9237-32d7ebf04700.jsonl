@@ -1,0 +1,7 @@
+{"t":0,"agent":"system","event":"skill_invoked","skill_name":"analyze-project"}
+{"t":0,"agent":"a99bcae","agent_type":"explore","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a36f9a2","agent_type":"explore","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a6a5c1e","agent_type":"explore","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a6a5c1e","agent_type":"explore","event":"agent_stop","success":true,"duration_ms":81352}
+{"t":0,"agent":"a99bcae","agent_type":"explore","event":"agent_stop","success":true,"duration_ms":127333}
+{"t":0,"agent":"a36f9a2","agent_type":"explore","event":"agent_stop","success":true,"duration_ms":147783}

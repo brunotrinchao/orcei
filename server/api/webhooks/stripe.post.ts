@@ -77,6 +77,7 @@ export default defineEventHandler(async (event) => {
                 subscriptionEndsAt: periodEnd,
                 cancelAtPeriodEnd: !!subscription.cancel_at_period_end,
                 creditsBalance: credits,
+                creditsUsed: 0, // Reset on new subscription
                 stripeSubscriptionId: subscriptionId,
                 stripeCustomerId: customerId,
                 stripePriceId: priceId || null
@@ -87,7 +88,7 @@ export default defineEventHandler(async (event) => {
           console.log('Profile updated (checkout.session.completed):', { plan, email: updated?.email })
         }
       } else if (type === 'credits' && session.mode === 'payment') {
-        const creditsToAdd = tier === 'single_credit' ? 1 : 0
+        const creditsToAdd = tier === 'single_credit' ? 1 : (tier === 'credits_5' ? 5 : (tier === 'credits_10' ? 10 : 0))
         const query = profileId ? { _id: profileId } : { stripeCustomerId: customerId }
 
         const updated = await Profile.findOneAndUpdate(
@@ -102,7 +103,7 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // 2. Subscription Updated (includes cancel_at_period_end from Customer Portal)
+    // 2. Subscription Updated
     if (stripeEvent.type === 'customer.subscription.updated' ||
         stripeEvent.type === 'customer.subscription.created') {
       const sub = session
@@ -121,7 +122,6 @@ export default defineEventHandler(async (event) => {
         stripeSubscriptionId: sub.id,
         stripePriceId: priceId || null
       }
-      // Only update plan on active-like statuses — don't downgrade while cancel_at_period_end=true
       if (plan && isActiveLike) updateFields.subscriptionPlan = plan
 
       const updated = await Profile.findOneAndUpdate(
@@ -131,9 +131,7 @@ export default defineEventHandler(async (event) => {
       )
       console.log('Profile updated (subscription.updated):', {
         email: updated?.email,
-        status: sub.status,
-        cancelAtPeriodEnd: sub.cancel_at_period_end,
-        endsAt: periodEnd
+        status: sub.status
       })
     }
 
@@ -162,18 +160,19 @@ export default defineEventHandler(async (event) => {
                 subscriptionEndsAt: periodEnd,
                 cancelAtPeriodEnd: !!subscription.cancel_at_period_end,
                 creditsBalance: credits,
+                creditsUsed: 0, // Reset for new billing cycle
                 stripeSubscriptionId: subscriptionId,
                 stripePriceId: priceId || null
               }
             },
             { returnDocument: 'after' }
           )
-          console.log('Profile updated (invoice.payment_succeeded):', { plan, email: updated?.email })
+          console.log('Profile renewed (invoice.payment_succeeded):', { plan, email: updated?.email })
         }
       }
     }
 
-    // 4. Subscription Deleted — final cancellation at period end
+    // 4. Subscription Deleted
     if (stripeEvent.type === 'customer.subscription.deleted') {
       const customerId = session.customer
       const updated = await Profile.findOneAndUpdate(
@@ -199,7 +198,6 @@ export default defineEventHandler(async (event) => {
       eventType: stripeEvent.type,
       message: dbErr.message
     })
-    // Delete idempotency record so Stripe will retry
     try { await StripeEvent.deleteOne({ eventId: stripeEvent.id }) } catch {}
     throw createError({ statusCode: 500, statusMessage: 'Webhook processing failed' })
   }

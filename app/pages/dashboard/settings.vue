@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Cropper } from 'vue-advanced-cropper'
 import 'vue-advanced-cropper/dist/style.css'
-import { SwatchBook, MapPin, Briefcase, FileText, Pencil, Image as PhotoIcon, RefreshCcw, Instagram, Youtube, Phone, MessageSquare, Plus, Trash2 } from 'lucide-vue-next'
+import { SwatchBook, MapPin, Briefcase, FileText, Pencil, Image as PhotoIcon, RefreshCcw, Instagram, Youtube, Phone, MessageSquare, Plus, Trash2, Shield } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../../types'
 
 const { notify } = useAlerts()
@@ -136,7 +136,84 @@ const sections = [
   { id: 'contato',  label: 'Contato',  icon: Phone },
   { id: 'negocio',  label: 'Negócio',  icon: RefreshCcw },
   { id: 'modelos',  label: 'Modelos',  icon: FileText },
+  { id: 'privacidade', label: 'Privacidade', icon: Shield },
 ]
+
+const isExporting = ref(false)
+const isDeleting = ref(false)
+const { confirm: confirmAlert } = useAlerts()
+
+async function exportData() {
+  isExporting.value = true
+  try {
+    const res: any = await $fetch('/api/profile/backup', { method: 'POST' })
+    notify('Sucesso', res.message || 'Backup enviado para seu e-mail.')
+  } catch (e: any) {
+    notify('Erro', e.data?.statusMessage || 'Erro ao processar backup.')
+  } finally {
+    isExporting.value = false
+  }
+}
+
+async function deleteAccount() {
+  if (!localProfile.value) return
+
+  // 1. Validar se tem plano ativo
+  const hasActiveSub = 
+    localProfile.value.subscriptionPlan !== 'free' && 
+    ['active', 'trialing', 'past_due'].includes(localProfile.value.subscriptionStatus || '')
+
+  if (hasActiveSub) {
+    return notify(
+      'Ação Necessária', 
+      'Você possui uma assinatura ativa. Por favor, cancele seu plano na aba "Assinatura" antes de excluir sua conta.'
+    )
+  }
+
+  // 2. Diálogo de Confirmação com opção de Backup
+  confirmAlert({
+    title: 'Encerrar Conta',
+    description: `Seus dados (clientes, orçamentos e agenda) serão deletados permanentemente. Seus ${localProfile.value.creditsBalance} créditos restantes ficarão salvos para quando você desejar voltar. \n\nDeseja realizar um backup antes de sair?`,
+    variant: 'destructive',
+    actionText: 'Fazer Backup e Excluir',
+    cancelText: 'Apenas Excluir Minha Conta',
+    onConfirm: async () => {
+      // Flow A: Backup + Delete
+      isDeleting.value = true
+      try {
+        await $fetch('/api/profile/backup', { method: 'POST' })
+        await $fetch('/api/profile', { method: 'DELETE' })
+        notify('Até logo', 'Backup enviado e conta excluída. Redirecionando...')
+        setTimeout(() => window.location.href = '/', 2000)
+      } catch (e: any) {
+        notify('Erro', e.data?.statusMessage || 'Erro ao processar exclusão.')
+      } finally {
+        isDeleting.value = false
+      }
+    },
+    onCancel: async () => {
+      // Flow B: Just Delete (Re-confirmar para segurança)
+      confirmAlert({
+        title: 'Tem Certeza?',
+        description: 'Você escolheu excluir a conta SEM backup. Todos os seus dados serão perdidos. Confirmar exclusão?',
+        variant: 'destructive',
+        actionText: 'Sim, deletar tudo',
+        onConfirm: async () => {
+          isDeleting.value = true
+          try {
+            await $fetch('/api/profile', { method: 'DELETE' })
+            notify('Até logo', 'Conta excluída. Redirecionando...')
+            setTimeout(() => window.location.href = '/', 2000)
+          } catch (e: any) {
+            notify('Erro', e.data?.statusMessage || 'Erro ao excluir conta.')
+          } finally {
+            isDeleting.value = false
+          }
+        }
+      })
+    }
+  })
+}
 
 const activeSection = ref('visual')
 
@@ -430,6 +507,52 @@ onMounted(() => {
           <div v-show="activeTab === 'terms'" class="space-y-4">
             <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Termos e Condições</label>
             <RichTextEditor v-model="localProfile.defaultTermsAndConditions" class="min-h-[350px] border-2 border-gray-50 rounded-3xl overflow-hidden" />
+          </div>
+        </section>
+
+        <!-- Privacidade e Dados -->
+        <section id="privacidade" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
+          <div class="flex items-center gap-3 mb-8">
+            <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
+              <Shield class="w-5 h-5 text-red-600" />
+            </div>
+            <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Privacidade e Dados</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="p-8 bg-gray-50/50 rounded-3xl border border-gray-100 space-y-4">
+              <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Backup Completo</h3>
+              <p class="text-sm text-gray-500 font-medium leading-relaxed">
+                Exporte todos os seus dados cadastrados (Clientes, Catálogo, Orçamentos e Agenda) em formato JSON. O arquivo será enviado para o seu e-mail.
+              </p>
+              <BaseButton 
+                variant="secondary" 
+                size="sm" 
+                class="w-full sm:w-auto" 
+                :disabled="isExporting" 
+                :loading="isExporting"
+                @click="exportData"
+              >
+                {{ isExporting ? 'Processando...' : 'Exportar Meus Dados' }}
+              </BaseButton>
+            </div>
+
+            <div class="p-8 bg-red-50/30 rounded-3xl border border-red-100 space-y-4">
+              <h3 class="text-sm font-black text-red-900 uppercase tracking-widest">Encerrar Conta</h3>
+              <p class="text-sm text-red-700/70 font-medium leading-relaxed">
+                Ao excluir sua conta, todos os seus dados serão apagados permanentemente. Esta ação não pode ser desfeita.
+              </p>
+              <BaseButton 
+                variant="outline" 
+                size="sm" 
+                class="w-full sm:w-auto text-red-600 border-red-200 hover:bg-red-50" 
+                :disabled="isDeleting" 
+                :loading="isDeleting"
+                @click="deleteAccount"
+              >
+                {{ isDeleting ? 'Excluindo...' : 'Excluir Minha Conta' }}
+              </BaseButton>
+            </div>
           </div>
         </section>
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core'
+import { Shield, ArrowLeft } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../types'
 const { loggedIn, user, clear } = useUserSession()
 const { data: profile, refresh: refreshLayoutProfile } = useFetch<ProfileDTO>('/api/profile')
@@ -26,6 +27,8 @@ async function logout() {
   })
 }
 
+const { data: systemInfo } = useFetch<any>('/api/system/status')
+
 onMounted(() => {
   window.addEventListener('pageshow', (e) => {
     if (e.persisted) refreshLayoutProfile()
@@ -40,11 +43,21 @@ onMounted(() => {
       <nav class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <div class="flex items-center gap-12">
           <NuxtLink to="/"><AppLogo size="sm" /></NuxtLink>
-          <div v-if="loggedIn" class="hidden md:flex gap-8">
+          <div v-if="loggedIn" class="hidden md:flex gap-8 items-center">
             <NuxtLink to="/dashboard" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Dashboard</NuxtLink>
             <NuxtLink to="/dashboard/clients" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Clientes</NuxtLink>
             <NuxtLink to="/dashboard/catalog" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Catálogo</NuxtLink>
             <NuxtLink to="/dashboard/proposals" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Orçamentos</NuxtLink>
+            <NuxtLink to="/dashboard/reports" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Relatórios</NuxtLink>
+            
+            <!-- Admin Quick Access -->
+            <template v-if="user?.role === 'admin'">
+              <div class="h-4 w-px bg-gray-200"></div>
+              <NuxtLink to="/admin" class="flex items-center gap-2 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-red-100 transition-all border border-red-100">
+                <Shield class="w-3.5 h-3.5" />
+                Painel Admin
+              </NuxtLink>
+            </template>
           </div>
           <div v-else class="hidden md:flex gap-8">
             <a href="#features" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Funcionalidades</a>
@@ -90,6 +103,7 @@ onMounted(() => {
                 </div>
                 <NuxtLink to="/dashboard/settings" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 transition">Configurações</NuxtLink>
                 <NuxtLink to="/dashboard/billing" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 transition">Plano</NuxtLink>
+                <NuxtLink v-if="user?.role === 'admin'" to="/admin" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-red-600 font-bold hover:bg-red-50 transition border-t border-gray-50">Painel Admin</NuxtLink>
                 <button @click="logout" class="w-full text-left px-4 py-2 text-xs text-red-500 hover:bg-red-50 transition border-t border-gray-50 mt-1">Sair</button>
               </div>
 
@@ -152,15 +166,21 @@ onMounted(() => {
         
         <div class="pt-8 border-t border-gray-50 flex flex-col md:flex-row justify-between items-center gap-4">
           <p class="text-[10px] font-black text-gray-300 uppercase tracking-widest">
-            © {{ new Date().getFullYear() }} ORCEI. Todos os direitos reservados.
+            {{ systemInfo?.footerText || `© ${new Date().getFullYear()} ${systemInfo?.landingPage?.appName || 'ORCEI'}. Todos os direitos reservados.` }}
           </p>
           <div class="flex items-center gap-6">
             <a v-if="profile?.contact?.social?.instagram" :href="`https://instagram.com/${profile.contact.social.instagram.replace('@', '')}`" target="_blank" class="text-gray-400 hover:text-pink-600 transition-colors">
               <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.074 4.771 4.85.058 1.266.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.164 4.771-4.771 4.85-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.075-4.771-4.85-.058-1.265-.069-1.644-.069-4.849 0-3.204.013-3.583.069-4.849.149-3.227 1.157-4.771 4.771-4.85 1.266-.058 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
             </a>
             <div class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-full border border-gray-100">
-              <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-              <span class="text-[8px] font-black text-gray-500 uppercase tracking-widest">Sistema Online</span>
+              <div 
+                :class="[
+                  systemInfo?.systemStatus?.color === 'green' ? 'bg-green-500' : 
+                  systemInfo?.systemStatus?.color === 'yellow' ? 'bg-yellow-500' : 'bg-red-500'
+                ]" 
+                class="w-1.5 h-1.5 rounded-full animate-pulse"
+              ></div>
+              <span class="text-[8px] font-black text-gray-500 uppercase tracking-widest">{{ systemInfo?.systemStatus?.label || 'Sistema Online' }}</span>
             </div>
           </div>
         </div>
@@ -184,6 +204,10 @@ onMounted(() => {
       <NuxtLink to="/dashboard/catalog" class="flex flex-col items-center gap-1 text-gray-400 py-2" active-class="text-gray-900">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
         <span class="text-[9px] font-bold">Catálogo</span>
+      </NuxtLink>
+      <NuxtLink v-if="user?.role === 'admin'" to="/admin" class="flex flex-col items-center gap-1 text-red-400 py-2" active-class="text-red-700">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.233-2.047-.618-3.016z"/></svg>
+        <span class="text-[9px] font-bold">Admin</span>
       </NuxtLink>
       <NuxtLink to="/dashboard/settings" class="flex flex-col items-center gap-1 text-gray-400 py-2" active-class="text-gray-900">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>

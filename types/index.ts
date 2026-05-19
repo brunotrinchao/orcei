@@ -59,6 +59,7 @@ export interface CatalogItemDTO {
   unit: string
   sku?: string
   imageUrl?: string
+  icon?: string
 }
 
 export type ServiceDTO = CatalogItemDTO

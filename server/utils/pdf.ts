@@ -1,9 +1,13 @@
 import { processVariables } from './variables'
 
-export function generateProposalHtml(proposal: any, profile: any) {
+export function generateProposalHtml(proposal: any, profile: any, appName: string = 'ORCEI') {
   // Processar variáveis
   const contractHtml = processVariables(proposal.contractText || '', proposal, profile)
   const termsHtml = processVariables(proposal.termsAndConditions || '', proposal, profile)
+
+  const logoHtml = process.env.APP_DOCUMENT_LOGO 
+    ? `<img src="${process.env.APP_DOCUMENT_LOGO}" width="150" height="108">` 
+    : appName.toUpperCase()
 
   return `
     <!DOCTYPE html>
@@ -31,7 +35,7 @@ export function generateProposalHtml(proposal: any, profile: any) {
     </head>
     <body>
       <div class="header">
-        <div class="logo">ORCEI</div>
+        <div class="logo">${logoHtml}</div>
         <div style="text-align: right">
           <div style="font-weight: bold">${profile.name}</div>
           <div style="font-size: 12px; color: #666">${profile.email}</div>
@@ -99,6 +103,54 @@ export function generateProposalHtml(proposal: any, profile: any) {
       <div class="terms prose">
         <div class="section-title">Termos e Condições</div>
         ${termsHtml}
+      </div>
+    </body>
+    </html>
+  `
+}
+
+export function generateReportHtml(report: any, profile: any, appName: string = 'Orcei') {
+  const logoHtml = process.env.APP_DOCUMENT_LOGO 
+    ? `<img src="${process.env.APP_DOCUMENT_LOGO}" width="150" height="108">` 
+    : appName.toUpperCase()
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        body { font-family: sans-serif; padding: 40px; color: #333; line-height: 1.6; }
+        .header { display: flex; justify-content: space-between; border-bottom: 2px solid #3B82F6; padding-bottom: 20px; margin-bottom: 40px; }
+        .logo { font-size: 24px; font-weight: bold; color: #3B82F6; }
+        .title { font-size: 28px; font-weight: 900; margin-bottom: 10px; }
+        .date { font-size: 14px; color: #6b7280; margin-bottom: 40px; }
+        .content { margin-top: 20px; }
+        .content h1, .content h2, .content h3 { color: #3B82F6; margin-top: 30px; }
+        .content p { margin-bottom: 15px; }
+        .content ul { margin-bottom: 15px; }
+        .footer { margin-top: 50px; border-top: 1px solid #eee; pt-20px; font-size: 10px; color: #999; text-align: center; }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <div class="logo">${logoHtml}</div>
+        <div style="text-align: right">
+          <div style="font-weight: bold">${profile.name}</div>
+          <div style="font-size: 12px; color: #666">${profile.email}</div>
+        </div>
+      </div>
+
+      <div class="title">Relatório Estratégico IA</div>
+      <div class="date">Gerado em: ${new Date(report.createdAt).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</div>
+
+      <div class="content">
+        ${report.contentHtml}
+      </div>
+
+      <div class="footer">
+        Este relatório foi gerado automaticamente pela Inteligência Artificial do ${appName}.<br>
+        © 2026 ${appName} - Todos os direitos reservados.
       </div>
     </body>
     </html>

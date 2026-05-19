@@ -1,31 +1,65 @@
 import { Profile } from '../models/Profile'
+import type { UserDTO } from '../../types/user'
 
 export const ProfileService = {
-  async createForUser(user: any) {
+  async createForUser(user: UserDTO) {
     const existing = await Profile.findOne({ userId: user.id })
-    if (existing) return existing
+    
+    if (existing) {
+      if (existing.isDeleted) {
+        // Reativar conta deletada sem dar novos créditos grátis
+        return await Profile.findByIdAndUpdate(existing._id, {
+          isDeleted: false,
+          deletedAt: null,
+          name: user.name,
+          avatar: user.avatar,
+          email: user.email,
+          creditsBalance: existing.creditsBalance // Mantém o que tinha (0 se foi zerado na exclusão)
+        }, { returnDocument: 'after' })
+      }
+      return existing
+    }
+
+    // Verificar se existe perfil deletado com o mesmo e-mail (outra conta social etc)
+    const existingEmail = await Profile.findOne({ email: user.email, isDeleted: true })
+    const initialCredits = existingEmail ? 0 : 1
 
     const stripe = useStripe()
+    let stripeCustomerId: string | undefined
 
-    // Criar Customer no Stripe
-    const customer = await stripe.customers.create({
-      email: user.email,
-      name: user.name,
-      metadata: { userId: user.id }
-    })
+    try {
+      // Criar Customer no Stripe
+      const customer = await stripe.customers.create({
+        email: user.email,
+        name: user.name,
+        metadata: { userId: user.id }
+      })
+      stripeCustomerId = customer.id
+    } catch (e: any) {
+      console.error('Stripe Customer Creation failed:', e)
+      throw createError({ statusCode: 500, statusMessage: 'Erro ao configurar conta de pagamentos (Stripe)' })
+    }
 
-    return await Profile.create({
-      userId: user.id,
-      name: user.name,
-      email: user.email,
-      avatar: user.avatar,
-      creditsBalance: 1, // Default inicial
-      stripeCustomerId: customer.id,
-      subscriptionPlan: 'free'
-    })
+    try {
+      return await Profile.create({
+        userId: user.id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        creditsBalance: initialCredits, // 0 se e-mail já existiu deletado
+        stripeCustomerId: stripeCustomerId,
+        subscriptionPlan: 'free'
+      })
+    } catch (dbErr: any) {
+      // Rollback Stripe customer if DB fails
+      if (stripeCustomerId) {
+        try { await stripe.customers.del(stripeCustomerId) } catch {}
+      }
+      throw dbErr
+    }
   },
 
   async getByUserId(userId: string) {
-    return await Profile.findOne({ userId })
+    return await Profile.findOne({ userId, isDeleted: { $ne: true } })
   }
 }

@@ -1,0 +1,7 @@
+{
+  "tool_name": "Read",
+  "tool_input_preview": "{\"file_path\":\"/home/brunotrinchao/server/models/Profile.ts\"}",
+  "error": "File does not exist. Note: your current working directory is /home/brunotrinchao/Documentos/Bruno/Orcei.",
+  "timestamp": "2026-05-18T19:46:43.112Z",
+  "retry_count": 5
+}

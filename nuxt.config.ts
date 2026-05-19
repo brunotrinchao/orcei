@@ -7,7 +7,20 @@ export default defineNuxtConfig({
   },
 
   app: {
-    pageTransition: { name: 'page', mode: 'out-in' }
+    pageTransition: { name: 'page', mode: 'out-in' },
+    head: {
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/images/favicon/favicon.ico' },
+        { rel: 'icon', type: 'image/png', sizes: '96x96', href: '/images/favicon/favicon-96x96.png' },
+        { rel: 'icon', type: 'image/svg+xml', href: '/images/favicon/favicon.svg' },
+        { rel: 'shortcut icon', href: '/images/favicon/favicon.ico' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/images/favicon/apple-touch-icon.png' },
+        { rel: 'manifest', href: '/images/favicon/site.webmanifest' }
+      ],
+      meta: [
+        { name: 'apple-mobile-web-app-title', content: process.env.APP_NAME || 'Orcei' }
+      ]
+    }
   },
 
   future: {
@@ -52,6 +65,7 @@ export default defineNuxtConfig({
     cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
     cloudinaryName: process.env.CLOUDINARY_NAME,
     appName: process.env.APP_NAME || 'Orcei',
+    appDocumentLogo: process.env.APP_DOCUMENT_LOGO,
     appEnv: process.env.APP_ENVIRONMENT || 'development',
     public: {
       stripeStarterPriceId: process.env.STRIPE_STARTER_PRICE_ID,
@@ -63,6 +77,7 @@ export default defineNuxtConfig({
       stripeCredits10PriceId: process.env.STRIPE_CREDITS_10_PRICE_ID,
       gtmId: process.env.NUXT_PUBLIC_GTM_ID || '',
       appName: process.env.APP_NAME || 'Orcei',
+      appDocumentLogo: process.env.APP_DOCUMENT_LOGO,
     }
   },
 

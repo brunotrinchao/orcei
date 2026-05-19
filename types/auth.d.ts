@@ -4,6 +4,7 @@ declare module '#auth-utils' {
     name: string
     email: string
     creditsBalance: number
+    role?: 'user' | 'admin'
   }
 
   interface UserSession {

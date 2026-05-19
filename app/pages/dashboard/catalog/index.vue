@@ -2,7 +2,8 @@
 import { ref, computed } from 'vue'
 import { Cropper } from 'vue-advanced-cropper'
 import 'vue-advanced-cropper/dist/style.css'
-import { Plus, Search, Image, Pencil, Trash2, Sparkles, RefreshCcw, Package, ShoppingBag } from 'lucide-vue-next'
+import * as LucideIcons from 'lucide-vue-next'
+import { Plus, Search, Image, Pencil, Trash2, Sparkles, RefreshCcw, Package, ShoppingBag, HelpCircle } from 'lucide-vue-next'
 import type { CatalogItemDTO } from '../../../../types'
 
 const { notify, confirm: confirmAlert } = useAlerts()
@@ -87,7 +88,8 @@ const form = ref({
   price: 0 as any,
   unit: 'UN',
   sku: '',
-  imageUrl: ''
+  imageUrl: '',
+  icon: 'Package'
 })
 
 const isSubmitting = ref(false)
@@ -116,11 +118,12 @@ function openModal(item: CatalogItemDTO | null = null) {
     form.value = { 
       type: item.type,
       name: item.name, 
-      description: item.description, 
+      description: item.description || '', 
       price: item.price, 
-      unit: item.unit,
+      unit: item.unit || 'UN',
       sku: item.sku || '',
-      imageUrl: item.imageUrl || ''
+      imageUrl: item.imageUrl || '',
+      icon: item.icon || 'Package'
     }
   } else {
     selectedItem.value = null
@@ -131,13 +134,14 @@ function openModal(item: CatalogItemDTO | null = null) {
       price: 0, 
       unit: 'UN',
       sku: '',
-      imageUrl: ''
+      imageUrl: '',
+      icon: 'Package'
     }
   }
   showForm.value = true
 }
 
-function generateWithAI() {
+function generateWithIA() {
   if (!form.value.name) return notify('Aviso', 'Digite o nome do item primeiro')
   if (form.value.type === 'service') {
     aiPromptText.value = ''
@@ -189,9 +193,9 @@ async function saveItem() {
       price: priceValue,
       unit: form.value.unit,
       sku: form.value.sku,
-      imageUrl: form.value.imageUrl || undefined
+      imageUrl: form.value.imageUrl || undefined,
+      icon: form.value.icon
     }
-    console.log('[Catalog] saveItem payload:', JSON.stringify({ ...payload, imageUrl: payload.imageUrl ? '(set)' : '(empty)' }))
 
     await $fetch(endpoint, {
       method,
@@ -223,6 +227,10 @@ async function deleteItem(id: string) {
     }
   })
 }
+
+function getIcon(name: string) {
+  return (LucideIcons as any)[name] || HelpCircle
+}
 </script>
 
 <template>
@@ -252,7 +260,6 @@ async function deleteItem(id: string) {
       :title="showCropper ? 'Ajustar Imagem' : (selectedItem ? 'Editar Item' : 'Novo Item')"
       size="lg"
     >
-      <!-- Cropper view (inline, sem Teleport extra) -->
       <div v-if="showCropper" class="flex flex-col gap-6">
         <p class="text-sm text-gray-500 font-bold">Arraste e redimensione para o enquadramento ideal (1:1)</p>
         <div class="bg-gray-100 rounded-3xl overflow-hidden min-h-[400px]">
@@ -270,39 +277,74 @@ async function deleteItem(id: string) {
       </div>
 
       <form v-else id="catalog-form" @submit.prevent="saveItem" class="space-y-8">
-        <div class="flex items-center gap-6 p-6 bg-gray-50/50 rounded-3xl border border-gray-100">
-          <div class="relative group">
-            <div class="w-24 h-24 bg-white rounded-2xl border-2 border-gray-100 shadow-sm flex items-center justify-center overflow-hidden">
-              <img v-if="form.imageUrl" :src="form.imageUrl" class="w-full h-full object-cover">
-              <div v-else class="text-gray-300">
-                <Image class="w-8 h-8 opacity-30" />
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+          <!-- Visual Identity -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between px-2">
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Identidade Visual</label>
+              <div class="flex bg-gray-100 p-1 rounded-xl">
+                <button 
+                  type="button"
+                  @click="form.imageUrl = ''"
+                  :class="[!form.imageUrl ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400']"
+                  class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all"
+                >Ícone</button>
+                <button 
+                  type="button"
+                  class="relative px-3 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all overflow-hidden"
+                  :class="[form.imageUrl ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400']"
+                >
+                  Imagem
+                  <input type="file" accept="image/*" @change="onFileChange" class="absolute inset-0 opacity-0 cursor-pointer">
+                </button>
               </div>
             </div>
-            <label class="absolute -bottom-2 -right-2 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white cursor-pointer shadow-lg hover:bg-blue-700 transition-all border-2 border-white">
-              <Pencil class="w-4 h-4" />
-              <input type="file" accept="image/*" @change="onFileChange" class="hidden">
-            </label>
-          </div>
-          <div>
-            <h4 class="text-sm font-black text-gray-900 uppercase tracking-tight">Imagem do Item</h4>
-            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Opcional. Recomendado 400x400px.</p>
-            <button v-if="form.imageUrl" type="button" @click="form.imageUrl = ''" class="text-[10px] text-red-600 font-black uppercase tracking-widest mt-2 hover:underline">Remover Imagem</button>
-          </div>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <BaseSelect 
-            v-model="form.type" 
-            label="Tipo de Item" 
-            :options="typeOptions" 
-          />
-          <div class="md:col-span-2">
+            <!-- Icon Selector -->
+            <div v-if="!form.imageUrl" class="animate-in fade-in zoom-in-95 duration-200">
+              <BaseIconSelect v-model="form.icon" />
+            </div>
+
+            <!-- Image Preview -->
+            <div v-else class="relative group aspect-square bg-gray-50 rounded-[2.5rem] border-2 border-dashed border-gray-200 overflow-hidden flex items-center justify-center animate-in fade-in zoom-in-95 duration-200">
+              <img :src="form.imageUrl" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                <label class="p-3 bg-white rounded-xl text-gray-900 cursor-pointer hover:scale-110 transition-transform">
+                  <Pencil class="w-5 h-5" />
+                  <input type="file" accept="image/*" @change="onFileChange" class="hidden">
+                </label>
+                <button type="button" @click="form.imageUrl = ''" class="p-3 bg-white rounded-xl text-red-600 hover:scale-110 transition-transform">
+                  <Trash2 class="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-6">
+            <BaseSelect 
+              v-model="form.type" 
+              label="Tipo de Item" 
+              :options="typeOptions" 
+            />
             <BaseInput 
               v-model="form.name" 
               label="Nome do Item" 
-              placeholder="Ex: Desenvolvimento Web ou Pacote de Logos" 
+              placeholder="Ex: Desenvolvimento Web" 
               required 
             />
+            <div class="grid grid-cols-2 gap-4">
+              <BaseInput 
+                v-model="form.price" 
+                label="Preço (R$)" 
+                mask="currency"
+                required 
+              />
+              <BaseSelect 
+                v-model="form.unit" 
+                label="Unidade" 
+                :options="unitOptions" 
+              />
+            </div>
           </div>
         </div>
 
@@ -311,42 +353,27 @@ async function deleteItem(id: string) {
             <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Descrição Comercial</label>
             <button
               type="button"
-              @click="generateWithAI"
+              @click="generateWithIA"
               :disabled="isGenerating || !form.name"
               class="text-[10px] font-black text-blue-600 hover:text-blue-800 flex items-center gap-2 disabled:opacity-40 uppercase tracking-widest transition-colors"
-              title="Gera descrição, preço e unidade sugeridos pela IA"
             >
               <Sparkles class="w-4 h-4" />
-              {{ isGenerating ? 'Gerando...' : 'Sugestão IA (descrição, preço, unidade)' }}
+              {{ isGenerating ? 'Gerando...' : 'Sugestão IA' }}
             </button>
           </div>
           <textarea 
             v-model="form.description" 
             rows="3" 
-            class="w-full px-6 py-5 bg-white border-2 border-gray-100 rounded-[1.5rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-300 shadow-inner"
+            class="w-full px-6 py-5 bg-white border-2 border-gray-100 rounded-[1.5rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 shadow-inner"
             placeholder="Descreva o que está incluído..."
           ></textarea>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <BaseInput 
-            v-model="form.price" 
-            label="Preço Base (R$)" 
-            mask="currency"
-            required 
-          />
-          <BaseSelect 
-            v-model="form.unit" 
-            label="Unidade" 
-            :options="unitOptions" 
-          />
-          <BaseInput 
-            v-model="form.sku" 
-            label="SKU / Código" 
-            placeholder="Opcional" 
-          />
-        </div>
-
+        <BaseInput 
+          v-model="form.sku" 
+          label="SKU / Código Interno" 
+          placeholder="Opcional" 
+        />
       </form>
 
       <template #footer>
@@ -381,16 +408,16 @@ async function deleteItem(id: string) {
           <tbody class="divide-y-2 divide-gray-50">
             <tr v-for="item in items" :key="item._id" class="hover:bg-gray-50/30 transition-all group">
               <td class="px-10 py-8">
-                <div class="flex items-center gap-4">
-                  <div class="w-12 h-12 rounded-xl bg-gray-100 border border-gray-100 overflow-hidden flex-shrink-0">
+                <div class="flex items-center gap-6">
+                  <div class="w-16 h-16 rounded-2xl border-2 border-gray-100 bg-white overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
                     <img v-if="item.imageUrl" :src="item.imageUrl" class="w-full h-full object-cover">
-                    <div v-else class="w-full h-full flex items-center justify-center text-gray-300">
-                      <Image class="w-5 h-5 opacity-30" />
+                    <div v-else class="text-gray-400">
+                      <component :is="getIcon(item.icon || 'Package')" class="w-8 h-8" />
                     </div>
                   </div>
                   <div class="flex flex-col">
                     <span class="font-black text-lg text-gray-900 group-hover:text-blue-600 transition-colors">{{ item.name }}</span>
-                    <span class="text-xs font-bold text-gray-400 line-clamp-1 max-w-xl mt-1">{{ item.description || 'Sem descrição comercial disponível' }}</span>
+                    <span class="text-xs font-bold text-gray-400 line-clamp-1 max-w-xl mt-1">{{ item.description || 'Sem descrição comercial' }}</span>
                   </div>
                 </div>
               </td>
@@ -410,10 +437,10 @@ async function deleteItem(id: string) {
               </td>
               <td class="px-10 py-8 text-right">
                 <div class="flex justify-end gap-3 items-center">
-                  <button @click="openModal(item)" class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all" title="Editar">
+                  <button @click="openModal(item)" class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all">
                     <Pencil class="w-6 h-6" />
                   </button>
-                  <button @click="deleteItem(item._id)" class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all" title="Excluir">
+                  <button @click="deleteItem(item._id)" class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all">
                     <Trash2 class="w-6 h-6" />
                   </button>
                 </div>
@@ -423,57 +450,37 @@ async function deleteItem(id: string) {
         </table>
       </div>
       
-      <!-- Paginação -->
       <div v-if="totalItems > itemsPerPage" class="px-10 py-6 border-t-2 border-gray-50 bg-gray-50/20 flex justify-center">
-        <BasePagination 
-          :total="totalItems" 
-          :items-per-page="itemsPerPage" 
-          v-model:page="currentPage" 
-        />
+        <BasePagination :total="totalItems" :items-per-page="itemsPerPage" v-model:page="currentPage" />
       </div>
       
       <div v-if="items.length === 0" class="text-center py-32 bg-gray-50/20">
         <div class="w-24 h-24 bg-white shadow-xl shadow-gray-100 text-gray-200 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8">
           <ShoppingBag class="w-10 h-10" />
         </div>
-        <h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight">{{ searchQuery ? 'Item não encontrado' : 'Catálogo Vazio' }}</h3>
-        <p class="text-gray-400 font-bold mt-2 px-6 max-w-sm mx-auto">{{ searchQuery ? 'Não encontramos nenhum item com esses termos.' : 'Sua lista de serviços e produtos aparecerá aqui.' }}</p>
-        <BaseButton v-if="!searchQuery" @click="openModal()" class="mt-10 shadow-xl shadow-blue-100">Adicionar Primeiro Item</BaseButton>
-        <button v-else @click="searchQuery = ''" class="mt-10 text-blue-600 font-black uppercase tracking-widest text-xs hover:underline decoration-2 underline-offset-8">Ver Catálogo Completo</button>
+        <h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Catálogo Vazio</h3>
+        <BaseButton @click="openModal()" class="mt-10 shadow-xl shadow-blue-100">Adicionar Primeiro Item</BaseButton>
       </div>
     </div>
 
-    <!-- Dialog: Contexto IA para Serviço -->
+    <!-- Dialog IA -->
     <BaseDialog v-model:open="showAIDialog" title="Sugestão com IA" size="sm">
       <div class="space-y-4">
-        <p class="text-sm text-gray-500 font-bold">
-          Descreva brevemente o serviço <span class="text-gray-900">{{ form.name }}</span> para a IA gerar uma sugestão mais precisa.
-        </p>
+        <p class="text-sm text-gray-500 font-bold">Descreva o serviço <span class="text-gray-900">{{ form.name }}</span> para a IA.</p>
         <textarea
           v-model="aiPromptText"
           rows="4"
-          placeholder="Ex: Criação de identidade visual completa para pequenas empresas, incluindo logo, paleta de cores e tipografia..."
-          class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400 text-sm resize-none"
-          @keydown.enter.ctrl="confirmAIGenerate"
+          placeholder="Ex: Criação de identidade visual completa..."
+          class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none font-bold text-gray-900 text-sm resize-none"
         />
-        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Ctrl+Enter para confirmar</p>
       </div>
-
       <template #footer>
-        <button type="button" @click="showAIDialog = false" class="px-6 py-3 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-900 transition-all">Cancelar</button>
-        <BaseButton type="button" @click="confirmAIGenerate" :disabled="isGenerating">
-          <Sparkles class="w-4 h-4 mr-2" />
-          {{ isGenerating ? 'Gerando...' : 'Gerar Sugestão' }}
-        </BaseButton>
+        <BaseButton type="button" @click="confirmAIGenerate" :disabled="isGenerating">Gerar Sugestão</BaseButton>
       </template>
     </BaseDialog>
-
   </div>
 </template>
 
 <style scoped>
-.cropper {
-  height: 400px;
-  background: #f3f4f6;
-}
+.cropper { height: 400px; background: #f3f4f6; }
 </style>

@@ -70,14 +70,16 @@ const maskOptions = computed(() => {
 
   return props.mask
 })
+const inputId = useId()
 </script>
 
 <template>
   <div class="space-y-2">
-    <label v-if="label" class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">
+    <label v-if="label" :for="inputId" class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">
       {{ label }} <span v-if="required" class="text-red-500">*</span>
     </label>
     <input
+      :id="inputId"
       :value="safeValue"
       v-imask="maskOptions"
       @input="onInput"

@@ -93,6 +93,8 @@ const formatDate = (date: any) => {
   })
 }
 
+const { data: systemInfo } = useFetch<any>('/api/system/status')
+
 const statusMap: any = {
   draft: { label: 'Rascunho', class: 'bg-gray-100 text-gray-600' },
   created: { label: 'Enviado', class: 'bg-blue-100 text-blue-600' },
@@ -134,8 +136,8 @@ const statusMap: any = {
       <div class="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
         <!-- Logo -->
         <img
-          src="https://res.cloudinary.com/dpeaqezkb/image/upload/v1778873300/orcafacil/logo-default.png"
-          alt="Orcei"
+          :src="useRuntimeConfig().public.appDocumentLogo || 'https://res.cloudinary.com/dpeaqezkb/image/upload/v1778873300/orcafacil/logo-default.png'"
+          :alt="systemInfo?.landingPage?.appName || 'Orcei'"
           class="h-7 w-auto object-contain"
         />
         <!-- Code + Status -->
@@ -492,11 +494,11 @@ const statusMap: any = {
 
         <div class="flex flex-col items-center gap-2 pt-4">
           <img
-            src="https://res.cloudinary.com/dpeaqezkb/image/upload/v1778873300/orcafacil/logo-default.png"
-            alt="Orcei"
+            :src="useRuntimeConfig().public.appDocumentLogo || 'https://res.cloudinary.com/dpeaqezkb/image/upload/v1778873300/orcafacil/logo-default.png'"
+            :alt="systemInfo?.landingPage?.appName || 'Orcei'"
             class="h-5 w-auto object-contain opacity-30"
           />
-          <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">Powered by Orcei</p>
+          <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">Powered by {{ systemInfo?.landingPage?.appName || 'Orcei' }}</p>
         </div>
       </footer>
     </main>

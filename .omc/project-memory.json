@@ -1,0 +1,260 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1779105531968,
+  "projectRoot": "/home/brunotrinchao/Documentos/Bruno/Orcei",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "nuxt",
+        "version": "4.4.5",
+        "category": "fullstack"
+      },
+      {
+        "name": "vue",
+        "version": "3.5.34",
+        "category": "frontend"
+      },
+      {
+        "name": "vitest",
+        "version": "4.1.6",
+        "category": "testing"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": "npm run dev",
+    "scripts": {
+      "build": "nuxt build",
+      "dev": "nuxt dev",
+      "generate": "nuxt generate",
+      "preview": "nuxt preview",
+      "postinstall": "nuxt prepare"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": "*.spec.ts",
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "app",
+      "docs",
+      "public",
+      "scripts",
+      "tests"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "app": {
+      "path": "app",
+      "purpose": "Application code",
+      "fileCount": 1,
+      "lastAccessed": 1779105531945,
+      "keyFiles": [
+        "app.vue"
+      ]
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 0,
+      "lastAccessed": 1779105531948,
+      "keyFiles": []
+    },
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 2,
+      "lastAccessed": 1779105531961,
+      "keyFiles": [
+        "favicon.ico",
+        "robots.txt"
+      ]
+    },
+    "resources": {
+      "path": "resources",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1779105531962,
+      "keyFiles": []
+    },
+    "scripts": {
+      "path": "scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 4,
+      "lastAccessed": 1779105531962,
+      "keyFiles": [
+        "check-db.mjs",
+        "fix-subscription.mjs",
+        "seed.mjs",
+        "setup-stripe.mjs"
+      ]
+    },
+    "server": {
+      "path": "server",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1779105531964,
+      "keyFiles": []
+    },
+    "tests": {
+      "path": "tests",
+      "purpose": "Test files",
+      "fileCount": 2,
+      "lastAccessed": 1779105531964,
+      "keyFiles": [
+        "BaseInput.spec.ts",
+        "Billing.spec.ts"
+      ]
+    },
+    "types": {
+      "path": "types",
+      "purpose": "Type definitions",
+      "fileCount": 3,
+      "lastAccessed": 1779105531965,
+      "keyFiles": [
+        "auth.d.ts",
+        "index.ts",
+        "user.ts"
+      ]
+    },
+    "app/components": {
+      "path": "app/components",
+      "purpose": "UI components",
+      "fileCount": 2,
+      "lastAccessed": 1779105531965,
+      "keyFiles": [
+        "ProposalForm.vue",
+        "RichTextEditor.vue"
+      ]
+    },
+    "app/middleware": {
+      "path": "app/middleware",
+      "purpose": "Middleware",
+      "fileCount": 1,
+      "lastAccessed": 1779105531965,
+      "keyFiles": [
+        "auth.global.ts"
+      ]
+    },
+    "app/pages": {
+      "path": "app/pages",
+      "purpose": "Page components",
+      "fileCount": 3,
+      "lastAccessed": 1779105531965,
+      "keyFiles": [
+        "index.vue",
+        "privacy.vue",
+        "terms.vue"
+      ]
+    },
+    "server/api": {
+      "path": "server/api",
+      "purpose": "API routes",
+      "fileCount": 0,
+      "lastAccessed": 1779105531966,
+      "keyFiles": []
+    },
+    "server/models": {
+      "path": "server/models",
+      "purpose": "Data models",
+      "fileCount": 8,
+      "lastAccessed": 1779105531967,
+      "keyFiles": [
+        "CatalogItem.ts",
+        "Client.ts",
+        "Consent.ts"
+      ]
+    },
+    "server/services": {
+      "path": "server/services",
+      "purpose": "Business logic services",
+      "fileCount": 6,
+      "lastAccessed": 1779105531967,
+      "keyFiles": [
+        "AIService.ts",
+        "CatalogService.ts",
+        "ClientService.ts"
+      ]
+    },
+    "server/utils": {
+      "path": "server/utils",
+      "purpose": "Utility functions",
+      "fileCount": 6,
+      "lastAccessed": 1779105531967,
+      "keyFiles": [
+        "email.ts",
+        "migrate-services.ts",
+        "pdf.ts"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "server/models/Profile.ts",
+      "accessCount": 2,
+      "lastAccessed": 1779133608240,
+      "type": "file"
+    },
+    {
+      "path": "server/api/ai/catalog-suggest.post.ts",
+      "accessCount": 1,
+      "lastAccessed": 1779133606342,
+      "type": "file"
+    },
+    {
+      "path": "server/api/upload/cloudinary.post.ts",
+      "accessCount": 1,
+      "lastAccessed": 1779133606768,
+      "type": "file"
+    },
+    {
+      "path": "server/utils/rate-limit.ts",
+      "accessCount": 1,
+      "lastAccessed": 1779133607154,
+      "type": "file"
+    },
+    {
+      "path": "server/api/profile/index.delete.ts",
+      "accessCount": 1,
+      "lastAccessed": 1779133607557,
+      "type": "file"
+    },
+    {
+      "path": "server/models/AuditLog.ts",
+      "accessCount": 1,
+      "lastAccessed": 1779133607975,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

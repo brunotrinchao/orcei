@@ -10,17 +10,17 @@ const profileSchema = new Schema({
     primaryColor: { type: String, default: '#3B82F6' }
   },
   address: {
-    street: { type: String, required: true },
+    street: String,
     number: String,
-    neighborhood: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    zip: { type: String, required: true }
+    neighborhood: String,
+    city: String,
+    state: String,
+    zip: String
   },
   company: {
-    taxId: { type: String, required: true },
-    legalName: { type: String, required: true },
-    tradeName: { type: String, required: true }
+    taxId: String,
+    legalName: String,
+    tradeName: String
   },
   contact: {
     phones: [{
@@ -69,7 +69,12 @@ Em caso de desistência por parte do cliente após o aceite e início dos trabal
 Os direitos autorais e patrimoniais sobre o trabalho final serão integralmente transferidos ao cliente apenas após a quitação total dos valores descritos neste orçamento.</p>
 
 <p><strong>7. Foro de Eleição</strong><br>
-Para dirimir quaisquer controvérsias oriundas desta proposta, fica eleito o foro da comarca de Belo Horizonte, Estado de Minas Gerais, renunciando as partes a qualquer outro, por mais privilegiado que seja.</p>` }
+Para dirimir quaisquer controvérsias oriundas desta proposta, fica eleito o foro da comarca de Belo Horizonte, Estado de Minas Gerais, renunciando as partes a qualquer outro, por mais privilegiado que seja.</p>` },
+  isDeleted: { type: Boolean, default: false },
+  deletedAt: { type: Date, default: null },
+  role: { type: String, enum: ['user', 'admin'], default: 'user' }
 }, { timestamps: true })
+
+profileSchema.index({ userId: 1, isDeleted: 1 })
 
 export const Profile = model('Profile', profileSchema)

@@ -21,7 +21,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Perfil não encontrado' })
   }
 
-  const htmlContent = generateProposalHtml(proposal, profile)
+  const config = useRuntimeConfig()
+  const htmlContent = generateProposalHtml(proposal, profile, config.appName)
 
   const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] })
   const page = await browser.newPage()

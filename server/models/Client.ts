@@ -7,6 +7,7 @@ const clientSchema = new Schema({
   email: { type: String, required: true },
   phone: { type: String, required: true },
   isWhatsapp: { type: Boolean, default: false },
+  avatar: String,
   address: {
     street: { type: String, required: true },
     number: String,

@@ -1,14 +1,37 @@
 import { ProfileService } from '../../services/ProfileService'
 import { Proposal } from '../../models/Proposal'
 import { CatalogItem } from '../../models/CatalogItem'
+import { Report } from '../../models/Report'
 import { AIService } from '../../services/AIService'
+import { checkRateLimit } from '../../utils/rate-limit'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
   if (!session?.user) throw createError({ statusCode: 401 })
 
+  // Rate Limit: 5 requests per 1 minute for AI
+  checkRateLimit(event, { max: 5, windowMs: 60 * 1000, keyPrefix: 'ai-analyze' })
+
   const profile = await ProfileService.getByUserId((session.user as any).id)
   if (!profile) throw createError({ statusCode: 404 })
+
+  // Daily Limit Check for non-admins (1 report per day)
+  if ((session.user as any).role !== 'admin') {
+    const startOfToday = new Date()
+    startOfToday.setHours(0, 0, 0, 0)
+    
+    const reportCount = await Report.countDocuments({
+      profileId: profile._id,
+      createdAt: { $gte: startOfToday }
+    })
+
+    if (reportCount >= 1) {
+      throw createError({
+        statusCode: 429,
+        statusMessage: 'Limite atingido: Você só pode gerar 1 relatório estratégico por dia.'
+      })
+    }
+  }
 
   const { start, end } = getQuery(event)
   const query: any = { profileId: profile._id }
@@ -75,7 +98,26 @@ Escreva um relatório Markdown estruturado com:
 
 Tom: Consultor sênior, direto, prático e motivador.`
 
-  const analysis = await AIService.generateDescription(prompt)
-  
-  return { text: analysis }
+  try {
+    const analysis = await AIService.generateDescription(prompt)
+    
+    // Save report to database
+    await Report.create({
+      profileId: profile._id,
+      content: analysis,
+      context: {
+        totalProposals: context.totalProposals,
+        totalRevenue: context.totalRevenue,
+        period: start && end ? `${start} a ${end}` : 'Todo o período'
+      }
+    })
+
+    return { text: analysis }
+  } catch (e: any) {
+    console.error('AI Analysis Error:', e)
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Não foi possível gerar a análise estratégica no momento. Tente novamente em alguns minutos.'
+    })
+  }
 })

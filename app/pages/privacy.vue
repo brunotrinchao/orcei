@@ -2,6 +2,9 @@
 definePageMeta({ layout: 'blank' })
 const { public: { appName } } = useRuntimeConfig()
 useHead({ title: `Política de Privacidade — ${appName}` })
+
+const { data: systemInfo } = useFetch<any>('/api/system/status')
+const dynamicAppName = computed(() => systemInfo.value?.landingPage?.appName || appName)
 </script>
 
 <template>
@@ -20,7 +23,7 @@ useHead({ title: `Política de Privacidade — ${appName}` })
         <p class="text-xs font-black text-blue-600 uppercase tracking-widest mb-3">Última atualização: Janeiro de 2026</p>
         <h1 class="text-4xl font-black text-gray-900 tracking-tight uppercase mb-4">Política de Privacidade</h1>
         <p class="text-gray-500 font-medium leading-relaxed">
-          A Orcei está comprometida com a proteção dos seus dados pessoais, em conformidade com a
+          A {{ dynamicAppName }} está comprometida com a proteção dos seus dados pessoais, em conformidade com a
           Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018) e demais legislações aplicáveis.
         </p>
       </div>
@@ -30,12 +33,12 @@ useHead({ title: `Política de Privacidade — ${appName}` })
         <section>
           <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">1. Quem Somos</h2>
           <p class="text-gray-700 font-medium leading-relaxed">
-            A <strong>Orcei</strong> é uma plataforma de gestão comercial para freelancers e pequenas empresas,
+            A <strong>{{ dynamicAppName }}</strong> é uma plataforma de gestão comercial para freelancers e pequenas empresas,
             que permite criação e envio de orçamentos, gestão de clientes, catálogo de serviços e controle de agenda.
-            O responsável pelo tratamento dos dados (controlador) é a empresa operadora da plataforma Orcei.
+            O responsável pelo tratamento dos dados (controlador) é a empresa operadora da plataforma {{ dynamicAppName }}.
           </p>
           <p class="text-gray-700 font-medium leading-relaxed mt-3">
-            Para dúvidas sobre privacidade, entre em contato via: <strong>privacidade@orcei.com.br</strong>
+            Para dúvidas sobre privacidade, entre em contato via: <strong>privacidade@{{ dynamicAppName.toLowerCase() }}.com.br</strong>
           </p>
         </section>
 
@@ -56,7 +59,7 @@ useHead({ title: `Política de Privacidade — ${appName}` })
             </div>
             <div class="bg-white rounded-2xl border border-gray-100 p-6">
               <h3 class="text-sm font-black text-gray-900 mb-2">Dados de Pagamento</h3>
-              <p class="text-sm text-gray-500 font-medium leading-relaxed">Informações de assinatura e cobrança são processadas pela Stripe Inc. A Orcei não armazena dados de cartão de crédito.</p>
+              <p class="text-sm text-gray-500 font-medium leading-relaxed">Informações de assinatura e cobrança são processadas pela Stripe Inc. A {{ dynamicAppName }} não armazena dados de cartão de crédito.</p>
             </div>
             <div class="bg-white rounded-2xl border border-gray-100 p-6">
               <h3 class="text-sm font-black text-gray-900 mb-2">Dados de Uso e Analytics</h3>
@@ -109,7 +112,7 @@ useHead({ title: `Política de Privacidade — ${appName}` })
             </li>
           </ul>
           <p class="text-sm text-gray-500 font-medium mt-6">
-            Para exercer seus direitos, envie solicitação para <strong>privacidade@orcei.com.br</strong>.
+            Para exercer seus direitos, envie solicitação para <strong>privacidade@{{ dynamicAppName.toLowerCase() }}.com.br</strong>.
             Responderemos em até 15 dias úteis.
           </p>
         </section>
@@ -161,7 +164,7 @@ useHead({ title: `Política de Privacidade — ${appName}` })
         <section>
           <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">9. Encarregado de Dados (DPO)</h2>
           <p class="text-gray-700 font-medium leading-relaxed">
-            Encarregado de Proteção de Dados: <strong>privacidade@orcei.com.br</strong><br>
+            Encarregado de Proteção de Dados: <strong>privacidade@{{ dynamicAppName.toLowerCase() }}.com.br</strong><br>
             Autoridade Nacional de Proteção de Dados (ANPD): <a href="https://www.gov.br/anpd" target="_blank" class="text-blue-600 underline">www.gov.br/anpd</a>
           </p>
         </section>
@@ -172,7 +175,7 @@ useHead({ title: `Política de Privacidade — ${appName}` })
     <!-- Footer -->
     <footer class="border-t border-gray-100 bg-white py-8">
       <div class="max-w-3xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p class="text-xs text-gray-400 font-medium">© 2026 Orcei · Todos os direitos reservados</p>
+        <p class="text-xs text-gray-400 font-medium">© 2026 {{ dynamicAppName }} · Todos os direitos reservados</p>
         <div class="flex gap-6">
           <NuxtLink to="/terms" class="text-xs font-black text-gray-400 hover:text-gray-900 uppercase tracking-widest transition-colors">Termos de Uso</NuxtLink>
           <NuxtLink to="/" class="text-xs font-black text-gray-400 hover:text-gray-900 uppercase tracking-widest transition-colors">Voltar ao Início</NuxtLink>
@@ -205,8 +208,8 @@ export default {
         'Revogação do consentimento a qualquer momento'
       ],
       cookies: [
-        { name: 'orcei:session-id', purpose: 'Identificador de sessão anônima para consentimento', duration: '1 ano' },
-        { name: 'orcei:consent', purpose: 'Registro da decisão de cookies', duration: '1 ano' },
+        { name: 'session-id', purpose: 'Identificador de sessão anônima para consentimento', duration: '1 ano' },
+        { name: 'consent', purpose: 'Registro da decisão de cookies', duration: '1 ano' },
         { name: 'nuxt-session', purpose: 'Sessão autenticada (essencial)', duration: 'Sessão' },
         { name: '_ga, _gid', purpose: 'Google Analytics — analytics de uso (com consentimento)', duration: '2 anos / 24h' },
         { name: '_hjSession', purpose: 'Hotjar — análise de comportamento (com consentimento)', duration: '30 min' }

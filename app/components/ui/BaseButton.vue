@@ -1,17 +1,25 @@
 <script setup lang="ts">
+import { Loader2 } from 'lucide-vue-next'
+
 interface Props {
   variant?: 'solid' | 'outline' | 'ghost' | 'primary' | 'secondary'
   size?: 'sm' | 'md' | 'lg'
   disabled?: boolean
   loading?: boolean
+  to?: string
 }
 withDefaults(defineProps<Props>(), {
   variant: 'solid',
   size: 'md'
 })
+
+const NuxtLink = resolveComponent('NuxtLink')
 </script>
+
 <template>
-  <button 
+  <component
+    :is="to ? NuxtLink : 'button'"
+    :to="to"
     :disabled="disabled || loading"
     class="inline-flex items-center justify-center rounded-2xl font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50"
     :class="[
@@ -26,7 +34,7 @@ withDefaults(defineProps<Props>(), {
   >
     <slot v-if="!loading" />
     <span v-else class="animate-spin w-5 h-5 flex items-center justify-center">
-      <div class="i-lucide-loader-2 w-5 h-5"></div>
+      <Loader2 class="w-5 h-5" />
     </span>
-  </button>
+  </component>
 </template>

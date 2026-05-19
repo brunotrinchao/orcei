@@ -35,7 +35,7 @@ const { data: stats, refresh, status } = useFetch<any>('/api/dashboard/stats', {
 const statusChartData = computed(() => {
   if (!stats.value?.statusDistribution) return { labels: [], datasets: [] }
   
-  const labels = Object.keys(stats.value.statusDistribution).map(s => s.toUpperCase())
+  const labels = Object.keys(stats.value.statusDistribution)
   const data = Object.values(stats.value.statusDistribution) as number[]
   
   return {
@@ -90,8 +90,12 @@ async function generateAIReport() {
   try {
     const data: any = await $fetch('/api/ai/analyze')
     aiReport.value = data.text
-  } catch (e) {
-    notify('Erro', 'Erro ao gerar relatório estratégico')
+  } catch (e: any) {
+    if (e.statusCode === 429) {
+      notify('Limite Atingido', e.statusMessage || 'Você já gerou um relatório hoje. Tente novamente amanhã.')
+    } else {
+      notify('Erro', 'Erro ao gerar relatório estratégico')
+    }
   } finally {
     isAnalyzing.value = false
   }
@@ -183,15 +187,28 @@ async function generateAIReport() {
           <h1 class="text-2xl md:text-3xl font-black text-white leading-tight tracking-tight">Otimize seu negócio com inteligência.</h1>
           <p class="text-blue-100 font-medium text-sm max-w-xl">Análise baseada em seus dados comerciais para sugerir estratégias de conversão.</p>
         </div>
-        <BaseButton 
-          @click="generateAIReport"
-          :disabled="isAnalyzing"
-          variant="secondary" 
-          class="bg-white text-blue-700 hover:bg-blue-50 px-10 py-4 rounded-2xl text-[10px] shadow-2xl shrink-0"
-        >
-          <Loader2 v-if="isAnalyzing" class="w-3.5 h-3.5 animate-spin mr-2" />
-          {{ isAnalyzing ? 'Analisando...' : 'Gerar Relatório IA' }}
-        </BaseButton>
+        <div class="flex flex-col sm:flex-row gap-3 shrink-0">
+          <NuxtLink to="/dashboard/reports" class="inline-flex items-center justify-center px-6 py-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl text-white text-[10px] font-black uppercase tracking-widest transition-all">
+            Ver Histórico
+          </NuxtLink>
+          <BaseButton 
+            @click="generateAIReport"
+            :disabled="isAnalyzing || (stats?.hasGeneratedReportToday && user?.role !== 'admin')"
+            variant="secondary" 
+            class="bg-white text-blue-700 hover:bg-blue-50 px-10 py-4 rounded-2xl text-[10px] shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <template v-if="isAnalyzing">
+              <Loader2 class="w-3.5 h-3.5 animate-spin mr-2" />
+              Analisando...
+            </template>
+            <template v-else-if="stats?.hasGeneratedReportToday && user?.role !== 'admin'">
+              Limite Diário Atingido
+            </template>
+            <template v-else>
+              Gerar Relatório IA
+            </template>
+          </BaseButton>
+        </div>
       </div>
     </div>
 
@@ -249,7 +266,12 @@ async function generateAIReport() {
         <div v-html="aiReport ? $md.render(aiReport) : ''"></div>
       </div>
       <template #footer>
-        <BaseButton @click="aiReport = null">Entendido</BaseButton>
+        <div class="flex justify-between w-full items-center">
+          <NuxtLink to="/dashboard/reports" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">
+            Ver todos os relatórios
+          </NuxtLink>
+          <BaseButton @click="aiReport = null">Entendido</BaseButton>
+        </div>
       </template>
     </BaseDialog>
   </div>

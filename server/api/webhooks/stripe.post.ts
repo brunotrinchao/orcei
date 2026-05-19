@@ -1,7 +1,9 @@
 import { Profile } from '../../models/Profile'
 import { StripeEvent } from '../../models/StripeEvent'
+import { sendPlanActivationEmail, sendCreditPurchaseEmail, sendPlanCancellationEmail } from '../../utils/email'
 
 export default defineEventHandler(async (event) => {
+  setResponseStatus(event, 200)
   const body = await readRawBody(event)
   const signature = getHeader(event, 'stripe-signature')
   const config = useRuntimeConfig()
@@ -86,6 +88,12 @@ export default defineEventHandler(async (event) => {
             { returnDocument: 'after' }
           )
           console.log('Profile updated (checkout.session.completed):', { plan, email: updated?.email })
+
+          if (updated?.email) {
+            const amount = session.amount_total ? (session.amount_total / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00'
+            const billingCycle = (priceId === config.public.stripePriceAnnual) ? 'Anual' : 'Mensal'
+            await sendPlanActivationEmail(updated.email, updated.name, plan, credits, amount, billingCycle)
+          }
         }
       } else if (type === 'credits' && session.mode === 'payment') {
         const creditsToAdd = tier === 'single_credit' ? 1 : (tier === 'credits_5' ? 5 : (tier === 'credits_10' ? 10 : 0))
@@ -100,6 +108,11 @@ export default defineEventHandler(async (event) => {
           { returnDocument: 'after' }
         )
         console.log('Profile updated (credits):', { creditsToAdd, email: updated?.email })
+
+        if (updated?.email) {
+          const amount = session.amount_total ? (session.amount_total / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00'
+          await sendCreditPurchaseEmail(updated.email, updated.name, creditsToAdd, updated.creditsBalance, amount)
+        }
       }
     }
 
@@ -168,6 +181,12 @@ export default defineEventHandler(async (event) => {
             { returnDocument: 'after' }
           )
           console.log('Profile renewed (invoice.payment_succeeded):', { plan, email: updated?.email })
+
+          if (updated?.email) {
+            const amount = session.amount_paid ? (session.amount_paid / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00'
+            const billingCycle = (priceId === config.public.stripePriceAnnual) ? 'Anual' : 'Mensal'
+            await sendPlanActivationEmail(updated.email, updated.name, plan, credits, amount, billingCycle)
+          }
         }
       }
     }
@@ -175,6 +194,8 @@ export default defineEventHandler(async (event) => {
     // 4. Subscription Deleted
     if (stripeEvent.type === 'customer.subscription.deleted') {
       const customerId = session.customer
+      const oldProfile = await Profile.findOne({ stripeCustomerId: customerId })
+      
       const updated = await Profile.findOneAndUpdate(
         { stripeCustomerId: customerId },
         {
@@ -190,6 +211,15 @@ export default defineEventHandler(async (event) => {
         { returnDocument: 'after' }
       )
       console.log('Profile updated (subscription.deleted):', { email: updated?.email })
+
+      if (updated?.email) {
+        const cancellationDate = new Date().toLocaleString('pt-BR')
+        const effectiveEndDate = oldProfile?.subscriptionEndsAt 
+          ? new Date(oldProfile.subscriptionEndsAt).toLocaleDateString('pt-BR')
+          : 'Imediato'
+          
+        await sendPlanCancellationEmail(updated.email, updated.name, oldProfile?.subscriptionPlan || 'Premium', cancellationDate, effectiveEndDate)
+      }
     }
 
   } catch (dbErr: any) {

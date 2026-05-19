@@ -68,6 +68,11 @@ export default defineNuxtConfig({
     appDocumentLogo: process.env.APP_DOCUMENT_LOGO,
     appEnv: process.env.APP_ENVIRONMENT || 'development',
     resendTemplateProposal: process.env.RESEND_TEMPLATE_PROPOSAL || 'proposta',
+    resendTemplateWelcome: process.env.RESEND_TEMPLATE_WELLCOME || 'bem-vindo',
+    resendTemplateBackup: process.env.RESEND_TEMPLATE_BACKUP || 'backup',
+    resendTemplateAssignPlan: process.env.RESEND_TEMPLATE_ASSING_PLAN || 'ativar-plano',
+    resendTemplateBuyCredit: process.env.RESEND_TEMPLATE_BUY_CREDIT || 'comprar-credito',
+    resendTemplateCancelPlan: process.env.RESEND_TEMPLATE_CANCEL_PLAN || 'cancelar-plano',
     public: {
       stripeStarterPriceId: process.env.STRIPE_STARTER_PRICE_ID,
       stripePremiumPriceId: process.env.STRIPE_PREMIUM_PRICE_ID,

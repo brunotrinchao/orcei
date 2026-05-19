@@ -1,5 +1,6 @@
 import { Profile } from '../models/Profile'
 import type { UserDTO } from '../../types/user'
+import { sendWelcomeEmail } from '../utils/email'
 
 export const ProfileService = {
   async createForUser(user: UserDTO) {
@@ -41,7 +42,7 @@ export const ProfileService = {
     }
 
     try {
-      return await Profile.create({
+      const profile = await Profile.create({
         userId: user.id,
         name: user.name,
         email: user.email,
@@ -50,6 +51,13 @@ export const ProfileService = {
         stripeCustomerId: stripeCustomerId,
         subscriptionPlan: 'free'
       })
+
+      // Send Welcome Email
+      if (profile.email) {
+        await sendWelcomeEmail(profile.email, profile.name)
+      }
+
+      return profile
     } catch (dbErr: any) {
       // Rollback Stripe customer if DB fails
       if (stripeCustomerId) {

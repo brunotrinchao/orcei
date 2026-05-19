@@ -3,8 +3,9 @@ import { processVariables } from '../../../utils/variables'
 
 export default defineEventHandler(async (event) => {
   const slug = getRouterParam(event, 'slug')
-  const { t: token, preview } = getQuery(event)
+  const { t: token, preview, consent } = getQuery(event)
   const isPreview = preview === 'true'
+  const hasConsent = consent === 'accepted'
 
   if (!slug) throw createError({ statusCode: 400, statusMessage: 'Missing Slug' })
 
@@ -22,8 +23,8 @@ export default defineEventHandler(async (event) => {
     proposal.termsAndConditions = processVariables(proposal.termsAndConditions || '', proposal as any, profile as any)
   }
 
-  // Log view event
-  if (!isPreview) {
+  // Log view event only if consent is given
+  if (!isPreview && hasConsent) {
     const headers = getHeaders(event)
     await ProposalService.logHistory(proposal._id as any, 'viewed', 'system', {
       ip: headers['x-forwarded-for'] || headers['x-real-ip'],

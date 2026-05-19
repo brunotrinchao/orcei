@@ -7,11 +7,16 @@ definePageMeta({
 })
 
 const { notify, confirm: confirmAlert } = useAlerts()
+const { hasConsent } = useCookieConsent()
 const route = useRoute()
 const { t: token, preview } = route.query
 const isPreview = computed(() => preview === 'true')
 const { data: proposal, refresh, error } = useFetch<ProposalDTO>(`/api/proposals/public/${route.params.slug}`, {
-  query: { t: token }
+  query: computed(() => ({ 
+    t: token, 
+    preview: preview,
+    consent: hasConsent.value ? 'accepted' : 'declined'
+  }))
 })
 
 const isAccepting = ref(false)

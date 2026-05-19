@@ -71,31 +71,7 @@ async function handleAction(tier: string, type: 'subscription' | 'credits' = 'su
 
 const route = useRoute()
 const success = computed(() => route.query.success === 'true')
-
-watchEffect(() => {
-  if (success.value) {
-    refreshProfile()
-    refreshInvoices()
-    setTimeout(() => {
-      navigateTo('/dashboard/billing', { replace: true })
-    }, 5000)
-  }
-})
-
 const portal = computed(() => route.query.portal === 'true')
-
-watchEffect(() => {
-  if (portal.value) {
-    // Retry profile refresh to handle webhook race condition
-    refreshProfile()
-    setTimeout(() => { refreshProfile(); refreshInvoices() }, 2000)
-    setTimeout(() => {
-      refreshProfile()
-      refreshInvoices()
-      navigateTo('/dashboard/billing', { replace: true })
-    }, 5000)
-  }
-})
 
 const { data: history, refresh: refreshInvoices } = useFetch<any[]>('/api/stripe/invoices')
 
@@ -103,6 +79,13 @@ const { data: history, refresh: refreshInvoices } = useFetch<any[]>('/api/stripe
 onMounted(() => {
   refreshProfile()
   refreshInvoices()
+
+  // Clear query params after success or portal return
+  if (import.meta.client && (success.value || portal.value)) {
+    setTimeout(() => {
+      navigateTo('/dashboard/billing', { replace: true })
+    }, 5000)
+  }
 
   const onVisibilityChange = () => {
     if (document.visibilityState === 'visible') {

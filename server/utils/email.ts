@@ -15,27 +15,10 @@ export const sendProposalEmail = async (
   const resend = new Resend(apiKey)
 
   try {
-    // Carregar template via Nitro Storage
-    const htmlTemplate = await useStorage().getItem('assets:templates:email:proposal.html')
-    
-    if (!htmlTemplate) {
-      console.error('[Resend] Template not found in storage')
-      return null
-    }
-
-    let html = htmlTemplate.toString()
-
     const config = useRuntimeConfig()
     const appName = config.appName || 'Orcei'
     const appLogo = config.appDocumentLogo
-
-    // Substituir variáveis
-    html = html
-      .replace(/{{clientName}}/g, clientName)
-      .replace(/{{professionalName}}/g, professionalName)
-      .replace(/{{proposalUrl}}/g, proposalUrl)
-      .replace(/{{appName}}/g, appName)
-      .replace(/{{appLogo}}/g, appLogo || '')
+    const templateId = config.resendTemplateProposal
 
     const recipient = process.env.RESEND_TEST_TO || clientEmail
 
@@ -43,7 +26,16 @@ export const sendProposalEmail = async (
       from: `${appName} <onboarding@resend.dev>`,
       to: recipient,
       subject: `${professionalName} preparou um orçamento para você`,
-      html // Usando o HTML carregado e processado
+      template: {
+        id: templateId,
+        variables: {
+          clientName,
+          professionalName,
+          proposalUrl,
+          appName,
+          appLogo: appLogo || ''
+        }
+      }
     })
 
     if (error) {
@@ -51,7 +43,7 @@ export const sendProposalEmail = async (
       return null
     }
 
-    console.log('[Resend] Email sent:', data?.id)
+    console.log('[Resend] Email sent via template:', data?.id)
     return data
   } catch (err) {
     console.error('[Resend] Exception:', err)

@@ -67,6 +67,7 @@ export default defineNuxtConfig({
     appName: process.env.APP_NAME || 'Orcei',
     appDocumentLogo: process.env.APP_DOCUMENT_LOGO,
     appEnv: process.env.APP_ENVIRONMENT || 'development',
+    resendTemplateProposal: process.env.RESEND_TEMPLATE_PROPOSAL || 'proposta',
     public: {
       stripeStarterPriceId: process.env.STRIPE_STARTER_PRICE_ID,
       stripePremiumPriceId: process.env.STRIPE_PREMIUM_PRICE_ID,
@@ -96,15 +97,6 @@ export default defineNuxtConfig({
         if (index !== -1) components.splice(index, 1)
       })
     }
-  },
-
-  nitro: {
-    serverAssets: [
-      {
-        baseName: 'templates',
-        dir: './server/templates'
-      }
-    ]
   },
 
   compatibilityDate: '2024-04-03',

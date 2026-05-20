@@ -67,7 +67,7 @@ export const ProposalService = {
     if (data.status === ProposalStatus.CREATED) {
       await this.consumeCredit(data.profileId)
 
-      if (data.sendMethod !== SendMethod, SubscriptionStatus.MANUAL) {
+      if (data.sendMethod !== SendMethod.MANUAL) {
         if (profile && data.client?.email) {
           const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${slug}?t=${token}`
           const emailRes = await sendProposalEmail(
@@ -114,7 +114,7 @@ export const ProposalService = {
       await this.consumeCredit(profileId)
 
       // Se mudou para 'created' e não for manual, envia e-mail
-      if (data.status === ProposalStatus.CREATED && data.sendMethod !== SendMethod, SubscriptionStatus.MANUAL) {
+      if (data.status === ProposalStatus.CREATED && data.sendMethod !== SendMethod.MANUAL) {
         const profile = await Profile.findById(profileId)
         if (profile && data.client?.email) {
           const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${oldProposal.slug}?t=${oldProposal.token}`
@@ -172,7 +172,8 @@ export const ProposalService = {
         [ProposalStatus.CREATED]: ProposalStatus.CREATED,
         [ProposalStatus.ACCEPTED]: ProposalStatus.ACCEPTED,
         [ProposalStatus.EXPIRED]: 'declined',
-        [ProposalStatus.VIEWED]: ProposalStatus.VIEWED
+        [ProposalStatus.VIEWED]: ProposalStatus.VIEWED,
+        [ProposalStatus.PENDING]: ProposalStatus.PENDING
       }
       await this.logHistory(updated._id, actionMap[status] || status)
     }

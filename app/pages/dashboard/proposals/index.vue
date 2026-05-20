@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles } from 'lucide-vue-next'
+import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles, Send } from 'lucide-vue-next'
 import type { ProposalDTO } from '../../../../types'
 
 const searchQuery = ref('')
@@ -25,6 +25,43 @@ const isModalOpen = ref(false)
 const isAIWizardOpen = ref(false)
 const isPreviewOpen = ref(false)
 const isHistoryOpen = ref(false)
+const isChatOpen = ref(false)
+const selectedProposalMessages = ref<any[]>([])
+const isSendingReply = ref(false)
+const newReply = ref('')
+
+async function openChat(proposal: ProposalDTO) {
+  selectedProposal.value = proposal
+  isChatOpen.value = true
+  await refreshMessages()
+}
+
+async function refreshMessages() {
+  if (!selectedProposal.value) return
+  try {
+    const data = await $fetch<any[]>(`/api/proposals/${selectedProposal.value._id}/messages`)
+    selectedProposalMessages.value = data
+  } catch (e) {
+    notify('Erro', 'Erro ao carregar mensagens')
+  }
+}
+
+async function sendReply() {
+  if (!newReply.value.trim() || isSendingReply.value || !selectedProposal.value) return
+  isSendingReply.value = true
+  try {
+    await $fetch(`/api/proposals/${selectedProposal.value._id}/messages`, {
+      method: 'POST',
+      body: { text: newReply.value }
+    })
+    newReply.value = ''
+    await refreshMessages()
+  } catch (e) {
+    notify('Erro', 'Erro ao enviar resposta')
+  } finally {
+    isSendingReply.value = false
+  }
+}
 const isAcceptedModalOpen = ref(false)
 const isSuccessModalOpen = ref(false)
 const lastCreatedProposal = ref<ProposalDTO | null>(null)
@@ -200,6 +237,13 @@ const getStatusVariant = (status: string): 'default' | 'success' | 'warning' | '
 const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString('pt-BR')
 }
+
+const formatTime = (date: any) => {
+  return new Date(date).toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
 </script>
 
 <template>
@@ -254,6 +298,14 @@ const formatDate = (date: string) => {
           <div class="flex justify-between items-center pt-2 border-t border-gray-50">
             <span class="font-black text-gray-900 text-lg tracking-tight">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
             <div class="flex items-center gap-1">
+              <button 
+                @click="openChat(proposal)"
+                class="p-2 text-gray-400 hover:text-blue-600 bg-gray-50 rounded-lg transition-all"
+                title="Chat e Interações"
+                aria-label="Abrir chat do orçamento"
+              >
+                <MessageCircle class="w-4 h-4" />
+              </button>
               <button 
                 @click="openHistory(proposal)"
                 class="p-2 text-gray-400 hover:text-blue-600 bg-gray-50 rounded-lg transition-all"
@@ -658,6 +710,72 @@ const formatDate = (date: string) => {
             :src="`/p/${selectedProposal.slug}?preview=true`"
             class="w-full h-full border-none"
           ></iframe>
+        </div>
+      </div>
+    </BaseDialog>
+    <!-- Modal de Chat/Interação -->
+    <BaseDialog
+      v-model:open="isChatOpen"
+      title="Dúvidas e Alterações"
+      size="lg"
+    >
+      <div v-if="selectedProposal" class="p-0 flex flex-col h-[60vh]">
+        <!-- Header -->
+        <div class="p-6 border-b border-gray-100 shrink-0">
+          <h3 class="text-xl font-black text-gray-900 tracking-tight leading-tight">{{ selectedProposal.title }}</h3>
+          <p class="text-sm text-gray-500 font-medium">Interações com {{ selectedProposal.client.name }}</p>
+        </div>
+
+        <!-- Messages Area -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50/50">
+          <div v-if="selectedProposalMessages.length === 0" class="text-center py-20">
+            <div class="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mx-auto mb-4 border border-gray-100 shadow-sm">
+              <MessageCircle class="w-6 h-6 text-gray-300" />
+            </div>
+            <p class="text-sm text-gray-400 font-bold uppercase tracking-widest">Nenhuma interação iniciada pelo cliente</p>
+          </div>
+
+          <div
+            v-for="msg in selectedProposalMessages"
+            :key="msg._id"
+            :class="[
+              'flex flex-col max-w-[85%]',
+              msg.sender === 'freelancer' ? 'ml-auto items-end' : 'items-start'
+            ]"
+          >
+            <div
+              :class="[
+                'p-4 rounded-2xl text-sm font-medium leading-relaxed shadow-sm border',
+                msg.sender === 'freelancer'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-700 border-gray-200'
+              ]"
+            >
+              {{ msg.text }}
+            </div>
+            <span class="mt-2 text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">
+              {{ msg.sender === 'freelancer' ? 'Você' : selectedProposal.client.name }} • {{ formatTime(msg.createdAt) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="p-6 border-t border-gray-100 shrink-0 bg-white">
+          <form @submit.prevent="sendReply" class="flex gap-3">
+            <input
+              v-model="newReply"
+              placeholder="Responder cliente..."
+              class="flex-1 px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all outline-none font-bold text-sm"
+            />
+            <button
+              type="submit"
+              :disabled="isSendingReply || !newReply.trim()"
+              class="px-6 py-4 bg-blue-600 hover:bg-blue-700 rounded-2xl text-white shadow-lg shadow-blue-100 transition-all flex items-center justify-center disabled:opacity-50"
+            >
+              <Loader2 v-if="isSendingReply" class="w-5 h-5 animate-spin" />
+              <Send v-else class="w-5 h-5" />
+            </button>
+          </form>
         </div>
       </div>
     </BaseDialog>

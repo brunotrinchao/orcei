@@ -16,6 +16,7 @@ const proposalHistorySchema = new Schema({
       'accepted', 
       'declined', 
       'viewed',
+      'pending',
       'scheduled',
       'received',
       'delayed',

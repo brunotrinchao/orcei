@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Phone, MessageCircle, CheckCircle2, Download, ExternalLink, MapPin, X, Loader2, AlertCircle, PencilLine, ThumbsDown, Eye, FileText, CreditCard, Banknote, Clock, Shield, Mail } from 'lucide-vue-next'
+import { Phone, MessageCircle, CheckCircle2, Download, ExternalLink, MapPin, X, Loader2, AlertCircle, PencilLine, ThumbsDown, Eye, FileText, CreditCard, Banknote, Clock, Shield, Mail, Send } from 'lucide-vue-next'
 import type { ProposalDTO } from '../../../types'
 
 definePageMeta({
@@ -27,6 +27,33 @@ const actionNotes = ref('')
 const isSubmittingAction = ref(false)
 
 const selectedMethod = ref<'cash' | 'credit_card'>('cash')
+
+// Interactions
+const { data: messages, refresh: refreshMessages } = useFetch<any[]>(`/api/proposals/public/${route.params.slug}/messages`, {
+  query: computed(() => ({ t: token }))
+})
+const newMessage = ref('')
+const isSendingMessage = ref(false)
+
+async function sendMessage() {
+  if (!newMessage.value.trim() || isSendingMessage.value) return
+  isSendingMessage.value = true
+  try {
+    await $fetch(`/api/proposals/public/${route.params.slug}/messages`, {
+      method: 'POST',
+      query: { t: token },
+      body: { text: newMessage.value }
+    })
+    newMessage.value = ''
+    await refreshMessages()
+    await refresh() // To update status if changed
+    notify('Sucesso', 'Mensagem enviada!')
+  } catch (e) {
+    notify('Erro', 'Erro ao enviar mensagem')
+  } finally {
+    isSendingMessage.value = false
+  }
+}
 
 const finalTotal = computed(() => {
   if (!proposal.value) return 0
@@ -60,6 +87,18 @@ async function handleAccept() {
 
 function openActionModal(type: 'decline' | 'request_changes') {
   if (isPreview.value) return
+  
+  if (type === 'request_changes') {
+    const chatEl = document.getElementById('chat')
+    if (chatEl) {
+      chatEl.scrollIntoView({ behavior: 'smooth' })
+      // Focus the input if possible
+      const input = chatEl.querySelector('input')
+      if (input) setTimeout(() => input.focus(), 500)
+    }
+    return
+  }
+
   actionType.value = type
   actionNotes.value = ''
   isActionModalOpen.value = true
@@ -433,7 +472,7 @@ const statusMap: any = {
             </div>
 
             <!-- Action buttons -->
-            <div v-if="['pending', 'created'].includes(proposal.status)" class="hidden sm:flex items-center gap-4">
+            <div v-if="!['draft', 'accepted', 'expired'].includes(proposal.status)" class="hidden sm:flex items-center gap-4">
               <template v-if="!isPreview">
                 <button
                   @click="openActionModal('request_changes')"
@@ -488,6 +527,75 @@ const statusMap: any = {
         </div>
       </section>
 
+      <!-- ── CHAT / INTERACTIONS ─────────────────────────────────── -->
+      <section id="chat" class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-blue-50 rounded-xl flex items-center justify-center">
+              <MessageCircle class="w-4 h-4 text-blue-600" />
+            </div>
+            <h2 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.25em]">Dúvidas e Alterações</h2>
+          </div>
+        </div>
+
+        <!-- Messages list -->
+        <div class="p-8 space-y-6 max-h-[400px] overflow-y-auto bg-gray-50/30">
+          <div v-if="!messages?.length" class="text-center py-10">
+            <div class="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mx-auto mb-4 border border-gray-100 shadow-sm">
+              <MessageCircle class="w-6 h-6 text-gray-300" />
+            </div>
+            <p class="text-sm text-gray-400 font-bold uppercase tracking-widest">Nenhuma interação ainda</p>
+            <p class="text-xs text-gray-400 mt-1">Envie uma dúvida ou peça uma alteração abaixo.</p>
+          </div>
+
+          <div
+            v-for="msg in messages"
+            :key="msg._id"
+            :class="[
+              'flex flex-col max-w-[85%]',
+              msg.sender === 'client' ? 'ml-auto items-end' : 'items-start'
+            ]"
+          >
+            <div
+              :class="[
+                'p-4 rounded-2xl text-sm font-medium leading-relaxed shadow-sm border',
+                msg.sender === 'client'
+                  ? 'bg-[#3147F6] text-white border-[#3147F6]'
+                  : 'bg-white text-gray-700 border-gray-100'
+              ]"
+            >
+              {{ msg.text }}
+            </div>
+            <span class="mt-2 text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">
+              {{ msg.sender === 'client' ? 'Você' : (proposal?.profileId?.name || 'Profissional') }} • {{ formatDate(msg.createdAt) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Message input -->
+        <div class="p-8 border-t border-gray-100 bg-white">
+          <form @submit.prevent="sendMessage" class="flex gap-3">
+            <input
+              v-model="newMessage"
+              placeholder="Digite sua mensagem aqui..."
+              class="flex-1 px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all outline-none font-bold text-sm"
+              :disabled="['accepted', 'expired'].includes(proposal.status)"
+            />
+            <button
+              type="submit"
+              :disabled="isSendingMessage || !newMessage.trim() || ['accepted', 'expired'].includes(proposal.status)"
+              class="px-6 py-4 bg-[#3147F6] hover:bg-blue-600 rounded-2xl text-white shadow-lg shadow-[#3147F6]/20 transition-all flex items-center justify-center disabled:opacity-50 disabled:grayscale"
+            >
+              <Loader2 v-if="isSendingMessage" class="w-5 h-5 animate-spin" />
+              <Send v-else class="w-5 h-5" />
+            </button>
+          </form>
+          <p v-if="['accepted', 'expired'].includes(proposal.status)" class="mt-3 text-[10px] font-black text-red-400 text-center uppercase tracking-widest">
+            A proposta está {{ proposal.status === 'accepted' ? 'aceita' : 'expirada' }}. Novas mensagens estão desabilitadas.
+          </p>
+        </div>
+      </section>
+
       <!-- ── TERMS LINK + FOOTER ─────────────────────────────────── -->
       <footer class="pt-4 pb-2 text-center space-y-6">
         <button
@@ -510,7 +618,7 @@ const statusMap: any = {
 
     <!-- ─── STICKY MOBILE BOTTOM BAR ──────────────────────────────── -->
     <div
-      v-if="['pending', 'created'].includes(proposal.status) && !isPreview"
+      v-if="!['draft', 'accepted', 'expired'].includes(proposal.status) && !isPreview"
       class="fixed bottom-0 left-0 right-0 sm:hidden z-50 bg-white/90 backdrop-blur-xl border-t border-gray-100 px-5 pt-4 pb-safe"
     >
       <div class="flex gap-3 pb-4">

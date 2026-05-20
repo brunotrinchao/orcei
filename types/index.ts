@@ -47,6 +47,13 @@ export interface ProfileDTO {
   defaultCashDiscount: number
   defaultContractTemplate: string
   defaultTermsAndConditions: string
+  googleIntegration?: {
+    email?: string
+    accessToken?: string
+    refreshToken?: string
+    expiryDate?: number
+    driveFolderId?: string
+  }
 }
 
 export interface CatalogItemDTO {
@@ -103,6 +110,7 @@ export interface ProposalDTO {
   contractText: string
   termsAndConditions: string
   expiresAt: string | Date
+  executionDate?: string | Date | null
   createdAt: string
   updatedAt: string
 }

@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose'
+import { SubscriptionPlan, SubscriptionStatus, UserRole } from '../../types/enums'
 
 const profileSchema = new Schema({
   userId: { type: String, required: true, unique: true },
@@ -34,12 +35,12 @@ const profileSchema = new Schema({
   },
   creditsBalance: { type: Number, default: 1 },
   creditsUsed: { type: Number, default: 0 },
-  subscriptionPlan: { type: String, enum: ['free', 'starter', 'premium'], default: 'free' },
+  subscriptionPlan: { type: String, enum: Object.values(SubscriptionPlan), default: SubscriptionPlan.CREDIT },
   stripeCustomerId: String,
   stripeSubscriptionId: String,
   subscriptionStatus: {
     type: String,
-    enum: ['active', 'trialing', 'past_due', 'canceled', 'incomplete', 'incomplete_expired', 'unpaid', 'paused', null],
+    enum: [...Object.values(SubscriptionStatus), null],
     default: null
   },
   subscriptionEndsAt: { type: Date, default: null },
@@ -72,7 +73,14 @@ Os direitos autorais e patrimoniais sobre o trabalho final serão integralmente 
 Para dirimir quaisquer controvérsias oriundas desta proposta, fica eleito o foro da comarca de Belo Horizonte, Estado de Minas Gerais, renunciando as partes a qualquer outro, por mais privilegiado que seja.</p>` },
   isDeleted: { type: Boolean, default: false },
   deletedAt: { type: Date, default: null },
-  role: { type: String, enum: ['user', 'admin'], default: 'user' }
+  role: { type: String, enum: Object.values(UserRole), default: UserRole.USER },
+  googleIntegration: {
+    email: String,
+    accessToken: String,
+    refreshToken: String,
+    expiryDate: Number,
+    driveFolderId: String
+  }
 }, { timestamps: true })
 
 profileSchema.index({ userId: 1, isDeleted: 1 })

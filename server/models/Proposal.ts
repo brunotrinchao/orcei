@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose'
+import { ProposalStatus, PaymentMethod, SendMethod, DiscountType } from '../../types/enums'
 
 const itemSnapshotSchema = new Schema({
   name: String,
@@ -7,7 +8,7 @@ const itemSnapshotSchema = new Schema({
   quantity: { type: Number, default: 1 },
   discount: {
     value: { type: Number, default: 0 },
-    type: { type: String, enum: ['percent', 'fixed'], default: 'percent' }
+    type: { type: String, enum: Object.values(DiscountType), default: DiscountType.PERCENT }
   }
 })
 const proposalSchema = new Schema({
@@ -22,7 +23,7 @@ const proposalSchema = new Schema({
     phone: String
   },
   slug: { type: String, required: true, unique: true },
-  status: { type: String, enum: ['draft', 'pending', 'accepted', 'expired', 'created', 'sent', 'delivered', 'opened', 'clicked', 'bounced', 'viewed', 'scheduled', 'received', 'delayed', 'failed', 'suppressed'], default: 'draft' },
+  status: { type: String, enum: Object.values(ProposalStatus), default: ProposalStatus.DRAFT },
   items: [itemSnapshotSchema],
   upsellItems: [itemSnapshotSchema],
   totals: {
@@ -32,14 +33,15 @@ const proposalSchema = new Schema({
     final: { type: Number, default: 0 }
   },
   paymentConfig: {
-    method: { type: String, enum: ['cash', 'credit_card'], default: 'cash' },
+    method: { type: String, enum: Object.values(PaymentMethod), default: PaymentMethod.CASH },
     installments: { type: Number, default: 1 },
     cashDiscount: { type: Number, default: 0 }
   },
-  sendMethod: { type: String, enum: ['manual', 'auto'], default: 'auto' },
+  sendMethod: { type: String, enum: Object.values(SendMethod), default: SendMethod.AUTO },
   contractText: String,
   termsAndConditions: String,
   expiresAt: Date,
+  executionDate: { type: Date, default: null },
   lastEmailId: String
 }, { timestamps: true })
 

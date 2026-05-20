@@ -35,7 +35,7 @@ const profileSchema = new Schema({
   },
   creditsBalance: { type: Number, default: 1 },
   creditsUsed: { type: Number, default: 0 },
-  subscriptionPlan: { type: String, enum: Object.values(SubscriptionPlan), default: SubscriptionPlan.CREDIT },
+  subscriptionPlan: { type: String, enum: Object.values(SubscriptionPlan), default: SubscriptionPlan.FREE },
   stripeCustomerId: String,
   stripeSubscriptionId: String,
   subscriptionStatus: {

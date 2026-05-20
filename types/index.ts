@@ -1,3 +1,12 @@
+import {
+  SubscriptionPlan,
+  SubscriptionStatus,
+  ProposalStatus,
+  PaymentMethod,
+  SendMethod,
+  CatalogItemType
+} from './enums'
+
 export interface BrandConfig {
   logoUrl?: string
   primaryColor: string
@@ -35,10 +44,10 @@ export interface ProfileDTO {
   }
   creditsBalance: number
   creditsUsed: number
-  subscriptionPlan: 'free' | 'starter' | 'premium'
+  subscriptionPlan: SubscriptionPlan
   stripeCustomerId?: string
   stripeSubscriptionId?: string
-  subscriptionStatus?: 'active' | 'trialing' | 'past_due' | 'canceled' | 'incomplete' | 'incomplete_expired' | 'unpaid' | 'paused' | null
+  subscriptionStatus?: SubscriptionStatus | null
   subscriptionEndsAt?: string | null
   cancelAtPeriodEnd?: boolean
   stripePriceId?: string | null
@@ -62,7 +71,7 @@ export interface CatalogItemDTO {
   name: string
   description: string
   price: number
-  type: 'product' | 'service'
+  type: CatalogItemType
   unit: string
   sku?: string
   imageUrl?: string
@@ -88,8 +97,8 @@ export interface ProposalDTO {
   sequenceNumber?: number
   token?: string
   slug: string
-  status: 'draft' | 'created' | 'pending' | 'accepted' | 'expired'
-  sendMethod?: 'manual' | 'auto'
+  status: ProposalStatus
+  sendMethod?: SendMethod
   client: {
     name: string
     email: string
@@ -103,7 +112,7 @@ export interface ProposalDTO {
     final: number
   }
   paymentConfig: {
-    method: 'cash' | 'credit_card'
+    method: PaymentMethod
     installments: number
     cashDiscount: number
   }

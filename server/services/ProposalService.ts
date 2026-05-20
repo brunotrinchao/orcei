@@ -7,7 +7,7 @@ import { sendProposalEmail } from '../utils/email'
 import { GoogleService } from './GoogleService'
 import { generateProposalPdfBuffer } from '../utils/pdf'
 
-import { ProposalStatus, PaymentMethod, SendMethod } from '../../types/enums'
+import { ProposalStatus, PaymentMethod, SendMethod, SubscriptionStatus } from '../../types/enums'
 
 export const ProposalService = {
   async listByProfile(profileId: string) {
@@ -67,7 +67,7 @@ export const ProposalService = {
     if (data.status === ProposalStatus.CREATED) {
       await this.consumeCredit(data.profileId)
 
-      if (data.sendMethod !== SendMethod.MANUAL) {
+      if (data.sendMethod !== SendMethod, SubscriptionStatus.MANUAL) {
         if (profile && data.client?.email) {
           const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${slug}?t=${token}`
           const emailRes = await sendProposalEmail(
@@ -114,7 +114,7 @@ export const ProposalService = {
       await this.consumeCredit(profileId)
 
       // Se mudou para 'created' e não for manual, envia e-mail
-      if (data.status === ProposalStatus.CREATED && data.sendMethod !== SendMethod.MANUAL) {
+      if (data.status === ProposalStatus.CREATED && data.sendMethod !== SendMethod, SubscriptionStatus.MANUAL) {
         const profile = await Profile.findById(profileId)
         if (profile && data.client?.email) {
           const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${oldProposal.slug}?t=${oldProposal.token}`

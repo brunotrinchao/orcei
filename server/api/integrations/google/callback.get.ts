@@ -5,18 +5,25 @@ import { google } from 'googleapis'
 export default defineEventHandler(async (event) => {
   const { code } = getQuery(event)
   const session = await getUserSession(event)
-  
-  if (!session?.user || !code) {
+
+  if (!session?.user) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Sessão expirada ou inválida. Faça login novamente.'
+    })
+  }
+
+  if (!code) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Missing code or session'
+      statusMessage: 'Código de autorização do Google não recebido.'
     })
   }
 
   try {
     const oauth2Client = GoogleService.getAuthClient({})
     const { tokens } = await oauth2Client.getToken(code as string)
-    
+
     oauth2Client.setCredentials(tokens)
     const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client })
     const userInfo = await oauth2.userinfo.get()
@@ -40,7 +47,8 @@ export default defineEventHandler(async (event) => {
     console.error('[Google Callback] Error:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Failed to authenticate with Google'
+      statusMessage: 'Falha na autenticação com Google'
     })
   }
 })
+

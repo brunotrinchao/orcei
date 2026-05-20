@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { SpeedInsights } from '@vercel/speed-insights/vue'
+
 const { isOpen, options } = useAlerts()
 const { initTracking } = useCookieConsent()
 
@@ -21,6 +23,7 @@ function handleCancel() {
   </NuxtLayout>
 
   <CookieConsent />
+  <SpeedInsights />
 
   <BaseAlertDialog
     v-model:open="isOpen"

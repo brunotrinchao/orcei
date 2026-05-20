@@ -27,6 +27,23 @@ export const GoogleService = {
       })
     }
 
+    // Add token refresh listener
+    oauth2Client.on('tokens', async (tokens) => {
+      try {
+        const updateData: any = {}
+        if (tokens.access_token) updateData['googleIntegration.accessToken'] = tokens.access_token
+        if (tokens.expiry_date) updateData['googleIntegration.expiryDate'] = tokens.expiry_date
+        
+        if (Object.keys(updateData).length > 0) {
+          const { Profile } = await import('../models/Profile')
+          await Profile.findByIdAndUpdate(profile._id, { $set: updateData })
+          console.log(`[GoogleService] Tokens refreshed and saved for profile: ${profile._id}`)
+        }
+      } catch (error) {
+        console.error(`[GoogleService] Failed to save refreshed tokens for profile: ${profile._id}`, error)
+      }
+    })
+
     return oauth2Client
   },
 

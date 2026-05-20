@@ -1,3 +1,4 @@
+<script setup lang="ts">
 import { ref, computed, watch, watchEffect, nextTick } from 'vue'
 import { Plus, Trash2, Sparkles, Loader2, Search } from 'lucide-vue-next'
 import type { CatalogItemDTO, ProfileDTO, ProposalDTO } from '../../types'

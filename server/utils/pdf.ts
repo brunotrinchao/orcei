@@ -1,4 +1,15 @@
 import { processVariables } from './variables'
+import puppeteer from 'puppeteer'
+
+export async function generateProposalPdfBuffer(proposal: any, profile: any, appName: string = 'ORCEI') {
+  const htmlContent = generateProposalHtml(proposal, profile, appName)
+  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] })
+  const page = await browser.newPage()
+  await page.setContent(htmlContent)
+  const pdf = await page.pdf({ format: 'A4', printBackground: true })
+  await browser.close()
+  return pdf
+}
 
 export function generateProposalHtml(proposal: any, profile: any, appName: string = 'ORCEI') {
   // Processar variáveis

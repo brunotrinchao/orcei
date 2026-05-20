@@ -1,7 +1,7 @@
-<script setup lang="ts">
 import { ref, computed, watch, watchEffect, nextTick } from 'vue'
 import { Plus, Trash2, Sparkles, Loader2, Search } from 'lucide-vue-next'
 import type { CatalogItemDTO, ProfileDTO, ProposalDTO } from '../../types'
+import { ProposalStatus, PaymentMethod, SendMethod } from '../../types/enums'
 
 const props = defineProps<{
   initialData?: ProposalDTO
@@ -64,7 +64,7 @@ const clientOptions = computed(() => {
 
 const form = ref({
   title: props.initialData?.title || '',
-  status: props.initialData?.status || 'draft',
+  status: props.initialData?.status || ProposalStatus.DRAFT,
   client: {
     name: props.initialData?.client?.name || '',
     email: props.initialData?.client?.email || '',
@@ -78,13 +78,14 @@ const form = ref({
     discount: props.initialData?.totals?.discount || 0
   },
   paymentConfig: {
-    method: props.initialData?.paymentConfig?.method || 'cash',
+    method: props.initialData?.paymentConfig?.method || PaymentMethod.CASH,
     installments: props.initialData?.paymentConfig?.installments || 1,
     cashDiscount: props.initialData?.paymentConfig?.cashDiscount || 0
   },
-  sendMethod: props.initialData?.sendMethod || 'auto',
+  sendMethod: props.initialData?.sendMethod || SendMethod.AUTO,
   contractText: props.initialData?.contractText || '',
-  termsAndConditions: props.initialData?.termsAndConditions || ''
+  termsAndConditions: props.initialData?.termsAndConditions || '',
+  executionDate: props.initialData?.executionDate ? new Date(props.initialData.executionDate).toISOString().slice(0, 16) : ''
 })
 
 // Carregar templates padrão se estiver vazio (novo orçamento)
@@ -114,13 +115,14 @@ watch(() => props.initialData, (newVal) => {
         discount: newVal.totals?.discount || 0
       },
       paymentConfig: {
-        method: newVal.paymentConfig?.method || 'cash',
+        method: newVal.paymentConfig?.method || PaymentMethod.CASH,
         installments: newVal.paymentConfig?.installments || 1,
         cashDiscount: newVal.paymentConfig?.cashDiscount || 0
       },
-      sendMethod: newVal.sendMethod || 'auto',
+      sendMethod: newVal.sendMethod || SendMethod.AUTO,
       contractText: newVal.contractText || '',
-      termsAndConditions: newVal.termsAndConditions || ''
+      termsAndConditions: newVal.termsAndConditions || '',
+      executionDate: newVal.executionDate ? new Date(newVal.executionDate).toISOString().slice(0, 16) : ''
     }
   }
 }, { deep: true })
@@ -174,13 +176,13 @@ const finalTotal = computed(() => {
   const subtotal = form.value.items.reduce((acc, i) => acc + (i.price * i.quantity), 0)
   const baseTotal = subtotal + form.value.totals.additional - form.value.totals.discount
   
-  if (form.value.paymentConfig.method === 'cash') {
+  if (form.value.paymentConfig.method === PaymentMethod.CASH) {
     return baseTotal * (1 - (form.value.paymentConfig.cashDiscount / 100))
   }
   return baseTotal
 })
 
-async function submit(status: 'draft' | 'created' = 'draft') {
+async function submit(status: ProposalStatus = ProposalStatus.DRAFT) {
   // Validação
   if (!form.value.title.trim()) return notify('Aviso', 'Título do orçamento é obrigatório')
   if (!form.value.client.name.trim()) return notify('Aviso', 'Nome do cliente é obrigatório')
@@ -205,12 +207,12 @@ async function submit(status: 'draft' | 'created' = 'draft') {
     return notify('Aviso', 'O desconto deve estar entre 0% e 100%')
   }
 
-  const keepStatus = props.isEditing && props.initialData?.status !== 'draft'
+  const keepStatus = props.isEditing && props.initialData?.status !== ProposalStatus.DRAFT
   const payload = keepStatus ? form.value : { ...form.value, status }
   emit('submit', payload)
 }
 
-defineExpose({ submit, isEditingNonDraft: computed(() => props.isEditing && props.initialData?.status !== 'draft') })
+defineExpose({ submit, isEditingNonDraft: computed(() => props.isEditing && props.initialData?.status !== ProposalStatus.DRAFT) })
 </script>
 
 <template>
@@ -337,8 +339,14 @@ defineExpose({ submit, isEditingNonDraft: computed(() => props.isEditing && prop
     <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
       <div class="space-y-8">
         <div class="bg-gray-50 p-8 rounded-[3rem] space-y-6">
-          <h3 class="text-xs font-black text-gray-900 uppercase tracking-widest">Condições de Pagamento</h3>
+          <h3 class="text-xs font-black text-gray-900 uppercase tracking-widest">Execução & Pagamento</h3>
           
+          <div class="space-y-3">
+            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Data de Execução (Opcional)</label>
+            <input v-model="form.executionDate" type="datetime-local" class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold">
+            <p class="text-[9px] text-gray-400 font-bold ml-1 uppercase">Sincroniza com Google Agenda se conectado.</p>
+          </div>
+
           <div class="grid grid-cols-2 gap-4">
             <BaseInput v-model.number="form.paymentConfig.installments" label="Max. Parcelas" type="number" />
             <BaseInput v-model.number="form.paymentConfig.cashDiscount" label="Desc. À Vista (%)" type="number" />
@@ -349,16 +357,16 @@ defineExpose({ submit, isEditingNonDraft: computed(() => props.isEditing && prop
             <div class="flex gap-2 p-1 bg-white rounded-2xl border border-gray-100">
               <button 
                 type="button"
-                @click="form.sendMethod = 'auto'"
-                :class="form.sendMethod === 'auto' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:bg-gray-50'"
+                @click="form.sendMethod = SendMethod.AUTO"
+                :class="form.sendMethod === SendMethod.AUTO ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:bg-gray-50'"
                 class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
               >
                 Auto (E-mail)
               </button>
               <button 
                 type="button"
-                @click="form.sendMethod = 'manual'"
-                :class="form.sendMethod === 'manual' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:bg-gray-50'"
+                @click="form.sendMethod = SendMethod.MANUAL"
+                :class="form.sendMethod === SendMethod.MANUAL ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:bg-gray-50'"
                 class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
               >
                 Manual (Link)

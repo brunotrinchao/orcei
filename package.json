@@ -33,6 +33,7 @@
     "chart.js": "^4.5.1",
     "cloudinary": "^2.10.0",
     "date-fns": "^4.2.1",
+    "googleapis": "^172.0.0",
     "imask": "^7.6.1",
     "lucide-vue-next": "^1.0.0",
     "markdown-it": "^14.1.1",

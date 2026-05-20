@@ -123,6 +123,8 @@ export default defineEventHandler(async (event) => {
       const customerId = sub.customer
       const priceId = sub.items?.data?.[0]?.price?.id
       const plan = getPlanByPriceId(priceId || '')
+      
+      // Capturar data de término do período atual (importante para cancelamento agendado)
       const periodEnd = sub.current_period_end
         ? new Date(sub.current_period_end * 1000)
         : null
@@ -130,7 +132,7 @@ export default defineEventHandler(async (event) => {
       const isActiveLike = ['active', 'trialing', 'past_due'].includes(sub.status)
       const updateFields: any = {
         subscriptionStatus: sub.status,
-        subscriptionEndsAt: periodEnd,
+        subscriptionEndsAt: periodEnd, // SSSOT para data limite
         cancelAtPeriodEnd: !!sub.cancel_at_period_end,
         stripeSubscriptionId: sub.id,
         stripePriceId: priceId || null
@@ -146,12 +148,12 @@ export default defineEventHandler(async (event) => {
       console.log('Profile updated (subscription.updated):', {
         email: updated?.email,
         status: sub.status,
-        cancelAtPeriodEnd: !!sub.cancel_at_period_end
+        cancelAtPeriodEnd: !!sub.cancel_at_period_end,
+        expiresAt: periodEnd?.toLocaleString('pt-BR')
       })
 
       // Se o usuário cancelou o cancelamento (reativou)
       if (updated && !sub.cancel_at_period_end && sub.status === 'active') {
-        // Opcional: registrar em log ou histórico que foi reativado
         console.log('Subscription re-activated for:', updated.email)
       }
     }

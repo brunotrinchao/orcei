@@ -1,8 +1,9 @@
 import { Schema, model } from 'mongoose'
+import { CatalogItemType } from '../../types/enums'
 
 const catalogItemSchema = new Schema({
   profileId: { type: Schema.Types.ObjectId, ref: 'Profile', required: true },
-  type: { type: String, enum: ['product', 'service'], required: true },
+  type: { type: String, enum: Object.values(CatalogItemType), required: true },
   name: { type: String, required: true },
   description: String,
   price: { type: Number, required: true },

@@ -1,34 +1,27 @@
 <script setup lang="ts">
+import { SubscriptionPlan } from '../../../types/enums'
 import { CreditCard, History, Zap, CheckCircle2, Loader2, ArrowRight, Download, AlertTriangle } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../../types'
 
 const { data: profile, refresh: refreshProfile } = useFetch<ProfileDTO>('/api/profile')
 const { notify } = useAlerts()
 
-const plans = [
-  {
-    name: 'Mensal',
-    price: 'R$ 19,90',
-    description: 'Uso ilimitado por 30 dias',
-    features: ['Orçamentos Ilimitados', 'Agenda FullCalendar', 'Relatórios IA', 'Suporte Prioritário'],
-    priceId: 'price_monthly_1990',
-    tier: 'premium_monthly'
-  },
-  {
-    name: 'Anual',
-    price: 'R$ 199,90',
-    description: 'Economize 15% ao ano',
-    features: ['Orçamentos Ilimitados', 'Agenda FullCalendar', 'Relatórios IA', 'Suporte VIP'],
-    priceId: 'price_annual_19990',
-    tier: 'premium_annual',
-    highlight: true
-  }
-]
+const { data: plans, pending: loadingPlans } = useFetch<any[]>('/api/stripe/plans')
 
+const billingCycle = ref<'monthly' | 'annual'>('monthly')
 const isLoading = ref<string | null>(null)
 const isCanceling = ref(false)
 
-const isPlanActive = computed(() => profile.value?.subscriptionPlan && profile.value.subscriptionPlan !== 'free')
+const subscriptionPlans = computed(() => {
+  return plans.value?.filter(p => [SubscriptionPlan.MONTHLY, SubscriptionPlan.ANNUAL].includes(p.planType)) || []
+})
+
+const selectedPlan = computed(() => {
+  const type = billingCycle.value === 'monthly' ? SubscriptionPlan.MONTHLY : SubscriptionPlan.ANNUAL
+  return subscriptionPlans.value.find(p => p.planType === type) || subscriptionPlans.value[0]
+})
+
+const isPlanActive = computed(() => profile.value?.subscriptionPlan && profile.value.subscriptionPlan !== SubscriptionPlan.FREE)
 const isCancelScheduled = computed(() => !!profile.value?.cancelAtPeriodEnd)
 
 const cancelEndDate = computed(() => {
@@ -149,51 +142,108 @@ onMounted(() => {
 
     <!-- Planos de Assinatura -->
     <section>
-      <div class="flex items-center gap-3 mb-8">
-        <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Assinaturas</h2>
-        <div class="h-px flex-1 bg-gray-100"></div>
+      <div class="flex flex-col items-center mb-12">
+        <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Assinatura Profissional</h2>
+        
+        <!-- Toggle Mensal/Anual -->
+        <div class="bg-gray-100 p-1.5 rounded-[1.5rem] flex items-center shadow-inner">
+          <button 
+            @click="billingCycle = 'monthly'"
+            :class="[
+              'px-8 py-3 rounded-[1.2rem] text-xs font-black uppercase tracking-widest transition-all',
+              billingCycle === 'monthly' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'
+            ]"
+          >
+            Mensal
+          </button>
+          <button 
+            @click="billingCycle = 'annual'"
+            :class="[
+              'px-8 py-3 rounded-[1.2rem] text-xs font-black uppercase tracking-widest transition-all relative flex items-center gap-2',
+              billingCycle === 'annual' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'
+            ]"
+          >
+            Anual
+            <span v-if="billingCycle !== 'annual'" class="absolute -top-1 -right-4 bg-green-500 text-white text-[8px] px-2 py-0.5 rounded-full animate-bounce">
+              -15%
+            </span>
+          </button>
+        </div>
+        <p class="mt-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+          <RefreshCcw class="w-3 h-3" /> Cobrança Recorrente
+        </p>
       </div>
       
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div v-if="loadingPlans" class="max-w-xl mx-auto">
+        <div class="bg-white p-10 rounded-[3rem] border-2 border-gray-100 animate-pulse h-[550px]">
+          <div class="h-8 bg-gray-100 rounded-xl w-1/3 mb-4 mx-auto"></div>
+          <div class="h-4 bg-gray-100 rounded-xl w-2/3 mb-10 mx-auto"></div>
+          <div class="h-12 bg-gray-100 rounded-xl w-1/2 mb-10 mx-auto"></div>
+          <div class="space-y-4">
+            <div v-for="j in 6" :key="j" class="h-4 bg-gray-100 rounded-xl w-full"></div>
+          </div>
+        </div>
+      </div>
+
+      <div v-else-if="selectedPlan" class="max-w-xl mx-auto">
         <div 
-          v-for="plan in plans" 
-          :key="plan.tier"
           :class="{
-            'bg-white p-10 rounded-[3rem] border-2 transition-all flex flex-col relative overflow-hidden': true,
-            'border-blue-600 ring-8 ring-blue-50': plan.highlight,
-            'border-gray-100 hover:border-gray-200': !plan.highlight
+            'bg-white p-10 rounded-[3rem] border-2 transition-all flex flex-col relative overflow-hidden shadow-xl shadow-blue-500/5': true,
+            'border-blue-600 ring-8 ring-blue-50': selectedPlan.highlight || billingCycle === 'annual',
+            'border-gray-100': !(selectedPlan.highlight || billingCycle === 'annual')
           }"
         >
-          <div v-if="plan.highlight" class="absolute top-8 right-[-35px] bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest px-10 py-1 rotate-45 shadow-lg">
-            Popular
+          <div v-if="billingCycle === 'annual'" class="absolute top-8 right-[-35px] bg-green-500 text-white text-[10px] font-black uppercase tracking-widest px-10 py-1 rotate-45 shadow-lg">
+            Melhor Valor
           </div>
 
-          <div class="mb-10">
-            <h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight">{{ plan.name }}</h3>
-            <p class="text-gray-500 font-medium text-sm mt-1">{{ plan.description }}</p>
-            <div class="mt-6 flex items-baseline gap-1">
-              <span class="text-4xl font-black text-gray-900">{{ plan.price }}</span>
+          <div class="text-center mb-10">
+            <BaseBadge variant="info" class="mb-4">Orçamentos Ilimitados</BaseBadge>
+            <h3 class="text-3xl font-black text-gray-900 uppercase tracking-tight">{{ selectedPlan.name }}</h3>
+            <p class="text-gray-500 font-medium text-sm mt-2 max-w-xs mx-auto">{{ selectedPlan.description }}</p>
+            
+            <div class="mt-8 flex flex-col items-center">
+              <div class="flex items-baseline gap-1">
+                <span class="text-5xl font-black text-gray-900">{{ selectedPlan.price }}</span>
+                <span class="text-sm font-bold text-gray-400 uppercase tracking-widest">
+                  {{ billingCycle === 'annual' ? '/ ano' : '/ mês' }}
+                </span>
+              </div>
+              <p v-if="billingCycle === 'annual'" class="text-green-600 text-[10px] font-black uppercase tracking-widest mt-2 bg-green-50 px-3 py-1 rounded-full">
+                Economia de aproximadamente 2 meses
+              </p>
             </div>
           </div>
 
+          <div class="h-px bg-gray-100 mb-10"></div>
+
           <ul class="space-y-4 mb-10 flex-1">
-            <li v-for="f in plan.features" :key="f" class="flex items-center gap-3 text-sm font-bold text-gray-600">
-              <div class="w-5 h-5 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0">
-                <CheckCircle2 class="w-3.5 h-3.5" />
+            <li v-for="f in selectedPlan.features" :key="f" class="flex items-center gap-3 text-sm font-bold text-gray-600">
+              <div class="w-6 h-6 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shrink-0">
+                <CheckCircle2 class="w-4 h-4" />
               </div>
               {{ f }}
             </li>
           </ul>
 
           <BaseButton 
-            @click="handleAction(plan.tier)" 
-            :disabled="isLoading === plan.tier"
-            class="w-full py-5 rounded-[1.5rem]"
-            :variant="plan.highlight ? 'primary' : 'secondary'"
+            @click="handleAction(selectedPlan.tier || selectedPlan.priceId)" 
+            :disabled="isLoading === (selectedPlan.tier || selectedPlan.priceId) || profile?.subscriptionPlan === selectedPlan.planType || profile?.stripePriceId === selectedPlan.priceId"
+            class="w-full py-6 rounded-[2rem] text-base"
+            :variant="(profile?.subscriptionPlan === selectedPlan.planType || profile?.stripePriceId === selectedPlan.priceId) ? 'outline' : 'primary'"
           >
-            <Loader2 v-if="isLoading === plan.tier" class="w-5 h-5 animate-spin mr-2" />
-            Ativar Plano {{ plan.name }}
+            <Loader2 v-if="isLoading === (selectedPlan.tier || selectedPlan.priceId)" class="w-5 h-5 animate-spin mr-2" />
+            <template v-if="profile?.subscriptionPlan === selectedPlan.planType || profile?.stripePriceId === selectedPlan.priceId">
+              <CheckCircle2 class="w-5 h-5 mr-2" /> Seu Plano Atual
+            </template>
+            <template v-else>
+              Assinar Plano {{ selectedPlan.name }}
+            </template>
           </BaseButton>
+          
+          <p class="text-center mt-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+            Cancele a qualquer momento sem taxas
+          </p>
         </div>
       </div>
     </section>

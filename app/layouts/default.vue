@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { SubscriptionPlan } from '../../types/enums'
 import { onClickOutside } from '@vueuse/core'
 import { Shield, ArrowLeft } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../types'
@@ -73,8 +74,9 @@ onMounted(() => {
                 <span class="text-[8px] uppercase font-bold text-gray-400 tracking-widest">Créditos</span>
                 <span class="text-xs font-semibold text-gray-700">{{ profile?.creditsBalance ?? 0 }}</span>
               </div>
-              <div v-if="profile?.subscriptionPlan && profile.subscriptionPlan !== 'free'" class="h-6 w-px bg-gray-200"></div>
-              <div v-if="profile?.subscriptionPlan && profile.subscriptionPlan !== 'free'" class="flex flex-col items-start">
+
+              <div v-if="profile?.subscriptionPlan && profile.subscriptionPlan !== SubscriptionPlan.FREE" class="h-6 w-px bg-gray-200"></div>
+              <div v-if="profile?.subscriptionPlan && profile.subscriptionPlan !== SubscriptionPlan.FREE" class="flex flex-col items-start">
                 <span :class="[
                   'text-[8px] uppercase font-bold tracking-widest',
                   profile.cancelAtPeriodEnd ? 'text-amber-400' : 'text-blue-400'

@@ -1,5 +1,23 @@
-import { google } from 'googleapis'
+# Google Service Refactor Implementation Plan
 
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Improve GoogleService by adding token refresh persistence, optimizing drive folder management, increasing type safety, and robust error handling.
+
+**Architecture:** Use `googleapis` library. Enhance `GoogleService` with event listeners for token refreshes and improved folder verification logic.
+
+**Tech Stack:** TypeScript, Google APIs, Nuxt/Nitro.
+
+---
+
+### Task 1: Type Safety and Error Handling Foundation
+
+**Files:**
+- Modify: `server/services/GoogleService.ts`
+
+- [ ] **Step 1: Define GoogleEventData interface and update method signatures**
+
+```typescript
 export interface GoogleEventData {
   summary: string
   location?: string
@@ -10,7 +28,32 @@ export interface GoogleEventData {
   fileName?: string
 }
 
-export const GoogleService = {
+// Update createEvent signature:
+// async createEvent(auth: any, data: GoogleEventData)
+```
+
+- [ ] **Step 2: Add try/catch blocks to existing methods for better logging**
+
+Wrap `ensureFolder`, `uploadPdf`, and `createEvent` in `try/catch` blocks. Log errors using `console.error` with descriptive messages.
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add server/services/GoogleService.ts
+git commit -m "refactor(google): add type safety and basic error handling"
+```
+
+### Task 2: Token Refresh Persistence
+
+**Files:**
+- Modify: `server/services/GoogleService.ts`
+- Modify: `server/models/Profile.ts` (Import if needed for type, but we'll use Mongoose model)
+
+- [ ] **Step 1: Update getAuthClient to handle token refreshes**
+
+Add a listener to `oauth2Client` to update the `Profile` in the database when new tokens are issued.
+
+```typescript
   getAuthClient(profile: any) {
     const config = useRuntimeConfig()
     const oauth2Client = new google.auth.OAuth2(
@@ -46,7 +89,25 @@ export const GoogleService = {
 
     return oauth2Client
   },
+```
 
+- [ ] **Step 2: Commit**
+
+```bash
+git add server/services/GoogleService.ts
+git commit -m "feat(google): implement token refresh persistence"
+```
+
+### Task 3: Optimize Drive Folder Management
+
+**Files:**
+- Modify: `server/services/GoogleService.ts`
+
+- [ ] **Step 1: Update ensureFolder to verify existing folder ID**
+
+If `profile.googleIntegration.driveFolderId` exists, verify it first. If it's valid, return it. If not, search by name or create it.
+
+```typescript
   async ensureFolder(auth: any, profile: any) {
     try {
       const drive = google.drive({ version: 'v3', auth })
@@ -59,7 +120,7 @@ export const GoogleService = {
             fields: 'id, trashed'
           })
           if (folder.data && !folder.data.trashed) {
-            return folder.data.id as string
+            return folder.data.id
           }
         } catch (e) {
           // Folder doesn't exist or no access, fall through to search/create
@@ -79,14 +140,14 @@ export const GoogleService = {
       let folderId: string | undefined
 
       if (res.data.files?.length) {
-        folderId = res.data.files[0].id as string
+        folderId = res.data.files[0].id
       } else {
         // 3. Create new folder
         const folder = await drive.files.create({
           requestBody: { name: folderName, mimeType: 'application/vnd.google-apps.folder' },
           fields: 'id'
         })
-        folderId = folder.data.id as string
+        folderId = folder.data.id
       }
 
       // 4. Update profile with new/found folderId
@@ -99,45 +160,19 @@ export const GoogleService = {
 
       return folderId
     } catch (error) {
-      console.error('[GoogleService] Error in ensureFolder:', error)
+      console.error('[GoogleService] ensureFolder failed:', error)
       throw error
     }
   },
+```
 
-  async uploadPdf(auth: any, folderId: string, fileName: string, buffer: Buffer) {
-    try {
-      const drive = google.drive({ version: 'v3', auth })
-      // Using a simple buffer upload for the plan
-      const res = await drive.files.create({
-        requestBody: { name: fileName, parents: [folderId] },
-        media: { mimeType: 'application/pdf', body: buffer },
-        fields: 'id, webViewLink'
-      })
-      return res.data
-    } catch (error) {
-      console.error('[GoogleService] Error in uploadPdf:', error)
-      throw error
-    }
-  },
+- [ ] **Step 2: Update callers of ensureFolder**
 
-  async createEvent(auth: any, data: GoogleEventData) {
-    try {
-      const calendar = google.calendar({ version: 'v3', auth })
-      return await calendar.events.insert({
-        calendarId: 'primary',
-        requestBody: {
-          summary: data.summary,
-          location: data.location,
-          description: data.description,
-          start: { dateTime: new Date(data.start).toISOString() },
-          end: { dateTime: new Date(new Date(data.start).getTime() + 3600000).toISOString() },
-          attachments: data.fileId ? [{ fileUrl: data.webViewLink, title: data.fileName, mimeType: 'application/pdf' }] : []
-        },
-        supportsAttachments: true
-      })
-    } catch (error) {
-      console.error('[GoogleService] Error in createEvent:', error)
-      throw error
-    }
-  }
-}
+I need to check where `ensureFolder` is called to ensure `profile` is passed.
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add server/services/GoogleService.ts
+git commit -m "feat(google): optimize drive folder management"
+```

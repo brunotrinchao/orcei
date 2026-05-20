@@ -4,6 +4,10 @@ import { Counter } from '../models/Counter'
 import { ProposalHistory } from '../models/ProposalHistory'
 import { nanoid } from 'nanoid'
 import { sendProposalEmail } from '../utils/email'
+import { GoogleService } from './GoogleService'
+import { generateProposalPdfBuffer } from '../utils/pdf'
+
+import { ProposalStatus, PaymentMethod, SendMethod } from '../../types/enums'
 
 export const ProposalService = {
   async listByProfile(profileId: string) {
@@ -60,10 +64,10 @@ export const ProposalService = {
 
     // Se criar já como 'created' e sendMethod for 'auto', consome crédito e envia
     let lastEmailId = undefined
-    if (data.status === 'created') {
+    if (data.status === ProposalStatus.CREATED) {
       await this.consumeCredit(data.profileId)
 
-      if (data.sendMethod !== 'manual') {
+      if (data.sendMethod !== SendMethod.MANUAL) {
         if (profile && data.client?.email) {
           const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${slug}?t=${token}`
           const emailRes = await sendProposalEmail(
@@ -89,9 +93,9 @@ export const ProposalService = {
       lastEmailId
     })
 
-    await this.logHistory(proposal._id, 'created')
+    await this.logHistory(proposal._id, ProposalStatus.CREATED)
     if (lastEmailId) {
-      await this.logHistory(proposal._id, 'sent', 'email', { emailId: lastEmailId })
+      await this.logHistory(proposal._id, ProposalStatus.SENT, 'email', { emailId: lastEmailId })
     }
 
     return proposal
@@ -100,17 +104,17 @@ export const ProposalService = {
   async update(id: string, profileId: string, data: any) {
     const oldProposal = await Proposal.findOne({ _id: id, profileId })
     if (!oldProposal) return null
-    if (oldProposal.status === 'accepted') return null
+    if (oldProposal.status === ProposalStatus.ACCEPTED) return null
 
     let lastEmailId = oldProposal.lastEmailId
     let emailSent = false
 
     // Consome crédito se mudar de draft para created/pending/etc
-    if (oldProposal.status === 'draft' && data.status !== 'draft') {
+    if (oldProposal.status === ProposalStatus.DRAFT && data.status !== ProposalStatus.DRAFT) {
       await this.consumeCredit(profileId)
 
       // Se mudou para 'created' e não for manual, envia e-mail
-      if (data.status === 'created' && data.sendMethod !== 'manual') {
+      if (data.status === ProposalStatus.CREATED && data.sendMethod !== SendMethod.MANUAL) {
         const profile = await Profile.findById(profileId)
         if (profile && data.client?.email) {
           const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${oldProposal.slug}?t=${oldProposal.token}`
@@ -136,7 +140,7 @@ export const ProposalService = {
     )
 
     if (updated && emailSent) {
-      await this.logHistory(updated._id, 'sent', 'email', { emailId: lastEmailId })
+      await this.logHistory(updated._id, ProposalStatus.SENT, 'email', { emailId: lastEmailId })
     }
 
     return updated
@@ -148,7 +152,7 @@ export const ProposalService = {
 
     const hasActiveSubscription =
       profile.subscriptionPlan !== 'free' &&
-      (profile.subscriptionStatus === 'active' || profile.subscriptionStatus === 'trialing')
+      (profile.subscriptionStatus === SubscriptionStatus.ACTIVE || profile.subscriptionStatus === SubscriptionStatus.TRIALING)
 
     if (!hasActiveSubscription && profile.creditsUsed >= profile.creditsBalance) {
       throw createError({
@@ -165,18 +169,18 @@ export const ProposalService = {
     if (updated) {
       // Map system status updates to history actions
       const actionMap: Record<string, string> = {
-        'created': 'created',
-        'accepted': 'accepted',
-        'expired': 'declined',
-        'viewed': 'viewed'
+        [ProposalStatus.CREATED]: ProposalStatus.CREATED,
+        [ProposalStatus.ACCEPTED]: ProposalStatus.ACCEPTED,
+        [ProposalStatus.EXPIRED]: 'declined',
+        [ProposalStatus.VIEWED]: ProposalStatus.VIEWED
       }
       await this.logHistory(updated._id, actionMap[status] || status)
     }
     return updated
   },
 
-  async acceptProposal(slug: string, paymentMethod: 'cash' | 'credit_card') {
-    const proposal = await Proposal.findOne({ slug })
+  async acceptProposal(slug: string, paymentMethod: PaymentMethod) {
+    const proposal = await Proposal.findOne({ slug }).populate('profileId')
     if (!proposal) return null
     
     // Calculate final totals based on client choice
@@ -188,7 +192,7 @@ export const ProposalService = {
     const updated = await Proposal.findOneAndUpdate(
       { slug }, 
       { 
-        status: 'accepted',
+        status: ProposalStatus.ACCEPTED,
         'paymentConfig.method': paymentMethod,
         totals
       }, 
@@ -196,14 +200,48 @@ export const ProposalService = {
     )
 
     if (updated) {
-      await this.logHistory(updated._id, 'accepted', 'system', { paymentMethod })
+      await this.logHistory(updated._id, ProposalStatus.ACCEPTED, 'system', { paymentMethod })
+
+      // Automação Google
+      const profile: any = proposal.profileId
+      if (profile?.googleIntegration?.refreshToken) {
+        try {
+          const auth = GoogleService.getAuthClient(profile)
+          
+          // 1. Garantir pasta e Upload PDF
+          const folderId = profile.googleIntegration.driveFolderId || await GoogleService.ensureFolder(auth, profile)
+          if (!profile.googleIntegration.driveFolderId) {
+            await Profile.findByIdAndUpdate(profile._id, { 'googleIntegration.driveFolderId': folderId })
+          }
+
+          const pdfBuffer = await generateProposalPdfBuffer(updated, profile)
+          const fileName = `Proposta-${updated.code}-${updated.client.name}.pdf`
+          const driveFile = await GoogleService.uploadPdf(auth, folderId, fileName, pdfBuffer)
+
+          // 2. Criar evento no Calendar se tiver executionDate
+          if (updated.executionDate) {
+            await GoogleService.createEvent(auth, {
+              summary: `Execução: ${updated.title} (${updated.client.name})`,
+              location: profile.address?.city || '',
+              description: `Orçamento: ${updated.code}\nCliente: ${updated.client.name}\nValor: R$ ${updated.totals.final.toLocaleString('pt-BR')}\n\nPDF: ${driveFile.webViewLink}`,
+              start: updated.executionDate,
+              fileId: driveFile.id,
+              webViewLink: driveFile.webViewLink,
+              fileName
+            })
+          }
+          console.log(`[ProposalService] Automação Google concluída para: ${updated.code}`)
+        } catch (error) {
+          console.error(`[ProposalService] Falha na automação Google para ${updated.code}:`, error)
+        }
+      }
     }
 
     return updated
   },
 
   async declineProposal(slug: string) {
-    const updated = await Proposal.findOneAndUpdate({ slug }, { status: 'expired' }, { returnDocument: 'after' })
+    const updated = await Proposal.findOneAndUpdate({ slug }, { status: ProposalStatus.EXPIRED }, { returnDocument: 'after' })
     if (updated) {
       await this.logHistory(updated._id, 'declined')
     }
@@ -211,9 +249,9 @@ export const ProposalService = {
   },
 
   async requestChanges(slug: string, notes?: string) {
-    const updated = await Proposal.findOneAndUpdate({ slug }, { status: 'pending' }, { returnDocument: 'after' })
+    const updated = await Proposal.findOneAndUpdate({ slug }, { status: ProposalStatus.PENDING }, { returnDocument: 'after' })
     if (updated) {
-      await this.logHistory(updated._id, 'viewed', 'system', { notes })
+      await this.logHistory(updated._id, ProposalStatus.VIEWED, 'system', { notes })
     }
     return updated
   },
@@ -229,7 +267,7 @@ export const ProposalService = {
     let final = baseTotal
     let cashDiscountValue = 0
 
-    if (paymentConfig.method === 'cash' && paymentConfig.cashDiscount > 0) {
+    if (paymentConfig.method === PaymentMethod.CASH && paymentConfig.cashDiscount > 0) {
       cashDiscountValue = baseTotal * (paymentConfig.cashDiscount / 100)
       final = baseTotal - cashDiscountValue
     }
@@ -242,3 +280,4 @@ export const ProposalService = {
     }
   }
 }
+

@@ -21,11 +21,21 @@ export default defineEventHandler(async (event) => {
             : tier === 'premium_annual' ? config.public.stripePriceAnnual
             : tier === 'starter' ? config.public.stripeStarterPriceId
             : tier === 'premium' ? config.public.stripePremiumPriceId : null
+    
+    // If not found in config, check if tier looks like a Stripe Price ID
+    if (!priceId && tier.startsWith('price_')) {
+      priceId = tier
+    }
     mode = 'subscription'
   } else {
     priceId = tier === 'single_credit' ? config.public.stripePriceSingle
             : tier === 'credits_5' ? config.public.stripeCredits5PriceId
             : tier === 'credits_10' ? config.public.stripeCredits10PriceId : null
+
+    // If not found in config, check if tier looks like a Stripe Price ID
+    if (!priceId && tier.startsWith('price_')) {
+      priceId = tier
+    }
     mode = 'payment'
   }
 

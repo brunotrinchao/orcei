@@ -84,6 +84,7 @@ export default defineNuxtConfig({
       gtmId: process.env.NUXT_PUBLIC_GTM_ID || '',
       appName: process.env.APP_NAME || 'Orcei',
       appDocumentLogo: process.env.APP_DOCUMENT_LOGO,
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
     }
   },
 

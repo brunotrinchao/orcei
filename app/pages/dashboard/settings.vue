@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Cropper } from 'vue-advanced-cropper'
 import 'vue-advanced-cropper/dist/style.css'
-import { SwatchBook, MapPin, Briefcase, FileText, Pencil, Image as PhotoIcon, RefreshCcw, Instagram, Youtube, Phone, MessageSquare, Plus, Trash2, Shield } from 'lucide-vue-next'
+import { SwatchBook, MapPin, Briefcase, FileText, Pencil, Image as PhotoIcon, RefreshCcw, Instagram, Youtube, Phone, MessageSquare, Plus, Trash2, Shield, Globe, Calendar } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../../types'
 
 const { notify } = useAlerts()
@@ -95,6 +95,23 @@ async function updateProfile() {
   }
 }
 
+async function disconnectGoogle() {
+  if (!localProfile.value) return
+  isSaving.value = true
+  try {
+    await $fetch('/api/profile', {
+      method: 'PUT',
+      body: { googleIntegration: null }
+    })
+    notify('Sucesso', 'Integração com Google removida.')
+    refresh()
+  } catch {
+    notify('Erro', 'Não foi possível desconectar.')
+  } finally {
+    isSaving.value = false
+  }
+}
+
 const activeTab = ref<'contract' | 'terms'>('contract')
 const isSearchingCEP = ref(false)
 
@@ -134,6 +151,7 @@ const sections = [
   { id: 'empresa',  label: 'Empresa',  icon: Briefcase },
   { id: 'endereco', label: 'Endereço', icon: MapPin },
   { id: 'contato',  label: 'Contato',  icon: Phone },
+  { id: 'integracoes', label: 'Integrações', icon: Globe },
   { id: 'negocio',  label: 'Negócio',  icon: RefreshCcw },
   { id: 'modelos',  label: 'Modelos',  icon: FileText },
   { id: 'privacidade', label: 'Privacidade', icon: Shield },
@@ -440,6 +458,37 @@ onMounted(() => {
                   <Youtube class="w-3.5 h-3.5" /> YouTube
                 </label>
                 <input v-model="localProfile.contact.social.youtube" type="text" placeholder="Canal" class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold">
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Integrações -->
+        <section id="integracoes" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
+          <div class="flex items-center gap-3 mb-8">
+            <div class="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center">
+              <Globe class="w-5 h-5 text-sky-600" />
+            </div>
+            <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Integrações</h2>
+          </div>
+
+          <div class="space-y-6">
+            <div class="p-6 bg-gray-50/50 rounded-3xl border border-gray-100 flex flex-col sm:flex-row items-center gap-6">
+              <div class="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center shrink-0 border border-gray-100">
+                <img src="https://www.gstatic.com/images/branding/product/2x/calendar_2020q4_48dp.png" class="w-8 h-8 object-contain">
+              </div>
+              <div class="flex-1 text-center sm:text-left">
+                <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Google Calendar & Drive</h3>
+                <p class="text-xs text-gray-500 font-bold mt-1 leading-relaxed">Sincronize sua agenda e arquive orçamentos automaticamente.</p>
+              </div>
+              <div class="shrink-0 w-full sm:w-auto">
+                <div v-if="localProfile.googleIntegration?.email" class="flex flex-col items-center sm:items-end gap-2">
+                  <span class="text-[10px] font-black text-green-600 uppercase tracking-widest bg-green-50 px-3 py-1 rounded-full">Conectado: {{ localProfile.googleIntegration.email }}</span>
+                  <button @click="disconnectGoogle" class="text-[10px] font-black text-red-400 uppercase tracking-widest hover:text-red-600 transition-colors">Desconectar</button>
+                </div>
+                <a v-else href="/api/integrations/google/connect" class="inline-flex items-center justify-center px-6 py-3 bg-white border-2 border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-700 hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm">
+                  Conectar Google
+                </a>
               </div>
             </div>
           </div>

@@ -1,10 +1,12 @@
+import { ProposalStatus } from '../../types/enums'
+
 export function useCookieConsent() {
   const config = useRuntimeConfig()
 
   const sessionId = useLocalStorage('orcei:session-id', () => crypto.randomUUID())
   const consent = useLocalStorage<{ status: string; date: string } | null>('orcei:consent', null)
 
-  const hasConsent = computed(() => consent.value?.status === 'accepted')
+  const hasConsent = computed(() => consent.value?.status === ProposalStatus.ACCEPTED)
   const hasDecided = computed(() => consent.value !== null)
 
   function loadTracking() {
@@ -37,12 +39,12 @@ export function useCookieConsent() {
   }
 
   async function accept() {
-    consent.value = { status: 'accepted', date: new Date().toISOString() }
+    consent.value = { status: ProposalStatus.ACCEPTED, date: new Date().toISOString() }
     loadTracking()
     try {
       await $fetch('/api/consent', {
         method: 'POST',
-        body: { sessionId: sessionId.value, status: 'accepted' }
+        body: { sessionId: sessionId.value, status: ProposalStatus.ACCEPTED }
       })
     } catch {}
   }

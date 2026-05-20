@@ -12,7 +12,7 @@ async function check() {
   
   console.log('--- DB CHECK ---')
   console.log('Total Profiles:', profiles.length)
-  profiles.forEach(p => console.log(`- Email: ${p.email}, UserId: ${p.userId}, ID: ${p._id}`))
+  profiles.forEach(p => console.log(`- Email: ${p.email}, Plan: ${p.subscriptionPlan}, Status: ${p.subscriptionStatus}, ID: ${p._id}`))
   console.log('Total Proposals:', proposalsCount)
   
   process.exit(0)

@@ -207,10 +207,13 @@ export const ProposalService = {
       const profile: any = proposal.profileId
       if (profile?.googleIntegration?.refreshToken) {
         try {
+          console.log(`[ProposalService] Iniciando automação Google para: ${updated.code}`)
           const auth = GoogleService.getAuthClient(profile)
           
           // 1. Garantir pasta e Upload PDF
           const folderId = profile.googleIntegration.driveFolderId || await GoogleService.ensureFolder(auth, profile)
+          console.log(`[ProposalService] FolderId: ${folderId}`)
+          
           if (!profile.googleIntegration.driveFolderId) {
             await Profile.findByIdAndUpdate(profile._id, { 'googleIntegration.driveFolderId': folderId })
           }
@@ -218,9 +221,11 @@ export const ProposalService = {
           const pdfBuffer = await generateProposalPdfBuffer(updated, profile)
           const fileName = `Proposta-${updated.code}-${updated.client.name}.pdf`
           const driveFile = await GoogleService.uploadPdf(auth, folderId, fileName, pdfBuffer)
+          console.log(`[ProposalService] PDF Upload OK: ${driveFile.id}`)
 
           // 2. Criar evento no Calendar se tiver executionDate
           if (updated.executionDate) {
+            console.log(`[ProposalService] Criando evento para: ${updated.executionDate}`)
             await GoogleService.createEvent(auth, {
               summary: `Execução: ${updated.title} (${updated.client.name})`,
               location: profile.address?.city || '',
@@ -232,8 +237,9 @@ export const ProposalService = {
             })
           }
           console.log(`[ProposalService] Automação Google concluída para: ${updated.code}`)
-        } catch (error) {
-          console.error(`[ProposalService] Falha na automação Google para ${updated.code}:`, error)
+        } catch (error: any) {
+          console.error(`[ProposalService] Falha na automação Google para ${updated.code}:`, error.message)
+          if (error.errors) console.error('[ProposalService] Google API Errors:', JSON.stringify(error.errors))
         }
       }
     }

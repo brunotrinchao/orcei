@@ -10,7 +10,9 @@ const catalogItemSchema = new Schema({
   unit: { type: String, default: 'UN' }, // UN, KG, CM, ML, H, DIA, MES
   sku: String,
   imageUrl: String,
-  icon: { type: String, default: 'Package' }
+  icon: { type: String, default: 'Package' },
+  embedding: [Number],
+  embeddingUpdatedAt: Date
 }, { timestamps: true })
 
 catalogItemSchema.index({ profileId: 1 })

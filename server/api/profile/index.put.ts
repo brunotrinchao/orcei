@@ -8,20 +8,27 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody(event)
   
+  const updateData: any = { 
+    name: body.name,
+    brandConfig: body.brandConfig,
+    address: body.address,
+    company: body.company,
+    contact: body.contact,
+    defaultValidityDays: body.defaultValidityDays,
+    defaultInstallments: body.defaultInstallments,
+    defaultCashDiscount: body.defaultCashDiscount,
+    defaultContractTemplate: body.defaultContractTemplate,
+    defaultTermsAndConditions: body.defaultTermsAndConditions
+  }
+
+  // Permitir desconectar Google Integration enviando null
+  if (body.googleIntegration === null) {
+    updateData.googleIntegration = null
+  }
+
   const profile = await Profile.findOneAndUpdate(
     { userId: (session.user as any).id },
-    { 
-      name: body.name,
-      brandConfig: body.brandConfig,
-      address: body.address,
-      company: body.company,
-      contact: body.contact,
-      defaultValidityDays: body.defaultValidityDays,
-      defaultInstallments: body.defaultInstallments,
-      defaultCashDiscount: body.defaultCashDiscount,
-      defaultContractTemplate: body.defaultContractTemplate,
-      defaultTermsAndConditions: body.defaultTermsAndConditions
-    },
+    updateData,
     { returnDocument: 'after', runValidators: true }
   )
 

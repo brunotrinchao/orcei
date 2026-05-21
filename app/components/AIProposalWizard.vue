@@ -67,7 +67,7 @@ function close() {
   emit('close')
 }
 
-function removeItem(idx: number) {
+function removeItem(idx: number | string) {
   results.value.items.splice(idx, 1)
   if (results.value.items.length === 0) {
     step.value = 'prompt'

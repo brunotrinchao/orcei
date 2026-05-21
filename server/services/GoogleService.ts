@@ -1,4 +1,5 @@
 import { google } from 'googleapis'
+import { Readable } from 'stream'
 
 export interface GoogleEventData {
   summary: string
@@ -107,10 +108,13 @@ export const GoogleService = {
   async uploadPdf(auth: any, folderId: string, fileName: string, buffer: Buffer) {
     try {
       const drive = google.drive({ version: 'v3', auth })
-      // Using a simple buffer upload for the plan
+      
+      // Google API espera Stream para uploads no Node.js
+      const stream = Readable.from(buffer)
+
       const res = await drive.files.create({
         requestBody: { name: fileName, parents: [folderId] },
-        media: { mimeType: 'application/pdf', body: buffer },
+        media: { mimeType: 'application/pdf', body: stream },
         fields: 'id, webViewLink'
       })
       return res.data

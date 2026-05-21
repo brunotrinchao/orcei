@@ -73,6 +73,10 @@ export default defineNuxtConfig({
     resendTemplateAssignPlan: process.env.RESEND_TEMPLATE_ASSING_PLAN || 'ativar-plano',
     resendTemplateBuyCredit: process.env.RESEND_TEMPLATE_BUY_CREDIT || 'comprar-credito',
     resendTemplateCancelPlan: process.env.RESEND_TEMPLATE_CANCEL_PLAN || 'cancelar-plano',
+    cloudflareAccountId: process.env.CLOUDFLARE_ACCOUNT_ID,
+    cloudflareApiKey: process.env.CLOUDFLARE_API_KEY,
+    cloudflareAiModel: process.env.CLOUDFLARE_AI_MODEL || '@cf/meta/llama-2-7b-chat-int8',
+    cloudflareFallbackRegex: process.env.CLOUDFLARE_FALLBACK_REGEX,
     public: {
       stripeStarterPriceId: process.env.STRIPE_STARTER_PRICE_ID,
       stripePremiumPriceId: process.env.STRIPE_PREMIUM_PRICE_ID,

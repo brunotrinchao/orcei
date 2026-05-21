@@ -2,9 +2,17 @@ import { Receiver } from "@upstash/qstash"
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  const signature = getHeader(event, 'upstash-signature')
-  const action = getHeader(event, 'upstash-forward-action')
+  const headers = getHeaders(event)
+  
+  // O QStash pode enviar os headers originais com ou sem prefixo 'upstash-'
+  const action = headers['upstash-forward-action'] || headers['forward-action'] || headers['x-action']
+  const signature = headers['upstash-signature']
   const body = await readBody(event)
+
+  if (!action) {
+    console.error('[QStash Webhook] Ação não encontrada nos headers:', JSON.stringify(headers))
+    throw createError({ statusCode: 400, statusMessage: 'Action missing' })
+  }
 
   // Validação de Segurança via SDK
   if (config.qstashCurrentSigningKey && config.qstashNextSigningKey) {
@@ -13,17 +21,19 @@ export default defineEventHandler(async (event) => {
       nextSigningKey: config.qstashNextSigningKey,
     })
 
+    // No SDK Receiver.verify, o body deve ser a string exata recebida
     const isValid = await receiver.verify({
       signature: signature || '',
-      body: JSON.stringify(body),
-    }).catch(() => false)
+      body: typeof body === 'string' ? body : JSON.stringify(body),
+    }).catch((e) => {
+      console.error('[QStash Webhook] Erro na verificação:', e.message)
+      return false
+    })
 
     if (!isValid) {
       console.error('[QStash Webhook] Assinatura inválida detectada.')
       throw createError({ statusCode: 401, statusMessage: 'Assinatura QStash inválida' })
     }
-  } else {
-    console.warn('[QStash Webhook] Chaves de assinatura não configuradas. Pulando validação.')
   }
 
   console.log(`[QStash Webhook] Recebido job: ${action}`)

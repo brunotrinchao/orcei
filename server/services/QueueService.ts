@@ -27,7 +27,8 @@ export const QueueService = {
         url: destination,
         body: payload,
         headers: {
-          'Upstash-Forward-Action': action
+          'Upstash-Forward-Action': action,
+          'X-Action': action // Header redundante
         },
         delay: delay > 0 ? delay : undefined
       })

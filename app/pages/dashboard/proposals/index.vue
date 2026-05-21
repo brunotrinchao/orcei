@@ -754,7 +754,6 @@ const formatTime = (date: any) => {
             <LinkIcon class="w-3 h-3" /> Link do Cliente:
             <span class="text-blue-600 lowercase font-bold select-all">{{ siteOrigin }}/p/{{ selectedProposal.slug }}{{ selectedProposal.token ? `?t=${selectedProposal.token}` : '' }}</span>
           </div>
-          <BaseButton size="sm" variant="outline" @click="shareProposal(selectedProposal)">Copiar Link</BaseButton>
         </div>
         <div class="flex-1 bg-white overflow-hidden rounded-b-3xl">
           <iframe

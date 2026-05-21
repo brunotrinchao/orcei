@@ -1,12 +1,16 @@
 import { ProposalMessage } from '../../../models/ProposalMessage'
 import { Proposal } from '../../../models/Proposal'
+import { ProfileService } from '../../../services/ProfileService'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
   if (!session?.user) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
 
+  const profile = await ProfileService.getByUserId((session.user as any).id)
+  if (!profile) throw createError({ statusCode: 404, statusMessage: 'Profile not found' })
+
   const id = getRouterParam(event, 'id')
-  const profileId = (session.user as any).id
+  const profileId = profile._id
 
   // Verify ownership
   const proposal = await Proposal.findOne({ _id: id, profileId })

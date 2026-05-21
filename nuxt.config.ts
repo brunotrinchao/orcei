@@ -106,6 +106,7 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    preset: 'vercel',
     trailingSlash: false
   },
 

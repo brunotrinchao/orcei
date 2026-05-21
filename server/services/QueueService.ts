@@ -28,6 +28,7 @@ export const QueueService = {
         body: payload,
         headers: {
           'Upstash-Forward-Action': action,
+          'Action': action,
           'X-Action': action // Header redundante
         },
         delay: delay > 0 ? delay : undefined

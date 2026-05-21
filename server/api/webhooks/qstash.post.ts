@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   const headers = getHeaders(event)
   
   // O QStash pode enviar os headers originais com ou sem prefixo 'upstash-'
-  const action = headers['upstash-forward-action'] || headers['forward-action'] || headers['x-action']
+  const action = headers['upstash-forward-action'] || headers['forward-action'] || headers['x-action'] || headers['action']
   const signature = headers['upstash-signature']
   const body = await readBody(event)
 

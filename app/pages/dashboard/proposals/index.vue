@@ -394,15 +394,6 @@ const formatTime = (date: any) => {
                 <MessageCircle class="w-4 h-4" />
               </button>
               <button 
-                v-if="proposal.status !== 'draft'"
-                @click="shareProposal(proposal)"
-                class="p-2 text-blue-500 hover:text-blue-600 bg-blue-50 rounded-lg transition-all"
-                title="Compartilhar"
-                aria-label="Compartilhar link"
-              >
-                <Share2 class="w-4 h-4" />
-              </button>
-              <button 
                 v-if="proposal.status !== 'accepted'"
                 @click="openModal(proposal)"
                 class="p-2 text-gray-400 hover:text-blue-600 bg-gray-50 rounded-lg transition-all"
@@ -498,15 +489,6 @@ const formatTime = (date: any) => {
                 >
                   <RefreshCcw v-if="isResending === proposal._id" class="w-5 h-5 animate-spin" />
                   <Mail v-else class="w-5 h-5" />
-                </button>
-                <button 
-                  v-if="proposal.status !== 'draft'"
-                  @click="shareProposal(proposal)"
-                  class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all"
-                  title="Compartilhar"
-                  aria-label="Compartilhar link do orçamento"
-                >
-                  <Share2 class="w-5 h-5" />
                 </button>
                 <button 
                   v-if="proposal.status !== 'accepted'"

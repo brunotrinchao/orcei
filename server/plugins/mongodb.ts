@@ -9,6 +9,10 @@ export default defineNitroPlugin(async (nitroApp) => {
     return
   }
 
+  // Debug ofuscado
+  const sanitizedUri = uri.replace(/:([^@]+)@/, ':****@')
+  console.log(`[MongoDB] Tentando conectar em: ${sanitizedUri}`)
+
   try {
     // Configurações para evitar buffering excessivo e timeouts em serverless
     const options = {

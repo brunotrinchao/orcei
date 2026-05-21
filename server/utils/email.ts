@@ -100,7 +100,7 @@ export const sendWelcomeEmail = async (userEmail: string, userName: string) => {
   }
 }
 
-export const sendBackupEmail = async (userEmail: string, userName: string, backupJson: string) => {
+export const sendBackupEmail = async (userEmail: string, userName: string, zipBuffer: Buffer) => {
   const resend = getResend()
   if (!resend) return null
 
@@ -123,8 +123,8 @@ export const sendBackupEmail = async (userEmail: string, userName: string, backu
       },
       attachments: [
         {
-          filename: `backup-${appName.toLowerCase()}-${new Date().toISOString().split('T')[0]}.json`,
-          content: Buffer.from(backupJson).toString('base64')
+          filename: `backup-${appName.toLowerCase()}-${new Date().toISOString().split('T')[0]}.zip`,
+          content: zipBuffer
         }
       ]
     })

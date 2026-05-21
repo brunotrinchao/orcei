@@ -48,10 +48,5 @@ export default defineEventHandler(async (event) => {
     ip: event.node.req.socket.remoteAddress
   })
 
-  // 2. Agendar Backup se Google estiver conectado
-  if (profile.googleIntegration?.refreshToken) {
-    await QueueService.publish('PROFILE_BACKUP', { profileId: profile._id })
-  }
-
   return profile
 })

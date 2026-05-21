@@ -3,13 +3,24 @@ import { Profile } from '../../../models/Profile'
 import { google } from 'googleapis'
 
 export default defineEventHandler(async (event) => {
-  const { code } = getQuery(event)
+  const { code, state } = getQuery(event)
   const session = await getUserSession(event)
+
+  const savedState = getCookie(event, 'google_auth_state')
+  deleteCookie(event, 'google_auth_state')
 
   if (!session?.user) {
     throw createError({
       statusCode: 401,
       statusMessage: 'Sessão expirada ou inválida. Faça login novamente.'
+    })
+  }
+
+  // SEGURANÇA: Validar state para prevenir CSRF
+  if (!state || state !== savedState) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Falha na validação de segurança (CSRF State mismatch). Tente novamente.'
     })
   }
 

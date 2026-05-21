@@ -19,8 +19,8 @@ export const ProposalService = {
   },
 
   async getBySlug(slug: string) {
-    // Populamos o profileId para que o cliente veja o nome/marca do freelancer
-    return await Proposal.findOne({ slug }).populate('profileId')
+    // Populamos o profileId apenas com campos necessários para evitar vazamento de tokens sensíveis
+    return await Proposal.findOne({ slug }).populate('profileId', 'name avatar brandConfig address company contact email')
   },
 
   async logHistory(proposalId: any, action: string, type: 'system' | 'email' = 'system', details?: any) {

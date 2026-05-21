@@ -12,14 +12,15 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Não autorizado' })
   }
 
-  const report = await Report.findById(id).lean()
-  if (!report) {
-    throw createError({ statusCode: 404, statusMessage: 'Relatório não encontrado' })
-  }
-
   const profile = await Profile.findOne({ userId: (session.user as any).id }).lean()
   if (!profile) {
     throw createError({ statusCode: 404, statusMessage: 'Perfil não encontrado' })
+  }
+
+  // SEGURANÇA: Filtrar pelo ID do relatório E pelo profileId do usuário logado
+  const report = await Report.findOne({ _id: id, profileId: profile._id }).lean()
+  if (!report) {
+    throw createError({ statusCode: 404, statusMessage: 'Relatório não encontrado' })
   }
 
   const md = new MarkdownIt({ html: true })

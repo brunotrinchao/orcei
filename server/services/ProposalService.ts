@@ -72,7 +72,8 @@ export const ProposalService = {
             clientEmail: data.client.email,
             clientName: data.client.name,
             url: proposalUrl,
-            profileName: profile.name
+            profileName: profile.name,
+            proposalId: proposal?._id || oldProposal?._id
           })
           emailQueued = true
         }
@@ -118,7 +119,8 @@ export const ProposalService = {
             clientEmail: data.client.email,
             clientName: data.client.name,
             url: proposalUrl,
-            profileName: profile.name
+            profileName: profile.name,
+            proposalId: proposal?._id || oldProposal?._id
           })
           emailQueued = true
         }

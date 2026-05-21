@@ -25,7 +25,8 @@ export default defineEventHandler(async (event) => {
     clientEmail: proposal.client.email,
     clientName: proposal.client.name || 'Cliente',
     url: proposalUrl,
-    profileName: profile.name
+    profileName: profile.name,
+    proposalId: proposal._id
   })
 
   // Log no histórico

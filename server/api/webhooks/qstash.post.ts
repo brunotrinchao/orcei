@@ -51,9 +51,9 @@ export default defineEventHandler(async (event) => {
       case 'REGISTER_AUDIT_LOG':
         await handleRegisterAuditLog(body)
         break
-      
-      case 'PROFILE_BACKUP':
-        await handleProfileBackup(body)
+
+      case 'GENERATE_BACKUP_CSV':
+        await handleGenerateBackupCsv(body)
         break
 
       case 'TEST_JOB':
@@ -76,54 +76,37 @@ async function handleRegisterAuditLog(payload: any) {
   await AuditService.persist(payload)
 }
 
-async function handleProfileBackup(payload: any) {
+async function handleGenerateBackupCsv(payload: any) {
   const { profileId } = payload
   const { Profile } = await import('../../models/Profile')
-  const { Proposal } = await import('../../models/Proposal')
   const { Client } = await import('../../models/Client')
+  const { Proposal } = await import('../../models/Proposal')
   const { CatalogItem } = await import('../../models/CatalogItem')
-  const { GoogleService } = await import('../../services/GoogleService')
+  const { jsonToCsv } = await import('../../utils/csv')
+  const { sendBackupEmail } = await import('../../utils/email')
+  const JSZip = await import('jszip').then(m => m.default)
 
   const profile = await Profile.findById(profileId)
-  if (!profile || !profile.googleIntegration?.refreshToken) return
+  if (!profile || !profile.email) return
 
-  console.log(`[Job] Iniciando backup para: ${profile.email}`)
+  console.log(`[Job] Gerando backup CSV para: ${profile.email}`)
 
-  const [proposals, clients, catalog] = await Promise.all([
-    Proposal.find({ profileId }),
-    Client.find({ profileId }),
-    CatalogItem.find({ profileId })
+  const [clients, proposals, catalog] = await Promise.all([
+    Client.find({ profileId }).lean(),
+    Proposal.find({ profileId }).lean(),
+    CatalogItem.find({ profileId }).lean()
   ])
 
-  const backupData = {
-    generatedAt: new Date().toISOString(),
-    profile,
-    proposals,
-    clients,
-    catalog
-  }
+  const zip = new JSZip()
+  zip.file('clientes.csv', jsonToCsv(clients))
+  zip.file('orcamentos.csv', jsonToCsv(proposals))
+  zip.file('catalogo.csv', jsonToCsv(catalog))
 
-  const auth = GoogleService.getAuthClient(profile)
-  const folderId = profile.googleIntegration.driveFolderId || await GoogleService.ensureFolder(auth, profile)
+  const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' })
   
-  const fileName = `Backup-Orcei-${new Date().toISOString().split('T')[0]}.json`
-  const buffer = Buffer.from(JSON.stringify(backupData, null, 2))
-
-  try {
-    const drive = await import('googleapis').then(g => g.google.drive({ version: 'v3', auth }))
-    const { Readable } = await import('stream')
-    const stream = Readable.from(buffer)
-
-    await drive.files.create({
-      requestBody: { name: fileName, parents: [folderId] },
-      media: { mimeType: 'application/json', body: stream },
-      fields: 'id'
-    })
-    console.log(`[Job] Backup concluído para: ${profile.email}`)
-  } catch (e: any) {
-    console.error(`[Job] Erro no upload do backup:`, e.message)
-    throw e
-  }
+  await sendBackupEmail(profile.email, profile.name, zipBuffer)
+  
+  console.log(`[Job] Backup CSV enviado para e-mail: ${profile.email}`)
 }
 
 async function handleProposalAccepted(payload: any) {
@@ -166,8 +149,15 @@ async function handleProposalAccepted(payload: any) {
 }
 
 async function handleSendEmailProposal(payload: any) {
-  const { clientEmail, clientName, url, profileName } = payload
+  const { clientEmail, clientName, url, profileName, proposalId } = payload
   console.log(`[Job] Enviando e-mail para: ${clientEmail}`)
+  
   const { sendProposalEmail } = await import('../../utils/email')
-  await sendProposalEmail(clientEmail, clientName, url, profileName)
+  const emailRes = await sendProposalEmail(clientEmail, clientName, url, profileName)
+
+  if (emailRes && proposalId) {
+    const { Proposal } = await import('../../models/Proposal')
+    await Proposal.findByIdAndUpdate(proposalId, { lastEmailId: emailRes.id })
+    console.log(`[Job] Proposta ${proposalId} atualizada com emailId: ${emailRes.id}`)
+  }
 }

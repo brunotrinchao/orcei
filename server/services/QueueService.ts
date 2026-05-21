@@ -1,6 +1,8 @@
+import { Client } from "@upstash/qstash"
+
 export const QueueService = {
   /**
-   * Publica uma tarefa na fila do QStash
+   * Publica uma tarefa na fila do QStash usando o SDK oficial
    * @param action Nome da ação/job (ex: 'PROPOSAL_ACCEPTED')
    * @param payload Dados necessários para o job
    * @param delay Tempo de espera em segundos (opcional)
@@ -11,32 +13,26 @@ export const QueueService = {
     const siteUrl = config.public.siteUrl
 
     if (!token) {
-      console.warn('[QueueService] QSTASH_TOKEN não configurado. As tarefas serão executadas de forma síncrona ou ignoradas.')
+      console.warn('[QueueService] QSTASH_TOKEN não configurado. As tarefas serão ignoradas.')
       return null
     }
 
+    const client = new Client({ token })
     const destination = `${siteUrl}/api/webhooks/qstash`
-    console.log(`[QueueService] Publicando job [${action}] para: ${destination}`)
-    
+
+    console.log(`[QueueService] Publicando job [${action}] via SDK para: ${destination}`)
+
     try {
-      const response = await fetch(`https://qstash.upstash.io/v2/publish/${destination}`, {
-        method: 'POST',
+      const result = await client.publishJSON({
+        url: destination,
+        body: payload,
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Upstash-Forward-Action': action, // Header customizado para identificarmos o job no webhook
-          ...(delay > 0 ? { 'Upstash-Delay': `${delay}s` } : {})
+          'Upstash-Forward-Action': action
         },
-        body: JSON.stringify(payload)
+        delay: delay > 0 ? delay : undefined
       })
 
-      if (!response.ok) {
-        const error = await response.text()
-        throw new Error(`QStash publish failed: ${error}`)
-      }
-
-      const result: any = await response.json()
-      console.log(`[QueueService] Job [${action}] publicado no QStash:`, result.messageId)
+      console.log(`[QueueService] Job [${action}] publicado:`, result.messageId)
       return result
     } catch (error) {
       console.error('[QueueService] Erro ao publicar na fila:', error)

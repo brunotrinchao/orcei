@@ -56,6 +56,7 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    mongodbUri: process.env.MONGODB_URI,
     googleClientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID,
     googleClientSecret: process.env.NUXT_OAUTH_GOOGLE_CLIENT_SECRET,
     geminiApiKey: process.env.GEMINI_API_KEY,

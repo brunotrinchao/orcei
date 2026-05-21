@@ -1,5 +1,6 @@
 import { ProfileService } from '../../services/ProfileService'
 import { Proposal } from '../../models/Proposal'
+import { ProposalMessage } from '../../models/ProposalMessage'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -23,12 +24,19 @@ export default defineEventHandler(async (event) => {
     Proposal.find(query)
       .sort({ createdAt: -1 })
       .skip((Number(page) - 1) * Number(limit))
-      .limit(Number(limit)),
+      .limit(Number(limit))
+      .lean(),
     Proposal.countDocuments(query)
   ])
 
+  // Injetar status de mensagens de forma eficiente
+  const proposalsWithMessages = await Promise.all(items.map(async (p: any) => {
+    const hasMessages = await ProposalMessage.exists({ proposalId: p._id })
+    return { ...p, hasMessages: !!hasMessages }
+  }))
+
   return {
-    items,
+    items: proposalsWithMessages,
     total,
     page: Number(page),
     limit: Number(limit)

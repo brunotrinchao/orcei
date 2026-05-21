@@ -18,23 +18,8 @@ const { data: proposalsData, refresh, pending } = useFetch<any>('/api/proposals'
   watch: [currentPage, searchQuery]
 })
 
-const proposals = computed<ProposalDTO[]>(() => proposalsData.value?.items || [])
+const proposals = computed<any[]>(() => proposalsData.value?.items || [])
 const totalProposals = computed(() => proposalsData.value?.total || 0)
-
-// Monitorar mensagens para exibir botão de chat (apenas se houver mensagens)
-const hasMessagesMap = ref<Record<string, boolean>>({})
-
-watch(proposals, async (newProposals) => {
-  for (const p of newProposals) {
-    if (hasMessagesMap.value[p._id!] !== undefined) continue
-    try {
-      const msgs = await $fetch<any[]>(`/api/proposals/${p._id}/messages`)
-      hasMessagesMap.value[p._id!] = msgs.length > 0
-    } catch {
-      hasMessagesMap.value[p._id!] = false
-    }
-  }
-}, { immediate: true })
 
 const { copy } = useClipboard()
 
@@ -343,7 +328,7 @@ const formatTime = (date: any) => {
             <span class="font-black text-gray-900 text-lg tracking-tight">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
             <div class="flex items-center gap-1">
               <button 
-                v-if="hasMessagesMap[proposal._id!]"
+                v-if="proposal.hasMessages"
                 @click="openChat(proposal)"
                 class="p-2 text-blue-600 hover:text-blue-700 bg-blue-50 rounded-lg transition-all"
                 title="Chat e Interações"
@@ -431,6 +416,15 @@ const formatTime = (date: any) => {
             </td>
             <td class="px-8 py-6 text-right">
               <div class="flex justify-end items-center gap-1">
+                <button 
+                  v-if="proposal.hasMessages"
+                  @click="openChat(proposal)"
+                  class="p-2.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-2xl transition-all"
+                  title="Chat e Interações"
+                  aria-label="Abrir chat do orçamento"
+                >
+                  <MessageCircle class="w-5 h-5" />
+                </button>
                 <button 
                   v-if="proposal.client.phone"
                   @click="sendWhatsapp(proposal)"
@@ -752,7 +746,7 @@ const formatTime = (date: any) => {
         </div>
         <div class="flex-1 bg-white overflow-hidden rounded-b-3xl">
           <iframe
-            :src="`/p/${selectedProposal.slug}?preview=true`"
+            :src="`/p/${selectedProposal.slug}?preview=true${selectedProposal.token ? `&t=${selectedProposal.token}` : ''}`"
             class="w-full h-full border-none"
           ></iframe>
         </div>

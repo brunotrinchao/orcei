@@ -78,9 +78,9 @@ export default defineNuxtConfig({
     cloudflareApiKey: process.env.CLOUDFLARE_API_KEY,
     cloudflareAiModel: process.env.CLOUDFLARE_AI_MODEL || '@cf/meta/llama-2-7b-chat-int8',
     cloudflareFallbackRegex: process.env.CLOUDFLARE_FALLBACK_REGEX,
-    qstashToken: process.env.QSTASH_TOKEN,
-    qstashCurrentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY,
-    qstashNextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY,
+    qstashToken: process.env.QSTASH_TOKEN || process.env.NUXT_QSTASH_TOKEN,
+    qstashCurrentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY || process.env.NUXT_QSTASH_CURRENT_SIGNING_KEY,
+    qstashNextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY || process.env.NUXT_QSTASH_NEXT_SIGNING_KEY,
     public: {
       stripeStarterPriceId: process.env.STRIPE_STARTER_PRICE_ID,
       stripePremiumPriceId: process.env.STRIPE_PREMIUM_PRICE_ID,

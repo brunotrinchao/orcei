@@ -9,11 +9,11 @@ export const QueueService = {
    */
   async publish(action: string, payload: any, delay: number = 0) {
     const config = useRuntimeConfig()
-    const token = config.qstashToken
-    const siteUrl = config.public.siteUrl
+    const token = config.qstashToken || process.env.QSTASH_TOKEN || process.env.NUXT_QSTASH_TOKEN
+    const siteUrl = config.public.siteUrl || process.env.NUXT_PUBLIC_SITE_URL || 'https://orceifacil.com.br'
 
     if (!token) {
-      console.warn('[QueueService] QSTASH_TOKEN não configurado. As tarefas serão ignoradas.')
+      console.warn(`[QueueService] QSTASH_TOKEN não configurado. Action [${action}] ignorada.`)
       return null
     }
 

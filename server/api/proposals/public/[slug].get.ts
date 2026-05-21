@@ -1,5 +1,5 @@
-import { ProposalService } from '../../../../services/ProposalService'
-import { processVariables } from '../../../../utils/variables'
+import { ProposalService } from '../../../services/ProposalService'
+import { processVariables } from '../../../utils/variables'
 
 export default defineEventHandler(async (event) => {
   const slug = getRouterParam(event, 'slug')

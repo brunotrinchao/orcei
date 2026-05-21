@@ -1,10 +1,9 @@
-import { Proposal } from '../../../../models/Proposal'
-import { ProposalMessage } from '../../../../models/ProposalMessage'
-import { ProposalService } from '../../../../services/ProposalService'
+import { Proposal } from '../../../models/Proposal'
+import { ProposalMessage } from '../../../models/ProposalMessage'
+import { ProposalService } from '../../../services/ProposalService'
 
 export default defineEventHandler(async (event) => {
-  const slug = getRouterParam(event, 'slug')
-  const { t: token } = getQuery(event)
+  const { slug, t: token } = getQuery(event)
   const body = await readBody(event)
 
   if (!slug) throw createError({ statusCode: 400, statusMessage: 'Missing Slug' })

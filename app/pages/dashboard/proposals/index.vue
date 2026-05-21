@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles, Send } from 'lucide-vue-next'
+import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles, Send, CheckCheck } from 'lucide-vue-next'
+import { isToday, isYesterday, format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import type { ProposalDTO } from '../../../../types'
 
 const searchQuery = ref('')
@@ -18,6 +20,21 @@ const { data: proposalsData, refresh, pending } = useFetch<any>('/api/proposals'
 
 const proposals = computed<ProposalDTO[]>(() => proposalsData.value?.items || [])
 const totalProposals = computed(() => proposalsData.value?.total || 0)
+
+// Monitorar mensagens para exibir botão de chat (apenas se houver mensagens)
+const hasMessagesMap = ref<Record<string, boolean>>({})
+
+watch(proposals, async (newProposals) => {
+  for (const p of newProposals) {
+    if (hasMessagesMap.value[p._id!] !== undefined) continue
+    try {
+      const msgs = await $fetch<any[]>(`/api/proposals/${p._id}/messages`)
+      hasMessagesMap.value[p._id!] = msgs.length > 0
+    } catch {
+      hasMessagesMap.value[p._id!] = false
+    }
+  }
+}, { immediate: true })
 
 const { copy } = useClipboard()
 
@@ -62,6 +79,31 @@ async function sendReply() {
     isSendingReply.value = false
   }
 }
+
+// Group messages by date
+const groupedMessages = computed(() => {
+  if (!selectedProposalMessages.value) return []
+  const groups: { date: string, items: any[] }[] = []
+  
+  selectedProposalMessages.value.forEach(msg => {
+    const date = new Date(msg.createdAt)
+    let label = ''
+    
+    if (isToday(date)) label = 'Hoje'
+    else if (isYesterday(date)) label = 'Ontem'
+    else label = format(date, "d 'de' MMMM", { locale: ptBR })
+    
+    const group = groups.find(g => g.date === label)
+    if (group) group.items.push(msg)
+    else groups.push({ date: label, items: [msg] })
+  })
+  
+  return groups
+})
+
+const formatMessageTime = (date: any) => {
+  return format(new Date(date), 'HH:mm')
+}
 const isAcceptedModalOpen = ref(false)
 const isSuccessModalOpen = ref(false)
 const lastCreatedProposal = ref<ProposalDTO | null>(null)
@@ -97,11 +139,12 @@ async function openHistory(proposal: ProposalDTO) {
 function sendWhatsapp(proposal: ProposalDTO) {
   if (!proposal.client.phone) return
   
+  const tokenPart = proposal.token ? `?t=${proposal.token}` : ''
   const message = encodeURIComponent(
     `Olá ${proposal.client.name}! \u{1F44B}\n\n` +
     `Preparei o orçamento *${proposal.title}* para você.\n\n` +
     `Confira os detalhes e aprove através deste link:\n` +
-    `${window.location.origin}/p/${proposal.slug}\n\n` +
+    `${window.location.origin}/p/${proposal.slug}${tokenPart}\n\n` +
     `Qualquer dúvida, estou à disposição!`
   )
   
@@ -124,7 +167,8 @@ async function resendEmail(proposalId: string) {
 }
 
 async function shareProposal(proposal: ProposalDTO) {
-  const url = `${window.location.origin}/p/${proposal.slug}`
+  const tokenPart = proposal.token ? `?t=${proposal.token}` : ''
+  const url = `${window.location.origin}/p/${proposal.slug}${tokenPart}`
   
   if (navigator.share) {
     try {
@@ -299,8 +343,9 @@ const formatTime = (date: any) => {
             <span class="font-black text-gray-900 text-lg tracking-tight">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
             <div class="flex items-center gap-1">
               <button 
+                v-if="hasMessagesMap[proposal._id!]"
                 @click="openChat(proposal)"
-                class="p-2 text-gray-400 hover:text-blue-600 bg-gray-50 rounded-lg transition-all"
+                class="p-2 text-blue-600 hover:text-blue-700 bg-blue-50 rounded-lg transition-all"
                 title="Chat e Interações"
                 aria-label="Abrir chat do orçamento"
               >
@@ -701,7 +746,7 @@ const formatTime = (date: any) => {
         <div class="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center shrink-0 rounded-t-3xl">
           <div class="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">
             <LinkIcon class="w-3 h-3" /> Link do Cliente:
-            <span class="text-blue-600 lowercase font-bold select-all">{{ siteOrigin }}/p/{{ selectedProposal.slug }}</span>
+            <span class="text-blue-600 lowercase font-bold select-all">{{ siteOrigin }}/p/{{ selectedProposal.slug }}{{ selectedProposal.token ? `?t=${selectedProposal.token}` : '' }}</span>
           </div>
           <BaseButton size="sm" variant="outline" @click="shareProposal(selectedProposal)">Copiar Link</BaseButton>
         </div>
@@ -719,61 +764,83 @@ const formatTime = (date: any) => {
       title="Dúvidas e Alterações"
       size="lg"
     >
-      <div v-if="selectedProposal" class="p-0 flex flex-col h-[60vh]">
+      <div v-if="selectedProposal" class="p-0 flex flex-col h-[65vh] bg-[#E5DDD5]">
         <!-- Header -->
-        <div class="p-6 border-b border-gray-100 shrink-0">
-          <h3 class="text-xl font-black text-gray-900 tracking-tight leading-tight">{{ selectedProposal.title }}</h3>
-          <p class="text-sm text-gray-500 font-medium">Interações com {{ selectedProposal.client.name }}</p>
+        <div class="p-6 border-b border-gray-100 shrink-0 bg-white shadow-sm z-10 flex items-center justify-between">
+          <div>
+            <h3 class="text-xl font-black text-gray-900 tracking-tight leading-tight">{{ selectedProposal.title }}</h3>
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">{{ selectedProposal.client.name }}</p>
+          </div>
         </div>
 
         <!-- Messages Area -->
-        <div class="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50/50">
-          <div v-if="selectedProposalMessages.length === 0" class="text-center py-20">
+        <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat bg-center scrollbar-hide">
+          <div v-if="!groupedMessages?.length" class="text-center py-20 bg-white/60 backdrop-blur-sm rounded-3xl p-8 max-w-xs mx-auto mt-10">
             <div class="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mx-auto mb-4 border border-gray-100 shadow-sm">
               <MessageCircle class="w-6 h-6 text-gray-300" />
             </div>
-            <p class="text-sm text-gray-400 font-bold uppercase tracking-widest">Nenhuma interação iniciada pelo cliente</p>
+            <p class="text-xs font-black text-gray-400 uppercase tracking-widest">Nenhuma interação iniciada</p>
           </div>
 
-          <div
-            v-for="msg in selectedProposalMessages"
-            :key="msg._id"
-            :class="[
-              'flex flex-col max-w-[85%]',
-              msg.sender === 'freelancer' ? 'ml-auto items-end' : 'items-start'
-            ]"
-          >
+          <div v-for="group in groupedMessages" :key="group.date" class="space-y-4">
+            <!-- Date Separator -->
+            <div class="flex justify-center my-6">
+              <span class="px-4 py-1.5 bg-white/80 backdrop-blur-md rounded-xl text-[9px] font-black text-gray-500 uppercase tracking-widest shadow-sm">
+                {{ group.date }}
+              </span>
+            </div>
+
             <div
+              v-for="msg in group.items"
+              :key="msg._id"
               :class="[
-                'p-4 rounded-2xl text-sm font-medium leading-relaxed shadow-sm border',
-                msg.sender === 'freelancer'
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-700 border-gray-200'
+                'flex flex-col max-w-[85%] relative',
+                msg.sender === 'freelancer' ? 'ml-auto items-end' : 'items-start'
               ]"
             >
-              {{ msg.text }}
+              <!-- Bubble -->
+              <div
+                :class="[
+                  'px-4 py-2.5 rounded-2xl text-sm font-medium leading-relaxed shadow-sm min-w-[80px]',
+                  msg.sender === 'freelancer'
+                    ? 'bg-[#DCF8C6] text-gray-800 rounded-tr-none'
+                    : 'bg-white text-gray-800 rounded-tl-none'
+                ]"
+              >
+                {{ msg.text }}
+                
+                <!-- Time and Status inside bubble -->
+                <div class="flex items-center justify-end gap-1 mt-1 -mr-1">
+                  <span class="text-[9px] font-bold opacity-40 uppercase tracking-tighter">
+                    {{ formatMessageTime(msg.createdAt) }}
+                  </span>
+                  <template v-if="msg.sender === 'freelancer'">
+                    <CheckCheck v-if="msg.read" class="w-3 h-3 text-blue-500" />
+                    <CheckCheck v-else class="w-3 h-3 text-gray-400" />
+                  </template>
+                </div>
+              </div>
             </div>
-            <span class="mt-2 text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">
-              {{ msg.sender === 'freelancer' ? 'Você' : selectedProposal.client.name }} • {{ formatTime(msg.createdAt) }}
-            </span>
           </div>
         </div>
 
         <!-- Input Area -->
-        <div class="p-6 border-t border-gray-100 shrink-0 bg-white">
-          <form @submit.prevent="sendReply" class="flex gap-3">
-            <input
-              v-model="newReply"
-              placeholder="Responder cliente..."
-              class="flex-1 px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all outline-none font-bold text-sm"
-            />
+        <div class="p-4 bg-[#F0F2F5] border-t border-gray-200 shrink-0">
+          <form @submit.prevent="sendReply" class="flex gap-3 items-center">
+            <div class="flex-1 relative">
+              <input
+                v-model="newReply"
+                placeholder="Digite uma mensagem..."
+                class="w-full px-6 py-3.5 bg-white border-none rounded-full focus:ring-0 outline-none font-medium text-sm shadow-sm placeholder:text-gray-400"
+              />
+            </div>
             <button
               type="submit"
               :disabled="isSendingReply || !newReply.trim()"
-              class="px-6 py-4 bg-blue-600 hover:bg-blue-700 rounded-2xl text-white shadow-lg shadow-blue-100 transition-all flex items-center justify-center disabled:opacity-50"
+              class="w-12 h-12 bg-[#00A884] hover:bg-[#008F6A] rounded-full text-white shadow-md flex items-center justify-center transition-all active:scale-90 disabled:opacity-50"
             >
               <Loader2 v-if="isSendingReply" class="w-5 h-5 animate-spin" />
-              <Send v-else class="w-5 h-5" />
+              <Send v-else class="w-5 h-5 ml-0.5" />
             </button>
           </form>
         </div>

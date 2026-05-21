@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { Phone, MessageCircle, CheckCircle2, Download, ExternalLink, MapPin, X, Loader2, AlertCircle, PencilLine, ThumbsDown, Eye, FileText, CreditCard, Banknote, Clock, Shield, Mail, Send } from 'lucide-vue-next'
+import { Phone, MessageCircle, CheckCircle2, Download, ExternalLink, MapPin, X, Loader2, AlertCircle, PencilLine, ThumbsDown, Eye, FileText, CreditCard, Banknote, Clock, Shield, Mail, Send, Check, CheckCheck } from 'lucide-vue-next'
+import { isToday, isYesterday, format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import type { ProposalDTO } from '../../../types'
 
 definePageMeta({
@@ -29,8 +31,8 @@ const isSubmittingAction = ref(false)
 const selectedMethod = ref<'cash' | 'credit_card'>('cash')
 
 // Interactions
-const { data: messages, refresh: refreshMessages } = useFetch<any[]>(`/api/proposals/public/${route.params.slug}/messages`, {
-  query: computed(() => ({ t: token }))
+const { data: messages, refresh: refreshMessages } = useFetch<any[]>(`/api/proposals/public/messages`, {
+  query: computed(() => ({ slug: route.params.slug, t: token }))
 })
 const newMessage = ref('')
 const isSendingMessage = ref(false)
@@ -39,20 +41,44 @@ async function sendMessage() {
   if (!newMessage.value.trim() || isSendingMessage.value) return
   isSendingMessage.value = true
   try {
-    await $fetch(`/api/proposals/public/${route.params.slug}/messages`, {
+    await $fetch(`/api/proposals/public/messages`, {
       method: 'POST',
-      query: { t: token },
+      query: { slug: route.params.slug, t: token },
       body: { text: newMessage.value }
     })
     newMessage.value = ''
     await refreshMessages()
     await refresh() // To update status if changed
-    notify('Sucesso', 'Mensagem enviada!')
   } catch (e) {
     notify('Erro', 'Erro ao enviar mensagem')
   } finally {
     isSendingMessage.value = false
   }
+}
+
+// Group messages by date
+const groupedMessages = computed(() => {
+  if (!messages.value) return []
+  const groups: { date: string, items: any[] }[] = []
+  
+  messages.value.forEach(msg => {
+    const date = new Date(msg.createdAt)
+    let label = ''
+    
+    if (isToday(date)) label = 'Hoje'
+    else if (isYesterday(date)) label = 'Ontem'
+    else label = format(date, "d 'de' MMMM", { locale: ptBR })
+    
+    const group = groups.find(g => g.date === label)
+    if (group) group.items.push(msg)
+    else groups.push({ date: label, items: [msg] })
+  })
+  
+  return groups
+})
+
+const formatMessageTime = (date: any) => {
+  return format(new Date(date), 'HH:mm')
 }
 
 const finalTotal = computed(() => {
@@ -528,70 +554,91 @@ const statusMap: any = {
       </section>
 
       <!-- ── CHAT / INTERACTIONS ─────────────────────────────────── -->
-      <section id="chat" class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-        <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between gap-3">
+      <section id="chat" class="bg-[#E5DDD5] rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col min-h-[500px]">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3 bg-white z-10">
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-blue-50 rounded-xl flex items-center justify-center">
-              <MessageCircle class="w-4 h-4 text-blue-600" />
+            <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center">
+              <MessageCircle class="w-5 h-5 text-blue-600" />
             </div>
-            <h2 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.25em]">Dúvidas e Alterações</h2>
+            <div>
+              <h2 class="text-xs font-black text-gray-900 uppercase tracking-widest">Dúvidas e Alterações</h2>
+              <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Fale com o profissional</p>
+            </div>
           </div>
         </div>
 
         <!-- Messages list -->
-        <div class="p-8 space-y-6 max-h-[400px] overflow-y-auto bg-gray-50/30">
-          <div v-if="!messages?.length" class="text-center py-10">
-            <div class="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mx-auto mb-4 border border-gray-100 shadow-sm">
-              <MessageCircle class="w-6 h-6 text-gray-300" />
-            </div>
-            <p class="text-sm text-gray-400 font-bold uppercase tracking-widest">Nenhuma interação ainda</p>
-            <p class="text-xs text-gray-400 mt-1">Envie uma dúvida ou peça uma alteração abaixo.</p>
+        <div class="flex-1 p-6 space-y-4 overflow-y-auto scrollbar-hide relative bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat bg-center">
+          <div v-if="!groupedMessages?.length" class="text-center py-10 bg-white/60 backdrop-blur-sm rounded-3xl p-8 max-w-xs mx-auto mt-10">
+            <MessageCircle class="w-8 h-8 text-gray-300 mx-auto mb-3" />
+            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-relaxed">Nenhuma interação ainda.<br>Envie sua primeira dúvida abaixo.</p>
           </div>
 
-          <div
-            v-for="msg in messages"
-            :key="msg._id"
-            :class="[
-              'flex flex-col max-w-[85%]',
-              msg.sender === 'client' ? 'ml-auto items-end' : 'items-start'
-            ]"
-          >
+          <div v-for="group in groupedMessages" :key="group.date" class="space-y-4">
+            <!-- Date Separator -->
+            <div class="flex justify-center my-6">
+              <span class="px-4 py-1.5 bg-white/80 backdrop-blur-md rounded-xl text-[9px] font-black text-gray-500 uppercase tracking-widest shadow-sm">
+                {{ group.date }}
+              </span>
+            </div>
+
             <div
+              v-for="msg in group.items"
+              :key="msg._id"
               :class="[
-                'p-4 rounded-2xl text-sm font-medium leading-relaxed shadow-sm border',
-                msg.sender === 'client'
-                  ? 'bg-[#3147F6] text-white border-[#3147F6]'
-                  : 'bg-white text-gray-700 border-gray-100'
+                'flex flex-col max-w-[85%] relative',
+                msg.sender === 'client' ? 'ml-auto items-end' : 'items-start'
               ]"
             >
-              {{ msg.text }}
+              <!-- Bubble -->
+              <div
+                :class="[
+                  'px-4 py-2.5 rounded-2xl text-sm font-medium leading-relaxed shadow-sm min-w-[80px]',
+                  msg.sender === 'client'
+                    ? 'bg-[#DCF8C6] text-gray-800 rounded-tr-none'
+                    : 'bg-white text-gray-800 rounded-tl-none'
+                ]"
+              >
+                {{ msg.text }}
+                
+                <!-- Time and Status inside bubble -->
+                <div class="flex items-center justify-end gap-1 mt-1 -mr-1">
+                  <span class="text-[9px] font-bold opacity-40 uppercase tracking-tighter">
+                    {{ formatMessageTime(msg.createdAt) }}
+                  </span>
+                  <template v-if="msg.sender === 'client'">
+                    <CheckCheck v-if="msg.read" class="w-3 h-3 text-blue-500" />
+                    <CheckCheck v-else class="w-3 h-3 text-gray-400" />
+                  </template>
+                </div>
+              </div>
             </div>
-            <span class="mt-2 text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">
-              {{ msg.sender === 'client' ? 'Você' : (proposal?.profileId?.name || 'Profissional') }} • {{ formatDate(msg.createdAt) }}
-            </span>
           </div>
         </div>
 
         <!-- Message input -->
-        <div class="p-8 border-t border-gray-100 bg-white">
-          <form @submit.prevent="sendMessage" class="flex gap-3">
-            <input
-              v-model="newMessage"
-              placeholder="Digite sua mensagem aqui..."
-              class="flex-1 px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all outline-none font-bold text-sm"
-              :disabled="['accepted', 'expired'].includes(proposal.status)"
-            />
+        <div class="p-4 bg-[#F0F2F5] border-t border-gray-200">
+          <form @submit.prevent="sendMessage" class="flex gap-3 items-center">
+            <div class="flex-1 relative">
+              <input
+                v-model="newMessage"
+                placeholder="Mensagem..."
+                class="w-full px-6 py-3.5 bg-white border-none rounded-full focus:ring-0 outline-none font-medium text-sm shadow-sm placeholder:text-gray-400"
+                :disabled="['accepted', 'expired'].includes(proposal.status)"
+              />
+            </div>
             <button
               type="submit"
               :disabled="isSendingMessage || !newMessage.trim() || ['accepted', 'expired'].includes(proposal.status)"
-              class="px-6 py-4 bg-[#3147F6] hover:bg-blue-600 rounded-2xl text-white shadow-lg shadow-[#3147F6]/20 transition-all flex items-center justify-center disabled:opacity-50 disabled:grayscale"
+              class="w-12 h-12 bg-[#00A884] hover:bg-[#008F6A] rounded-full text-white shadow-md flex items-center justify-center transition-all active:scale-90 disabled:opacity-50 disabled:grayscale"
             >
               <Loader2 v-if="isSendingMessage" class="w-5 h-5 animate-spin" />
-              <Send v-else class="w-5 h-5" />
+              <Send v-else class="w-5 h-5 ml-0.5" />
             </button>
           </form>
-          <p v-if="['accepted', 'expired'].includes(proposal.status)" class="mt-3 text-[10px] font-black text-red-400 text-center uppercase tracking-widest">
-            A proposta está {{ proposal.status === 'accepted' ? 'aceita' : 'expirada' }}. Novas mensagens estão desabilitadas.
+          <p v-if="['accepted', 'expired'].includes(proposal.status)" class="mt-3 text-[9px] font-black text-red-400 text-center uppercase tracking-widest">
+            Chat desabilitado (Proposta {{ proposal.status === 'accepted' ? 'aceita' : 'expirada' }})
           </p>
         </div>
       </section>

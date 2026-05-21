@@ -32,6 +32,32 @@ const selectedProposalMessages = ref<any[]>([])
 const isSendingReply = ref(false)
 const newReply = ref('')
 
+// Polling for new messages (Freelancer side)
+let chatPollingInterval: any = null
+
+function startChatPolling() {
+  if (chatPollingInterval) return
+  chatPollingInterval = setInterval(async () => {
+    if (isChatOpen.value && selectedProposal.value) {
+      await refreshMessages()
+    }
+  }, 30000)
+}
+
+function stopChatPolling() {
+  if (chatPollingInterval) {
+    clearInterval(chatPollingInterval)
+    chatPollingInterval = null
+  }
+}
+
+watch(isChatOpen, (isOpen) => {
+  if (isOpen) startChatPolling()
+  else stopChatPolling()
+})
+
+onUnmounted(() => stopChatPolling())
+
 async function openChat(proposal: ProposalDTO) {
   selectedProposal.value = proposal
   isChatOpen.value = true

@@ -37,6 +37,27 @@ const { data: messages, refresh: refreshMessages } = useFetch<any[]>(`/api/propo
 const newMessage = ref('')
 const isSendingMessage = ref(false)
 
+// Polling for new messages (Client side)
+let pollingInterval: any = null
+
+function startPolling() {
+  if (pollingInterval) return
+  pollingInterval = setInterval(async () => {
+    // Only poll if there's at least one interaction or the user is typing
+    if (messages.value?.length || newMessage.value.trim()) {
+      await refreshMessages()
+    }
+  }, 30000)
+}
+
+watch(messages, (val) => {
+  if (val?.length && !pollingInterval) startPolling()
+}, { immediate: true })
+
+onUnmounted(() => {
+  if (pollingInterval) clearInterval(pollingInterval)
+})
+
 async function sendMessage() {
   if (!newMessage.value.trim() || isSendingMessage.value) return
   isSendingMessage.value = true

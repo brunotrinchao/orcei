@@ -16,6 +16,7 @@ export const QueueService = {
     }
 
     const destination = `${siteUrl}/api/webhooks/qstash`
+    console.log(`[QueueService] Publicando job [${action}] para: ${destination}`)
     
     try {
       const response = await fetch(`https://qstash.upstash.io/v2/publish/${destination}`, {

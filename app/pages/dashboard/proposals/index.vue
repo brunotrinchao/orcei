@@ -330,11 +330,17 @@ const formatTime = (date: any) => {
               <button 
                 v-if="proposal.hasMessages"
                 @click="openChat(proposal)"
-                class="p-2 text-blue-600 hover:text-blue-700 bg-blue-50 rounded-lg transition-all"
+                class="p-2 text-blue-600 hover:text-blue-700 bg-blue-50 rounded-lg transition-all relative"
                 title="Chat e Interações"
                 aria-label="Abrir chat do orçamento"
               >
                 <MessageCircle class="w-4 h-4" />
+                <span 
+                  v-if="proposal.unreadMessages > 0"
+                  class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[8px] font-black text-white ring-2 ring-white"
+                >
+                  {{ proposal.unreadMessages }}
+                </span>
               </button>
               <button 
                 @click="openHistory(proposal)"
@@ -419,11 +425,17 @@ const formatTime = (date: any) => {
                 <button 
                   v-if="proposal.hasMessages"
                   @click="openChat(proposal)"
-                  class="p-2.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-2xl transition-all"
+                  class="p-2.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-2xl transition-all relative"
                   title="Chat e Interações"
                   aria-label="Abrir chat do orçamento"
                 >
                   <MessageCircle class="w-5 h-5" />
+                  <span 
+                    v-if="proposal.unreadMessages > 0"
+                    class="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[8px] font-black text-white ring-2 ring-white"
+                  >
+                    {{ proposal.unreadMessages }}
+                  </span>
                 </button>
                 <button 
                   v-if="proposal.client.phone"

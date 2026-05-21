@@ -14,5 +14,11 @@ export default defineEventHandler(async (event) => {
 
   const messages = await ProposalMessage.find({ proposalId: id }).sort({ createdAt: 1 })
   
+  // Marcar como lidas mensagens do cliente ao profissional abrir o chat
+  await ProposalMessage.updateMany(
+    { proposalId: id, sender: 'client', read: false },
+    { $set: { read: true } }
+  )
+
   return messages
 })

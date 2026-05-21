@@ -31,8 +31,11 @@ export default defineEventHandler(async (event) => {
 
   // Injetar status de mensagens de forma eficiente
   const proposalsWithMessages = await Promise.all(items.map(async (p: any) => {
-    const hasMessages = await ProposalMessage.exists({ proposalId: p._id })
-    return { ...p, hasMessages: !!hasMessages }
+    const [hasMessages, unreadCount] = await Promise.all([
+      ProposalMessage.exists({ proposalId: p._id }),
+      ProposalMessage.countDocuments({ proposalId: p._id, sender: 'client', read: false })
+    ])
+    return { ...p, hasMessages: !!hasMessages, unreadMessages: unreadCount }
   }))
 
   return {

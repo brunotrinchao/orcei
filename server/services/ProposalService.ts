@@ -3,9 +3,7 @@ import { Profile } from '../models/Profile'
 import { Counter } from '../models/Counter'
 import { ProposalHistory } from '../models/ProposalHistory'
 import { nanoid } from 'nanoid'
-import { sendProposalEmail } from '../utils/email'
-import { GoogleService } from './GoogleService'
-import { generateProposalPdfBuffer } from '../utils/pdf'
+import { QueueService } from './QueueService'
 
 import { ProposalStatus, PaymentMethod, SendMethod, SubscriptionStatus } from '../../types/enums'
 
@@ -62,21 +60,21 @@ export const ProposalService = {
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + validityDays)
 
-    // Se criar já como 'created' e sendMethod for 'auto', consome crédito e envia
-    let lastEmailId = undefined
+    // Se criar já como 'created' e sendMethod for 'auto', consome crédito e agenda envio
+    let emailQueued = false
     if (data.status === ProposalStatus.CREATED) {
       await this.consumeCredit(data.profileId)
 
       if (data.sendMethod !== SendMethod.MANUAL) {
         if (profile && data.client?.email) {
           const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${slug}?t=${token}`
-          const emailRes = await sendProposalEmail(
-            data.client.email,
-            data.client.name,
-            proposalUrl,
-            profile.name
-          )
-          if (emailRes) lastEmailId = emailRes.id
+          await QueueService.publish('SEND_EMAIL_PROPOSAL', {
+            clientEmail: data.client.email,
+            clientName: data.client.name,
+            url: proposalUrl,
+            profileName: profile.name
+          })
+          emailQueued = true
         }
       }
     }
@@ -89,13 +87,12 @@ export const ProposalService = {
       sequenceNumber,
       code,
       totals,
-      expiresAt,
-      lastEmailId
+      expiresAt
     })
 
     await this.logHistory(proposal._id, ProposalStatus.CREATED)
-    if (lastEmailId) {
-      await this.logHistory(proposal._id, ProposalStatus.SENT, 'email', { emailId: lastEmailId })
+    if (emailQueued) {
+      await this.logHistory(proposal._id, ProposalStatus.SENT, 'email', { status: 'queued' })
     }
 
     return proposal
@@ -106,28 +103,24 @@ export const ProposalService = {
     if (!oldProposal) return null
     if (oldProposal.status === ProposalStatus.ACCEPTED) return null
 
-    let lastEmailId = oldProposal.lastEmailId
-    let emailSent = false
+    let emailQueued = false
 
     // Consome crédito se mudar de draft para created/pending/etc
     if (oldProposal.status === ProposalStatus.DRAFT && data.status !== ProposalStatus.DRAFT) {
       await this.consumeCredit(profileId)
 
-      // Se mudou para 'created' e não for manual, envia e-mail
+      // Se mudou para 'created' e não for manual, agenda e-mail
       if (data.status === ProposalStatus.CREATED && data.sendMethod !== SendMethod.MANUAL) {
         const profile = await Profile.findById(profileId)
         if (profile && data.client?.email) {
           const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${oldProposal.slug}?t=${oldProposal.token}`
-          const emailRes = await sendProposalEmail(
-            data.client.email,
-            data.client.name,
-            proposalUrl,
-            profile.name
-          )
-          if (emailRes) {
-            lastEmailId = emailRes.id
-            emailSent = true
-          }
+          await QueueService.publish('SEND_EMAIL_PROPOSAL', {
+            clientEmail: data.client.email,
+            clientName: data.client.name,
+            url: proposalUrl,
+            profileName: profile.name
+          })
+          emailQueued = true
         }
       }
     }
@@ -135,12 +128,12 @@ export const ProposalService = {
     const totals = this.calculateTotals(data.items, data.totals?.additional || 0, data.totals?.discount || 0, data.paymentConfig)
     const updated = await Proposal.findOneAndUpdate(
       { _id: id, profileId },
-      { ...data, totals, lastEmailId },
+      { ...data, totals },
       { returnDocument: 'after' }
     )
 
-    if (updated && emailSent) {
-      await this.logHistory(updated._id, ProposalStatus.SENT, 'email', { emailId: lastEmailId })
+    if (updated && emailQueued) {
+      await this.logHistory(updated._id, ProposalStatus.SENT, 'email', { status: 'queued' })
     }
 
     return updated
@@ -203,44 +196,14 @@ export const ProposalService = {
     if (updated) {
       await this.logHistory(updated._id, ProposalStatus.ACCEPTED, 'system', { paymentMethod })
 
-      // Automação Google
+      // Agendar Automação Google via Fila
       const profile: any = proposal.profileId
       if (profile?.googleIntegration?.refreshToken) {
         try {
-          console.log(`[ProposalService] Iniciando automação Google para: ${updated.code}`)
-          const auth = GoogleService.getAuthClient(profile)
-          
-          // 1. Garantir pasta e Upload PDF
-          const folderId = profile.googleIntegration.driveFolderId || await GoogleService.ensureFolder(auth, profile)
-          console.log(`[ProposalService] FolderId: ${folderId}`)
-          
-          if (!profile.googleIntegration.driveFolderId) {
-            await Profile.findByIdAndUpdate(profile._id, { 'googleIntegration.driveFolderId': folderId })
-          }
-
-          const pdfBuffer = await generateProposalPdfBuffer(updated, profile)
-          const fileName = `Proposta-${updated.code}-${updated.client.name}.pdf`
-          const driveFile = await GoogleService.uploadPdf(auth, folderId, fileName, pdfBuffer)
-          console.log(`[ProposalService] PDF Upload OK: ${driveFile.id}`)
-
-          // 2. Criar evento no Calendar se tiver executionDate
-          if (updated.executionDate) {
-            console.log(`[ProposalService] Criando evento para: ${updated.executionDate}`)
-            await GoogleService.createEvent(auth, {
-              summary: `Execução: ${updated.title} (${updated.client.name})`,
-              location: profile.address?.city || '',
-              description: `Orçamento: ${updated.code}\nCliente: ${updated.client.name}\nValor: R$ ${updated.totals.final.toLocaleString('pt-BR')}\n\nPDF: ${driveFile.webViewLink}`,
-              start: updated.executionDate,
-              fileId: driveFile.id,
-              webViewLink: driveFile.webViewLink,
-              fileName
-            })
-          }
-          console.log(`[ProposalService] Automação Google concluída para: ${updated.code}`)
-          await this.logHistory(updated._id, 'google_sync', 'system', { drive: true, calendar: !!updated.executionDate })
-        } catch (error: any) {
-          console.error(`[ProposalService] Falha na automação Google para ${updated.code}:`, error.message)
-          if (error.errors) console.error('[ProposalService] Google API Errors:', JSON.stringify(error.errors))
+          await QueueService.publish('PROPOSAL_ACCEPTED', { proposalId: updated._id })
+          console.log(`[ProposalService] Automação Google agendada via fila para: ${updated.code}`)
+        } catch (error) {
+          console.error(`[ProposalService] Erro ao agendar automação Google para ${updated.code}:`, error)
         }
       }
     }

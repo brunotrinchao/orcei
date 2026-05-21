@@ -1,7 +1,7 @@
 import { ProfileService } from '../../../services/ProfileService'
 import { ProposalService } from '../../../services/ProposalService'
 import { Proposal } from '../../../models/Proposal'
-import { sendProposalEmail } from '../../../utils/email'
+import { QueueService } from '../../../services/QueueService'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -14,28 +14,22 @@ export default defineEventHandler(async (event) => {
   const proposal = await ProposalService.getById(id!, profile._id.toString())
   if (!proposal) throw createError({ statusCode: 404, statusMessage: 'Proposal not found' })
 
-  // Reenviar e-mail via Resend
+  // Agendar reenvio de e-mail via Fila
   if (!proposal.client?.email) {
     throw createError({ statusCode: 400, statusMessage: 'Cliente sem e-mail cadastrado' })
   }
 
-  const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcfacil.com.br'}/p/${proposal.slug}?t=${proposal.token}`
-  const emailRes = await sendProposalEmail(
-    proposal.client.email,
-    proposal.client.name || 'Cliente',
-    proposalUrl,
-    profile.name
-  )
+  const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${proposal.slug}?t=${proposal.token}`
+  
+  await QueueService.publish('SEND_EMAIL_PROPOSAL', {
+    clientEmail: proposal.client.email,
+    clientName: proposal.client.name || 'Cliente',
+    url: proposalUrl,
+    profileName: profile.name
+  })
 
-  if (!emailRes) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Erro ao enviar e-mail via Resend. Verifique os logs do servidor para detalhes.'
-    })
-  }
+  // Log no histórico
+  await ProposalService.logHistory(proposal._id, 'sent', 'email', { status: 'queued', action: 'resend' })
 
-  // Atualizar só o lastEmailId — update direto evita recalcular totals
-  await Proposal.findByIdAndUpdate(id, { lastEmailId: emailRes.id })
-
-  return { success: true, emailId: emailRes.id }
+  return { success: true, queued: true }
 })

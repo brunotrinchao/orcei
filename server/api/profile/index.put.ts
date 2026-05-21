@@ -1,4 +1,6 @@
 import { Profile } from '../../models/Profile'
+import { QueueService } from '../../services/QueueService'
+import { AuditService } from '../../services/AuditService'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -34,6 +36,21 @@ export default defineEventHandler(async (event) => {
 
   if (!profile) {
     throw createError({ statusCode: 404, statusMessage: 'Perfil não encontrado' })
+  }
+
+  // 1. Registrar Auditoria Assíncrona
+  await AuditService.log({
+    adminId: profile._id.toString(),
+    adminName: profile.name,
+    action: 'UPDATE_PROFILE',
+    targetId: profile._id.toString(),
+    targetType: 'Profile',
+    ip: event.node.req.socket.remoteAddress
+  })
+
+  // 2. Agendar Backup se Google estiver conectado
+  if (profile.googleIntegration?.refreshToken) {
+    await QueueService.publish('PROFILE_BACKUP', { profileId: profile._id })
   }
 
   return profile

@@ -48,6 +48,14 @@ export default defineEventHandler(async (event) => {
         await handleSendEmailProposal(body)
         break
 
+      case 'REGISTER_AUDIT_LOG':
+        await handleRegisterAuditLog(body)
+        break
+      
+      case 'PROFILE_BACKUP':
+        await handleProfileBackup(body)
+        break
+
       case 'TEST_JOB':
         console.log('[QStash Webhook] Teste recebido com sucesso!', body)
         break
@@ -62,6 +70,61 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, statusMessage: error.message })
   }
 })
+
+async function handleRegisterAuditLog(payload: any) {
+  const { AuditService } = await import('../../services/AuditService')
+  await AuditService.persist(payload)
+}
+
+async function handleProfileBackup(payload: any) {
+  const { profileId } = payload
+  const { Profile } = await import('../../models/Profile')
+  const { Proposal } = await import('../../models/Proposal')
+  const { Client } = await import('../../models/Client')
+  const { CatalogItem } = await import('../../models/CatalogItem')
+  const { GoogleService } = await import('../../services/GoogleService')
+
+  const profile = await Profile.findById(profileId)
+  if (!profile || !profile.googleIntegration?.refreshToken) return
+
+  console.log(`[Job] Iniciando backup para: ${profile.email}`)
+
+  const [proposals, clients, catalog] = await Promise.all([
+    Proposal.find({ profileId }),
+    Client.find({ profileId }),
+    CatalogItem.find({ profileId })
+  ])
+
+  const backupData = {
+    generatedAt: new Date().toISOString(),
+    profile,
+    proposals,
+    clients,
+    catalog
+  }
+
+  const auth = GoogleService.getAuthClient(profile)
+  const folderId = profile.googleIntegration.driveFolderId || await GoogleService.ensureFolder(auth, profile)
+  
+  const fileName = `Backup-Orcei-${new Date().toISOString().split('T')[0]}.json`
+  const buffer = Buffer.from(JSON.stringify(backupData, null, 2))
+
+  try {
+    const drive = await import('googleapis').then(g => g.google.drive({ version: 'v3', auth }))
+    const { Readable } = await import('stream')
+    const stream = Readable.from(buffer)
+
+    await drive.files.create({
+      requestBody: { name: fileName, parents: [folderId] },
+      media: { mimeType: 'application/json', body: stream },
+      fields: 'id'
+    })
+    console.log(`[Job] Backup concluído para: ${profile.email}`)
+  } catch (e: any) {
+    console.error(`[Job] Erro no upload do backup:`, e.message)
+    throw e
+  }
+}
 
 async function handleProposalAccepted(payload: any) {
   const { proposalId } = payload

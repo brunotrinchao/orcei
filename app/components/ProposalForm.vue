@@ -50,9 +50,9 @@ function onClientSelect(clientId: string | undefined) {
     
     // Reset phone first to trigger reactivity properly in masked inputs
     form.value.client.phone = ''
-    nextTick(() => {
+    setTimeout(() => {
       form.value.client.phone = client.phone || ''
-    })
+    }, 0)
   }
 }
 
@@ -137,8 +137,18 @@ watch(() => props.prefilledItems, (newVal) => {
   }
 }, { deep: true })
 
+function isItemSelected(item: CatalogItemDTO) {
+  return form.value.items.some(i => 
+    i.catalogItemId?.toString() === item._id?.toString() || 
+    (i.name === item.name && i.price === item.price)
+  )
+}
+
 function toggleItem(item: CatalogItemDTO) {
-  const index = form.value.items.findIndex((i: any) => i.catalogItemId === item._id)
+  const index = form.value.items.findIndex((i: any) => 
+    i.catalogItemId?.toString() === item._id?.toString() ||
+    (i.name === item.name && i.price === item.price)
+  )
   if (index > -1) {
     form.value.items.splice(index, 1)
   } else {
@@ -261,10 +271,10 @@ defineExpose({ submit, isEditingNonDraft: computed(() => props.isEditing && prop
             >
               <div class="flex items-center gap-4">
                 <div 
-                  :class="form.items.some(i => i.catalogItemId === item._id) ? 'bg-blue-600 border-blue-600' : 'bg-white border-gray-200'"
+                  :class="isItemSelected(item) ? 'bg-blue-600 border-blue-600' : 'bg-white border-gray-200'"
                   class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all"
                 >
-                  <Plus v-if="!form.items.some(i => i.catalogItemId === item._id)" class="w-3 h-3 text-gray-300" />
+                  <Plus v-if="!isItemSelected(item)" class="w-3 h-3 text-gray-300" />
                   <div v-else class="w-2 h-2 bg-white rounded-full"></div>
                 </div>
                 <div>

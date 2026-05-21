@@ -480,7 +480,7 @@ const formatTime = (date: any) => {
                   <Eye class="w-5 h-5" />
                 </button>
                 <button 
-                  v-if="proposal.status === 'created' || proposal.status === 'pending'"
+                  v-if="proposal.status !== 'draft' && proposal.status !== 'accepted'"
                   @click="resendEmail(proposal._id)"
                   :disabled="isResending === proposal._id"
                   class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all disabled:opacity-50"
@@ -499,16 +499,6 @@ const formatTime = (date: any) => {
                 >
                   <Pencil class="w-5 h-5" />
                 </button>
-                <NuxtLink 
-                  v-if="proposal.status !== 'draft'"
-                  :to="`/p/${proposal.slug}`" 
-                  target="_blank" 
-                  class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all"
-                  title="Ver Link Público"
-                  aria-label="Ver link público do orçamento"
-                >
-                  <ExternalLink class="w-5 h-5" />
-                </NuxtLink>
               </div>
             </td>
           </tr>

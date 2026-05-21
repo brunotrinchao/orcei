@@ -21,7 +21,8 @@ const proposalHistorySchema = new Schema({
       'received',
       'delayed',
       'failed',
-      'suppressed'
+      'suppressed',
+      'google_sync'
     ], 
     required: true 
   },

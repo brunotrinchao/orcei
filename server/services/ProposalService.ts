@@ -237,6 +237,7 @@ export const ProposalService = {
             })
           }
           console.log(`[ProposalService] Automação Google concluída para: ${updated.code}`)
+          await this.logHistory(updated._id, 'google_sync', 'system', { drive: true, calendar: !!updated.executionDate })
         } catch (error: any) {
           console.error(`[ProposalService] Falha na automação Google para ${updated.code}:`, error.message)
           if (error.errors) console.error('[ProposalService] Google API Errors:', JSON.stringify(error.errors))

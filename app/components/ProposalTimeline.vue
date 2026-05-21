@@ -10,7 +10,8 @@ import {
   XCircle,
   AlertCircle,
   Clock,
-  Inbox
+  Inbox,
+  RefreshCcw
 } from 'lucide-vue-next'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -43,7 +44,8 @@ const getActionLabel = (action: string) => {
     'received': 'E-mail recebido pelo servidor de destino',
     'delayed': 'Entrega atrasada',
     'failed': 'Falha no envio',
-    'suppressed': 'Envio suprimido (Lista de rejeição)'
+    'suppressed': 'Envio suprimido (Lista de rejeição)',
+    'google_sync': 'Sincronizado com Google'
   }
   return labels[action] || action
 }
@@ -64,7 +66,8 @@ const getActionIcon = (action: string) => {
     'received': Inbox,
     'delayed': Clock,
     'failed': AlertCircle,
-    'suppressed': XCircle
+    'suppressed': XCircle,
+    'google_sync': RefreshCcw
   }
   return icons[action] || AlertCircle
 }
@@ -85,7 +88,8 @@ const getActionColor = (action: string) => {
     'received': 'text-green-400 bg-green-50',
     'delayed': 'text-yellow-500 bg-yellow-50',
     'failed': 'text-red-700 bg-red-100',
-    'suppressed': 'text-gray-700 bg-gray-200'
+    'suppressed': 'text-gray-700 bg-gray-200',
+    'google_sync': 'text-blue-600 bg-blue-50'
   }
   return colors[action] || 'text-gray-500 bg-gray-100'
 }
@@ -113,6 +117,9 @@ const formatDate = (date: string) => {
                   {{ getActionLabel(event.action) }}
                   <span v-if="event.details?.paymentMethod" class="font-medium text-gray-900">
                     via {{ event.details.paymentMethod === 'cash' ? 'À vista' : 'Cartão' }}
+                  </span>
+                  <span v-if="event.action === 'google_sync'" class="text-xs opacity-70">
+                    ({{ event.details?.calendar ? 'Agenda + Drive' : 'Drive' }})
                   </span>
                 </p>
               </div>

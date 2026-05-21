@@ -60,26 +60,6 @@ export const ProposalService = {
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + validityDays)
 
-    // Se criar já como 'created' e sendMethod for 'auto', consome crédito e agenda envio
-    let emailQueued = false
-    if (data.status === ProposalStatus.CREATED) {
-      await this.consumeCredit(data.profileId)
-
-      if (data.sendMethod !== SendMethod.MANUAL) {
-        if (profile && data.client?.email) {
-          const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${slug}?t=${token}`
-          await QueueService.publish('SEND_EMAIL_PROPOSAL', {
-            clientEmail: data.client.email,
-            clientName: data.client.name,
-            url: proposalUrl,
-            profileName: profile.name,
-            proposalId: proposal?._id || oldProposal?._id
-          })
-          emailQueued = true
-        }
-      }
-    }
-
     const proposal = await Proposal.create({
       ...data,
       title: data.title?.trim() || code,
@@ -90,6 +70,27 @@ export const ProposalService = {
       totals,
       expiresAt
     })
+
+    // Se criar já como 'created' e sendMethod for 'auto', consome crédito e agenda envio
+    let emailQueued = false
+    if (data.status === ProposalStatus.CREATED) {
+      await this.consumeCredit(data.profileId)
+
+      if (data.sendMethod !== SendMethod.MANUAL) {
+        const profile = await Profile.findById(data.profileId)
+        if (profile && data.client?.email) {
+          const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${slug}?t=${token}`
+          await QueueService.publish('SEND_EMAIL_PROPOSAL', {
+            clientEmail: data.client.email,
+            clientName: data.client.name,
+            url: proposalUrl,
+            profileName: profile.name,
+            proposalId: proposal._id
+          })
+          emailQueued = true
+        }
+      }
+    }
 
     await this.logHistory(proposal._id, ProposalStatus.CREATED)
     if (emailQueued) {

@@ -32,7 +32,8 @@ const selectedMethod = ref<'cash' | 'credit_card'>('cash')
 
 // Interactions
 const { data: messages, refresh: refreshMessages } = useFetch<any[]>(`/api/proposals/public/messages`, {
-  query: computed(() => ({ slug: route.params.slug, t: token }))
+  query: computed(() => ({ slug: route.params.slug, t: token })),
+  transform: (msgs) => msgs.map(m => ({ ...m, status: 'sent' }))
 })
 const newMessage = ref('')
 const isSendingMessage = ref(false)
@@ -53,9 +54,13 @@ watch(proposal, (newProposal) => {
       chatChannel = pusher.subscribe(`private-proposal-${newProposal._id}`)
       chatChannel.bind('new-message', (data: any) => {
         if (messages.value) {
-          // Check if message already exists to avoid duplicates
-          if (!messages.value.find(m => m._id === data._id)) {
-            messages.value.push(data)
+          // Se for do cliente (eu), apenas atualizamos o status para 'sent' se acharmos pelo ID temporário ou texto
+          // Mas o Pusher envia o objeto real do DB.
+          const existingIdx = messages.value.findIndex(m => m._id === data._id || (m.status === 'pending' && m.text === data.text))
+          if (existingIdx !== -1) {
+            messages.value[existingIdx] = { ...data, status: 'sent' }
+          } else {
+            messages.value.push({ ...data, status: 'sent' })
           }
         }
       })
@@ -70,20 +75,41 @@ onUnmounted(() => {
 
 async function sendMessage() {
   if (!newMessage.value.trim() || isSendingMessage.value) return
-  isSendingMessage.value = true
+  
+  const text = newMessage.value
+  newMessage.value = ''
+  
+  // Envio otimista
+  const tempId = Date.now().toString()
+  const optimisticMessage = {
+    _id: tempId,
+    text,
+    sender: 'client',
+    createdAt: new Date().toISOString(),
+    status: 'pending'
+  }
+  
+  if (!messages.value) messages.value = []
+  messages.value.push(optimisticMessage)
+
   try {
-    await $fetch(`/api/proposals/public/messages`, {
+    const sentMessage = await $fetch<any>(`/api/proposals/public/messages`, {
       method: 'POST',
       query: { slug: route.params.slug, t: token },
-      body: { text: newMessage.value }
+      body: { text }
     })
-    newMessage.value = ''
-    // Pusher will handle adding the message to the list
-    await refresh() // To update status if changed
+    
+    // Atualiza a mensagem otimista com o ID real
+    const idx = messages.value.findIndex(m => m._id === tempId)
+    if (idx !== -1) {
+      messages.value[idx] = { ...sentMessage, status: 'sent' }
+    }
+    
+    await refresh() // Atualiza status da proposta
   } catch (e) {
+    // Remove se falhar
+    messages.value = messages.value.filter(m => m._id !== tempId)
     notify('Erro', 'Erro ao enviar mensagem')
-  } finally {
-    isSendingMessage.value = false
   }
 }
 
@@ -646,8 +672,11 @@ const statusMap: any = {
                     {{ formatMessageTime(msg.createdAt) }}
                   </span>
                   <template v-if="msg.sender === 'client'">
-                    <CheckCheck v-if="msg.read" class="w-3 h-3 text-blue-500" />
-                    <CheckCheck v-else class="w-3 h-3 text-gray-400" />
+                    <Clock v-if="msg.status === 'pending'" class="w-2.5 h-2.5 text-gray-400 animate-pulse" />
+                    <template v-else>
+                      <CheckCheck v-if="msg.read" class="w-3 h-3 text-blue-500" />
+                      <Check v-else class="w-3 h-3 text-gray-400" />
+                    </template>
                   </template>
                 </div>
               </div>

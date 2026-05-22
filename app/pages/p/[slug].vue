@@ -636,9 +636,14 @@ const statusMap: any = {
             <!-- Total display -->
             <div>
               <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.25em] mb-3">Total do Investimento</p>
-              <p class="text-4xl sm:text-5xl font-black text-white tracking-tight">
-                R$ {{ finalTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
-              </p>
+              <div class="flex flex-col">
+                <span v-if="selectedMethod === 'cash' && proposal.paymentConfig.cashDiscount > 0" class="text-sm font-bold text-gray-500 line-through decoration-red-500/50 mb-1">
+                  R$ {{ (proposal.totals.subtotal + (proposal.totals.additional || 0) - (proposal.totals.discount || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
+                </span>
+                <p class="text-4xl sm:text-5xl font-black text-white tracking-tight">
+                  R$ {{ finalTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
+                </p>
+              </div>
               <p v-if="!['accepted', 'expired'].includes(proposal.status)" class="mt-2 text-xs font-black text-[#6B84FF] uppercase tracking-widest">
                 {{ selectedMethod === 'cash' ? `À Vista — ${proposal.paymentConfig.cashDiscount}% OFF` : `Cartão — ${proposal.paymentConfig.installments}x sem juros` }}
               </p>

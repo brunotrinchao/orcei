@@ -1,5 +1,5 @@
-import { Proposal } from '../../../models/Proposal'
-import { ProposalMessage } from '../../../models/ProposalMessage'
+import { Proposal } from '../../../../models/Proposal'
+import { ProposalMessage } from '../../../../models/ProposalMessage'
 
 export default defineEventHandler(async (event) => {
   const { slug, t: token } = getQuery(event)

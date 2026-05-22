@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Map Resend events to actions
-  const actionMap: Record<string, string> = {
+  const actionMap: Record<string, any> = {
     'email.sent': 'sent',
     'email.delivered': 'delivered',
     'email.opened': 'opened',

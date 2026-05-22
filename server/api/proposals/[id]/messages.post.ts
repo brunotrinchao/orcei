@@ -26,5 +26,11 @@ export default defineEventHandler(async (event) => {
     text: body.text
   })
 
+  // Trigger Pusher Event
+  const pusher = usePusher()
+  if (pusher) {
+    pusher.trigger(`private-proposal-${id}`, 'new-message', message)
+  }
+
   return message
 })

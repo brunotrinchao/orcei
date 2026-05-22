@@ -1,17 +1,30 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mocking Nuxt global functions
-const mockRuntimeConfig = {
-  qstashCurrentSigningKey: '',
-  qstashNextSigningKey: ''
-}
-
-vi.stubGlobal('useRuntimeConfig', () => mockRuntimeConfig)
+vi.stubGlobal('useRuntimeConfig', () => ({
+  qstashCurrentSigningKey: 'mock',
+  qstashNextSigningKey: 'mock'
+}))
 vi.stubGlobal('getHeader', vi.fn())
 vi.stubGlobal('getHeaders', vi.fn())
 vi.stubGlobal('readBody', vi.fn())
-vi.stubGlobal('createError', (err: any) => err)
+vi.stubGlobal('createError', (e: any) => {
+  const err = new Error(e.statusMessage || 'Error')
+  ;(err as any).statusCode = e.statusCode
+  return err
+})
 vi.stubGlobal('defineEventHandler', (handler: any) => handler)
+
+// Mock Receiver
+const { mockVerify } = vi.hoisted(() => ({
+  mockVerify: vi.fn().mockResolvedValue(true)
+}))
+vi.mock('@upstash/qstash', () => {
+  class Receiver {
+    verify = mockVerify
+  }
+  return { Receiver }
+})
 
 describe('QStash Webhook Integration', () => {
   let handler: any
@@ -24,6 +37,7 @@ describe('QStash Webhook Integration', () => {
 
   it('should throw 400 if action header is missing', async () => {
     const event = { node: { req: {}, res: {} } } as any
+    const { getHeaders, readBody } = (global as any)
     vi.mocked(getHeaders).mockReturnValue({})
     vi.mocked(readBody).mockResolvedValue({})
 
@@ -35,6 +49,7 @@ describe('QStash Webhook Integration', () => {
 
   it('should process a valid TEST_JOB', async () => {
     const event = { node: { req: {}, res: {} } } as any
+    const { getHeaders, readBody } = (global as any)
     vi.mocked(getHeaders).mockReturnValue({
       'action': 'TEST_JOB'
     })

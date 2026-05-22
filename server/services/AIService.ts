@@ -1,8 +1,12 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 export const AIService = {
+  _getConfig() {
+    return useRuntimeConfig()
+  },
+
   async generateDescription(prompt: string) {
-    const config = useRuntimeConfig()
+    const config = this._getConfig()
     
     try {
       // 1. Tentar Gemini
@@ -41,7 +45,7 @@ export const AIService = {
   },
 
   async suggestProposalItems(prompt: string, catalog: any[]) {
-    const config = useRuntimeConfig()
+    const config = this._getConfig()
     
     try {
       if (config.geminiApiKey) {
@@ -100,7 +104,7 @@ export const AIService = {
   },
 
   async generateWithCloudflare(prompt: string) {
-    const config = useRuntimeConfig()
+    const config = this._getConfig()
     const { cloudflareAccountId: accountId, cloudflareApiKey: apiKey, cloudflareAiModel: model } = config
 
     if (!accountId || !apiKey) {

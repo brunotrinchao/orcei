@@ -44,7 +44,11 @@ export default defineEventHandler(async (event) => {
     pusher.trigger(`private-proposal-${proposal._id}`, 'new-message', message)
     
     // Global profile channel for freelancer notifications
-    pusher.trigger(`private-profile-${proposal.profileId}`, 'proposal-notification', {
+    const profileId = typeof proposal.profileId === 'object' && proposal.profileId._id 
+      ? proposal.profileId._id.toString() 
+      : proposal.profileId.toString()
+
+    pusher.trigger(`private-profile-${profileId}`, 'proposal-notification', {
       proposalId: proposal._id,
       type: 'new-message',
       message

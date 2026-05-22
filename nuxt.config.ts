@@ -46,7 +46,10 @@ export default defineNuxtConfig({
         '@tiptap/starter-kit',
         '@tiptap/extension-underline',
         '@tiptap/extension-link',
-        'markdown-it'
+        'markdown-it',
+        'date-fns',
+        'date-fns/locale',
+        'pusher-js'
       ]
     }
   },
@@ -81,6 +84,10 @@ export default defineNuxtConfig({
     qstashToken: process.env.QSTASH_TOKEN || process.env.NUXT_QSTASH_TOKEN,
     qstashCurrentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY || process.env.NUXT_QSTASH_CURRENT_SIGNING_KEY,
     qstashNextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY || process.env.NUXT_QSTASH_NEXT_SIGNING_KEY,
+    pusherAppId: process.env.PUSHER_APP_ID,
+    pusherKey: process.env.PUSHER_KEY,
+    pusherSecret: process.env.PUSHER_SECRET,
+    pusherCluster: process.env.PUSHER_CLUSTER,
     public: {
       stripeStarterPriceId: process.env.STRIPE_STARTER_PRICE_ID,
       stripePremiumPriceId: process.env.STRIPE_PREMIUM_PRICE_ID,
@@ -93,6 +100,8 @@ export default defineNuxtConfig({
       appName: process.env.APP_NAME || 'Orcei',
       appDocumentLogo: process.env.APP_DOCUMENT_LOGO,
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+      pusherKey: process.env.PUSHER_KEY,
+      pusherCluster: process.env.PUSHER_CLUSTER,
     }
   },
 

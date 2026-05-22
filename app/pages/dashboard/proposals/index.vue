@@ -1,21 +1,42 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles, Send, CheckCheck } from 'lucide-vue-next'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles, Send, CheckCheck, X } from 'lucide-vue-next'
 import { isToday, isYesterday, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import type { ProposalDTO } from '../../../../types'
 
 const searchQuery = ref('')
+const filterStatus = ref('')
+const filterStartDate = ref('')
+const filterEndDate = ref('')
+const filterPendingChat = ref(false)
 const currentPage = ref(1)
 const itemsPerPage = 10
+
+const hasFilters = computed(() => {
+  return !!(searchQuery.value || filterStatus.value || filterStartDate.value || filterEndDate.value || filterPendingChat.value)
+})
+
+function clearFilters() {
+  searchQuery.value = ''
+  filterStatus.value = ''
+  filterStartDate.value = ''
+  filterEndDate.value = ''
+  filterPendingChat.value = false
+  currentPage.value = 1
+}
 
 const { data: proposalsData, refresh, pending } = useFetch<any>('/api/proposals', {
   query: computed(() => ({
     page: currentPage.value,
     limit: itemsPerPage,
-    search: searchQuery.value
+    search: searchQuery.value,
+    status: filterStatus.value,
+    startDate: filterStartDate.value,
+    endDate: filterEndDate.value,
+    pendingChat: filterPendingChat.value
   })),
-  watch: [currentPage, searchQuery]
+  watch: [currentPage, searchQuery, filterStatus, filterStartDate, filterEndDate, filterPendingChat]
 })
 
 const proposals = computed<any[]>(() => proposalsData.value?.items || [])
@@ -32,36 +53,71 @@ const selectedProposalMessages = ref<any[]>([])
 const isSendingReply = ref(false)
 const newReply = ref('')
 
-// Polling for new messages (Freelancer side)
-let chatPollingInterval: any = null
+// Pusher Integration
+let pusherInstance: any = null
+let chatChannel: any = null
+let notificationChannel: any = null
 
-function startChatPolling() {
-  if (chatPollingInterval) return
-  chatPollingInterval = setInterval(async () => {
-    if (isChatOpen.value && selectedProposal.value) {
-      await refreshMessages()
+async function setupGlobalNotifications() {
+  try {
+    const profile = await $fetch<any>('/api/profile')
+    const { pusher } = usePusher()
+    if (pusher && profile) {
+      notificationChannel = pusher.subscribe(`private-profile-${profile._id}`)
+      notificationChannel.bind('proposal-notification', (data: any) => {
+        // Se receber uma notificação de nova mensagem, atualiza a lista para refletir no badge
+        refresh()
+        
+        // Se o chat daquela proposta estiver aberto, a própria lógica do chatPusher lidará, 
+        // mas o refresh garante o badge global.
+      })
     }
-  }, 30000)
+  } catch (e) {
+    console.error('Failed to setup global notifications', e)
+  }
 }
 
-function stopChatPolling() {
-  if (chatPollingInterval) {
-    clearInterval(chatPollingInterval)
-    chatPollingInterval = null
+function setupChatPusher(proposalId: string) {
+  if (chatChannel) chatChannel.unbind_all()
+  
+  const { pusher } = usePusher() // Uses session for auth
+  if (pusher) {
+    pusherInstance = pusher
+    chatChannel = pusher.subscribe(`private-proposal-${proposalId}`)
+    chatChannel.bind('new-message', (data: any) => {
+      if (selectedProposalMessages.value) {
+        if (!selectedProposalMessages.value.find(m => m._id === data._id)) {
+          selectedProposalMessages.value.push(data)
+        }
+      }
+    })
   }
 }
 
 watch(isChatOpen, (isOpen) => {
-  if (isOpen) startChatPolling()
-  else stopChatPolling()
+  if (!isOpen) {
+    if (chatChannel) chatChannel.unbind_all()
+    refresh() // Atualiza a listagem para limpar badges de mensagens lidas
+  } else if (selectedProposal.value) {
+    setupChatPusher(selectedProposal.value._id)
+  }
 })
 
-onUnmounted(() => stopChatPolling())
+onMounted(() => {
+  siteOrigin.value = window.location.origin
+  setupGlobalNotifications()
+})
+
+onUnmounted(() => {
+  if (chatChannel) chatChannel.unbind_all()
+  if (notificationChannel) notificationChannel.unbind_all()
+  if (pusherInstance) pusherInstance.disconnect()
+})
 
 async function openChat(proposal: ProposalDTO) {
   selectedProposal.value = proposal
   isChatOpen.value = true
-  await refreshMessages()
+  refreshMessages()
 }
 
 async function refreshMessages() {
@@ -316,16 +372,58 @@ const formatTime = (date: any) => {
       </div>
     </PageHeader>
 
-    <!-- Busca -->
-    <div class="mb-10 relative max-w-xl">
-      <input
-        v-model="searchQuery"
-        type="text"
-        placeholder="Buscar por título, cliente ou código..."
-        class="w-full pl-14 pr-6 py-5 bg-white border-2 border-gray-100 rounded-[2rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-300 shadow-sm"
-      >
-      <div class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300">
-        <Search class="w-6 h-6" />
+    <!-- Busca e Filtros -->
+    <div class="mb-10 space-y-6">
+      <div class="relative max-w-xl">
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Buscar por título, cliente ou código..."
+          class="w-full pl-14 pr-6 py-5 bg-white border-2 border-gray-100 rounded-[2rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-300 shadow-sm"
+        >
+        <div class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300">
+          <Search class="w-6 h-6" />
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-end gap-4">
+        <div class="w-full sm:w-64">
+          <BaseDateRangePicker
+            label="Data de Criação"
+            v-model:start="filterStartDate"
+            v-model:end="filterEndDate"
+          />
+        </div>
+
+        <div class="w-full sm:w-48">
+          <BaseSelect
+            label="Status"
+            v-model="filterStatus"
+            :options="[
+              { label: 'Todos', value: '__EMPTY__' },
+              ...Object.entries(statusMap).map(([value, info]: any) => ({
+                label: info.label,
+                value
+              }))
+            ]"
+            placeholder="Todos os Status"
+          />
+        </div>
+
+        <div class="flex items-center gap-3 px-6 py-4 bg-white border-2 border-gray-100 rounded-2xl hover:border-blue-200 transition-all group h-[58px]">
+          <BaseCheckbox v-model="filterPendingChat" id="pending-chat" />
+          <label for="pending-chat" class="text-xs font-black text-gray-500 uppercase tracking-widest cursor-pointer group-hover:text-gray-900 transition-colors">
+            Chat Pendente
+          </label>
+        </div>
+
+        <button 
+          v-if="hasFilters" 
+          @click="clearFilters" 
+          class="flex items-center gap-2 px-4 py-2 text-xs font-black text-gray-400 hover:text-red-500 uppercase tracking-widest transition-all mb-4"
+        >
+          <X class="w-4 h-4" /> Limpar Filtros
+        </button>
       </div>
     </div>
 
@@ -354,7 +452,6 @@ const formatTime = (date: any) => {
             <span class="font-black text-gray-900 text-lg tracking-tight">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
             <div class="flex items-center gap-1">
               <button 
-                v-if="proposal.hasMessages"
                 @click="openChat(proposal)"
                 class="p-2 text-blue-600 hover:text-blue-700 bg-blue-50 rounded-lg transition-all relative"
                 title="Chat e Interações"
@@ -440,7 +537,6 @@ const formatTime = (date: any) => {
             <td class="px-8 py-6 text-right">
               <div class="flex justify-end items-center gap-1">
                 <button 
-                  v-if="proposal.hasMessages"
                   @click="openChat(proposal)"
                   class="p-2.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-2xl transition-all relative"
                   title="Chat e Interações"

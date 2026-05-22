@@ -20,6 +20,13 @@ export const QueueService = {
     const client = new Client({ token })
     const destination = `${siteUrl}/api/webhooks/qstash`
 
+    // QStash não suporta localhost (loopback address). 
+    // Em desenvolvimento local, apenas logamos a intenção sem disparar erro.
+    if (siteUrl.includes('localhost') || siteUrl.includes('127.0.0.1')) {
+      console.warn(`[QueueService] Localhost detectado. Ignorando chamada real ao QStash para: ${destination}`)
+      return { messageId: 'local-dev-id' }
+    }
+
     console.log(`[QueueService] Publicando job [${action}] via SDK para: ${destination}`)
 
     try {

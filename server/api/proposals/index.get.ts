@@ -9,9 +9,17 @@ export default defineEventHandler(async (event) => {
   const profile = await ProfileService.getByUserId((session.user as any).id)
   if (!profile) throw createError({ statusCode: 404 })
 
-  const { page = 1, limit = 10, search = '' } = getQuery(event)
+  const queryParams = getQuery(event)
+  const page = Number(queryParams.page || 1)
+  const limit = Number(queryParams.limit || 10)
+  const search = String(queryParams.search || '')
+  const status = String(queryParams.status || '')
+  const startDate = String(queryParams.startDate || '')
+  const endDate = String(queryParams.endDate || '')
+  const pendingChat = queryParams.pendingChat === 'true'
 
   const query: any = { profileId: profile._id }
+  
   if (search) {
     query.$or = [
       { title: { $regex: search, $options: 'i' } },
@@ -20,11 +28,37 @@ export default defineEventHandler(async (event) => {
     ]
   }
 
+  if (status && status !== '__EMPTY__') {
+    query.status = status
+  }
+
+  const dateQuery: any = {}
+  if (startDate) {
+    const d = new Date(startDate)
+    if (!isNaN(d.getTime())) dateQuery.$gte = d
+  }
+  if (endDate) {
+    const d = new Date(endDate)
+    if (!isNaN(d.getTime())) dateQuery.$lte = d
+  }
+  if (Object.keys(dateQuery).length > 0) {
+    query.createdAt = dateQuery
+  }
+
+  if (pendingChat) {
+    const unreadProposalIds = await ProposalMessage.distinct('proposalId', {
+      profileId: profile._id,
+      sender: 'client',
+      read: false
+    })
+    query._id = { $in: unreadProposalIds }
+  }
+
   const [items, total] = await Promise.all([
     Proposal.find(query)
       .sort({ createdAt: -1 })
-      .skip((Number(page) - 1) * Number(limit))
-      .limit(Number(limit))
+      .skip((page - 1) * limit)
+      .limit(limit)
       .lean(),
     Proposal.countDocuments(query)
   ])
@@ -41,7 +75,7 @@ export default defineEventHandler(async (event) => {
   return {
     items: proposalsWithMessages,
     total,
-    page: Number(page),
-    limit: Number(limit)
+    page,
+    limit
   }
 })

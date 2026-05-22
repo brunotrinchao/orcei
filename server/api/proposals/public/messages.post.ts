@@ -30,5 +30,19 @@ export default defineEventHandler(async (event) => {
     await ProposalService.logHistory(proposal._id, 'pending', 'system', { notes: body.text })
   }
 
+  // Trigger Pusher Event
+  const pusher = usePusher()
+  if (pusher) {
+    // Specific proposal channel
+    pusher.trigger(`private-proposal-${proposal._id}`, 'new-message', message)
+    
+    // Global profile channel for freelancer notifications
+    pusher.trigger(`private-profile-${proposal.profileId}`, 'proposal-notification', {
+      proposalId: proposal._id,
+      type: 'new-message',
+      message
+    })
+  }
+
   return message
 })

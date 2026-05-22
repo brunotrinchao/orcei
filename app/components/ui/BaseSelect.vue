@@ -67,7 +67,7 @@ const modelValue = defineModel<string>()
             <SelectItem
               v-for="option in options"
               :key="option.value"
-              :value="option.value"
+              :value="option.value || '__EMPTY__'"
               class="relative flex items-center px-8 py-3 text-sm font-bold text-gray-600 rounded-xl cursor-pointer outline-none focus:bg-gray-50 focus:text-gray-900 data-[state=checked]:text-gray-900 data-[state=checked]:bg-gray-50 transition-colors"
             >
               <SelectItemIndicator class="absolute left-2 inline-flex items-center justify-center">

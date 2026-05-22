@@ -1,4 +1,14 @@
 import { Receiver } from "@upstash/qstash"
+import { Profile } from '../../models/Profile'
+import { Client } from '../../models/Client'
+import { Proposal } from '../../models/Proposal'
+import { CatalogItem } from '../../models/CatalogItem'
+import { AuditService } from '../../services/AuditService'
+import { ProposalService } from '../../services/ProposalService'
+import { GoogleService } from '../../services/GoogleService'
+import { generateProposalPdfBuffer } from '../../utils/pdf'
+import { jsonToCsv } from '../../utils/csv'
+import { sendBackupEmail, sendProposalEmail } from '../../utils/email'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -72,18 +82,11 @@ export default defineEventHandler(async (event) => {
 })
 
 async function handleRegisterAuditLog(payload: any) {
-  const { AuditService } = await import('../../services/AuditService')
   await AuditService.persist(payload)
 }
 
 async function handleGenerateBackupCsv(payload: any) {
   const { profileId } = payload
-  const { Profile } = await import('../../models/Profile')
-  const { Client } = await import('../../models/Client')
-  const { Proposal } = await import('../../models/Proposal')
-  const { CatalogItem } = await import('../../models/CatalogItem')
-  const { jsonToCsv } = await import('../../utils/csv')
-  const { sendBackupEmail } = await import('../../utils/email')
   const JSZip = await import('jszip').then(m => m.default)
 
   const profile = await Profile.findById(profileId)
@@ -111,9 +114,6 @@ async function handleGenerateBackupCsv(payload: any) {
 
 async function handleProposalAccepted(payload: any) {
   const { proposalId } = payload
-  const { Proposal } = await import('../../models/Proposal')
-  const { GoogleService } = await import('../../services/GoogleService')
-  const { generateProposalPdfBuffer } = await import('../../utils/pdf')
 
   const proposal = await Proposal.findById(proposalId).populate('profileId')
   if (!proposal) throw new Error(`Proposta ${proposalId} não encontrada`)
@@ -142,7 +142,6 @@ async function handleProposalAccepted(payload: any) {
     })
   }
 
-  const { ProposalService } = await import('../../services/ProposalService')
   await ProposalService.logHistory(proposal._id, 'google_sync', 'system', { drive: true, calendar: !!proposal.executionDate })
   
   console.log(`[Job] Automação Google concluída para: ${proposal.code}`)
@@ -152,11 +151,9 @@ async function handleSendEmailProposal(payload: any) {
   const { clientEmail, clientName, url, profileName, proposalId } = payload
   console.log(`[Job] Enviando e-mail para: ${clientEmail}`)
   
-  const { sendProposalEmail } = await import('../../utils/email')
   const emailRes = await sendProposalEmail(clientEmail, clientName, url, profileName)
 
   if (emailRes && proposalId) {
-    const { Proposal } = await import('../../models/Proposal')
     await Proposal.findByIdAndUpdate(proposalId, { lastEmailId: emailRes.id })
     console.log(`[Job] Proposta ${proposalId} atualizada com emailId: ${emailRes.id}`)
   }

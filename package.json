@@ -50,6 +50,8 @@
     "nuxt": "^4.4.5",
     "nuxt-auth-utils": "^0.5.29",
     "puppeteer-core": "^24.43.1",
+    "pusher": "^5.3.3",
+    "pusher-js": "^8.5.0",
     "radix-vue": "^1.9.17",
     "resend": "^6.12.3",
     "stripe": "^22.1.1",

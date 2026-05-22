@@ -37,25 +37,35 @@ const { data: messages, refresh: refreshMessages } = useFetch<any[]>(`/api/propo
 const newMessage = ref('')
 const isSendingMessage = ref(false)
 
-// Polling for new messages (Client side)
-let pollingInterval: any = null
+// Pusher Integration
+let pusherInstance: any = null
+let chatChannel: any = null
 
-function startPolling() {
-  if (pollingInterval) return
-  pollingInterval = setInterval(async () => {
-    // Only poll if there's at least one interaction or the user is typing
-    if (messages.value?.length || newMessage.value.trim()) {
-      await refreshMessages()
+watch(proposal, (newProposal) => {
+  if (newProposal && !pusherInstance) {
+    const { pusher } = usePusher({
+      slug: route.params.slug,
+      token: token
+    })
+    
+    if (pusher) {
+      pusherInstance = pusher
+      chatChannel = pusher.subscribe(`private-proposal-${newProposal._id}`)
+      chatChannel.bind('new-message', (data: any) => {
+        if (messages.value) {
+          // Check if message already exists to avoid duplicates
+          if (!messages.value.find(m => m._id === data._id)) {
+            messages.value.push(data)
+          }
+        }
+      })
     }
-  }, 30000)
-}
-
-watch(messages, (val) => {
-  if (val?.length && !pollingInterval) startPolling()
+  }
 }, { immediate: true })
 
 onUnmounted(() => {
-  if (pollingInterval) clearInterval(pollingInterval)
+  if (chatChannel) chatChannel.unbind_all()
+  if (pusherInstance) pusherInstance.disconnect()
 })
 
 async function sendMessage() {
@@ -68,7 +78,7 @@ async function sendMessage() {
       body: { text: newMessage.value }
     })
     newMessage.value = ''
-    await refreshMessages()
+    // Pusher will handle adding the message to the list
     await refresh() // To update status if changed
   } catch (e) {
     notify('Erro', 'Erro ao enviar mensagem')

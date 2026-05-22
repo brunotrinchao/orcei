@@ -21,27 +21,6 @@ defineProps<{
   >
     <!-- ICON: apenas os 3 paths do símbolo (espiral azul), viewBox cropado ao ícone -->
     <div class="relative flex items-center justify-center">
-      <!-- Círculo de Carregamento Externo -->
-      <svg v-if="loading" class="absolute inset-0 -rotate-90" :class="{'w-32 h-32': size === 'xl', 'w-16 h-16': size === 'lg'}" viewBox="0 0 100 100">
-        <circle
-          cx="50" cy="50" r="45"
-          fill="none"
-          stroke="#C7D3FD"
-          stroke-width="4"
-          class="opacity-20"
-        />
-        <circle
-          cx="50" cy="50" r="45"
-          fill="none"
-          stroke="#2F49F4"
-          stroke-width="4"
-          stroke-dasharray="283"
-          stroke-dashoffset="283"
-          stroke-linecap="round"
-          class="loader-circle"
-        />
-      </svg>
-
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="360 280 265 265"
@@ -93,41 +72,18 @@ defineProps<{
 </template>
 
 <style scoped>
-.loader-circle {
-  animation: circle-draw 2s ease-in-out infinite;
-}
-
-@keyframes circle-draw {
-  0% {
-    stroke-dashoffset: 283;
-    transform: rotate(0deg);
-  }
-  50% {
-    stroke-dashoffset: 0;
-    transform: rotate(180deg);
-  }
-  100% {
-    stroke-dashoffset: -283;
-    transform: rotate(360deg);
-  }
-}
-
 .logo-inner-anim {
-  animation: logo-fill-pulse 2s ease-in-out infinite;
+  animation: logo-simple-pulse 1.5s ease-in-out infinite;
 }
 
-@keyframes logo-fill-pulse {
+@keyframes logo-simple-pulse {
   0%, 100% {
-    transform: scale(0.8);
-    opacity: 0.3;
+    transform: scale(0.9);
+    opacity: 0.6;
   }
   50% {
-    transform: scale(1);
+    transform: scale(1.1);
     opacity: 1;
   }
-}
-
-.logo-loading .logo-path {
-  transition: all 0.3s ease;
 }
 </style>

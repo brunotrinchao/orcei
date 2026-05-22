@@ -17,3 +17,11 @@ export default defineEventHandler(async () => {
     }
   }
 })
+    landingPage: {
+      appName,
+      heroTitle: settings?.landingPage?.heroTitle || `Crie orçamentos profissionais em segundos com IA`,
+      heroSubtitle: settings?.landingPage?.heroSubtitle || `A plataforma definitiva para freelancers e pequenas agências gerenciarem vendas e fecharem mais negócios.`,
+      features: settings?.landingPage?.features || []
+    }
+  }
+})

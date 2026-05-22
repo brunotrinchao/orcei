@@ -24,7 +24,7 @@ const { data: systemInfo } = useFetch<any>('/api/system/status')
         <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Precisa de Ajuda?</p>
         <a href="mailto:contato@orcei.com.br" class="inline-flex items-center gap-2 text-sm font-black text-blue-600 hover:text-blue-700 transition-colors">
           <Mail class="w-4 h-4" />
-          contato@orcei.com.br
+          contato@orceifacil.com.br
         </a>
       </div>
 

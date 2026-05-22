@@ -86,8 +86,12 @@ function setupChatPusher(proposalId: string) {
     chatChannel = pusher.subscribe(`private-proposal-${proposalId}`)
     chatChannel.bind('new-message', (data: any) => {
       if (selectedProposalMessages.value) {
-        if (!selectedProposalMessages.value.find(m => m._id === data._id)) {
-          selectedProposalMessages.value.push(data)
+        // Se for minha (freelancer), apenas confirmamos o status
+        const existingIdx = selectedProposalMessages.value.findIndex(m => m._id === data._id || (m.status === 'pending' && m.text === data.text))
+        if (existingIdx !== -1) {
+          selectedProposalMessages.value[existingIdx] = { ...data, status: 'sent' }
+        } else {
+          selectedProposalMessages.value.push({ ...data, status: 'sent' })
         }
       }
     })
@@ -124,7 +128,7 @@ async function refreshMessages() {
   if (!selectedProposal.value) return
   try {
     const data = await $fetch<any[]>(`/api/proposals/${selectedProposal.value._id}/messages`)
-    selectedProposalMessages.value = data
+    selectedProposalMessages.value = data.map(m => ({ ...m, status: 'sent' }))
   } catch (e) {
     notify('Erro', 'Erro ao carregar mensagens')
   }
@@ -132,18 +136,38 @@ async function refreshMessages() {
 
 async function sendReply() {
   if (!newReply.value.trim() || isSendingReply.value || !selectedProposal.value) return
-  isSendingReply.value = true
+  
+  const text = newReply.value
+  const proposalId = selectedProposal.value._id
+  newReply.value = ''
+  
+  // Envio otimista
+  const tempId = Date.now().toString()
+  const optimisticMessage = {
+    _id: tempId,
+    text,
+    sender: 'freelancer',
+    createdAt: new Date().toISOString(),
+    status: 'pending'
+  }
+  
+  selectedProposalMessages.value.push(optimisticMessage)
+
   try {
-    await $fetch(`/api/proposals/${selectedProposal.value._id}/messages`, {
+    const sentMessage = await $fetch<any>(`/api/proposals/${proposalId}/messages`, {
       method: 'POST',
-      body: { text: newReply.value }
+      body: { text }
     })
-    newReply.value = ''
-    await refreshMessages()
+    
+    // Atualiza a mensagem otimista com o ID real
+    const idx = selectedProposalMessages.value.findIndex(m => m._id === tempId)
+    if (idx !== -1) {
+      selectedProposalMessages.value[idx] = { ...sentMessage, status: 'sent' }
+    }
   } catch (e) {
+    // Remove se falhar
+    selectedProposalMessages.value = selectedProposalMessages.value.filter(m => m._id !== tempId)
     notify('Erro', 'Erro ao enviar resposta')
-  } finally {
-    isSendingReply.value = false
   }
 }
 

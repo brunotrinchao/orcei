@@ -70,20 +70,16 @@ defineProps<{
 .logo-loading .logo-path {
   fill: none !important;
   stroke-width: 4px;
-  stroke: currentColor;
   stroke-dasharray: 1000;
   stroke-dashoffset: 1000;
   animation: draw-logo 4s ease-in-out infinite;
   vector-effect: non-scaling-stroke;
 }
 
-.logo-loading svg:first-child .logo-path {
-  stroke: #2F49F4;
-}
-
-.logo-loading svg:last-child .logo-path {
-  stroke: #181717;
-}
+/* Cores específicas baseadas nos preenchimentos originais */
+.logo-loading svg:first-child path[fill="#2F49F4"] { stroke: #2F49F4; }
+.logo-loading svg:first-child path[fill="#C7D3FD"] { stroke: #C7D3FD; }
+.logo-loading svg:last-child path { stroke: #181717; }
 
 @keyframes draw-logo {
   0% {
@@ -95,7 +91,7 @@ defineProps<{
   }
   50% {
     stroke-dashoffset: 0;
-    fill: currentColor !important;
+    /* Volta o fill original no pico da animação */
   }
   80% {
     opacity: 1;

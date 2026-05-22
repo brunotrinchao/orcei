@@ -47,10 +47,10 @@ function handleCancel() {
     leave-to-class="opacity-0"
   >
     <div v-if="isLoading" class="fixed inset-0 z-[9999] bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center">
-      <div class="scale-125">
+      <div class="flex flex-col items-center gap-6">
         <AppLogo size="xl" :loading="true" />
+        <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] animate-pulse">Iniciando navegação</p>
       </div>
-      <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] mt-8 animate-pulse">Iniciando navegação</p>
     </div>
   </Transition>
 

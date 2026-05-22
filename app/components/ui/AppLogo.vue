@@ -27,7 +27,7 @@ defineProps<{
         'h-7 w-auto': size === 'sm' || !size,
         'h-10 w-auto': size === 'md',
         'h-14 w-auto': size === 'lg',
-        'h-24 w-auto': size === 'xl',
+        'h-20 w-auto': size === 'xl',
       }"
       aria-hidden="true"
     >

@@ -1,5 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+// Mock mongoose partially
+vi.mock('mongoose', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('mongoose')>()
+  return {
+    ...actual,
+    default: {
+      ...actual.default,
+      connection: {
+        readyState: 1
+      },
+      connect: vi.fn(),
+      set: vi.fn()
+    }
+  }
+})
+
 // Mock Receiver to bypass signature verification
 const { mockVerify } = vi.hoisted(() => ({
   mockVerify: vi.fn().mockResolvedValue(true)

@@ -18,7 +18,7 @@ export default defineNuxtConfig({
         { rel: 'manifest', href: '/images/favicon/site.webmanifest' }
       ],
       meta: [
-        { name: 'apple-mobile-web-app-title', content: process.env.APP_NAME || 'Orcei' }
+        { name: 'apple-mobile-web-app-title', content: process.env.APP_NAME || 'Orcei Fácil' }
       ]
     }
   },

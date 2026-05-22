@@ -63,7 +63,7 @@ function handleCancel() {
   >
     <div v-if="isLoading" class="fixed inset-0 z-[9999] bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center">
       <div class="flex flex-col items-center gap-6">
-        <AppLogo size="xl" :loading="true" />
+        <AppLogo size="xl" :loading="true" :icon-only="true" />
         <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] animate-pulse">Iniciando navegação</p>
       </div>
     </div>

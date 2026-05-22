@@ -12,12 +12,16 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 
   try {
+    console.log('[Admin Stats] Iniciando busca de métricas...')
+    
     // 1. Métricas do Stripe
     const thirtyDaysAgo = Math.floor(Date.now() / 1000) - (30 * 24 * 60 * 60)
+    console.log('[Admin Stats] Buscando dados do Stripe...')
     const [invoices, activeSubscriptions] = await Promise.all([
       stripe.invoices.list({ created: { gte: thirtyDaysAgo }, limit: 100 }),
       stripe.subscriptions.list({ status: 'active', limit: 100 })
     ])
+    console.log(`[Admin Stats] Stripe ok: ${invoices.data.length} faturas, ${activeSubscriptions.data.length} assinaturas`)
 
     const revenueBreakdown = {
       annual: 0,
@@ -48,8 +52,9 @@ export default defineEventHandler(async (event) => {
     let mrr = 0
     activeSubscriptions.data.forEach(sub => {
       const item = sub.items.data[0]
-      const amount = (item.plan.amount || 0) / 100
-      if (item.plan.interval === 'year') {
+      if (!item) return
+      const amount = (item.plan?.amount || item.price?.unit_amount || 0) / 100
+      if (item.plan?.interval === 'year' || item.price?.recurring?.interval === 'year') {
         mrr += amount / 12
       } else {
         mrr += amount
@@ -66,6 +71,7 @@ export default defineEventHandler(async (event) => {
     })
     
     // 2. Métricas do MongoDB
+    console.log('[Admin Stats] Buscando dados do MongoDB...')
     const [totalUsers, newUsersMonth, totalProposals, acceptedProposals] = await Promise.all([
       Profile.countDocuments({ isDeleted: { $ne: true } }),
       Profile.countDocuments({ 
@@ -75,6 +81,7 @@ export default defineEventHandler(async (event) => {
       Proposal.countDocuments({}),
       Proposal.countDocuments({ status: 'accepted' })
     ])
+    console.log('[Admin Stats] MongoDB ok')
 
     return {
       revenue: {
@@ -99,7 +106,11 @@ export default defineEventHandler(async (event) => {
       }
     }
   } catch (e: any) {
-    console.error('Admin Stats Error:', e)
-    throw createError({ statusCode: 500, statusMessage: 'Erro ao buscar estatísticas' })
+    console.error('[Admin Stats] Erro Fatal:', e)
+    throw createError({ 
+      statusCode: 500, 
+      statusMessage: 'Erro ao buscar estatísticas',
+      data: { error: e.message }
+    })
   }
 })

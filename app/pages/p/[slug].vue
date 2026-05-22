@@ -13,7 +13,7 @@ const { hasConsent } = useCookieConsent()
 const route = useRoute()
 const { t: token, preview } = route.query
 const isPreview = computed(() => preview === 'true')
-const { data: proposal, refresh, error } = useFetch<ProposalDTO>(`/api/proposals/public/${route.params.slug}`, {
+const { data: proposal, refresh, error, pending } = useFetch<ProposalDTO>(`/api/proposals/public/${route.params.slug}`, {
   query: computed(() => ({ 
     t: token, 
     preview: preview,
@@ -279,46 +279,45 @@ const statusMap: any = {
 
 <template>
   <!-- Loading state with Skeleton -->
-  <div v-if="!proposal && !error" class="min-h-screen bg-gray-50">
+  <div v-if="pending || (!proposal && !error)" class="min-h-screen bg-gray-50 flex flex-col">
     <!-- Header Skeleton -->
-    <header class="bg-white/80 border-b border-gray-100 h-16 flex items-center px-5 sm:px-8">
+    <header class="bg-white border-b border-gray-200 h-16 flex items-center px-5 sm:px-8 shrink-0">
       <div class="max-w-6xl mx-auto w-full flex justify-between items-center">
-        <BaseSkeleton width="120px" height="1.75rem" />
-        <BaseSkeleton width="80px" height="1.5rem" borderRadius="9999px" />
+        <div class="w-32 h-8 bg-gray-200 animate-pulse rounded-lg"></div>
+        <div class="w-20 h-6 bg-gray-200 animate-pulse rounded-full"></div>
       </div>
     </header>
 
     <!-- Hero Skeleton -->
     <div class="bg-gray-900 py-16 sm:py-24 px-5 sm:px-8">
-      <div class="max-w-6xl mx-auto space-y-6">
-        <BaseSkeleton width="150px" height="0.75rem" customClass="bg-blue-400/20" />
-        <BaseSkeleton width="70%" height="3rem" customClass="bg-white/10" />
-        <BaseSkeleton width="40%" height="1.5rem" customClass="bg-white/10" />
+      <div class="max-w-6xl mx-auto space-y-8">
+        <div class="w-40 h-4 bg-blue-500/20 animate-pulse rounded"></div>
+        <div class="w-3/4 h-12 bg-white/10 animate-pulse rounded-xl"></div>
+        <div class="w-1/2 h-6 bg-white/10 animate-pulse rounded-lg"></div>
+        
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6 mt-12">
-          <BaseSkeleton height="80px" borderRadius="1rem" customClass="bg-white/5" />
-          <BaseSkeleton height="80px" borderRadius="1rem" customClass="bg-white/5" />
-          <BaseSkeleton height="80px" borderRadius="1rem" customClass="bg-white/5" />
+          <div v-for="i in 3" :key="i" class="h-24 bg-white/5 border border-white/10 animate-pulse rounded-2xl"></div>
         </div>
       </div>
     </div>
 
     <!-- Content Skeleton -->
-    <main class="max-w-6xl mx-auto px-5 sm:px-8 py-12 space-y-10">
+    <main class="max-w-6xl mx-auto px-5 sm:px-8 py-12 space-y-10 flex-1">
       <div class="bg-white rounded-3xl border border-gray-100 p-8 space-y-8">
-        <BaseSkeleton width="200px" height="1rem" />
+        <div class="w-48 h-4 bg-gray-100 animate-pulse rounded"></div>
         <div v-for="i in 3" :key="i" class="flex gap-6 border-b border-gray-50 pb-8 last:border-0 last:pb-0">
-          <BaseSkeleton width="36px" height="36px" borderRadius="0.75rem" />
+          <div class="w-10 h-10 bg-gray-100 animate-pulse rounded-xl"></div>
           <div class="flex-1 space-y-3">
-            <BaseSkeleton width="30%" height="1.25rem" />
-            <BaseSkeleton width="90%" height="0.75rem" />
+            <div class="w-1/3 h-5 bg-gray-200 animate-pulse rounded"></div>
+            <div class="w-full h-3 bg-gray-100 animate-pulse rounded"></div>
           </div>
-          <BaseSkeleton width="100px" height="1.5rem" />
+          <div class="w-24 h-8 bg-gray-200 animate-pulse rounded-lg"></div>
         </div>
       </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <BaseSkeleton height="200px" borderRadius="1.5rem" />
-        <BaseSkeleton height="200px" borderRadius="1.5rem" />
+
+      <!-- Fallback indicator -->
+      <div class="flex justify-center py-4">
+        <Loader2 class="w-6 h-6 text-gray-300 animate-spin" />
       </div>
     </main>
   </div>

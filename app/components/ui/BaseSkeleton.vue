@@ -16,8 +16,11 @@ withDefaults(defineProps<Props>(), {
 
 <template>
   <div
-    class="animate-pulse bg-gray-200"
-    :class="customClass"
+    class="animate-pulse"
+    :class="[
+      !customClass.includes('bg-') ? 'bg-gray-200' : '',
+      customClass
+    ]"
     :style="{
       width,
       height,

@@ -46,14 +46,11 @@ function handleCancel() {
     leave-from-class="opacity-100"
     leave-to-class="opacity-0"
   >
-    <div v-if="isLoading" class="fixed inset-0 z-[9999] bg-white/60 backdrop-blur-[2px] flex flex-col items-center justify-center">
-      <div class="flex flex-col items-center gap-4 scale-110">
-        <div class="relative">
-          <div class="w-16 h-16 border-4 border-blue-100 rounded-full"></div>
-          <Loader2 class="w-16 h-16 text-blue-600 animate-spin absolute top-0 left-0" />
-        </div>
-        <p class="text-[10px] font-black text-blue-900 uppercase tracking-[0.3em] animate-pulse">Navegando...</p>
+    <div v-if="isLoading" class="fixed inset-0 z-[9999] bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center">
+      <div class="scale-125">
+        <AppLogo size="xl" :loading="true" />
       </div>
+      <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] mt-8 animate-pulse">Iniciando navegação</p>
     </div>
   </Transition>
 

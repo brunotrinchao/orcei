@@ -16,24 +16,6 @@ router.afterEach(() => {
   stopLoading()
 })
 
-// Instant trigger on click for better perceived performance
-if (process.client) {
-  window.addEventListener('click', (e) => {
-    const target = e.target as HTMLElement
-    const link = target.closest('a')
-    
-    // Dispara apenas para links internos que não abrem em nova aba
-    if (link && 
-        link.href && 
-        link.href.startsWith(window.location.origin) && 
-        !link.target && 
-        !e.ctrlKey && 
-        !e.metaKey) {
-      startLoading()
-    }
-  }, { capture: true })
-}
-
 onMounted(() => initTracking())
 
 function handleConfirm() {

@@ -28,9 +28,8 @@ async function logout() {
   })
 }
 
-const { data: systemInfo } = await useAsyncData('system-status', () => $fetch('/api/system/status'), {
-  getCachedData: (key) => useNuxtApp().payload.data[key] || useNuxtApp().static.data[key],
-  server: true
+const { data: systemInfo } = useFetch<any>('/api/system/status', {
+  key: 'system-status'
 })
 
 onMounted(() => {

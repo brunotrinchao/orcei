@@ -48,7 +48,7 @@ vi.stubGlobal('useRuntimeConfig', () => ({
   googleClientId: 'client-id',
   googleClientSecret: 'client-secret',
   public: { siteUrl: 'https://test.com' },
-  appName: 'Orcei Fácil'
+  appName: 'Orcei'
 }))
 
 import { google } from 'googleapis'
@@ -104,7 +104,7 @@ describe('GoogleService', () => {
 
       expect(folderId).toBe('found-id')
       expect(mockFilesList).toHaveBeenCalledWith(expect.objectContaining({
-        q: "name = 'Orcei Fácil' and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
+        q: "name = 'Orcei' and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
       }))
       expect(Profile.findByIdAndUpdate).toHaveBeenCalledWith('prof-id', expect.objectContaining({
         $set: { 'googleIntegration.driveFolderId': 'found-id' }
@@ -119,7 +119,7 @@ describe('GoogleService', () => {
 
       expect(folderId).toBe('new-id')
       expect(mockFilesCreate).toHaveBeenCalledWith(expect.objectContaining({
-        requestBody: { name: 'Orcei Fácil', mimeType: 'application/vnd.google-apps.folder' }
+        requestBody: { name: 'Orcei', mimeType: 'application/vnd.google-apps.folder' }
       }))
     })
   })

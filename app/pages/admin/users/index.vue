@@ -83,107 +83,80 @@ const formatDate = (date: string) => new Date(date).toLocaleDateString('pt-BR')
       </div>
     </div>
 
-    <!-- Tabela -->
-    <div class="bg-white rounded-[2.5rem] border border-gray-200 shadow-sm overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-gray-50/50 border-b border-gray-200">
-              <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Usuário</th>
-              <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Plano</th>
-              <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Créditos</th>
-              <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Cadastro</th>
-              <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Ações</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100">
-            <template v-if="pending && users?.length === 0">
-              <tr v-for="i in 5" :key="i">
-                <td class="px-8 py-6">
-                  <div class="flex items-center gap-3">
-                    <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="0.75rem" />
-                    <div class="space-y-2 flex-1">
-                      <BaseSkeleton width="150px" height="1.1rem" />
-                      <BaseSkeleton width="100px" height="0.75rem" />
-                    </div>
-                  </div>
-                </td>
-                <td class="px-8 py-6 text-center">
-                  <div class="flex justify-center">
-                    <BaseSkeleton width="80px" height="1.5rem" borderRadius="999px" />
-                  </div>
-                </td>
-                <td class="px-8 py-6 text-center">
-                  <div class="flex justify-center">
-                    <BaseSkeleton width="30px" height="1.5rem" />
-                  </div>
-                </td>
-                <td class="px-8 py-6 text-center text-xs font-bold text-gray-500">
-                  <div class="flex justify-center">
-                    <BaseSkeleton width="80px" height="1rem" />
-                  </div>
-                </td>
-                <td class="px-8 py-6 text-right">
-                  <div class="flex justify-end gap-2">
-                    <BaseSkeleton width="2rem" height="2rem" borderRadius="0.5rem" />
-                  </div>
-                </td>
-              </tr>
-            </template>
-            <template v-else>
-              <tr v-for="user in users" :key="user._id" class="hover:bg-gray-50/30 transition-all group">
-                <td class="px-8 py-6">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
-                      <img v-if="user.avatar" :src="user.avatar" class="w-full h-full object-cover">
-                      <User v-else class="w-5 h-5 text-gray-400" />
-                    </div>
-                    <div class="flex flex-col">
-                      <span class="font-black text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">{{ user.name }}</span>
-                      <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tight mt-1">{{ user.email }}</span>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-8 py-6 text-center">
-                  <BaseBadge :variant="user.subscriptionPlan === 'premium' ? 'success' : user.subscriptionPlan === 'starter' ? 'info' : 'default'">
-                    {{ user.subscriptionPlan.toUpperCase() }}
-                  </BaseBadge>
-                </td>
-                <td class="px-8 py-6 text-center font-black text-gray-900">
-                  {{ user.creditsBalance }}
-                </td>
-                <td class="px-8 py-6 text-center text-xs font-bold text-gray-500">
-                  {{ formatDate(user.createdAt) }}
-                </td>
-                <td class="px-8 py-6 text-right">
-                  <div class="flex justify-end gap-2">
-                    <button @click="openCreditModal(user)" class="p-2.5 text-blue-500 hover:bg-blue-50 rounded-xl transition-all" title="Ajustar Créditos">
-                      <CreditCard class="w-5 h-5" />
-                    </button>
-                    <button v-if="user.role === 'admin'" class="p-2.5 text-red-500 bg-red-50 rounded-xl" title="Administrador">
-                      <Shield class="w-5 h-5" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </template>
-          </tbody>
-        </table>
-      </div>
+    <!-- Listagem Unificada -->
+    <BaseDataList
+      :items="users"
+      :pending="pending"
+      :total="totalUsers"
+      :items-per-page="itemsPerPage"
+      v-model:current-page="currentPage"
+      empty-title="Nenhum usuário encontrado"
+    >
+      <template #header>
+        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Usuário</th>
+        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Plano</th>
+        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Créditos</th>
+        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Cadastro</th>
+        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Ações</th>
+      </template>
 
-      <!-- Paginação -->
-      <div v-if="totalUsers > itemsPerPage" class="px-8 py-6 border-t border-gray-100 bg-gray-50/20 flex justify-center">
-        <BasePagination 
-          :total="totalUsers" 
-          :items-per-page="itemsPerPage" 
-          v-model:page="currentPage" 
-        />
-      </div>
+      <template #item="{ item: user }">
+        <tr class="hover:bg-gray-50/30 transition-all group">
+          <td class="px-8 py-6">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
+                <img v-if="user.avatar" :src="user.avatar" class="w-full h-full object-cover">
+                <User v-else class="w-5 h-5 text-gray-400" />
+              </div>
+              <div class="flex flex-col">
+                <span class="font-black text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">{{ user.name }}</span>
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tight mt-1">{{ user.email }}</span>
+              </div>
+            </div>
+          </td>
+          <td class="px-8 py-6 text-center">
+            <BaseBadge :variant="user.subscriptionPlan === 'premium' ? 'success' : user.subscriptionPlan === 'starter' ? 'info' : 'default'">
+              {{ user.subscriptionPlan?.toUpperCase() || 'FREE' }}
+            </BaseBadge>
+          </td>
+          <td class="px-8 py-6 text-center font-black text-gray-900">
+            {{ user.creditsBalance }}
+          </td>
+          <td class="px-8 py-6 text-center text-xs font-bold text-gray-500">
+            {{ formatDate(user.createdAt) }}
+          </td>
+          <td class="px-8 py-6 text-right">
+            <div class="flex justify-end gap-2">
+              <button @click="openCreditModal(user)" class="p-2.5 text-blue-500 hover:bg-blue-50 rounded-xl transition-all" title="Ajustar Créditos">
+                <CreditCard class="w-5 h-5" />
+              </button>
+              <button v-if="user.role === 'admin'" class="p-2.5 text-red-500 bg-red-50 rounded-xl" title="Administrador">
+                <Shield class="w-5 h-5" />
+              </button>
+            </div>
+          </td>
+        </tr>
+      </template>
 
-      <div v-if="!pending && users?.length === 0" class="text-center py-20 text-gray-400 font-bold uppercase text-xs tracking-widest">
-        Nenhum usuário encontrado.
-      </div>
-    </div>
+      <!-- Custom skeleton -->
+      <template #skeleton>
+        <tr v-for="i in 5" :key="i">
+          <td class="px-8 py-6">
+            <div class="flex items-center gap-3">
+              <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="0.75rem" />
+              <div class="space-y-2 flex-1">
+                <BaseSkeleton width="150px" height="1.1rem" />
+                <BaseSkeleton width="100px" height="0.75rem" />
+              </div>
+            </div>
+          </td>
+          <td class="px-8 py-6 text-center"><div class="flex justify-center"><BaseSkeleton width="80px" height="1.5rem" borderRadius="999px" /></div></td>
+          <td class="px-8 py-6 text-center"><div class="flex justify-center"><BaseSkeleton width="30px" height="1.5rem" /></div></td>
+          <td class="px-8 py-6 text-center"><div class="flex justify-center"><BaseSkeleton width="80px" height="1rem" /></div></td>
+          <td class="px-8 py-6 text-right"><div class="flex justify-end gap-2"><BaseSkeleton width="2rem" height="2rem" borderRadius="0.5rem" /></div></td>
+        </tr>
+      </template>
+    </BaseDataList>
 
     <!-- Modal de Créditos -->
     <BaseDialog v-model:open="isCreditModalOpen" title="Ajustar Créditos" size="md">

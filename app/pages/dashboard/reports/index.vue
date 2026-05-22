@@ -69,25 +69,15 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
       </div>
     </div>
 
-    <!-- Listagem -->
-    <div class="bg-white rounded-[2.5rem] border border-gray-200 shadow-sm overflow-hidden">
-      <div v-if="pending" class="p-20 text-center space-y-4">
-        <RefreshCcw class="w-10 h-10 text-blue-600 animate-spin mx-auto" />
-        <p class="text-gray-400 font-black uppercase tracking-widest text-xs">Carregando Relatórios...</p>
-      </div>
-
-      <div v-else-if="!filteredReports.length" class="p-20 text-center space-y-6">
-        <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto">
-          <FileText class="w-10 h-10 text-gray-300" />
-        </div>
-        <div class="space-y-2">
-          <h3 class="text-xl font-black text-gray-900 uppercase tracking-tight">Nenhum relatório encontrado</h3>
-          <p class="text-gray-500 font-medium">Você ainda não gerou relatórios IA ou os filtros não retornaram resultados.</p>
-        </div>
-      </div>
-
-      <div v-else class="divide-y divide-gray-100">
-        <div v-for="report in filteredReports" :key="report._id" class="p-8 hover:bg-gray-50/50 transition-all group flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <!-- Listagem Unificada -->
+    <BaseDataList
+      :items="filteredReports"
+      :pending="pending"
+      empty-title="Nenhum relatório encontrado"
+      empty-subtitle="Você ainda não gerou relatórios IA ou os filtros não retornaram resultados."
+    >
+      <template #item="{ item: report }">
+        <div class="p-8 hover:bg-gray-50/50 transition-all group flex flex-col md:flex-row md:items-center justify-between gap-6 border-b last:border-0 border-gray-100">
           <div class="flex items-center gap-6">
             <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
               <Sparkles class="w-8 h-8" />
@@ -118,8 +108,25 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
             </BaseButton>
           </div>
         </div>
-      </div>
-    </div>
+      </template>
+
+      <!-- Custom skeleton for report cards -->
+      <template #skeleton>
+        <div v-for="i in 3" :key="i" class="p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-gray-50">
+          <div class="flex items-center gap-6">
+            <BaseSkeleton width="4rem" height="4rem" borderRadius="1rem" />
+            <div class="space-y-2">
+              <BaseSkeleton width="180px" height="1.25rem" />
+              <BaseSkeleton width="250px" height="0.75rem" />
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <BaseSkeleton width="120px" height="2.5rem" borderRadius="1rem" />
+            <BaseSkeleton width="150px" height="2.5rem" borderRadius="1rem" />
+          </div>
+        </div>
+      </template>
+    </BaseDataList>
 
     <!-- Modal de Visualização -->
     <BaseDialog

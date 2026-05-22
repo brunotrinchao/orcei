@@ -302,105 +302,88 @@ const formatPhone = (phone: string) => {
       </template>
     </BaseDialog>
 
-    <!-- Listagem -->
-    <div class="bg-white rounded-[3rem] border-2 border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden transition-all">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-gray-50/50 border-b-2 border-gray-100">
-              <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Cliente</th>
-              <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Contato</th>
-              <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Localização</th>
-              <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] text-right">Ações</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y-2 divide-gray-50">
-            <template v-if="pending && clients?.length === 0">
-              <tr v-for="i in 5" :key="i">
-                <td class="px-10 py-8">
-                  <div class="space-y-2">
-                    <BaseSkeleton width="60%" height="1.25rem" />
-                    <BaseSkeleton width="30%" height="0.75rem" />
-                  </div>
-                </td>
-                <td class="px-10 py-8">
-                  <div class="space-y-2">
-                    <BaseSkeleton width="150px" height="0.9rem" />
-                    <BaseSkeleton width="120px" height="0.9rem" />
-                  </div>
-                </td>
-                <td class="px-10 py-8">
-                  <div class="space-y-2">
-                    <BaseSkeleton width="100px" height="0.8rem" />
-                    <BaseSkeleton width="140px" height="0.8rem" />
-                  </div>
-                </td>
-                <td class="px-10 py-8 text-right">
-                  <div class="flex justify-end gap-3">
-                    <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="1rem" />
-                    <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="1rem" />
-                  </div>
-                </td>
-              </tr>
-            </template>
-            <template v-else>
-              <tr v-for="client in clients" :key="client._id" class="hover:bg-gray-50/30 transition-all group">
-                <td class="px-10 py-8">
-                  <div class="flex flex-col">
-                    <span class="font-black text-lg text-gray-900 group-hover:text-blue-600 transition-colors">{{ client.name }}</span>
-                    <span v-if="client.taxId" class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{{ client.taxId }}</span>
-                    <span v-else class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Sem documento</span>
-                  </div>
-                </td>
-                <td class="px-10 py-8">
-                  <div class="flex flex-col">
-                    <span class="text-sm font-bold text-gray-600">{{ client.email }}</span>
-                    <div class="flex items-center gap-2 mt-1">
-                      <span class="text-xs font-black text-gray-400">{{ formatPhone(client.phone) }}</span>
-                      <div v-if="client.isWhatsapp" class="i-simple-icons-whatsapp w-3.5 h-3.5 text-green-500"></div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-10 py-8">
-                  <div class="flex flex-col">
-                    <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">{{ client.address.city }} - {{ client.address.state }}</span>
-                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest line-clamp-1 max-w-[180px] mt-1">{{ client.address.street }}, {{ client.address.number }}</span>
-                  </div>
-                </td>
-                <td class="px-10 py-8 text-right">
-                  <div class="flex justify-end gap-3 items-center">
-                    <button @click="openModal(client)" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all" title="Editar">
-                      <Pencil class="w-5 h-5" />
-                    </button>
-                    <button @click="deleteClient(client._id)" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all" title="Excluir">
-                      <Trash2 class="w-5 h-5" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </template>
-          </tbody>
-        </table>
-      </div>
-      
-      <!-- Paginação -->
-      <div v-if="totalClients > itemsPerPage" class="px-10 py-6 border-t-2 border-gray-50 bg-gray-50/20 flex justify-center">
-        <BasePagination 
-          :total="totalClients" 
-          :items-per-page="itemsPerPage" 
-          v-model:page="currentPage" 
-        />
-      </div>
-      
-      <div v-if="clients?.length === 0" class="text-center py-32 bg-gray-50/20">
-        <div class="w-24 h-24 bg-white shadow-xl shadow-gray-100 text-gray-200 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8">
-          <MapPin class="w-10 h-10" />
-        </div>
-        <h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight">{{ searchQuery ? 'Nada encontrado' : 'Lista Vazia' }}</h3>
-        <p class="text-gray-400 font-bold mt-2 px-6 max-w-sm mx-auto">{{ searchQuery ? 'Não encontramos nenhum cliente com esses termos.' : 'Sua lista de clientes aparecerá aqui. Comece cadastrando o primeiro.' }}</p>
-        <BaseButton v-if="!searchQuery" @click="openModal()" class="mt-10 shadow-xl shadow-blue-100">Cadastrar Primeiro Cliente</BaseButton>
-        <button v-else @click="searchQuery = ''" class="mt-10 text-blue-600 font-black uppercase tracking-widest text-xs hover:underline decoration-2 underline-offset-8">Limpar Filtros de Busca</button>
-      </div>
-    </div>
+    <!-- Listagem Unificada -->
+    <BaseDataList
+      :items="clients"
+      :pending="pending"
+      :total="totalClients"
+      :items-per-page="itemsPerPage"
+      v-model:current-page="currentPage"
+      empty-title="Sem Clientes"
+      empty-subtitle="Sua lista de clientes aparecerá aqui. Comece cadastrando o primeiro."
+    >
+      <template #header>
+        <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Cliente</th>
+        <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Contato</th>
+        <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Localização</th>
+        <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] text-right">Ações</th>
+      </template>
+
+      <template #item="{ item: client }">
+        <tr class="hover:bg-gray-50/30 transition-all group">
+          <td class="px-10 py-8">
+            <div class="flex flex-col">
+              <span class="font-black text-lg text-gray-900 group-hover:text-blue-600 transition-colors">{{ client.name }}</span>
+              <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{{ client.taxId || 'Sem documento' }}</span>
+            </div>
+          </td>
+          <td class="px-10 py-8">
+            <div class="flex flex-col">
+              <span class="text-sm font-bold text-gray-600">{{ client.email }}</span>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="text-xs font-black text-gray-400">{{ formatPhone(client.phone) }}</span>
+                <div v-if="client.isWhatsapp" class="i-simple-icons-whatsapp w-3.5 h-3.5 text-green-500"></div>
+              </div>
+            </div>
+          </td>
+          <td class="px-10 py-8">
+            <div class="flex flex-col">
+              <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">{{ client.address?.city || '-' }} - {{ client.address?.state || '-' }}</span>
+              <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest line-clamp-1 max-w-[180px] mt-1">{{ client.address?.street }}, {{ client.address?.number }}</span>
+            </div>
+          </td>
+          <td class="px-10 py-8 text-right">
+            <div class="flex justify-end gap-3 items-center">
+              <button @click="openModal(client)" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all" title="Editar">
+                <Pencil class="w-5 h-5" />
+              </button>
+              <button @click="deleteClient(client._id)" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all" title="Excluir">
+                <Trash2 class="w-5 h-5" />
+              </button>
+            </div>
+          </td>
+        </tr>
+      </template>
+
+      <!-- Custom skeleton -->
+      <template #skeleton>
+        <tr v-for="i in 5" :key="i">
+          <td class="px-10 py-8">
+            <div class="space-y-2">
+              <BaseSkeleton width="60%" height="1.25rem" />
+              <BaseSkeleton width="30%" height="0.75rem" />
+            </div>
+          </td>
+          <td class="px-10 py-8">
+            <div class="space-y-2">
+              <BaseSkeleton width="150px" height="0.9rem" />
+              <BaseSkeleton width="120px" height="0.9rem" />
+            </div>
+          </td>
+          <td class="px-10 py-8">
+            <div class="space-y-2">
+              <BaseSkeleton width="100px" height="0.8rem" />
+              <BaseSkeleton width="140px" height="0.8rem" />
+            </div>
+          </td>
+          <td class="px-10 py-8 text-right">
+            <div class="flex justify-end gap-3">
+              <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="1rem" />
+              <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="1rem" />
+            </div>
+          </td>
+        </tr>
+      </template>
+    </BaseDataList>
   </div>
 </template>

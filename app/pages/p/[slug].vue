@@ -23,6 +23,7 @@ const { data: proposal, refresh, error } = useFetch<ProposalDTO>(`/api/proposals
 
 const isAccepting = ref(false)
 const isTermsOpen = ref(false)
+const isChatModalOpen = ref(false)
 const isActionModalOpen = ref(false)
 const actionType = ref<'decline' | 'request_changes' | null>(null)
 const actionNotes = ref('')
@@ -47,9 +48,18 @@ function scrollToBottom() {
   })
 }
 
+// Watch chat modal open to scroll
+watch(isChatModalOpen, (val) => {
+  if (val) {
+    scrollToBottom()
+  }
+})
+
 // Watch messages to scroll
 watch(messages, () => {
-  scrollToBottom()
+  if (isChatModalOpen.value) {
+    scrollToBottom()
+  }
 }, { deep: true })
 
 // Pusher Integration
@@ -619,10 +629,10 @@ const statusMap: any = {
             <div v-if="!['draft', 'accepted', 'expired'].includes(proposal.status)" class="hidden sm:flex items-center gap-4">
               <template v-if="!isPreview">
                 <button
-                  @click="openActionModal('request_changes')"
+                  @click="isChatModalOpen = true"
                   class="px-7 py-4 rounded-2xl text-xs font-black uppercase tracking-widest border-2 border-white/10 text-gray-300 hover:bg-white/10 transition-all"
                 >
-                  Solicitar Alteração
+                  Chat com o Profissional
                 </button>
                 <button
                   @click="handleAccept"
@@ -671,25 +681,68 @@ const statusMap: any = {
         </div>
       </section>
 
-      <!-- ── CHAT / INTERACTIONS ─────────────────────────────────── -->
-      <section id="chat" class="bg-[#E5DDD5] rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col min-h-[500px]">
-        <!-- Header -->
-        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3 bg-white z-10">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center">
-              <MessageCircle class="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <h2 class="text-xs font-black text-gray-900 uppercase tracking-widest">Dúvidas e Alterações</h2>
-              <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Fale com o profissional</p>
-            </div>
-          </div>
-        </div>
+      <!-- ── TERMS LINK + FOOTER ─────────────────────────────────── -->
+      <footer class="pt-4 pb-2 text-center space-y-6">
+        <button
+          @click="isTermsOpen = true"
+          class="text-gray-400 hover:text-gray-600 text-[10px] font-black uppercase tracking-[0.2em] underline decoration-dotted underline-offset-8 transition-colors"
+        >
+          Termos e Condições de Serviço
+        </button>
 
+        <div class="flex flex-col items-center gap-2 pt-4">
+          <img
+            :src="useRuntimeConfig().public.appDocumentLogo || 'https://res.cloudinary.com/dpeaqezkb/image/upload/v1778873300/orcafacil/logo-default.png'"
+            :alt="systemInfo?.landingPage?.appName || 'Orcei'"
+            class="h-5 w-auto object-contain opacity-30"
+          />
+          <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">Powered by {{ systemInfo?.landingPage?.appName || 'Orcei' }}</p>
+        </div>
+      </footer>
+    </main>
+
+    <!-- ─── STICKY MOBILE BOTTOM BAR ──────────────────────────────── -->
+    <div
+      v-if="!['draft', 'accepted', 'expired'].includes(proposal.status) && !isPreview"
+      class="fixed bottom-0 left-0 right-0 sm:hidden z-50 bg-white/90 backdrop-blur-xl border-t border-gray-100 px-5 pt-4 pb-safe"
+    >
+      <div class="flex gap-3 pb-4">
+        <button
+          @click="isChatModalOpen = true"
+          class="flex-1 py-4 rounded-2xl text-xs font-black uppercase tracking-widest border-2 border-gray-200 text-gray-700 hover:bg-gray-50 transition-all"
+        >
+          Chat com Profissional
+        </button>
+        <button
+          @click="handleAccept"
+          :disabled="isAccepting"
+          class="flex-[2] py-4 bg-[#3147F6] rounded-2xl text-xs font-black uppercase tracking-widest text-white shadow-xl shadow-[#3147F6]/20 flex items-center justify-center gap-2 active:scale-95 transition-all disabled:opacity-60"
+        >
+          <Loader2 v-if="isAccepting" class="w-4 h-4 animate-spin" />
+          {{ isAccepting ? 'Processando...' : 'Aceitar Proposta' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- ─── MODALS ──────────────────────────────────────────────────── -->
+
+    <!-- Terms Dialog -->
+    <BaseDialog v-model:open="isTermsOpen" title="Termos e Condições" size="lg">
+      <div class="prose-contract p-4 text-sm text-gray-600 leading-relaxed">
+        <div v-html="proposal.termsAndConditions"></div>
+      </div>
+      <template #footer>
+        <BaseButton @click="isTermsOpen = false">Fechar</BaseButton>
+      </template>
+    </BaseDialog>
+
+    <!-- Chat Dialog -->
+    <BaseDialog v-model:open="isChatModalOpen" title="Dúvidas e Alterações" size="md">
+      <div class="p-0 flex flex-col h-[500px] bg-[#E5DDD5] overflow-hidden rounded-b-2xl">
         <!-- Messages list -->
         <div 
           ref="chatMessagesRef"
-          class="flex-1 p-6 space-y-4 overflow-y-auto max-h-[500px] scrollbar-hide relative bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat bg-center"
+          class="flex-1 p-6 space-y-4 overflow-y-auto scrollbar-hide relative bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat bg-center"
         >
           <div v-if="!groupedMessages?.length" class="text-center py-10 bg-white/60 backdrop-blur-sm rounded-3xl p-8 max-w-xs mx-auto mt-10">
             <MessageCircle class="w-8 h-8 text-gray-300 mx-auto mb-3" />
@@ -764,98 +817,6 @@ const statusMap: any = {
           <p v-if="['accepted', 'expired'].includes(proposal.status)" class="mt-3 text-[9px] font-black text-red-400 text-center uppercase tracking-widest">
             Chat desabilitado (Proposta {{ proposal.status === 'accepted' ? 'aceita' : 'expirada' }})
           </p>
-        </div>
-      </section>
-
-      <!-- ── TERMS LINK + FOOTER ─────────────────────────────────── -->
-      <footer class="pt-4 pb-2 text-center space-y-6">
-        <button
-          @click="isTermsOpen = true"
-          class="text-gray-400 hover:text-gray-600 text-[10px] font-black uppercase tracking-[0.2em] underline decoration-dotted underline-offset-8 transition-colors"
-        >
-          Termos e Condições de Serviço
-        </button>
-
-        <div class="flex flex-col items-center gap-2 pt-4">
-          <img
-            :src="useRuntimeConfig().public.appDocumentLogo || 'https://res.cloudinary.com/dpeaqezkb/image/upload/v1778873300/orcafacil/logo-default.png'"
-            :alt="systemInfo?.landingPage?.appName || 'Orcei'"
-            class="h-5 w-auto object-contain opacity-30"
-          />
-          <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">Powered by {{ systemInfo?.landingPage?.appName || 'Orcei' }}</p>
-        </div>
-      </footer>
-    </main>
-
-    <!-- ─── STICKY MOBILE BOTTOM BAR ──────────────────────────────── -->
-    <div
-      v-if="!['draft', 'accepted', 'expired'].includes(proposal.status) && !isPreview"
-      class="fixed bottom-0 left-0 right-0 sm:hidden z-50 bg-white/90 backdrop-blur-xl border-t border-gray-100 px-5 pt-4 pb-safe"
-    >
-      <div class="flex gap-3 pb-4">
-        <button
-          @click="openActionModal('request_changes')"
-          class="flex-1 py-4 rounded-2xl text-xs font-black uppercase tracking-widest border-2 border-gray-200 text-gray-700 hover:bg-gray-50 transition-all"
-        >
-          Alterar
-        </button>
-        <button
-          @click="handleAccept"
-          :disabled="isAccepting"
-          class="flex-[2] py-4 bg-[#3147F6] rounded-2xl text-xs font-black uppercase tracking-widest text-white shadow-xl shadow-[#3147F6]/20 flex items-center justify-center gap-2 active:scale-95 transition-all disabled:opacity-60"
-        >
-          <Loader2 v-if="isAccepting" class="w-4 h-4 animate-spin" />
-          {{ isAccepting ? 'Processando...' : 'Aceitar Proposta' }}
-        </button>
-      </div>
-    </div>
-
-    <!-- ─── MODALS ──────────────────────────────────────────────────── -->
-
-    <!-- Terms Dialog -->
-    <BaseDialog v-model:open="isTermsOpen" title="Termos e Condições" size="lg">
-      <div class="prose-contract p-4 text-sm text-gray-600 leading-relaxed">
-        <div v-html="proposal.termsAndConditions"></div>
-      </div>
-      <template #footer>
-        <BaseButton @click="isTermsOpen = false">Fechar</BaseButton>
-      </template>
-    </BaseDialog>
-
-    <!-- Action Dialog (decline / request changes) -->
-    <BaseDialog
-      v-model:open="isActionModalOpen"
-      :title="actionType === 'decline' ? 'Recusar Proposta' : 'Pedir Alteração'"
-      size="md"
-    >
-      <div class="p-4 space-y-6">
-        <div class="bg-blue-50 p-5 rounded-2xl flex gap-4">
-          <AlertCircle class="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-          <p class="text-sm text-blue-700 font-medium leading-relaxed">
-            {{ actionType === 'decline'
-              ? 'Poderia nos contar o motivo da recusa? Isso ajuda o profissional a melhorar os serviços.'
-              : 'Descreva quais pontos você gostaria de ajustar nesta proposta.' }}
-          </p>
-        </div>
-
-        <textarea
-          v-model="actionNotes"
-          rows="4"
-          class="w-full p-5 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-[#3147F6]/10 focus:border-[#3147F6] outline-none font-bold text-gray-900 transition-all resize-none"
-          :placeholder="actionType === 'decline' ? 'Ex: Orçamento acima do esperado no momento...' : 'Ex: Gostaria de ajustar a quantidade do item X...'"
-        ></textarea>
-
-        <div class="flex gap-4">
-          <BaseButton variant="secondary" class="flex-1" @click="isActionModalOpen = false">Cancelar</BaseButton>
-          <BaseButton
-            class="flex-1"
-            :variant="actionType === 'decline' ? 'secondary' : 'primary'"
-            @click="handleAction"
-            :disabled="isSubmittingAction"
-          >
-            <Loader2 v-if="isSubmittingAction" class="w-4 h-4 animate-spin mr-2" />
-            Confirmar
-          </BaseButton>
         </div>
       </div>
     </BaseDialog>

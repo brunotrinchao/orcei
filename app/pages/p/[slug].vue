@@ -24,6 +24,25 @@ const { data: proposal, refresh, error } = useFetch<ProposalDTO>(`/api/proposals
 const isAccepting = ref(false)
 const isTermsOpen = ref(false)
 const isChatModalOpen = ref(false)
+
+// Mark messages as read when opening modal
+watch(isChatModalOpen, async (val) => {
+  if (val) {
+    scrollToBottom()
+    if (proposal.value?.unreadMessages > 0) {
+      try {
+        await $fetch(`/api/proposals/public/messages/read`, {
+          method: 'POST',
+          query: { slug: route.params.slug, t: token }
+        })
+        proposal.value.unreadMessages = 0
+      } catch (e) {
+        console.error('Failed to mark messages as read')
+      }
+    }
+  }
+})
+
 const isActionModalOpen = ref(false)
 const actionType = ref<'decline' | 'request_changes' | null>(null)
 const actionNotes = ref('')
@@ -630,9 +649,15 @@ const statusMap: any = {
               <template v-if="!isPreview">
                 <button
                   @click="isChatModalOpen = true"
-                  class="px-7 py-4 rounded-2xl text-xs font-black uppercase tracking-widest border-2 border-white/10 text-gray-300 hover:bg-white/10 transition-all"
+                  class="px-7 py-4 rounded-2xl text-xs font-black uppercase tracking-widest border-2 border-white/10 text-gray-300 hover:bg-white/10 transition-all relative"
                 >
                   Chat com o Profissional
+                  <span 
+                    v-if="proposal.unreadMessages > 0"
+                    class="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-[10px] font-black text-white ring-4 ring-gray-900 animate-bounce"
+                  >
+                    {{ proposal.unreadMessages }}
+                  </span>
                 </button>
                 <button
                   @click="handleAccept"
@@ -709,9 +734,15 @@ const statusMap: any = {
       <div class="flex gap-3 pb-4">
         <button
           @click="isChatModalOpen = true"
-          class="flex-1 py-4 rounded-2xl text-xs font-black uppercase tracking-widest border-2 border-gray-200 text-gray-700 hover:bg-gray-50 transition-all"
+          class="flex-1 py-4 rounded-2xl text-xs font-black uppercase tracking-widest border-2 border-gray-200 text-gray-700 hover:bg-gray-50 transition-all relative"
         >
           Chat com Profissional
+          <span 
+            v-if="proposal.unreadMessages > 0"
+            class="absolute -top-2 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[9px] font-black text-white ring-2 ring-white"
+          >
+            {{ proposal.unreadMessages }}
+          </span>
         </button>
         <button
           @click="handleAccept"

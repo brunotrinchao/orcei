@@ -59,5 +59,16 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  return proposal
+  // Adicionar contagem de mensagens não lidas para o cliente
+  const { ProposalMessage } = await import('../../../models/ProposalMessage')
+  const unreadCount = await ProposalMessage.countDocuments({
+    proposalId: proposal._id,
+    sender: 'freelancer',
+    read: false
+  })
+
+  return {
+    ...proposal.toObject ? proposal.toObject() : proposal,
+    unreadMessages: unreadCount
+  }
 })

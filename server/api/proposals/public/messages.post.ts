@@ -37,22 +37,27 @@ export default defineEventHandler(async (event) => {
     await ProposalService.logHistory(proposal._id, 'pending', 'system', { notes: body.text })
   }
 
-  // Trigger Pusher Event
+  // Trigger Pusher Event safely
   const pusher = usePusher()
   if (pusher) {
-    // Specific proposal channel
-    pusher.trigger(`private-proposal-${proposal._id}`, 'new-message', message)
-    
-    // Global profile channel for freelancer notifications
-    const profileId = typeof proposal.profileId === 'object' && proposal.profileId._id 
-      ? proposal.profileId._id.toString() 
-      : proposal.profileId.toString()
+    try {
+      // Specific proposal channel
+      await pusher.trigger(`private-proposal-${proposal._id}`, 'new-message', message)
+      
+      // Global profile channel for freelancer notifications
+      const profileId = typeof proposal.profileId === 'object' && (proposal.profileId as any)._id 
+        ? (proposal.profileId as any)._id.toString() 
+        : proposal.profileId.toString()
 
-    pusher.trigger(`private-profile-${profileId}`, 'proposal-notification', {
-      proposalId: proposal._id,
-      type: 'new-message',
-      message
-    })
+      await pusher.trigger(`private-profile-${profileId}`, 'proposal-notification', {
+        proposalId: proposal._id,
+        type: 'new-message',
+        message
+      })
+    } catch (pusherError) {
+      console.error('[Chat API] Pusher trigger failed:', pusherError)
+      // Não interrompemos o retorno pois a mensagem já foi salva no DB
+    }
   }
 
   return message

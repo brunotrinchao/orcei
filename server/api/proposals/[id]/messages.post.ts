@@ -26,10 +26,14 @@ export default defineEventHandler(async (event) => {
     text: body.text
   })
 
-  // Trigger Pusher Event
+  // Trigger Pusher Event safely
   const pusher = usePusher()
   if (pusher) {
-    pusher.trigger(`private-proposal-${id}`, 'new-message', message)
+    try {
+      await pusher.trigger(`private-proposal-${id}`, 'new-message', message)
+    } catch (pusherError) {
+      console.error('[Freelancer Chat API] Pusher trigger failed:', pusherError)
+    }
   }
 
   return message

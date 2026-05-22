@@ -46,7 +46,8 @@ watch(proposal, (newProposal) => {
   if (newProposal && !pusherInstance) {
     const { pusher } = usePusher({
       slug: route.params.slug,
-      token: token
+      token: token,
+      chatRole: 'client'
     })
     
     if (pusher) {

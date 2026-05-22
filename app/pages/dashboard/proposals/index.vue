@@ -80,7 +80,7 @@ async function setupGlobalNotifications() {
 function setupChatPusher(proposalId: string) {
   if (chatChannel) chatChannel.unbind_all()
   
-  const { pusher } = usePusher() // Uses session for auth
+  const { pusher } = usePusher({ chatRole: 'freelancer' }) // Uses session for auth
   if (pusher) {
     pusherInstance = pusher
     chatChannel = pusher.subscribe(`private-proposal-${proposalId}`)

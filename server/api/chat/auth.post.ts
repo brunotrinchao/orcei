@@ -6,12 +6,13 @@ export default defineEventHandler(async (event) => {
   if (!pusher) throw createError({ statusCode: 500, statusMessage: 'Pusher not configured' })
 
   const body = await readBody(event)
-  const socketId = body.socket_id
-  const channelName = body.channel_name
+  const { socket_id: socketId, channel_name: channelName, chatRole, slug, token } = body
 
   if (!socketId || !channelName) {
     throw createError({ statusCode: 400, statusMessage: 'Missing socket_id or channel_name' })
   }
+
+  console.log(`[Pusher Auth] Tentando autorizar canal: ${channelName} para papel: ${chatRole || 'desconhecido'}`)
 
   let authorized = false
 
@@ -20,22 +21,28 @@ export default defineEventHandler(async (event) => {
   if (proposalMatch) {
     const proposalId = proposalMatch[1]
     const proposal = await Proposal.findById(proposalId)
-    if (!proposal) throw createError({ statusCode: 404, statusMessage: 'Proposal not found' })
+    if (!proposal) {
+      console.error(`[Pusher Auth] Proposta ${proposalId} não encontrada`)
+      throw createError({ statusCode: 404, statusMessage: 'Proposal not found' })
+    }
 
-    // Freelancer
+    // Freelancer: Se tiver sessão, checa se é o dono
     const session = await getUserSession(event)
     if (session?.user) {
       const profile = await ProfileService.getByUserId((session.user as any).id)
       if (profile && proposal.profileId.toString() === profile._id.toString()) {
         authorized = true
+        console.log(`[Pusher Auth] Freelancer autorizado para canal: ${channelName}`)
       }
     }
 
-    // Client
+    // Client: Se não for freelancer, checa via slug/token
     if (!authorized) {
-      const { slug, token } = body
       if (slug === proposal.slug && (!proposal.token || token === proposal.token)) {
         authorized = true
+        console.log(`[Pusher Auth] Cliente autorizado via Slug/Token para canal: ${channelName}`)
+      } else {
+        console.warn(`[Pusher Auth] Cliente negado. Recebido slug=${slug}, token=${token}. Esperado slug=${proposal.slug}`)
       }
     }
   }

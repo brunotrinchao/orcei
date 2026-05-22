@@ -9,7 +9,14 @@ export default defineEventHandler(async (event) => {
   if (!slug) throw createError({ statusCode: 400, statusMessage: 'Missing Slug' })
   if (!body.text) throw createError({ statusCode: 400, statusMessage: 'Missing Message Text' })
 
-  const proposal = await Proposal.findOne({ slug })
+  let proposal
+  try {
+    proposal = await ProposalService.getBySlug(slug)
+  } catch (err) {
+    console.error('[Chat API] Erro ao buscar proposta:', err)
+    throw createError({ statusCode: 503, statusMessage: 'Erro de conexão com o banco de dados' })
+  }
+
   if (!proposal) throw createError({ statusCode: 404, statusMessage: 'Proposal not found' })
 
   // Security check

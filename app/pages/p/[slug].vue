@@ -219,8 +219,15 @@ const statusMap: any = {
       <div class="w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
         <AlertCircle class="w-10 h-10 text-red-400" />
       </div>
-      <h1 class="text-2xl font-black text-gray-900 tracking-tight mb-2">Proposta não encontrada</h1>
-      <p class="text-gray-500 font-medium">Este link pode ter expirado ou ser inválido.</p>
+      <h1 class="text-2xl font-black text-gray-900 tracking-tight mb-2">
+        {{ error.statusCode === 503 ? 'Sistema Temporariamente Offline' : 'Proposta não encontrada' }}
+      </h1>
+      <p class="text-gray-500 font-medium">
+        {{ error.statusCode === 503 ? 'Estamos com dificuldades de conexão com o banco de dados. Por favor, tente novamente em alguns instantes.' : 'Este link pode ter expirado ou ser inválido.' }}
+      </p>
+      <div v-if="error.statusCode === 503" class="mt-8">
+        <BaseButton @click="refresh()">Tentar Novamente</BaseButton>
+      </div>
     </div>
   </div>
 

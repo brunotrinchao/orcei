@@ -1,4 +1,5 @@
 import { Receiver } from "@upstash/qstash"
+import mongoose from 'mongoose'
 import { Profile } from '../../models/Profile'
 import { Client } from '../../models/Client'
 import { Proposal } from '../../models/Proposal'
@@ -22,6 +23,16 @@ export default defineEventHandler(async (event) => {
   if (!action) {
     console.error('[QStash Webhook] Ação não encontrada nos headers:', JSON.stringify(headers))
     throw createError({ statusCode: 400, statusMessage: 'Action missing' })
+  }
+
+  // Garantir conexão com MongoDB antes de qualquer operação
+  if (mongoose.connection.readyState !== 1) {
+    console.warn(`[QStash Webhook] MongoDB state is ${mongoose.connection.readyState}. Operation [${action}] might fail.`)
+    // Se estiver desconectado, tentamos forçar a conexão (útil em cold starts severos)
+    if (mongoose.connection.readyState === 0) {
+      const uri = config.mongodbUri || process.env.MONGODB_URI
+      if (uri) await mongoose.connect(uri)
+    }
   }
 
   // Validação de Segurança via SDK

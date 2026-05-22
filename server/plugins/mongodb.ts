@@ -9,19 +9,30 @@ export default defineNitroPlugin(async (nitroApp) => {
     return
   }
 
+  // Desabilitar buffering global para evitar timeouts silenciosos em serverless
+  // Se a conexão cair, o Mongoose deve falhar imediatamente ao invés de esperar 10s
+  mongoose.set('bufferCommands', false)
+
   // Debug ofuscado
   const sanitizedUri = uri.replace(/:([^@]+)@/, ':****@')
   console.log(`[MongoDB] Tentando conectar em: ${sanitizedUri}`)
 
   try {
-    // Configurações para evitar buffering excessivo e timeouts em serverless
     const options = {
       connectTimeoutMS: 10000,
       socketTimeoutMS: 45000,
-      serverSelectionTimeoutMS: 5000
+      serverSelectionTimeoutMS: 5000,
+      // Manter pool de conexões otimizado
+      maxPoolSize: 10
     }
 
     if (mongoose.connection.readyState === 1) {
+      return
+    }
+
+    // Se estiver conectando (2), esperamos a conexão atual
+    if (mongoose.connection.readyState === 2) {
+      console.log('[MongoDB] Já existe uma tentativa de conexão em andamento...')
       return
     }
 
@@ -31,3 +42,4 @@ export default defineNitroPlugin(async (nitroApp) => {
     console.error('MongoDB connection error:', e)
   }
 })
+

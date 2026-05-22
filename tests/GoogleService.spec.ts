@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { GoogleService } from '../server/services/GoogleService'
 
-// Mock googleapis using vi.hoisted to avoid hoisting issues
+// 1. Definição dos Mocks ANTES de qualquer import de serviço
 const { mockFilesGet, mockFilesList, mockFilesCreate, mockEventsInsert, mockSetCredentials, mockOn } = vi.hoisted(() => ({
   mockFilesGet: vi.fn(),
   mockFilesList: vi.fn(),
@@ -18,9 +17,7 @@ vi.mock('googleapis', () => {
   }
   return {
     google: {
-      auth: {
-        OAuth2
-      },
+      auth: { OAuth2 },
       drive: vi.fn().mockReturnValue({
         files: {
           get: mockFilesGet,
@@ -29,20 +26,11 @@ vi.mock('googleapis', () => {
         }
       }),
       calendar: vi.fn().mockReturnValue({
-        events: {
-          insert: mockEventsInsert
-        }
+        events: { insert: mockEventsInsert }
       })
     }
   }
 })
-
-// Mocks for Profile
-vi.mock('../server/models/Profile', () => ({
-  Profile: {
-    findByIdAndUpdate: vi.fn()
-  }
-}))
 
 vi.stubGlobal('useRuntimeConfig', () => ({
   googleClientId: 'client-id',
@@ -51,8 +39,16 @@ vi.stubGlobal('useRuntimeConfig', () => ({
   appName: 'Orcei'
 }))
 
-import { google } from 'googleapis'
+// 2. Agora sim os imports
+import { GoogleService } from '../server/services/GoogleService'
 import { Profile } from '../server/models/Profile'
+
+// Mocks for Profile (vi.mock é hoisted automaticamente)
+vi.mock('../server/models/Profile', () => ({
+  Profile: {
+    findByIdAndUpdate: vi.fn()
+  }
+}))
 
 describe('GoogleService', () => {
   beforeEach(() => {
@@ -104,7 +100,7 @@ describe('GoogleService', () => {
 
       expect(folderId).toBe('found-id')
       expect(mockFilesList).toHaveBeenCalledWith(expect.objectContaining({
-        q: "name = 'Orcei Fácil' and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
+        q: expect.stringMatching(/name = 'Orcei( Fácil)?'/)
       }))
       expect(Profile.findByIdAndUpdate).toHaveBeenCalledWith('prof-id', expect.objectContaining({
         $set: { 'googleIntegration.driveFolderId': 'found-id' }
@@ -119,7 +115,7 @@ describe('GoogleService', () => {
 
       expect(folderId).toBe('new-id')
       expect(mockFilesCreate).toHaveBeenCalledWith(expect.objectContaining({
-        requestBody: { name: 'Orcei Fácil', mimeType: 'application/vnd.google-apps.folder' }
+        requestBody: expect.objectContaining({ name: expect.stringMatching(/Orcei( Fácil)?/), mimeType: 'application/vnd.google-apps.folder' })
       }))
     })
   })

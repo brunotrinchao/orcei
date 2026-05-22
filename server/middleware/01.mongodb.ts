@@ -7,6 +7,19 @@ export default defineEventHandler(async (event) => {
   // Se já está conectado, segue o fluxo
   if (mongoose.connection.readyState === 1) return
 
+  // Se estiver desconectado (0), tentamos disparar a conexão novamente
+  if (mongoose.connection.readyState === 0) {
+    const config = useRuntimeConfig()
+    const uri = config.mongodbUri || process.env.MONGODB_URI
+    if (uri) {
+      console.log('[Middleware DB] Estado 0 detectado. Tentando reconectar...')
+      mongoose.connect(uri, {
+        serverSelectionTimeoutMS: 5000,
+        connectTimeoutMS: 10000,
+      }).catch(err => console.error('[Middleware DB] Erro na tentativa de reconexão:', err))
+    }
+  }
+
   // Se estiver conectando (2) ou desconectado (0), esperamos um pouco (max 10s)
   if (mongoose.connection.readyState !== 1) {
     console.log(`[Middleware DB] Banco em estado ${mongoose.connection.readyState}, aguardando estabilização...`)

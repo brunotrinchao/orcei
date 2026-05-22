@@ -151,7 +151,8 @@ async function sendReply() {
     status: 'pending'
   }
   
-  selectedProposalMessages.value.push(optimisticMessage)
+  // Força reatividade criando novo array
+  selectedProposalMessages.value = [...selectedProposalMessages.value, optimisticMessage]
 
   try {
     const sentMessage = await $fetch<any>(`/api/proposals/${proposalId}/messages`, {
@@ -159,13 +160,12 @@ async function sendReply() {
       body: { text }
     })
     
-    // Atualiza a mensagem otimista com o ID real
-    const idx = selectedProposalMessages.value.findIndex(m => m._id === tempId)
-    if (idx !== -1) {
-      selectedProposalMessages.value[idx] = { ...sentMessage, status: 'sent' }
-    }
+    // Atualiza a mensagem otimista com o ID real de forma reativa
+    selectedProposalMessages.value = selectedProposalMessages.value.map(m => 
+      m._id === tempId ? { ...sentMessage, status: 'sent' } : m
+    )
   } catch (e) {
-    // Remove se falhar
+    // Remove se falhar de forma reativa
     selectedProposalMessages.value = selectedProposalMessages.value.filter(m => m._id !== tempId)
     notify('Erro', 'Erro ao enviar resposta')
   }

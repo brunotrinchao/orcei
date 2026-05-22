@@ -59,9 +59,11 @@ watch(proposal, (newProposal) => {
           // Mas o Pusher envia o objeto real do DB.
           const existingIdx = messages.value.findIndex(m => m._id === data._id || (m.status === 'pending' && m.text === data.text))
           if (existingIdx !== -1) {
-            messages.value[existingIdx] = { ...data, status: 'sent' }
+            const newMessages = [...messages.value]
+            newMessages[existingIdx] = { ...data, status: 'sent' }
+            messages.value = newMessages
           } else {
-            messages.value.push({ ...data, status: 'sent' })
+            messages.value = [...messages.value, { ...data, status: 'sent' }]
           }
         }
       })
@@ -91,7 +93,8 @@ async function sendMessage() {
   }
   
   if (!messages.value) messages.value = []
-  messages.value.push(optimisticMessage)
+  // Força reatividade criando novo array
+  messages.value = [...messages.value, optimisticMessage]
 
   try {
     const sentMessage = await $fetch<any>(`/api/proposals/public/messages`, {
@@ -100,11 +103,10 @@ async function sendMessage() {
       body: { text }
     })
     
-    // Atualiza a mensagem otimista com o ID real
-    const idx = messages.value.findIndex(m => m._id === tempId)
-    if (idx !== -1) {
-      messages.value[idx] = { ...sentMessage, status: 'sent' }
-    }
+    // Atualiza a mensagem otimista com o ID real de forma reativa
+    messages.value = messages.value.map(m => 
+      m._id === tempId ? { ...sentMessage, status: 'sent' } : m
+    )
     
     await refresh() // Atualiza status da proposta
   } catch (e) {

@@ -19,10 +19,9 @@ export default defineNitroPlugin(async (nitroApp) => {
 
   try {
     const options = {
-      connectTimeoutMS: 10000,
+      connectTimeoutMS: 15000,
       socketTimeoutMS: 45000,
-      serverSelectionTimeoutMS: 5000,
-      // Manter pool de conexões otimizado
+      serverSelectionTimeoutMS: 30000, // Aumentado para 30s para evitar falhas em cold starts
       maxPoolSize: 10
     }
 
@@ -32,14 +31,19 @@ export default defineNitroPlugin(async (nitroApp) => {
 
     // Se estiver conectando (2), esperamos a conexão atual
     if (mongoose.connection.readyState === 2) {
-      console.log('[MongoDB] Já existe uma tentativa de conexão em andamento...')
+      console.log('[MongoDB] Conexão já em andamento...')
       return
     }
 
+    console.log('[MongoDB] Iniciando conexão...')
     await mongoose.connect(uri, options)
-    console.log('MongoDB connected successfully')
-  } catch (e) {
-    console.error('MongoDB connection error:', e)
+    console.log('[MongoDB] Conectado com sucesso!')
+  } catch (e: any) {
+    console.error('[MongoDB] Erro fatal de conexão:', {
+      name: e.name,
+      message: e.message,
+      reason: e.reason ? 'Server Selection Timeout / Network Access' : 'Authentication / DNS'
+    })
   }
 })
 

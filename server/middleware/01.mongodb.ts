@@ -14,8 +14,8 @@ export default defineEventHandler(async (event) => {
     if (uri) {
       console.log('[Middleware DB] Estado 0 detectado. Tentando reconectar...')
       mongoose.connect(uri, {
-        serverSelectionTimeoutMS: 5000,
-        connectTimeoutMS: 10000,
+        serverSelectionTimeoutMS: 30000,
+        connectTimeoutMS: 15000,
       }).catch(err => console.error('[Middleware DB] Erro na tentativa de reconexão:', err))
     }
   }

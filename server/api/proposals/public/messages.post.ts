@@ -41,8 +41,16 @@ export default defineEventHandler(async (event) => {
   const pusher = usePusher()
   if (pusher) {
     try {
+      // Enviar apenas o necessário para evitar erro 413 (max 10KB)
+      const messagePayload = {
+        _id: message._id,
+        text: message.text,
+        sender: message.sender,
+        createdAt: message.createdAt
+      }
+
       // Specific proposal channel
-      await pusher.trigger(`private-proposal-${proposal._id}`, 'new-message', message)
+      await pusher.trigger(`private-proposal-${proposal._id}`, 'new-message', messagePayload)
       
       // Global profile channel for freelancer notifications
       const profileId = typeof proposal.profileId === 'object' && (proposal.profileId as any)._id 
@@ -52,7 +60,7 @@ export default defineEventHandler(async (event) => {
       await pusher.trigger(`private-profile-${profileId}`, 'proposal-notification', {
         proposalId: proposal._id,
         type: 'new-message',
-        message
+        message: messagePayload
       })
     } catch (pusherError) {
       console.error('[Chat API] Pusher trigger failed:', pusherError)

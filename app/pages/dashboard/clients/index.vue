@@ -9,7 +9,7 @@ const searchQuery = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 10
 
-const { data: clientsData, refresh } = useFetch<any>('/api/clients', {
+const { data: clientsData, refresh, pending } = useFetch<any>('/api/clients', {
   query: computed(() => ({
     page: currentPage.value,
     limit: itemsPerPage,
@@ -315,39 +315,70 @@ const formatPhone = (phone: string) => {
             </tr>
           </thead>
           <tbody class="divide-y-2 divide-gray-50">
-            <tr v-for="client in clients" :key="client._id" class="hover:bg-gray-50/30 transition-all group">
-              <td class="px-10 py-8">
-                <div class="flex flex-col">
-                  <span class="font-black text-lg text-gray-900 group-hover:text-blue-600 transition-colors">{{ client.name }}</span>
-                  <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{{ client.taxId || 'Sem documento' }}</span>
-                </div>
-              </td>
-              <td class="px-10 py-8">
-                <div class="flex flex-col">
-                  <span class="text-sm font-bold text-gray-600">{{ client.email }}</span>
-                  <div class="flex items-center gap-2 mt-1">
-                    <span class="text-xs font-black text-gray-400">{{ formatPhone(client.phone) }}</span>
-                    <div v-if="client.isWhatsapp" class="i-simple-icons-whatsapp w-3.5 h-3.5 text-green-500"></div>
+            <template v-if="pending && clients?.length === 0">
+              <tr v-for="i in 5" :key="i">
+                <td class="px-10 py-8">
+                  <div class="space-y-2">
+                    <BaseSkeleton width="60%" height="1.25rem" />
+                    <BaseSkeleton width="30%" height="0.75rem" />
                   </div>
-                </div>
-              </td>
-              <td class="px-10 py-8">
-                <div class="flex flex-col">
-                  <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">{{ client.address.city }} - {{ client.address.state }}</span>
-                  <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest line-clamp-1 max-w-[180px] mt-1">{{ client.address.street }}, {{ client.address.number }}</span>
-                </div>
-              </td>
-              <td class="px-10 py-8 text-right">
-                <div class="flex justify-end gap-3 items-center">
-                  <button @click="openModal(client)" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all" title="Editar">
-                    <Pencil class="w-5 h-5" />
-                  </button>
-                  <button @click="deleteClient(client._id)" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all" title="Excluir">
-                    <Trash2 class="w-5 h-5" />
-                  </button>
-                </div>
-              </td>
-            </tr>
+                </td>
+                <td class="px-10 py-8">
+                  <div class="space-y-2">
+                    <BaseSkeleton width="150px" height="0.9rem" />
+                    <BaseSkeleton width="120px" height="0.9rem" />
+                  </div>
+                </td>
+                <td class="px-10 py-8">
+                  <div class="space-y-2">
+                    <BaseSkeleton width="100px" height="0.8rem" />
+                    <BaseSkeleton width="140px" height="0.8rem" />
+                  </div>
+                </td>
+                <td class="px-10 py-8 text-right">
+                  <div class="flex justify-end gap-3">
+                    <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="1rem" />
+                    <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="1rem" />
+                  </div>
+                </td>
+              </tr>
+            </template>
+            <template v-else>
+              <tr v-for="client in clients" :key="client._id" class="hover:bg-gray-50/30 transition-all group">
+                <td class="px-10 py-8">
+                  <div class="flex flex-col">
+                    <span class="font-black text-lg text-gray-900 group-hover:text-blue-600 transition-colors">{{ client.name }}</span>
+                    <span v-if="client.taxId" class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{{ client.taxId }}</span>
+                    <span v-else class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Sem documento</span>
+                  </div>
+                </td>
+                <td class="px-10 py-8">
+                  <div class="flex flex-col">
+                    <span class="text-sm font-bold text-gray-600">{{ client.email }}</span>
+                    <div class="flex items-center gap-2 mt-1">
+                      <span class="text-xs font-black text-gray-400">{{ formatPhone(client.phone) }}</span>
+                      <div v-if="client.isWhatsapp" class="i-simple-icons-whatsapp w-3.5 h-3.5 text-green-500"></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-10 py-8">
+                  <div class="flex flex-col">
+                    <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">{{ client.address.city }} - {{ client.address.state }}</span>
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest line-clamp-1 max-w-[180px] mt-1">{{ client.address.street }}, {{ client.address.number }}</span>
+                  </div>
+                </td>
+                <td class="px-10 py-8 text-right">
+                  <div class="flex justify-end gap-3 items-center">
+                    <button @click="openModal(client)" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all" title="Editar">
+                      <Pencil class="w-5 h-5" />
+                    </button>
+                    <button @click="deleteClient(client._id)" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all" title="Excluir">
+                      <Trash2 class="w-5 h-5" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>

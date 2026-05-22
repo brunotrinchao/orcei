@@ -104,13 +104,6 @@ async function generateAIReport() {
 
 <template>
   <div class="space-y-12 relative">
-    <div v-if="status === 'pending' && !stats" class="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-center justify-center rounded-[3rem]">
-      <div class="flex flex-col items-center gap-4">
-        <Loader2 class="w-10 h-10 animate-spin text-blue-600" />
-        <p class="text-xs font-black text-gray-400 uppercase tracking-widest">Carregando Dados...</p>
-      </div>
-    </div>
-
     <!-- Filtros de Período -->
     <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
       <button 
@@ -132,48 +125,59 @@ async function generateAIReport() {
 
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group">
-        <div class="flex justify-between items-start mb-6">
-          <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 transition-colors">
-            <FileText class="w-6 h-6 text-blue-600 group-hover:text-white transition-colors" />
-          </div>
-          <span class="text-[10px] font-black text-green-500 uppercase tracking-widest bg-green-50 px-2 py-1 rounded-lg">+12%</span>
+      <div v-for="i in 4" :key="i" v-if="status === 'pending' && !stats" class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-4">
+        <div class="flex justify-between items-start">
+          <BaseSkeleton width="3rem" height="3rem" borderRadius="1rem" />
+          <BaseSkeleton width="3rem" height="1.5rem" />
         </div>
-        <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Total Orçamentos</p>
-        <h3 class="text-3xl font-black text-gray-900">{{ stats?.proposalsCount ?? 0 }}</h3>
+        <BaseSkeleton width="60%" height="0.75rem" />
+        <BaseSkeleton width="40%" height="2rem" />
       </div>
 
-      <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group">
-        <div class="flex justify-between items-start mb-6">
-          <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center group-hover:bg-green-600 transition-colors">
-            <DollarSign class="w-6 h-6 text-green-600 group-hover:text-white transition-colors" />
+      <template v-else>
+        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group">
+          <div class="flex justify-between items-start mb-6">
+            <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 transition-colors">
+              <FileText class="w-6 h-6 text-blue-600 group-hover:text-white transition-colors" />
+            </div>
+            <span class="text-[10px] font-black text-green-500 uppercase tracking-widest bg-green-50 px-2 py-1 rounded-lg">+12%</span>
           </div>
-          <span class="text-[10px] font-black text-green-500 uppercase tracking-widest bg-green-50 px-2 py-1 rounded-lg">+R$ 2.4k</span>
+          <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Total Orçamentos</p>
+          <h3 class="text-3xl font-black text-gray-900">{{ stats?.proposalsCount ?? 0 }}</h3>
         </div>
-        <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Receita Confirmada</p>
-        <h3 class="text-3xl font-black text-gray-900">R$ {{ (stats?.totalRevenue as number)?.toLocaleString('pt-BR') ?? '0,00' }}</h3>
-      </div>
 
-      <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group">
-        <div class="flex justify-between items-start mb-6">
-          <div class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center group-hover:bg-purple-600 transition-colors">
-            <TrendingUp class="w-6 h-6 text-purple-600 group-hover:text-white transition-colors" />
+        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group">
+          <div class="flex justify-between items-start mb-6">
+            <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center group-hover:bg-green-600 transition-colors">
+              <DollarSign class="w-6 h-6 text-green-600 group-hover:text-white transition-colors" />
+            </div>
+            <span class="text-[10px] font-black text-green-500 uppercase tracking-widest bg-green-50 px-2 py-1 rounded-lg">+R$ 2.4k</span>
           </div>
-          <span class="text-[10px] font-black text-purple-500 uppercase tracking-widest bg-purple-50 px-2 py-1 rounded-lg">Top 5%</span>
+          <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Receita Confirmada</p>
+          <h3 class="text-3xl font-black text-gray-900">R$ {{ (stats?.totalRevenue as number)?.toLocaleString('pt-BR') ?? '0,00' }}</h3>
         </div>
-        <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Taxa de Aprovação</p>
-        <h3 class="text-3xl font-black text-gray-900">{{ Math.round(stats?.approvalRate ?? 0) }}%</h3>
-      </div>
 
-      <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group">
-        <div class="flex justify-between items-start mb-6">
-          <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center group-hover:bg-orange-600 transition-colors">
-            <Users class="w-6 h-6 text-orange-600 group-hover:text-white transition-colors" />
+        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group">
+          <div class="flex justify-between items-start mb-6">
+            <div class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center group-hover:bg-purple-600 transition-colors">
+              <TrendingUp class="w-6 h-6 text-purple-600 group-hover:text-white transition-colors" />
+            </div>
+            <span class="text-[10px] font-black text-purple-500 uppercase tracking-widest bg-purple-50 px-2 py-1 rounded-lg">Top 5%</span>
           </div>
+          <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Taxa de Aprovação</p>
+          <h3 class="text-3xl font-black text-gray-900">{{ Math.round(stats?.approvalRate ?? 0) }}%</h3>
         </div>
-        <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Ticket Médio</p>
-        <h3 class="text-3xl font-black text-gray-900">R$ {{ Math.round(stats?.ticketMedia ?? 0).toLocaleString('pt-BR') }}</h3>
-      </div>
+
+        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group">
+          <div class="flex justify-between items-start mb-6">
+            <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center group-hover:bg-orange-600 transition-colors">
+              <Users class="w-6 h-6 text-orange-600 group-hover:text-white transition-colors" />
+            </div>
+          </div>
+          <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Ticket Médio</p>
+          <h3 class="text-3xl font-black text-gray-900">R$ {{ Math.round(stats?.ticketMedia ?? 0).toLocaleString('pt-BR') }}</h3>
+        </div>
+      </template>
     </div>
 
     <!-- Banner IA (Abaixo das Stats, altura reduzida) -->
@@ -217,7 +221,8 @@ async function generateAIReport() {
       <div class="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm">
         <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-8">Evolução do Faturamento</h3>
         <div class="h-80 relative">
-          <Line :data="revenueChartData" :options="{ ...chartOptions, plugins: { ...chartOptions.plugins, legend: { display: false } } }" />
+          <BaseSkeleton v-if="status === 'pending' && !stats" height="100%" borderRadius="1.5rem" />
+          <Line v-else :data="revenueChartData" :options="{ ...chartOptions, plugins: { ...chartOptions.plugins, legend: { display: false } } }" />
         </div>
       </div>
 
@@ -225,7 +230,8 @@ async function generateAIReport() {
       <div class="lg:col-span-1 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm">
         <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-8">Distribuição de Status</h3>
         <div class="h-80 relative">
-          <Doughnut :data="statusChartData" :options="chartOptions" />
+          <BaseSkeleton v-if="status === 'pending' && !stats" height="100%" borderRadius="1.5rem" />
+          <Doughnut v-else :data="statusChartData" :options="chartOptions" />
         </div>
       </div>
 
@@ -236,25 +242,39 @@ async function generateAIReport() {
           <NuxtLink to="/dashboard/clients" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-800">Ver Todos</NuxtLink>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div v-for="(client, idx) in stats?.clientRanking" :key="idx" class="flex items-center justify-between p-5 bg-gray-50/50 rounded-3xl border border-gray-100 hover:bg-gray-50 transition-colors group">
-            <div class="flex items-center gap-4">
-              <div class="w-10 h-10 bg-white rounded-xl border border-gray-200 flex items-center justify-center text-xs font-black text-gray-400 group-hover:border-blue-200 group-hover:text-blue-600 transition-all">
-                #{{ (idx as number) + 1 }}
+          <template v-if="status === 'pending' && !stats">
+            <div v-for="i in 4" :key="i" class="flex items-center justify-between p-5 bg-gray-50/50 rounded-3xl border border-gray-100">
+              <div class="flex items-center gap-4">
+                <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="0.75rem" />
+                <div class="space-y-2">
+                  <BaseSkeleton width="120px" height="1rem" />
+                  <BaseSkeleton width="80px" height="0.6rem" />
+                </div>
               </div>
-              <div>
-                <p class="font-bold text-gray-900">{{ client.name }}</p>
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Faturamento Acumulado</p>
+              <BaseSkeleton width="60px" height="1.5rem" />
+            </div>
+          </template>
+          <template v-else>
+            <div v-for="(client, idx) in stats?.clientRanking" :key="idx" class="flex items-center justify-between p-5 bg-gray-50/50 rounded-3xl border border-gray-100 hover:bg-gray-50 transition-colors group">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-white rounded-xl border border-gray-200 flex items-center justify-center text-xs font-black text-gray-400 group-hover:border-blue-200 group-hover:text-blue-600 transition-all">
+                  #{{ (idx as number) + 1 }}
+                </div>
+                <div>
+                  <p class="font-bold text-gray-900">{{ client.name }}</p>
+                  <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Faturamento Acumulado</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="font-black text-gray-900">R$ {{ (client.revenue as number).toLocaleString('pt-BR') }}</p>
+                <div class="w-24 h-1.5 bg-gray-100 rounded-full mt-2 overflow-hidden">
+                  <div class="h-full bg-blue-600 rounded-full" :style="{ width: ((client.revenue as number) / stats.totalRevenue * 100) + '%' }"></div>
+                </div>
               </div>
             </div>
-            <div class="text-right">
-              <p class="font-black text-gray-900">R$ {{ (client.revenue as number).toLocaleString('pt-BR') }}</p>
-              <div class="w-24 h-1.5 bg-gray-100 rounded-full mt-2 overflow-hidden">
-                <div class="h-full bg-blue-600 rounded-full" :style="{ width: ((client.revenue as number) / stats.totalRevenue * 100) + '%' }"></div>
-              </div>
-            </div>
-          </div>
+          </template>
         </div>
-        <div v-if="!stats?.clientRanking?.length" class="text-center py-12">
+        <div v-if="status === 'success' && !stats?.clientRanking?.length" class="text-center py-12">
           <p class="text-gray-400 font-medium">Nenhum dado de faturamento disponível.</p>
         </div>
       </div>

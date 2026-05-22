@@ -7,8 +7,8 @@ interface Props {
 }
 
 withDefaults(defineProps<Props>(), {
-  width: '100%',
-  height: '1rem',
+  width: 'auto',
+  height: 'auto',
   borderRadius: '0.5rem',
   customClass: ''
 })
@@ -16,14 +16,14 @@ withDefaults(defineProps<Props>(), {
 
 <template>
   <div
-    class="animate-pulse"
+    class="animate-pulse shrink-0"
     :class="[
       !customClass.includes('bg-') ? 'bg-gray-200' : '',
       customClass
     ]"
     :style="{
-      width,
-      height,
+      width: width !== 'auto' ? width : undefined,
+      height: height !== 'auto' ? height : undefined,
       borderRadius
     }"
   ></div>

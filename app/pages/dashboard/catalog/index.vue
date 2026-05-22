@@ -12,7 +12,7 @@ const searchQuery = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 10
 
-const { data: catalogData, refresh } = useFetch<any>('/api/catalog', {
+const { data: catalogData, refresh, pending } = useFetch<any>('/api/catalog', {
   query: computed(() => ({
     page: currentPage.value,
     limit: itemsPerPage,
@@ -406,46 +406,78 @@ function getIcon(name: string) {
             </tr>
           </thead>
           <tbody class="divide-y-2 divide-gray-50">
-            <tr v-for="item in items" :key="item._id" class="hover:bg-gray-50/30 transition-all group">
-              <td class="px-10 py-8">
-                <div class="flex items-center gap-6">
-                  <div class="w-16 h-16 rounded-2xl border-2 border-gray-100 bg-white overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
-                    <img v-if="item.imageUrl" :src="item.imageUrl" class="w-full h-full object-cover">
-                    <div v-else class="text-gray-400">
-                      <component :is="getIcon(item.icon || 'Package')" class="w-8 h-8" />
+            <template v-if="pending && items?.length === 0">
+              <tr v-for="i in 5" :key="i">
+                <td class="px-10 py-8">
+                  <div class="flex items-center gap-6">
+                    <BaseSkeleton width="4rem" height="4rem" borderRadius="1rem" />
+                    <div class="space-y-2 flex-1">
+                      <BaseSkeleton width="60%" height="1.25rem" />
+                      <BaseSkeleton width="90%" height="0.75rem" />
                     </div>
                   </div>
-                  <div class="flex flex-col">
-                    <span class="font-black text-lg text-gray-900 group-hover:text-blue-600 transition-colors">{{ item.name }}</span>
-                    <span class="text-xs font-bold text-gray-400 line-clamp-1 max-w-xl mt-1">{{ item.description || 'Sem descrição comercial' }}</span>
+                </td>
+                <td class="px-10 py-8 text-center">
+                  <div class="flex justify-center">
+                    <BaseSkeleton width="80px" height="1.5rem" borderRadius="999px" />
                   </div>
-                </div>
-              </td>
-              <td class="px-10 py-8 text-center">
-                <span 
-                  :class="item.type === 'service' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-purple-50 text-purple-600 border-purple-100'" 
-                  class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border"
-                >
-                  {{ item.type === 'service' ? 'Serviço' : 'Produto' }}
-                </span>
-              </td>
-              <td class="px-10 py-8 text-right">
-                <div class="flex flex-col items-end">
-                  <span class="font-black text-lg text-gray-900">R$ {{ (item.price ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-                  <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">por {{ item.unit }}</span>
-                </div>
-              </td>
-              <td class="px-10 py-8 text-right">
-                <div class="flex justify-end gap-3 items-center">
-                  <button @click="openModal(item)" class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all">
-                    <Pencil class="w-6 h-6" />
-                  </button>
-                  <button @click="deleteItem(item._id)" class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all">
-                    <Trash2 class="w-6 h-6" />
-                  </button>
-                </div>
-              </td>
-            </tr>
+                </td>
+                <td class="px-10 py-8 text-right">
+                  <div class="space-y-2">
+                    <BaseSkeleton width="100px" height="1.5rem" />
+                    <BaseSkeleton width="60px" height="0.75rem" />
+                  </div>
+                </td>
+                <td class="px-10 py-8 text-right">
+                  <div class="flex justify-end gap-3">
+                    <BaseSkeleton width="3rem" height="3rem" borderRadius="1rem" />
+                    <BaseSkeleton width="3rem" height="3rem" borderRadius="1rem" />
+                  </div>
+                </td>
+              </tr>
+            </template>
+            <template v-else>
+              <tr v-for="item in items" :key="item._id" class="hover:bg-gray-50/30 transition-all group">
+                <td class="px-10 py-8">
+                  <div class="flex items-center gap-6">
+                    <div class="w-16 h-16 rounded-2xl border-2 border-gray-100 bg-white overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
+                      <img v-if="item.imageUrl" :src="item.imageUrl" class="w-full h-full object-cover">
+                      <div v-else class="text-gray-400">
+                        <component :is="getIcon(item.icon || 'Package')" class="w-8 h-8" />
+                      </div>
+                    </div>
+                    <div class="flex flex-col">
+                      <span class="font-black text-lg text-gray-900 group-hover:text-blue-600 transition-colors">{{ item.name }}</span>
+                      <span class="text-xs font-bold text-gray-400 line-clamp-1 max-w-xl mt-1">{{ item.description || 'Sem descrição comercial' }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-10 py-8 text-center">
+                  <span 
+                    :class="item.type === 'service' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-purple-50 text-purple-600 border-purple-100'" 
+                    class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border"
+                  >
+                    {{ item.type === 'service' ? 'Serviço' : 'Produto' }}
+                  </span>
+                </td>
+                <td class="px-10 py-8 text-right">
+                  <div class="flex flex-col items-end">
+                    <span class="font-black text-lg text-gray-900">R$ {{ (item.price ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">por {{ item.unit }}</span>
+                  </div>
+                </td>
+                <td class="px-10 py-8 text-right">
+                  <div class="flex justify-end gap-3 items-center">
+                    <button @click="openModal(item)" class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all">
+                      <Pencil class="w-6 h-6" />
+                    </button>
+                    <button @click="deleteItem(item._id)" class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all">
+                      <Trash2 class="w-6 h-6" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>

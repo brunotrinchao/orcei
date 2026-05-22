@@ -468,77 +468,97 @@ const formatTime = (date: any) => {
     <div class="bg-white rounded-[2rem] sm:rounded-[2.5rem] border border-gray-200 shadow-sm overflow-hidden">
       <!-- Mobile View (Cards) -->
       <div class="block sm:hidden divide-y divide-gray-100">
-        <div v-for="proposal in proposals" :key="proposal._id" class="p-4 space-y-4">
-          <!-- Top Row: Title & Status -->
-          <div class="flex justify-between items-start gap-3">
-            <div class="flex flex-col min-w-0">
-              <span class="font-black text-gray-900 text-base leading-tight truncate">{{ proposal.title || 'Sem título' }}</span>
-              <div class="flex items-center gap-2 mt-1">
-                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ proposal.client.name }}</span>
-                <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
-                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ formatDate(proposal.createdAt) }}</span>
+        <template v-if="pending && proposals?.length === 0">
+          <div v-for="i in 3" :key="i" class="p-6 space-y-4">
+            <div class="flex justify-between items-start">
+              <div class="space-y-2 flex-1">
+                <BaseSkeleton width="70%" height="1.25rem" />
+                <BaseSkeleton width="40%" height="0.75rem" />
+              </div>
+              <BaseSkeleton width="60px" height="1.5rem" borderRadius="999px" />
+            </div>
+            <div class="flex justify-between items-center pt-4 border-t border-gray-50">
+              <BaseSkeleton width="80px" height="1.5rem" />
+              <div class="flex gap-2">
+                <BaseSkeleton width="2rem" height="2rem" borderRadius="0.5rem" />
+                <BaseSkeleton width="2rem" height="2rem" borderRadius="0.5rem" />
               </div>
             </div>
-            <BaseBadge :variant="getStatusVariant(proposal.status)" class="shrink-0">
-              {{ statusMap[proposal.status]?.label }}
-            </BaseBadge>
           </div>
+        </template>
+        <template v-else>
+          <div v-for="proposal in proposals" :key="proposal._id" class="p-4 space-y-4">
+            <!-- Top Row: Title & Status -->
+            <div class="flex justify-between items-start gap-3">
+              <div class="flex flex-col min-w-0">
+                <span class="font-black text-gray-900 text-base leading-tight truncate">{{ proposal.title || 'Sem título' }}</span>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ proposal.client.name }}</span>
+                  <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+                  <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ formatDate(proposal.createdAt) }}</span>
+                </div>
+              </div>
+              <BaseBadge :variant="getStatusVariant(proposal.status)" class="shrink-0">
+                {{ statusMap[proposal.status]?.label }}
+              </BaseBadge>
+            </div>
 
-          <!-- Bottom Row: Price & Actions -->
-          <div class="flex justify-between items-center pt-2 border-t border-gray-50">
-            <span class="font-black text-gray-900 text-lg tracking-tight">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-            <div class="flex items-center gap-1">
-              <button 
-                @click="openChat(proposal)"
-                class="p-2 text-blue-600 hover:text-blue-700 bg-blue-50 rounded-lg transition-all relative"
-                title="Chat e Interações"
-                aria-label="Abrir chat do orçamento"
-              >
-                <MessageCircle class="w-4 h-4" />
-                <span 
-                  v-if="proposal.unreadMessages > 0"
-                  class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[8px] font-black text-white ring-2 ring-white"
+            <!-- Bottom Row: Price & Actions -->
+            <div class="flex justify-between items-center pt-2 border-t border-gray-50">
+              <span class="font-black text-gray-900 text-lg tracking-tight">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+              <div class="flex items-center gap-1">
+                <button 
+                  @click="openChat(proposal)"
+                  class="p-2 text-blue-600 hover:text-blue-700 bg-blue-50 rounded-lg transition-all relative"
+                  title="Chat e Interações"
+                  aria-label="Abrir chat do orçamento"
                 >
-                  {{ proposal.unreadMessages }}
-                </span>
-              </button>
-              <button 
-                @click="openHistory(proposal)"
-                class="p-2 text-gray-400 hover:text-blue-600 bg-gray-50 rounded-lg transition-all"
-                title="Histórico"
-                aria-label="Ver histórico do orçamento"
-              >
-                <History class="w-4 h-4" />
-              </button>
-              <button 
-                @click="openPreview(proposal)"
-                class="p-2 text-gray-400 hover:text-gray-900 bg-gray-50 rounded-lg transition-all"
-                title="Visualizar"
-                aria-label="Visualizar orçamento"
-              >
-                <Eye class="w-4 h-4" />
-              </button>
-              <button 
-                v-if="proposal.client.phone"
-                @click="sendWhatsapp(proposal)"
-                class="p-2 text-green-500 hover:text-green-600 bg-green-50 rounded-lg transition-all"
-                title="WhatsApp"
-                aria-label="Enviar via WhatsApp"
-              >
-                <MessageCircle class="w-4 h-4" />
-              </button>
-              <button 
-                v-if="proposal.status !== 'accepted'"
-                @click="openModal(proposal)"
-                class="p-2 text-gray-400 hover:text-blue-600 bg-gray-50 rounded-lg transition-all"
-                title="Editar"
-                aria-label="Editar orçamento"
-              >
-                <Pencil class="w-4 h-4" />
-              </button>
+                  <MessageCircle class="w-4 h-4" />
+                  <span 
+                    v-if="proposal.unreadMessages > 0"
+                    class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[8px] font-black text-white ring-2 ring-white"
+                  >
+                    {{ proposal.unreadMessages }}
+                  </span>
+                </button>
+                <button 
+                  @click="openHistory(proposal)"
+                  class="p-2 text-gray-400 hover:text-blue-600 bg-gray-50 rounded-lg transition-all"
+                  title="Histórico"
+                  aria-label="Ver histórico do orçamento"
+                >
+                  <History class="w-4 h-4" />
+                </button>
+                <button 
+                  @click="openPreview(proposal)"
+                  class="p-2 text-gray-400 hover:text-gray-900 bg-gray-50 rounded-lg transition-all"
+                  title="Visualizar"
+                  aria-label="Visualizar orçamento"
+                >
+                  <Eye class="w-4 h-4" />
+                </button>
+                <button 
+                  v-if="proposal.client.phone"
+                  @click="sendWhatsapp(proposal)"
+                  class="p-2 text-green-500 hover:text-green-600 bg-green-50 rounded-lg transition-all"
+                  title="WhatsApp"
+                  aria-label="Enviar via WhatsApp"
+                >
+                  <MessageCircle class="w-4 h-4" />
+                </button>
+                <button 
+                  v-if="proposal.status !== 'accepted'"
+                  @click="openModal(proposal)"
+                  class="p-2 text-gray-400 hover:text-blue-600 bg-gray-50 rounded-lg transition-all"
+                  title="Editar"
+                  aria-label="Editar orçamento"
+                >
+                  <Pencil class="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </template>
       </div>
 
       <!-- Desktop View (Table) -->
@@ -553,88 +573,104 @@ const formatTime = (date: any) => {
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
-          <tr v-for="proposal in proposals" :key="proposal._id" class="hover:bg-gray-50/30 transition-all group">
-            <td class="px-8 py-6">
-              <div class="flex flex-col">
-                <span class="font-black text-gray-900 group-hover:text-blue-600 transition-colors text-lg tracking-tight">{{ proposal.title || 'Sem título' }}</span>
-                <span class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">{{ proposal.client.name }}</span>
-              </div>
-            </td>
-            <td class="px-8 py-6 text-sm text-gray-500 font-medium">
-              {{ formatDate(proposal.createdAt) }}
-            </td>
-            <td class="px-8 py-6">
-              <BaseBadge :variant="getStatusVariant(proposal.status)">
-                {{ statusMap[proposal.status]?.label }}
-              </BaseBadge>
-            </td>
-            <td class="px-8 py-6 text-right">
-              <span class="font-black text-gray-900 text-xl tracking-tight">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-            </td>
-            <td class="px-8 py-6 text-right">
-              <div class="flex justify-end items-center gap-1">
-                <button 
-                  @click="openChat(proposal)"
-                  class="p-2.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-2xl transition-all relative"
-                  title="Chat e Interações"
-                  aria-label="Abrir chat do orçamento"
-                >
-                  <MessageCircle class="w-5 h-5" />
-                  <span 
-                    v-if="proposal.unreadMessages > 0"
-                    class="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[8px] font-black text-white ring-2 ring-white"
+          <template v-if="pending && proposals?.length === 0">
+            <tr v-for="i in 5" :key="i">
+              <td class="px-8 py-6">
+                <div class="space-y-2">
+                  <BaseSkeleton width="60%" height="1.25rem" />
+                  <BaseSkeleton width="30%" height="0.75rem" />
+                </div>
+              </td>
+              <td class="px-8 py-6"><BaseSkeleton width="80px" height="1rem" /></td>
+              <td class="px-8 py-6"><BaseSkeleton width="70px" height="1.5rem" borderRadius="999px" /></td>
+              <td class="px-8 py-6"><div class="flex justify-end"><BaseSkeleton width="100px" height="1.5rem" /></div></td>
+              <td class="px-8 py-6"><div class="flex justify-end gap-2"><BaseSkeleton v-for="j in 4" :key="j" width="2rem" height="2rem" borderRadius="0.5rem" /></div></td>
+            </tr>
+          </template>
+          <template v-else>
+            <tr v-for="proposal in proposals" :key="proposal._id" class="hover:bg-gray-50/30 transition-all group">
+              <td class="px-8 py-6">
+                <div class="flex flex-col">
+                  <span class="font-black text-gray-900 group-hover:text-blue-600 transition-colors text-lg tracking-tight">{{ proposal.title || 'Sem título' }}</span>
+                  <span class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">{{ proposal.client.name }}</span>
+                </div>
+              </td>
+              <td class="px-8 py-6 text-sm text-gray-500 font-medium">
+                {{ formatDate(proposal.createdAt) }}
+              </td>
+              <td class="px-8 py-6">
+                <BaseBadge :variant="getStatusVariant(proposal.status)">
+                  {{ statusMap[proposal.status]?.label }}
+                </BaseBadge>
+              </td>
+              <td class="px-8 py-6 text-right">
+                <span class="font-black text-gray-900 text-xl tracking-tight">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+              </td>
+              <td class="px-8 py-6 text-right">
+                <div class="flex justify-end items-center gap-1">
+                  <button 
+                    @click="openChat(proposal)"
+                    class="p-2.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-2xl transition-all relative"
+                    title="Chat e Interações"
+                    aria-label="Abrir chat do orçamento"
                   >
-                    {{ proposal.unreadMessages }}
-                  </span>
-                </button>
-                <button 
-                  v-if="proposal.client.phone"
-                  @click="sendWhatsapp(proposal)"
-                  class="p-2.5 text-green-500 hover:text-green-600 hover:bg-green-50 rounded-2xl transition-all"
-                  title="Enviar via WhatsApp"
-                  aria-label="Enviar via WhatsApp"
-                >
-                  <MessageCircle class="w-5 h-5" />
-                </button>
-                <button 
-                  @click="openHistory(proposal)"
-                  class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all"
-                  title="Ver Histórico"
-                  aria-label="Ver histórico do orçamento"
-                >
-                  <History class="w-5 h-5" />
-                </button>
-                <button 
-                  @click="openPreview(proposal)"
-                  class="p-2.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-2xl transition-all"
-                  title="Visualizar Orçamento"
-                  aria-label="Visualizar orçamento"
-                >
-                  <Eye class="w-5 h-5" />
-                </button>
-                <button 
-                  v-if="proposal.status !== 'draft' && proposal.status !== 'accepted'"
-                  @click="resendEmail(proposal._id)"
-                  :disabled="isResending === proposal._id"
-                  class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all disabled:opacity-50"
-                  title="Reenviar E-mail"
-                  aria-label="Reenviar e-mail de notificação"
-                >
-                  <RefreshCcw v-if="isResending === proposal._id" class="w-5 h-5 animate-spin" />
-                  <Mail v-else class="w-5 h-5" />
-                </button>
-                <button 
-                  v-if="proposal.status !== 'accepted'"
-                  @click="openModal(proposal)"
-                  class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all"
-                  title="Editar"
-                  aria-label="Editar orçamento"
-                >
-                  <Pencil class="w-5 h-5" />
-                </button>
-              </div>
-            </td>
-          </tr>
+                    <MessageCircle class="w-5 h-5" />
+                    <span 
+                      v-if="proposal.unreadMessages > 0"
+                      class="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[8px] font-black text-white ring-2 ring-white"
+                    >
+                      {{ proposal.unreadMessages }}
+                    </span>
+                  </button>
+                  <button 
+                    v-if="proposal.client.phone"
+                    @click="sendWhatsapp(proposal)"
+                    class="p-2.5 text-green-500 hover:text-green-600 hover:bg-green-50 rounded-2xl transition-all"
+                    title="Enviar via WhatsApp"
+                    aria-label="Enviar via WhatsApp"
+                  >
+                    <MessageCircle class="w-5 h-5" />
+                  </button>
+                  <button 
+                    @click="openHistory(proposal)"
+                    class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all"
+                    title="Ver Histórico"
+                    aria-label="Ver histórico do orçamento"
+                  >
+                    <History class="w-5 h-5" />
+                  </button>
+                  <button 
+                    @click="openPreview(proposal)"
+                    class="p-2.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-2xl transition-all"
+                    title="Visualizar Orçamento"
+                    aria-label="Visualizar orçamento"
+                  >
+                    <Eye class="w-5 h-5" />
+                  </button>
+                  <button 
+                    v-if="proposal.status !== 'draft' && proposal.status !== 'accepted'"
+                    @click="resendEmail(proposal._id)"
+                    :disabled="isResending === proposal._id"
+                    class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all disabled:opacity-50"
+                    title="Reenviar E-mail"
+                    aria-label="Reenviar e-mail de notificação"
+                  >
+                    <RefreshCcw v-if="isResending === proposal._id" class="w-5 h-5 animate-spin" />
+                    <Mail v-else class="w-5 h-5" />
+                  </button>
+                  <button 
+                    v-if="proposal.status !== 'accepted'"
+                    @click="openModal(proposal)"
+                    class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all"
+                    title="Editar"
+                    aria-label="Editar orçamento"
+                  >
+                    <Pencil class="w-5 h-5" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </template>
         </tbody>
       </table>
 

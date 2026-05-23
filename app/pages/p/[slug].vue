@@ -25,6 +25,12 @@ const isAccepting = ref(false)
 const isTermsOpen = ref(false)
 const isChatModalOpen = ref(false)
 
+const selectedMethod = ref<'cash' | 'credit_card'>('cash')
+const actionType = ref<'decline' | 'request_changes'>('decline')
+const actionNotes = ref('')
+const isActionModalOpen = ref(false)
+const isSubmittingAction = ref(false)
+
 const {
   messages,
   newMessage,
@@ -322,196 +328,25 @@ const statusMap: any = {
     <main class="max-w-6xl mx-auto px-5 sm:px-8 py-12 sm:py-16 space-y-10 pb-40 sm:pb-16">
 
       <!-- ── ITEMS TABLE ─────────────────────────────────────────── -->
-      <section class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-        <!-- Section header -->
-        <div class="px-8 py-6 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-8 h-8 bg-[#3147F6]/10 rounded-xl flex items-center justify-center">
-            <FileText class="w-4 h-4 text-[#3147F6]" />
-          </div>
-          <h2 class="text-[10px] font-black text-gray-600 uppercase tracking-[0.25em]">Escopo do Projeto</h2>
-        </div>
-
-        <!-- Items list -->
-        <div class="divide-y divide-gray-50">
-          <div
-            v-for="(item, idx) in proposal.items"
-            :key="item._id"
-            class="px-8 py-7 flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6"
-          >
-            <!-- Index bubble -->
-            <div class="shrink-0 w-9 h-9 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center">
-              <span class="text-xs font-black text-gray-600">{{ String(idx + 1).padStart(2, '0') }}</span>
-            </div>
-
-            <!-- Description -->
-            <div class="flex-1 min-w-0">
-              <h3 class="font-black text-gray-900 text-base tracking-tight leading-snug mb-1">{{ item.name }}</h3>
-              <p v-if="item.description" class="text-sm text-gray-600 font-medium leading-relaxed">{{ item.description }}</p>
-              <!-- Unit price × qty -->
-              <div class="mt-3 flex flex-wrap items-center gap-2">
-                <span class="text-[10px] font-black text-gray-600 uppercase tracking-widest bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
-                  R$ {{ item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }} × {{ item.quantity }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Subtotal -->
-            <div class="shrink-0 text-right">
-              <p class="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">Subtotal</p>
-              <p class="font-black text-gray-900 text-lg">
-                R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Totals summary -->
-        <div class="px-8 py-6 bg-gray-50 border-t border-gray-100 space-y-3">
-          <div class="flex justify-between items-center">
-            <span class="text-sm font-bold text-gray-600">Subtotal</span>
-            <span class="font-bold text-gray-700">R$ {{ proposal.totals.subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-          </div>
-          <div v-if="proposal.totals.discount" class="flex justify-between items-center">
-            <span class="text-sm font-bold text-green-600">Desconto</span>
-            <span class="font-bold text-green-600">− R$ {{ proposal.totals.discount.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-          </div>
-          <div v-if="proposal.totals.additional" class="flex justify-between items-center">
-            <span class="text-sm font-bold text-orange-600">Acréscimo</span>
-            <span class="font-bold text-orange-600">+ R$ {{ proposal.totals.additional.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-          </div>
-          <div class="pt-3 border-t border-gray-200 flex justify-between items-baseline">
-            <span class="text-sm font-black text-gray-900 uppercase tracking-widest">Total</span>
-            <span class="text-2xl font-black text-[#3147F6]">
-              R$ {{ finalTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
-            </span>
-          </div>
-        </div>
-      </section>
+      <ProposalClientScope
+        :items="proposal.items"
+        :totals="proposal.totals"
+        :final-total="finalTotal"
+      />
 
       <!-- ── PAYMENT OPTIONS ─────────────────────────────────────── -->
-      <section v-if="!['accepted', 'expired'].includes(proposal.status)">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-8 h-8 bg-[#3147F6]/10 rounded-xl flex items-center justify-center">
-            <CreditCard class="w-4 h-4 text-[#3147F6]" />
-          </div>
-          <h2 class="text-[10px] font-black text-gray-600 uppercase tracking-[0.25em]">Forma de Pagamento</h2>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5" role="radiogroup" aria-label="Opções de forma de pagamento">
-          <!-- Cash option -->
-          <button
-            type="button"
-            role="radio"
-            :aria-checked="selectedMethod === 'cash'"
-            @click="selectedMethod = 'cash'"
-            :class="[
-              'relative text-left rounded-3xl border-2 p-7 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2',
-              selectedMethod === 'cash'
-                ? 'border-[#3147F6] bg-[#3147F6]/5 shadow-lg shadow-[#3147F6]/10'
-                : 'border-gray-100 bg-white hover:border-blue-200 hover:shadow-md'
-            ]"
-          >
-            <!-- Selected indicator -->
-            <div class="absolute top-5 right-5">
-              <div v-if="selectedMethod === 'cash'" class="w-6 h-6 bg-[#3147F6] rounded-full flex items-center justify-center shadow-md">
-                <CheckCircle2 class="w-3.5 h-3.5 text-white" />
-              </div>
-              <div v-else class="w-6 h-6 border-2 border-gray-200 rounded-full group-hover:border-blue-300 transition-colors"></div>
-            </div>
-
-            <div class="mb-5">
-              <div class="w-11 h-11 bg-green-50 rounded-2xl flex items-center justify-center mb-4">
-                <Banknote class="w-5 h-5 text-green-600" />
-              </div>
-              <h3 class="font-black text-gray-900 text-lg tracking-tight leading-snug">À Vista</h3>
-              <p class="text-xs font-bold text-gray-600 mt-0.5">Pix / Transferência</p>
-            </div>
-
-            <p class="text-sm text-gray-600 font-medium leading-relaxed mb-6">
-              Pagamento integral na aprovação com
-              <strong class="text-green-600">{{ proposal.paymentConfig.cashDiscount }}% de desconto</strong>
-              sobre o valor total.
-            </p>
-
-            <div class="pt-5 border-t border-gray-100">
-              <p class="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">Total com desconto</p>
-              <p class="text-2xl font-black text-green-600">
-                R$ {{ (proposal.totals.subtotal * (1 - proposal.paymentConfig.cashDiscount / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
-              </p>
-              <p class="text-[10px] font-bold text-green-500 mt-1 uppercase tracking-widest">
-                Economize R$ {{ (proposal.totals.subtotal * proposal.paymentConfig.cashDiscount / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
-              </p>
-            </div>
-          </button>
-
-          <!-- Credit card option -->
-          <button
-            type="button"
-            role="radio"
-            :aria-checked="selectedMethod === 'credit_card'"
-            @click="selectedMethod = 'credit_card'"
-            :class="[
-              'relative text-left rounded-3xl border-2 p-7 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2',
-              selectedMethod === 'credit_card'
-                ? 'border-[#3147F6] bg-[#3147F6]/5 shadow-lg shadow-[#3147F6]/10'
-                : 'border-gray-100 bg-white hover:border-blue-200 hover:shadow-md'
-            ]"
-          >
-            <!-- Selected indicator -->
-            <div class="absolute top-5 right-5">
-              <div v-if="selectedMethod === 'credit_card'" class="w-6 h-6 bg-[#3147F6] rounded-full flex items-center justify-center shadow-md">
-                <CheckCircle2 class="w-3.5 h-3.5 text-white" />
-              </div>
-              <div v-else class="w-6 h-6 border-2 border-gray-200 rounded-full group-hover:border-blue-300 transition-colors"></div>
-            </div>
-
-            <div class="mb-5">
-              <div class="w-11 h-11 bg-blue-50 rounded-2xl flex items-center justify-center mb-4">
-                <CreditCard class="w-5 h-5 text-[#3147F6]" />
-              </div>
-              <h3 class="font-black text-gray-900 text-lg tracking-tight leading-snug">Cartão de Crédito</h3>
-              <p class="text-xs font-bold text-gray-600 mt-0.5">Parcelado sem juros</p>
-            </div>
-
-            <p class="text-sm text-gray-600 font-medium leading-relaxed mb-6">
-              Parcele em até
-              <strong class="text-[#3147F6]">{{ proposal.paymentConfig.installments }}x</strong>
-              de
-              <strong class="text-[#3147F6]">R$ {{ (proposal.totals.subtotal / proposal.paymentConfig.installments).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</strong>
-              sem juros.
-            </p>
-
-            <div class="pt-5 border-t border-gray-100">
-              <p class="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">Total</p>
-              <p class="text-2xl font-black text-[#3147F6]">
-                R$ {{ proposal.totals.subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
-              </p>
-              <p class="text-[10px] font-bold text-gray-600 mt-1 uppercase tracking-widest">
-                {{ proposal.paymentConfig.installments }}x de R$ {{ (proposal.totals.subtotal / proposal.paymentConfig.installments).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
-              </p>
-            </div>
-          </button>
-        </div>
-      </section>
+      <ProposalClientPayment
+        v-if="!['accepted', 'expired'].includes(proposal.status)"
+        v-model="selectedMethod"
+        :payment-config="proposal.paymentConfig"
+        :totals="proposal.totals"
+      />
 
       <!-- ── CONTRACT (collapsible) ──────────────────────────────── -->
-      <section v-if="proposal.contractText" class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-        <details class="group">
-          <summary class="px-8 py-6 flex items-center justify-between cursor-pointer select-none list-none outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-inset">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 bg-[#3147F6]/10 rounded-xl flex items-center justify-center">
-                <Shield class="w-4 h-4 text-[#3147F6]" />
-              </div>
-              <h2 class="text-[10px] font-black text-gray-600 uppercase tracking-[0.25em]">Contrato e Detalhes</h2>
-            </div>
-            <span class="text-xs font-black text-gray-600 uppercase tracking-widest group-open:hidden">Expandir</span>
-            <span class="text-xs font-black text-gray-600 uppercase tracking-widest hidden group-open:block">Recolher</span>
-          </summary>
-          <div class="px-8 pb-8 border-t border-gray-50 pt-6 prose-contract">
-            <div v-html="proposal.contractText"></div>
-          </div>
-        </details>
-      </section>
+      <ProposalClientContract
+        v-if="proposal.contractText"
+        :contract-text="proposal.contractText"
+      />
 
       <!-- ── DECISION PANEL ──────────────────────────────────────── -->
       <section class="relative overflow-hidden rounded-3xl bg-gray-900 shadow-2xl">

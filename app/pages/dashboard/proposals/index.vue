@@ -49,26 +49,8 @@ const isAIWizardOpen = ref(false)
 const isPreviewOpen = ref(false)
 const isHistoryOpen = ref(false)
 const isChatOpen = ref(false)
-const selectedProposalMessages = ref<any[]>([])
-const isSendingReply = ref(false)
-const newReply = ref('')
-const chatMessagesRef = ref<HTMLElement | null>(null)
-
-function scrollToBottom() {
-  nextTick(() => {
-    if (chatMessagesRef.value) {
-      chatMessagesRef.value.scrollTop = chatMessagesRef.value.scrollHeight
-    }
-  })
-}
-
-watch(selectedProposalMessages, () => {
-  scrollToBottom()
-}, { deep: true })
 
 // Pusher Integration
-let pusherInstance: any = null
-let chatChannel: any = null
 let notificationChannel: any = null
 
 async function setupGlobalNotifications() {
@@ -80,9 +62,6 @@ async function setupGlobalNotifications() {
       notificationChannel.bind('proposal-notification', (data: any) => {
         // Se receber uma notificação de nova mensagem, atualiza a lista para refletir no badge
         refresh()
-        
-        // Se o chat daquela proposta estiver aberto, a própria lógica do chatPusher lidará, 
-        // mas o refresh garante o badge global.
       })
     }
   } catch (e) {
@@ -90,123 +69,18 @@ async function setupGlobalNotifications() {
   }
 }
 
-function setupChatPusher(proposalId: string) {
-  if (chatChannel) chatChannel.unbind_all()
-  
-  const { pusher } = usePusher({ chatRole: 'freelancer' }) // Uses session for auth
-  if (pusher) {
-    pusherInstance = pusher
-    chatChannel = pusher.subscribe(`private-proposal-${proposalId}`)
-    chatChannel.bind('new-message', (data: any) => {
-      if (selectedProposalMessages.value) {
-        // Se for minha (freelancer), apenas confirmamos o status
-        const existingIdx = selectedProposalMessages.value.findIndex(m => m._id === data._id || (m.status === 'pending' && m.text === data.text))
-        if (existingIdx !== -1) {
-          selectedProposalMessages.value[existingIdx] = { ...data, status: 'sent' }
-        } else {
-          selectedProposalMessages.value.push({ ...data, status: 'sent' })
-        }
-      }
-    })
-  }
-}
-
-watch(isChatOpen, (isOpen) => {
-  if (!isOpen) {
-    if (chatChannel) chatChannel.unbind_all()
-    refresh() // Atualiza a listagem para limpar badges de mensagens lidas
-  } else if (selectedProposal.value) {
-    setupChatPusher(selectedProposal.value._id)
-  }
-})
-
 onMounted(() => {
   siteOrigin.value = window.location.origin
   setupGlobalNotifications()
 })
 
 onUnmounted(() => {
-  if (chatChannel) chatChannel.unbind_all()
   if (notificationChannel) notificationChannel.unbind_all()
-  if (pusherInstance) pusherInstance.disconnect()
 })
 
-async function openChat(proposal: ProposalDTO) {
+function openChat(proposal: ProposalDTO) {
   selectedProposal.value = proposal
   isChatOpen.value = true
-  refreshMessages()
-}
-
-async function refreshMessages() {
-  if (!selectedProposal.value) return
-  try {
-    const data = await $fetch<any[]>(`/api/proposals/${selectedProposal.value._id}/messages`)
-    selectedProposalMessages.value = data.map(m => ({ ...m, status: 'sent' }))
-  } catch (e) {
-    notify('Erro', 'Erro ao carregar mensagens')
-  }
-}
-
-async function sendReply() {
-  if (!newReply.value.trim() || isSendingReply.value || !selectedProposal.value) return
-  
-  const text = newReply.value
-  const proposalId = selectedProposal.value._id
-  newReply.value = ''
-  
-  // Envio otimista
-  const tempId = Date.now().toString()
-  const optimisticMessage = {
-    _id: tempId,
-    text,
-    sender: 'freelancer',
-    createdAt: new Date().toISOString(),
-    status: 'pending'
-  }
-  
-  // Força reatividade criando novo array
-  selectedProposalMessages.value = [...selectedProposalMessages.value, optimisticMessage]
-
-  try {
-    const sentMessage = await $fetch<any>(`/api/proposals/${proposalId}/messages`, {
-      method: 'POST',
-      body: { text }
-    })
-    
-    // Atualiza a mensagem otimista com o ID real de forma reativa
-    selectedProposalMessages.value = selectedProposalMessages.value.map(m => 
-      m._id === tempId ? { ...sentMessage, status: 'sent' } : m
-    )
-  } catch (e) {
-    // Remove se falhar de forma reativa
-    selectedProposalMessages.value = selectedProposalMessages.value.filter(m => m._id !== tempId)
-    notify('Erro', 'Erro ao enviar resposta')
-  }
-}
-
-// Group messages by date
-const groupedMessages = computed(() => {
-  if (!selectedProposalMessages.value) return []
-  const groups: { date: string, items: any[] }[] = []
-  
-  selectedProposalMessages.value.forEach(msg => {
-    const date = new Date(msg.createdAt)
-    let label = ''
-    
-    if (isToday(date)) label = 'Hoje'
-    else if (isYesterday(date)) label = 'Ontem'
-    else label = format(date, "d 'de' MMMM", { locale: ptBR })
-    
-    const group = groups.find(g => g.date === label)
-    if (group) group.items.push(msg)
-    else groups.push({ date: label, items: [msg] })
-  })
-  
-  return groups
-})
-
-const formatMessageTime = (date: any) => {
-  return format(new Date(date), 'HH:mm')
 }
 const isAcceptedModalOpen = ref(false)
 const isSuccessModalOpen = ref(false)
@@ -823,92 +697,10 @@ const formatTime = (date: any) => {
       </div>
     </BaseDialog>
     <!-- Modal de Chat/Interação -->
-    <BaseDialog
+    <ProposalChatModal
       v-model:open="isChatOpen"
-      title="Dúvidas e Alterações"
-      size="lg"
-    >
-      <div v-if="selectedProposal" class="p-0 flex flex-col h-[65vh] bg-[#E5DDD5]">
-        <!-- Header -->
-        <div class="p-6 border-b border-gray-100 shrink-0 bg-white shadow-sm z-10 flex items-center justify-between">
-          <div>
-            <h3 class="text-xl font-black text-gray-900 tracking-tight leading-tight">{{ selectedProposal.title }}</h3>
-            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">{{ selectedProposal.client.name }}</p>
-          </div>
-        </div>
-
-        <!-- Messages Area -->
-        <div ref="chatMessagesRef" class="flex-1 overflow-y-auto p-6 space-y-4 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat bg-center scrollbar-hide">
-          <div v-if="!groupedMessages?.length" class="text-center py-20 bg-white/60 backdrop-blur-sm rounded-3xl p-8 max-w-xs mx-auto mt-10">
-            <div class="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mx-auto mb-4 border border-gray-100 shadow-sm">
-              <MessageCircle class="w-6 h-6 text-gray-300" />
-            </div>
-            <p class="text-xs font-black text-gray-400 uppercase tracking-widest">Nenhuma interação iniciada</p>
-          </div>
-
-          <div v-for="group in groupedMessages" :key="group.date" class="space-y-4">
-            <!-- Date Separator -->
-            <div class="flex justify-center my-6">
-              <span class="px-4 py-1.5 bg-white/80 backdrop-blur-md rounded-xl text-[9px] font-black text-gray-500 uppercase tracking-widest shadow-sm">
-                {{ group.date }}
-              </span>
-            </div>
-
-            <div
-              v-for="msg in group.items"
-              :key="msg._id"
-              :class="[
-                'flex flex-col max-w-[85%] relative',
-                msg.sender === 'freelancer' ? 'ml-auto items-end' : 'items-start'
-              ]"
-            >
-              <!-- Bubble -->
-              <div
-                :class="[
-                  'px-4 py-2.5 rounded-2xl text-sm font-medium leading-relaxed shadow-sm min-w-[80px]',
-                  msg.sender === 'freelancer'
-                    ? 'bg-[#DCF8C6] text-gray-800 rounded-tr-none'
-                    : 'bg-white text-gray-800 rounded-tl-none'
-                ]"
-              >
-                {{ msg.text }}
-                
-                <!-- Time and Status inside bubble -->
-                <div class="flex items-center justify-end gap-1 mt-1 -mr-1">
-                  <span class="text-[9px] font-bold opacity-40 uppercase tracking-tighter">
-                    {{ formatMessageTime(msg.createdAt) }}
-                  </span>
-                  <template v-if="msg.sender === 'freelancer'">
-                    <CheckCheck v-if="msg.read" class="w-3 h-3 text-blue-500" />
-                    <CheckCheck v-else class="w-3 h-3 text-gray-400" />
-                  </template>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Input Area -->
-        <div class="p-4 bg-[#F0F2F5] border-t border-gray-200 shrink-0">
-          <form @submit.prevent="sendReply" class="flex gap-3 items-center">
-            <div class="flex-1 relative">
-              <input
-                v-model="newReply"
-                placeholder="Digite uma mensagem..."
-                class="w-full px-6 py-3.5 bg-white border-none rounded-full focus:ring-0 outline-none font-medium text-sm shadow-sm placeholder:text-gray-400"
-              />
-            </div>
-            <button
-              type="submit"
-              :disabled="isSendingReply || !newReply.trim()"
-              class="w-12 h-12 bg-[#00A884] hover:bg-[#008F6A] rounded-full text-white shadow-md flex items-center justify-center transition-all active:scale-90 disabled:opacity-50"
-            >
-              <Loader2 v-if="isSendingReply" class="w-5 h-5 animate-spin" />
-              <Send v-else class="w-5 h-5 ml-0.5" />
-            </button>
-          </form>
-        </div>
-      </div>
-    </BaseDialog>
+      :proposal="selectedProposal"
+      @refresh="refresh"
+    />
   </div>
 </template>

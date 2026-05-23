@@ -1,5 +1,6 @@
 import { processVariables } from './variables'
 import puppeteer from 'puppeteer'
+import DOMPurify from 'isomorphic-dompurify'
 
 export async function generateProposalPdfBuffer(proposal: any, profile: any, appName: string = 'ORCEI') {
   const htmlContent = generateProposalHtml(proposal, profile, appName)
@@ -12,9 +13,9 @@ export async function generateProposalPdfBuffer(proposal: any, profile: any, app
 }
 
 export function generateProposalHtml(proposal: any, profile: any, appName: string = 'ORCEI') {
-  // Processar variáveis
-  const contractHtml = processVariables(proposal.contractText || '', proposal, profile)
-  const termsHtml = processVariables(proposal.termsAndConditions || '', proposal, profile)
+  // Processar variáveis e sanitizar contra injeção de script
+  const contractHtml = DOMPurify.sanitize(processVariables(proposal.contractText || '', proposal, profile))
+  const termsHtml = DOMPurify.sanitize(processVariables(proposal.termsAndConditions || '', proposal, profile))
 
   const logoHtml = process.env.APP_DOCUMENT_LOGO 
     ? `<img src="${process.env.APP_DOCUMENT_LOGO}" width="150" height="108">` 
@@ -156,7 +157,7 @@ export function generateReportHtml(report: any, profile: any, appName: string = 
       <div class="date">Gerado em: ${new Date(report.createdAt).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</div>
 
       <div class="content">
-        ${report.contentHtml}
+        ${DOMPurify.sanitize(report.contentHtml)}
       </div>
 
       <div class="footer">

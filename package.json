@@ -40,6 +40,7 @@
     "date-fns": "^4.2.1",
     "googleapis": "^172.0.0",
     "imask": "^7.6.1",
+    "isomorphic-dompurify": "^3.14.0",
     "jszip": "^3.10.1",
     "lucide-vue-next": "^1.0.0",
     "markdown-it": "^14.1.1",

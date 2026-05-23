@@ -4,7 +4,7 @@ import { SubscriptionPlan, SubscriptionStatus, UserRole } from '../../types/enum
 const profileSchema = new Schema({
   userId: { type: String, required: true, unique: true },
   name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
+  email: { type: String, required: true },
   avatar: String,
   brandConfig: {
     logoUrl: String,
@@ -84,5 +84,7 @@ Para dirimir quaisquer controvérsias oriundas desta proposta, fica eleito o for
 }, { timestamps: true })
 
 profileSchema.index({ userId: 1, isDeleted: 1 })
+profileSchema.index({ stripeCustomerId: 1 }, { sparse: true })
+profileSchema.index({ email: 1 }, { unique: true, partialFilterExpression: { isDeleted: false } })
 
 export const Profile = model('Profile', profileSchema)

@@ -170,9 +170,22 @@ export default defineEventHandler(async (event) => {
         const credits = plan === 'premium' ? 9999 : (plan === 'starter' ? 5 : 0)
 
         if (plan) {
+          const profile = await Profile.findOne({ stripeCustomerId: customerId })
           const periodEnd = subscription.current_period_end
             ? new Date(subscription.current_period_end * 1000)
             : null
+
+          let novoCreditsBalance = credits
+
+          if (profile) {
+            // Calcular a preservação de créditos avulsos (add-ons)
+            const oldPlan = profile.subscriptionPlan
+            const oldPlanCredits = oldPlan === 'premium' ? 9999 : (oldPlan === 'starter' ? 5 : 1)
+            const saldoLiquido = profile.creditsBalance - profile.creditsUsed
+            const franquiaExpiravel = Math.max(0, oldPlanCredits - profile.creditsUsed)
+            const avulsosRestantes = Math.max(0, saldoLiquido - franquiaExpiravel)
+            novoCreditsBalance = credits + avulsosRestantes
+          }
 
           const updated = await Profile.findOneAndUpdate(
             { stripeCustomerId: customerId },
@@ -182,7 +195,7 @@ export default defineEventHandler(async (event) => {
                 subscriptionStatus: subscription.status,
                 subscriptionEndsAt: periodEnd,
                 cancelAtPeriodEnd: !!subscription.cancel_at_period_end,
-                creditsBalance: credits,
+                creditsBalance: novoCreditsBalance,
                 creditsUsed: 0, // Reset for new billing cycle
                 stripeSubscriptionId: subscriptionId,
                 stripePriceId: priceId || null
@@ -190,12 +203,12 @@ export default defineEventHandler(async (event) => {
             },
             { returnDocument: 'after' }
           )
-          console.log('Profile renewed (invoice.payment_succeeded):', { plan, email: updated?.email })
+          console.log('Profile renewed (invoice.payment_succeeded):', { plan, email: updated?.email, creditsBalance: updated?.creditsBalance })
 
           if (updated?.email) {
             const amount = session.amount_paid ? (session.amount_paid / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00'
             const billingCycle = (priceId === config.public.stripePriceAnnual) ? 'Anual' : 'Mensal'
-            await sendPlanActivationEmail(updated.email, updated.name, plan, credits, amount, billingCycle)
+            await sendPlanActivationEmail(updated.email, updated.name, plan, novoCreditsBalance, amount, billingCycle)
           }
         }
       }

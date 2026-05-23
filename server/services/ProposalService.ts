@@ -46,58 +46,94 @@ export const ProposalService = {
 
     // Numeração Sequencial
     const currentYear = new Date().getFullYear()
-    const counter = await Counter.findOneAndUpdate(
-      { profileId: data.profileId, year: currentYear },
-      { $inc: { lastSequence: 1 } },
-      { upsert: true, returnDocument: 'after' }
-    )
 
-    const sequenceNumber = counter.lastSequence
-    const code = `#ORC-${currentYear}-${String(sequenceNumber).padStart(3, '0')}`
+    const session = typeof Profile.db?.startSession === 'function' ? await Profile.db.startSession() : null
+    if (session) {
+      session.startTransaction()
+    }
 
-    const profile = await Profile.findById(data.profileId)
-    const validityDays = profile?.defaultValidityDays || 7
-    const expiresAt = new Date()
-    expiresAt.setDate(expiresAt.getDate() + validityDays)
+    try {
+      const counter = await Counter.findOneAndUpdate(
+        { profileId: data.profileId, year: currentYear },
+        { $inc: { lastSequence: 1 } },
+        { upsert: true, returnDocument: 'after', session: session || undefined }
+      )
 
-    const proposal = await Proposal.create({
-      ...data,
-      title: data.title?.trim() || code,
-      slug,
-      token,
-      sequenceNumber,
-      code,
-      totals,
-      expiresAt
-    })
+      const sequenceNumber = counter.lastSequence
+      const code = `#ORC-${currentYear}-${String(sequenceNumber).padStart(3, '0')}`
 
-    // Se criar já como 'created' e sendMethod for 'auto', consome crédito e agenda envio
-    let emailQueued = false
-    if (data.status === ProposalStatus.CREATED) {
-      await this.consumeCredit(data.profileId)
+      const profile = session 
+        ? await Profile.findById(data.profileId).session(session) 
+        : await Profile.findById(data.profileId)
+      const validityDays = profile?.defaultValidityDays || 7
+      const expiresAt = new Date()
+      expiresAt.setDate(expiresAt.getDate() + validityDays)
 
-      if (data.sendMethod !== SendMethod.MANUAL) {
-        const profile = await Profile.findById(data.profileId)
-        if (profile && data.client?.email) {
-          const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${slug}?t=${token}`
-          await QueueService.publish('SEND_EMAIL_PROPOSAL', {
-            clientEmail: data.client.email,
-            clientName: data.client.name,
-            url: proposalUrl,
-            profileName: profile.name,
-            proposalId: proposal._id
-          })
-          emailQueued = true
+      let proposal: any
+      if (session) {
+        const [created] = await Proposal.create([{
+          ...data,
+          title: data.title?.trim() || code,
+          slug,
+          token,
+          sequenceNumber,
+          code,
+          totals,
+          expiresAt
+        }], { session })
+        proposal = created
+      } else {
+        proposal = await Proposal.create({
+          ...data,
+          title: data.title?.trim() || code,
+          slug,
+          token,
+          sequenceNumber,
+          code,
+          totals,
+          expiresAt
+        })
+      }
+
+      // Se criar já como 'created' e sendMethod for 'auto', consome crédito e agenda envio
+      let emailQueued = false
+      if (data.status === ProposalStatus.CREATED) {
+        await this.consumeCredit(data.profileId, session || undefined)
+
+        if (data.sendMethod !== SendMethod.MANUAL) {
+          if (profile && data.client?.email) {
+            const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${slug}?t=${token}`
+            await QueueService.publish('SEND_EMAIL_PROPOSAL', {
+              clientEmail: data.client.email,
+              clientName: data.client.name,
+              url: proposalUrl,
+              profileName: profile.name,
+              proposalId: proposal._id
+            })
+            emailQueued = true
+          }
         }
       }
-    }
 
-    await this.logHistory(proposal._id, ProposalStatus.CREATED)
-    if (emailQueued) {
-      await this.logHistory(proposal._id, ProposalStatus.SENT, 'email', { status: 'queued' })
-    }
+      await this.logHistory(proposal._id, ProposalStatus.CREATED)
+      if (emailQueued) {
+        await this.logHistory(proposal._id, ProposalStatus.SENT, 'email', { status: 'queued' })
+      }
 
-    return proposal
+      if (session) {
+        await session.commitTransaction()
+      }
+      return proposal
+    } catch (error) {
+      if (session) {
+        await session.abortTransaction()
+      }
+      throw error
+    } finally {
+      if (session) {
+        session.endSession()
+      }
+    }
   },
 
   async update(id: string, profileId: string, data: any) {
@@ -106,58 +142,101 @@ export const ProposalService = {
     if (oldProposal.status === ProposalStatus.ACCEPTED) return null
 
     let emailQueued = false
+    const session = typeof Profile.db?.startSession === 'function' ? await Profile.db.startSession() : null
+    if (session) {
+      session.startTransaction()
+    }
 
-    // Consome crédito se mudar de draft para created/pending/etc
-    if (oldProposal.status === ProposalStatus.DRAFT && data.status !== ProposalStatus.DRAFT) {
-      await this.consumeCredit(profileId)
+    try {
+      // Consome crédito se mudar de draft para created/pending/etc
+      if (oldProposal.status === ProposalStatus.DRAFT && data.status !== ProposalStatus.DRAFT) {
+        await this.consumeCredit(profileId, session || undefined)
 
-      // Se mudou para 'created' e não for manual, agenda e-mail
-      if (data.status === ProposalStatus.CREATED && data.sendMethod !== SendMethod.MANUAL) {
-        const profile = await Profile.findById(profileId)
-        if (profile && data.client?.email) {
-          const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${oldProposal.slug}?t=${oldProposal.token}`
-          await QueueService.publish('SEND_EMAIL_PROPOSAL', {
-            clientEmail: data.client.email,
-            clientName: data.client.name,
-            url: proposalUrl,
-            profileName: profile.name,
-            proposalId: proposal?._id || oldProposal?._id
-          })
-          emailQueued = true
+        // Se mudou para 'created' e não for manual, agenda e-mail
+        if (data.status === ProposalStatus.CREATED && data.sendMethod !== SendMethod.MANUAL) {
+          const profile = session 
+            ? await Profile.findById(profileId).session(session) 
+            : await Profile.findById(profileId)
+          if (profile && data.client?.email) {
+            const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${oldProposal.slug}?t=${oldProposal.token}`
+            await QueueService.publish('SEND_EMAIL_PROPOSAL', {
+              clientEmail: data.client.email,
+              clientName: data.client.name,
+              url: proposalUrl,
+              profileName: profile.name,
+              proposalId: oldProposal._id
+            })
+            emailQueued = true
+          }
         }
       }
+
+      const totals = this.calculateTotals(data.items, data.totals?.additional || 0, data.totals?.discount || 0, data.paymentConfig)
+      const updated = await Proposal.findOneAndUpdate(
+        { _id: id, profileId },
+        { ...data, totals },
+        { returnDocument: 'after', session: session || undefined }
+      )
+
+      if (updated && emailQueued) {
+        await this.logHistory(updated._id, ProposalStatus.SENT, 'email', { status: 'queued' })
+      }
+
+      if (session) {
+        await session.commitTransaction()
+      }
+      return updated
+    } catch (error) {
+      if (session) {
+        await session.abortTransaction()
+      }
+      throw error
+    } finally {
+      if (session) {
+        session.endSession()
+      }
     }
-
-    const totals = this.calculateTotals(data.items, data.totals?.additional || 0, data.totals?.discount || 0, data.paymentConfig)
-    const updated = await Proposal.findOneAndUpdate(
-      { _id: id, profileId },
-      { ...data, totals },
-      { returnDocument: 'after' }
-    )
-
-    if (updated && emailQueued) {
-      await this.logHistory(updated._id, ProposalStatus.SENT, 'email', { status: 'queued' })
-    }
-
-    return updated
   },
 
-  async consumeCredit(profileId: string) {
-    const profile = await Profile.findById(profileId)
-    if (!profile) return
+  async consumeCredit(profileId: string, session?: any) {
+    if (typeof Profile.findOneAndUpdate === 'function') {
+      const updatedProfile = await Profile.findOneAndUpdate(
+        {
+          _id: profileId,
+          $or: [
+            // Usuários Pro/Premium com plano ativo passam livremente
+            { subscriptionPlan: { $ne: 'free' }, subscriptionStatus: { $in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING] } },
+            // Usuários Free só passam se o uso acumulado for estritamente menor que o saldo contratado
+            { $expr: { $lt: ['$creditsUsed', '$creditsBalance'] } }
+          ]
+        },
+        { $inc: { creditsUsed: 1 } },
+        { new: true, session }
+      )
 
-    const hasActiveSubscription =
-      profile.subscriptionPlan !== 'free' &&
-      (profile.subscriptionStatus === SubscriptionStatus.ACTIVE || profile.subscriptionStatus === SubscriptionStatus.TRIALING)
+      if (!updatedProfile) {
+        throw createError({
+          statusCode: 403,
+          statusMessage: 'Créditos insuficientes. Faça um upgrade do seu plano.'
+        })
+      }
+    } else {
+      // Fallback para ambiente de testes unitários onde Mongoose está mockado de forma leve
+      const profile = await Profile.findById(profileId)
+      if (profile) {
+        const hasActiveSubscription =
+          profile.subscriptionPlan !== 'free' &&
+          (profile.subscriptionStatus === SubscriptionStatus.ACTIVE || profile.subscriptionStatus === SubscriptionStatus.TRIALING)
 
-    if (!hasActiveSubscription && profile.creditsUsed >= profile.creditsBalance) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Créditos insuficientes. Faça um upgrade do seu plano.'
-      })
+        if (!hasActiveSubscription && profile.creditsUsed >= profile.creditsBalance) {
+          throw createError({
+            statusCode: 403,
+            statusMessage: 'Créditos insuficientes. Faça um upgrade do seu plano.'
+          })
+        }
+      }
+      await Profile.findByIdAndUpdate(profileId, { $inc: { creditsUsed: 1 } })
     }
-
-    await Profile.findByIdAndUpdate(profileId, { $inc: { creditsUsed: 1 } })
   },
 
   async updateStatus(slug: string, status: string) {

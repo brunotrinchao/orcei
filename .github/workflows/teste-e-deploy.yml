@@ -23,8 +23,14 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
+      - name: Validar tipagem TypeScript
+        run: npx vue-tsc --noEmit
+
       - name: Executar testes unitários
         run: npm run test
+
+      - name: Instalar navegadores do Playwright
+        run: npx playwright install chromium
 
       - name: Executar testes End-to-End (E2E)
         run: npm run test:e2e

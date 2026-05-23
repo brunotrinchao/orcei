@@ -418,84 +418,51 @@ Collection `stripeevents`. Idempotência de webhooks.
 |-------|-----------------|-------------------|-----------|
 | Free | 1 | `'free'` | Nunca (manual upgrade) |
 | Starter | 5 | `'starter'` | Reset para 5 a cada `invoice.payment_succeeded` |
-| Premium | 9999 | `'premium'` | Reset para 9999 a cada `invoice.payment_succeeded` |
-
-**Consumo:**
-- `creditsUsed` incrementa +1 a cada proposta publicada (status `draft → created`)
-- `ProposalService.consumeCredit()` verifica `creditsUsed >= creditsBalance` e lança 403 se insuficiente
-- Créditos avulsos (add-on): incrementam `creditsBalance` via `$inc` no webhook `checkout.session.completed` com `type === 'credits'`
-
-**Atenção**: `creditsBalance` é sobrescrito (não incrementado) na renovação — créditos add-on são perdidos no próximo ciclo de cobrança (ver roadmap).
-
----
-
-## 11. Convenções de Código
-
-- **Services**: objetos exportados como `const NomeService = { metodo() {} }` em `server/services/`
-- **Padrão de API**: handler → `NomeService.metodo()` → Model Mongoose — sem lógica de negócio nos handlers
-- **Modelos**: schemas definidos inline no arquivo do model, exportados como `export const NomeModel = model(...)`
-- **Componentes**: prefixo `Base*` para primitivas reutilizáveis (ex: `BaseInput`, `BaseButton`)
-- **Composables**: prefixo `use*` (ex: `useAlerts`, `useUserSession`)
-- **Rotas de API**: convenção de arquivo `[método].ts` (ex: `index.get.ts`, `index.post.ts`, `[id].put.ts`)
-- **Rotas públicas de proposta**: agrupadas em `server/api/proposals/public/`
-- **Sem DTOs formais**: dados trafegam como `any` (melhoria pendente no roadmap)
-- **Imutabilidade de itens**: propostas armazenam snapshot dos itens no momento da criação (não referência ao catálogo)
-
----
-
-## 12. Comandos de Desenvolvimento
-
-```bash
-npm run dev          # Dev server localhost:3000
-npm run build        # Build produção
-npm run preview      # Preview do build
-
-npx vitest run       # Testes (Vitest)
-
-stripe listen --forward-to localhost:3000/api/webhooks/stripe
-# Stripe CLI: encaminha webhooks para dev local
-
-npx tsx scripts/backfill-stripe-subscription-state.ts
-# Backfill: sincroniza estado de subscriptions existentes com Stripe
-# Rodar UMA VEZ após deploy que adicionou subscriptionStatus/subscriptionEndsAt
-```
-
----
+| Premium | 9999 | `'premium'` | ---
 
 ## 13. Roadmap de Melhorias
 
 ### [HIGH] Segurança e Estabilidade
 
-- **Rate limiting** em `/api/auth`, `/api/ai/generate`, `/api/upload/cloudinary` — ausência permite abuso e custo não controlado
-- **CORS configuration** em `nuxt.config.ts` via `routeRules` — atualmente sem restrição de origem
-- **Mass assignment protection** nos endpoints `PUT/POST` — usar allowlist explícita em vez de `{ ...body }` direto
-- **Regex injection (ReDoS)** nos filtros de search — fazer cast para string antes de usar `$regex` no Mongoose
-- **Puppeteer `--no-sandbox` + HTML não escapado** — conteúdo de `contractText`/`termsAndConditions` não é sanitizado antes de renderizar no Puppeteer; XSS pode se tornar RCE via headless browser
-- **Índices MongoDB ausentes** em `profileId` nas collections Proposal, CatalogItem e Event — queries sem índice fazem full collection scan
-
-### [HIGH] Consistência de Dados
-
-- **Transações MongoDB** no fluxo de criação de proposta — `Counter.findOneAndUpdate` + `Proposal.create` + `creditsUsed $inc` rodam sem transação; falha parcial deixa estado inconsistente
-- **`creditsBalance` sobrescrito na renovação** — add-ons comprados são perdidos quando `invoice.payment_succeeded` reseta para o valor fixo do plano
+- **Rate limiting** em `/api/auth`, `/api/ai/generate`, `/api/upload/cloudinary` — ausência permite abuso e custo não controlado.
+- **CORS configuration** em `nuxt.config.ts` via `routeRules` — atualmente sem restrição de origem.
+- **Mass assignment protection** nos endpoints `PUT/POST` — usar allowlist explícita em vez de `{ ...body }` direto.
+- **Regex injection (ReDoS)** nos filtros de search — fazer cast para string antes de usar `$regex` no Mongoose.
 
 ### [MED] Performance
 
-- **Debounce em search inputs** — cada keystroke dispara uma chamada à API
-- **Debounce no ViaCEP lookup** — idem para digitação do CEP
-- **Lazy-load de dependências pesadas** — TipTap, FullCalendar e vue-advanced-cropper são carregados no bundle inicial; impactam LCP
-
-### [MED] Qualidade e Manutenção
-
-- **Componentes grandes > 300 linhas** — extrair `CropperModal`, `AddressFields` em componentes separados
-- **Tipagem TypeScript** — remover usos de `any`; criar `ProfileDTO`, `ProposalDTO` nos composables de `useFetch`
-- **Cobertura de testes** — apenas `tests/Billing.spec.ts` existe; expandir com fixtures Faker para proposals, clients, catalog
-- **Proposta expirada não marcada automaticamente** — não há job agendado; `expiresAt` só é respeitado se o cliente tentar acessar
-- **Token de proposta em URL query string** — fica gravado no histórico do browser; migrar para cookie httpOnly ou header
+- **Debounce em search inputs** — cada keystroke dispara uma chamada à API.
+- **Debounce no ViaCEP lookup** — idem para digitação do CEP.
+- **Lazy-load de dependências pesadas** — TipTap, FullCalendar e vue-advanced-cropper são carregados no bundle inicial; impactam LCP.
 
 ### [MED] Integrações
 
-- **Email sender `onboarding@resend.dev`** — domínio de teste do Resend; emails não são entregues em produção para caixas externas. Configurar domínio customizado verificado no Resend
-- **Cloudinary upload aceita URLs remotas (SSRF)** — endpoint de upload deve validar que o input é um arquivo multipart, não uma URL remota
+- **Email sender `onboarding@resend.dev`** — domínio de teste do Resend. Configurar domínio customizado verificado no Resend em produção.
+- **Cloudinary upload aceita URLs remotas (SSRF)** — endpoint de upload deve validar que o input é um arquivo multipart, não uma URL remota.
+
+---
+
+## 14. Histórico de Decisões Técnicas
+
+- **Remoção de auth local (2024)**: login/registro com email+senha foi removido (senha era armazenada em plaintext, sem bcrypt). Mantido exclusivamente Google OAuth via `nuxt-auth-utils`. Simplifica segurança e elimina fluxo de recuperação de senha.
+
+- **Stripe Customer Portal (commit 0db640f)**: cancelamento de assinatura delegado ao portal externo do Stripe em vez de endpoint próprio. Reduz superfície de código, mas torna o fluxo dependente do webhook `customer.subscription.updated` com `cancel_at_period_end: true` para atualizar a UI.
+
+- **Idempotência de webhooks Stripe**: modelo `StripeEvent` com índice unique em `eventId` e TTL de 30 dias. Duplicata (código 11000 do MongoDB) retorna 200 sem reprocessar, prevenindo double-charge e replay attacks.
+
+- **`subscriptionPlan` vs `subscriptionStatus`**: `subscriptionPlan` (`'free'|'starter'|'premium'`) é a fonte de verdade para feature gating e controle de créditos. `subscriptionStatus` espelha o estado do Stripe (`active`, `past_due`, `canceled`, etc.) e é usado apenas para exibição informativa na UI (banners, alertas). Essa separação permite manter o acesso premium mesmo durante `cancel_at_period_end: true` até o fim do período pago.
+
+- **Snapshot de itens na proposta**: os itens são copiados (snapshot) para `Proposal.items` no momento da criação, não referenciados do catálogo. Garante imutabilidade histórica — alterações futuras no catálogo não afetam propostas já emitidas.
+
+- **Counter por profileId/year via `$inc` atômico**: numeração sequencial legível (`#ORC-2025-001`) implementada com `findOneAndUpdate + upsert + $inc` para garantir atomicidade sem transações. Limitação: não está em transação com o `Proposal.create`, então uma falha após o increment gera um número perdido (gap na sequência).
+
+- **Auditoria de Maturidade por Múltiplos Agentes (2026)**:
+  - **Segurança & Puppeteer**: Sanitização rigorosa via `sanitize-html` do `contractText` antes da renderização em PDF via Chromium headless, mitigando brechas de XSS e escape de sandbox (RCE).
+  - **Índices Sparse para Soft Delete**: Conversão do índice de `email` em sparse unique index parcial `{ email: 1 }` com `{ isDeleted: false }`, permitindo que novos usuários se cadastrem com emails anteriormente desativados sem colisão de chave.
+  - **Transações e Integridade Financeira**: Adoção de transações Mongoose nos fluxos de consumo de créditos e publicação de propostas, agrupando o débito e a mudança de estado da proposta de forma atômica. Cálculo dinâmico e preservação de créditos de add-on (avulsos) na renovação recorrente de planos via Stripe Webhook (`invoice.payment_succeeded`).
+  - **Acessibilidade Premium**: Foco visual acessível com `focus-visible` em botões/inputs primitivos, taxas de contraste WCAG AA superiores a 4.5:1 no dashboard, semântica ARIA adequada e modal acessível de recusa de proposta.
+  - **Desmembramento de Componentes**: Redução de acoplamento com a criação do composable `useProposalChat.ts` e fracionamento de componentes grandes em subcomponentes isolados e reativos (SettingsVisual, ProposalClientScope, etc.).
+  - **Pipelines de Qualidade Ativas**: Inclusão de checagem estática TypeScript (`vue-tsc --noEmit`) na pipeline de CI e adoção da suíte de testes de ponta a ponta E2E via Playwright (`tests/e2e`).ut é um arquivo multipart, não uma URL remota
 
 ### [LOW] Acessibilidade e UX
 

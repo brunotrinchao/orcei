@@ -142,7 +142,7 @@ async function generateAIReport() {
             </div>
             <span class="text-[10px] font-black text-green-500 uppercase tracking-widest bg-green-50 px-2 py-1 rounded-lg">+12%</span>
           </div>
-          <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Total Orçamentos</p>
+          <p class="text-xs font-black text-gray-600 uppercase tracking-widest mb-1">Total Orçamentos</p>
           <h3 class="text-3xl font-black text-gray-900">{{ stats?.proposalsCount ?? 0 }}</h3>
         </div>
 
@@ -153,7 +153,7 @@ async function generateAIReport() {
             </div>
             <span class="text-[10px] font-black text-green-500 uppercase tracking-widest bg-green-50 px-2 py-1 rounded-lg">+R$ 2.4k</span>
           </div>
-          <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Receita Confirmada</p>
+          <p class="text-xs font-black text-gray-600 uppercase tracking-widest mb-1">Receita Confirmada</p>
           <h3 class="text-3xl font-black text-gray-900">R$ {{ (stats?.totalRevenue as number)?.toLocaleString('pt-BR') ?? '0,00' }}</h3>
         </div>
 
@@ -164,7 +164,7 @@ async function generateAIReport() {
             </div>
             <span class="text-[10px] font-black text-purple-500 uppercase tracking-widest bg-purple-50 px-2 py-1 rounded-lg">Top 5%</span>
           </div>
-          <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Taxa de Aprovação</p>
+          <p class="text-xs font-black text-gray-600 uppercase tracking-widest mb-1">Taxa de Aprovação</p>
           <h3 class="text-3xl font-black text-gray-900">{{ Math.round(stats?.approvalRate ?? 0) }}%</h3>
         </div>
 
@@ -174,7 +174,7 @@ async function generateAIReport() {
               <Users class="w-6 h-6 text-orange-600 group-hover:text-white transition-colors" />
             </div>
           </div>
-          <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Ticket Médio</p>
+          <p class="text-xs font-black text-gray-600 uppercase tracking-widest mb-1">Ticket Médio</p>
           <h3 class="text-3xl font-black text-gray-900">R$ {{ Math.round(stats?.ticketMedia ?? 0).toLocaleString('pt-BR') }}</h3>
         </div>
       </template>

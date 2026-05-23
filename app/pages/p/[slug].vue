@@ -218,13 +218,7 @@ function openActionModal(type: 'decline' | 'request_changes') {
   if (isPreview.value) return
   
   if (type === 'request_changes') {
-    const chatEl = document.getElementById('chat')
-    if (chatEl) {
-      chatEl.scrollIntoView({ behavior: 'smooth' })
-      // Focus the input if possible
-      const input = chatEl.querySelector('input')
-      if (input) setTimeout(() => input.focus(), 500)
-    }
+    isChatModalOpen.value = true
     return
   }
 
@@ -358,7 +352,7 @@ const statusMap: any = {
         />
         <!-- Code + Status -->
         <div class="flex items-center gap-3">
-          <span class="hidden sm:block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+          <span class="hidden sm:block text-[10px] font-black text-gray-600 uppercase tracking-[0.2em]">
             #{{ proposal.code }}
           </span>
           <BaseBadge :variant="proposal.status === 'accepted' ? 'success' : proposal.status === 'expired' ? 'error' : 'info'">
@@ -384,7 +378,7 @@ const statusMap: any = {
         </h1>
 
         <!-- Client name -->
-        <p class="text-gray-400 font-bold text-lg mb-12">
+        <p class="text-gray-300 font-bold text-lg mb-12">
           Preparado para <span class="text-white">{{ proposal.client.name }}</span>
         </p>
 
@@ -394,7 +388,7 @@ const statusMap: any = {
           <div class="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
             <div class="flex items-center gap-2 mb-2">
               <Clock class="w-4 h-4 text-blue-400" />
-              <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Válido até</span>
+              <span class="text-[10px] font-black text-gray-300 uppercase tracking-widest">Válido até</span>
             </div>
             <p class="font-black text-white text-base leading-tight">{{ formatDate(proposal.expiresAt) }}</p>
           </div>
@@ -403,7 +397,7 @@ const statusMap: any = {
           <div class="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
             <div class="flex items-center gap-2 mb-2">
               <FileText class="w-4 h-4 text-blue-400" />
-              <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Código</span>
+              <span class="text-[10px] font-black text-gray-300 uppercase tracking-widest">Código</span>
             </div>
             <p class="font-black text-white text-base leading-tight">#{{ proposal.code }}</p>
           </div>
@@ -411,8 +405,8 @@ const statusMap: any = {
           <!-- Total -->
           <div class="col-span-2 sm:col-span-1 bg-[#3147F6] border border-blue-500/40 rounded-2xl p-5">
             <div class="flex items-center gap-2 mb-2">
-              <Banknote class="w-4 h-4 text-blue-200" />
-              <span class="text-[10px] font-black text-blue-200 uppercase tracking-widest">Valor Total</span>
+              <Banknote class="w-4 h-4 text-blue-100" />
+              <span class="text-[10px] font-black text-blue-100 uppercase tracking-widest">Valor Total</span>
             </div>
             <p class="font-black text-white text-2xl leading-tight">
               R$ {{ finalTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
@@ -432,7 +426,7 @@ const statusMap: any = {
           <div class="w-8 h-8 bg-[#3147F6]/10 rounded-xl flex items-center justify-center">
             <FileText class="w-4 h-4 text-[#3147F6]" />
           </div>
-          <h2 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.25em]">Escopo do Projeto</h2>
+          <h2 class="text-[10px] font-black text-gray-600 uppercase tracking-[0.25em]">Escopo do Projeto</h2>
         </div>
 
         <!-- Items list -->
@@ -444,16 +438,16 @@ const statusMap: any = {
           >
             <!-- Index bubble -->
             <div class="shrink-0 w-9 h-9 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center">
-              <span class="text-xs font-black text-gray-400">{{ String(idx + 1).padStart(2, '0') }}</span>
+              <span class="text-xs font-black text-gray-600">{{ String(idx + 1).padStart(2, '0') }}</span>
             </div>
 
             <!-- Description -->
             <div class="flex-1 min-w-0">
               <h3 class="font-black text-gray-900 text-base tracking-tight leading-snug mb-1">{{ item.name }}</h3>
-              <p v-if="item.description" class="text-sm text-gray-500 font-medium leading-relaxed">{{ item.description }}</p>
+              <p v-if="item.description" class="text-sm text-gray-600 font-medium leading-relaxed">{{ item.description }}</p>
               <!-- Unit price × qty -->
               <div class="mt-3 flex flex-wrap items-center gap-2">
-                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+                <span class="text-[10px] font-black text-gray-600 uppercase tracking-widest bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
                   R$ {{ item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }} × {{ item.quantity }}
                 </span>
               </div>
@@ -461,7 +455,7 @@ const statusMap: any = {
 
             <!-- Subtotal -->
             <div class="shrink-0 text-right">
-              <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Subtotal</p>
+              <p class="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">Subtotal</p>
               <p class="font-black text-gray-900 text-lg">
                 R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
               </p>
@@ -472,7 +466,7 @@ const statusMap: any = {
         <!-- Totals summary -->
         <div class="px-8 py-6 bg-gray-50 border-t border-gray-100 space-y-3">
           <div class="flex justify-between items-center">
-            <span class="text-sm font-bold text-gray-500">Subtotal</span>
+            <span class="text-sm font-bold text-gray-600">Subtotal</span>
             <span class="font-bold text-gray-700">R$ {{ proposal.totals.subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
           </div>
           <div v-if="proposal.totals.discount" class="flex justify-between items-center">
@@ -498,15 +492,18 @@ const statusMap: any = {
           <div class="w-8 h-8 bg-[#3147F6]/10 rounded-xl flex items-center justify-center">
             <CreditCard class="w-4 h-4 text-[#3147F6]" />
           </div>
-          <h2 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.25em]">Forma de Pagamento</h2>
+          <h2 class="text-[10px] font-black text-gray-600 uppercase tracking-[0.25em]">Forma de Pagamento</h2>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5" role="radiogroup" aria-label="Opções de forma de pagamento">
           <!-- Cash option -->
           <button
+            type="button"
+            role="radio"
+            :aria-checked="selectedMethod === 'cash'"
             @click="selectedMethod = 'cash'"
             :class="[
-              'relative text-left rounded-3xl border-2 p-7 transition-all duration-200 group',
+              'relative text-left rounded-3xl border-2 p-7 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2',
               selectedMethod === 'cash'
                 ? 'border-[#3147F6] bg-[#3147F6]/5 shadow-lg shadow-[#3147F6]/10'
                 : 'border-gray-100 bg-white hover:border-blue-200 hover:shadow-md'
@@ -525,17 +522,17 @@ const statusMap: any = {
                 <Banknote class="w-5 h-5 text-green-600" />
               </div>
               <h3 class="font-black text-gray-900 text-lg tracking-tight leading-snug">À Vista</h3>
-              <p class="text-xs font-bold text-gray-400 mt-0.5">Pix / Transferência</p>
+              <p class="text-xs font-bold text-gray-600 mt-0.5">Pix / Transferência</p>
             </div>
 
-            <p class="text-sm text-gray-500 font-medium leading-relaxed mb-6">
+            <p class="text-sm text-gray-600 font-medium leading-relaxed mb-6">
               Pagamento integral na aprovação com
               <strong class="text-green-600">{{ proposal.paymentConfig.cashDiscount }}% de desconto</strong>
               sobre o valor total.
             </p>
 
             <div class="pt-5 border-t border-gray-100">
-              <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total com desconto</p>
+              <p class="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">Total com desconto</p>
               <p class="text-2xl font-black text-green-600">
                 R$ {{ (proposal.totals.subtotal * (1 - proposal.paymentConfig.cashDiscount / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
               </p>
@@ -547,9 +544,12 @@ const statusMap: any = {
 
           <!-- Credit card option -->
           <button
+            type="button"
+            role="radio"
+            :aria-checked="selectedMethod === 'credit_card'"
             @click="selectedMethod = 'credit_card'"
             :class="[
-              'relative text-left rounded-3xl border-2 p-7 transition-all duration-200 group',
+              'relative text-left rounded-3xl border-2 p-7 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2',
               selectedMethod === 'credit_card'
                 ? 'border-[#3147F6] bg-[#3147F6]/5 shadow-lg shadow-[#3147F6]/10'
                 : 'border-gray-100 bg-white hover:border-blue-200 hover:shadow-md'
@@ -568,10 +568,10 @@ const statusMap: any = {
                 <CreditCard class="w-5 h-5 text-[#3147F6]" />
               </div>
               <h3 class="font-black text-gray-900 text-lg tracking-tight leading-snug">Cartão de Crédito</h3>
-              <p class="text-xs font-bold text-gray-400 mt-0.5">Parcelado sem juros</p>
+              <p class="text-xs font-bold text-gray-600 mt-0.5">Parcelado sem juros</p>
             </div>
 
-            <p class="text-sm text-gray-500 font-medium leading-relaxed mb-6">
+            <p class="text-sm text-gray-600 font-medium leading-relaxed mb-6">
               Parcele em até
               <strong class="text-[#3147F6]">{{ proposal.paymentConfig.installments }}x</strong>
               de
@@ -580,11 +580,11 @@ const statusMap: any = {
             </p>
 
             <div class="pt-5 border-t border-gray-100">
-              <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total</p>
+              <p class="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">Total</p>
               <p class="text-2xl font-black text-[#3147F6]">
                 R$ {{ proposal.totals.subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
               </p>
-              <p class="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-widest">
+              <p class="text-[10px] font-bold text-gray-600 mt-1 uppercase tracking-widest">
                 {{ proposal.paymentConfig.installments }}x de R$ {{ (proposal.totals.subtotal / proposal.paymentConfig.installments).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
               </p>
             </div>
@@ -595,15 +595,15 @@ const statusMap: any = {
       <!-- ── CONTRACT (collapsible) ──────────────────────────────── -->
       <section v-if="proposal.contractText" class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
         <details class="group">
-          <summary class="px-8 py-6 flex items-center justify-between cursor-pointer select-none list-none">
+          <summary class="px-8 py-6 flex items-center justify-between cursor-pointer select-none list-none outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-inset">
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 bg-[#3147F6]/10 rounded-xl flex items-center justify-center">
                 <Shield class="w-4 h-4 text-[#3147F6]" />
               </div>
-              <h2 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.25em]">Contrato e Detalhes</h2>
+              <h2 class="text-[10px] font-black text-gray-600 uppercase tracking-[0.25em]">Contrato e Detalhes</h2>
             </div>
-            <span class="text-xs font-black text-gray-400 uppercase tracking-widest group-open:hidden">Expandir</span>
-            <span class="text-xs font-black text-gray-400 uppercase tracking-widest hidden group-open:block">Recolher</span>
+            <span class="text-xs font-black text-gray-600 uppercase tracking-widest group-open:hidden">Expandir</span>
+            <span class="text-xs font-black text-gray-600 uppercase tracking-widest hidden group-open:block">Recolher</span>
           </summary>
           <div class="px-8 pb-8 border-t border-gray-50 pt-6 prose-contract">
             <div v-html="proposal.contractText"></div>
@@ -634,9 +634,9 @@ const statusMap: any = {
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-8">
             <!-- Total display -->
             <div>
-              <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.25em] mb-3">Total do Investimento</p>
+              <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.25em] mb-3">Total do Investimento</p>
               <div class="flex flex-col">
-                <span v-if="selectedMethod === 'cash' && proposal.paymentConfig.cashDiscount > 0" class="text-sm font-bold text-gray-500 line-through decoration-red-500/50 mb-1">
+                <span v-if="selectedMethod === 'cash' && proposal.paymentConfig.cashDiscount > 0" class="text-sm font-bold text-gray-400 line-through decoration-red-500/50 mb-1">
                   R$ {{ (proposal.totals.subtotal + (proposal.totals.additional || 0) - (proposal.totals.discount || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
                 </span>
                 <p class="text-4xl sm:text-5xl font-black text-white tracking-tight">
@@ -652,8 +652,14 @@ const statusMap: any = {
             <div v-if="!['draft', 'accepted', 'expired'].includes(proposal.status)" class="hidden sm:flex items-center gap-4">
               <template v-if="!isPreview">
                 <button
+                  @click="openActionModal('decline')"
+                  class="px-7 py-4 rounded-2xl text-xs font-black uppercase tracking-widest border-2 border-transparent text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                >
+                  Recusar Proposta
+                </button>
+                <button
                   @click="isChatModalOpen = true"
-                  class="px-7 py-4 rounded-2xl text-xs font-black uppercase tracking-widest border-2 border-white/10 text-gray-300 hover:bg-white/10 transition-all relative"
+                  class="px-7 py-4 rounded-2xl text-xs font-black uppercase tracking-widest border-2 border-white/10 text-gray-300 hover:bg-white/10 transition-all relative outline-none focus-visible:ring-2 focus-visible:ring-white"
                 >
                   Chat com o Profissional
                   <span 
@@ -666,7 +672,7 @@ const statusMap: any = {
                 <button
                   @click="handleAccept"
                   :disabled="isAccepting"
-                  class="px-9 py-4 bg-[#3147F6] hover:bg-blue-600 rounded-2xl text-xs font-black uppercase tracking-widest text-white shadow-xl shadow-[#3147F6]/30 transition-all flex items-center gap-2 disabled:opacity-60"
+                  class="px-9 py-4 bg-[#3147F6] hover:bg-blue-600 rounded-2xl text-xs font-black uppercase tracking-widest text-white shadow-xl shadow-[#3147F6]/30 transition-all flex items-center gap-2 disabled:opacity-60 outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2"
                 >
                   <Loader2 v-if="isAccepting" class="w-4 h-4 animate-spin" />
                   Aceitar Proposta
@@ -682,13 +688,13 @@ const statusMap: any = {
           <div class="mt-10 pt-8 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <a
               :href="`mailto:${proposal.client.email}`"
-              class="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10 transition-all group"
+              class="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10 transition-all group outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <div class="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
                 <Mail class="w-4 h-4 text-gray-300 group-hover:text-white transition-colors" />
               </div>
               <div>
-                <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest">E-mail</p>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">E-mail</p>
                 <p class="text-xs font-bold text-gray-300 truncate">{{ proposal.client.email }}</p>
               </div>
             </a>
@@ -696,13 +702,13 @@ const statusMap: any = {
               v-if="proposal.client.phone"
               :href="`https://wa.me/${proposal.client.phone.replace(/\D/g, '')}`"
               target="_blank"
-              class="flex items-center gap-3 p-4 bg-white/5 hover:bg-green-500/10 rounded-2xl border border-white/10 hover:border-green-500/30 transition-all group"
+              class="flex items-center gap-3 p-4 bg-white/5 hover:bg-green-500/10 rounded-2xl border border-white/10 hover:border-green-500/30 transition-all group outline-none focus-visible:ring-2 focus-visible:ring-green-500"
             >
               <div class="w-9 h-9 bg-white/10 group-hover:bg-green-500/20 rounded-xl flex items-center justify-center shrink-0 transition-colors">
                 <MessageCircle class="w-4 h-4 text-gray-300 group-hover:text-green-400 transition-colors" />
               </div>
               <div>
-                <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest">WhatsApp</p>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">WhatsApp</p>
                 <p class="text-xs font-bold text-gray-300">{{ proposal.client.phone }}</p>
               </div>
             </a>
@@ -714,7 +720,7 @@ const statusMap: any = {
       <footer class="pt-4 pb-2 text-center space-y-6">
         <button
           @click="isTermsOpen = true"
-          class="text-gray-400 hover:text-gray-600 text-[10px] font-black uppercase tracking-[0.2em] underline decoration-dotted underline-offset-8 transition-colors"
+          class="text-gray-600 hover:text-gray-800 text-[10px] font-black uppercase tracking-[0.2em] underline decoration-dotted underline-offset-8 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6]"
         >
           Termos e Condições de Serviço
         </button>
@@ -854,6 +860,41 @@ const statusMap: any = {
           </p>
         </div>
       </div>
+    </BaseDialog>
+
+    <!-- Action/Decline Dialog -->
+    <BaseDialog v-model:open="isActionModalOpen" title="Recusar Proposta" size="md">
+      <div class="p-6 space-y-4">
+        <p class="text-sm text-gray-600 leading-relaxed">
+          Lamentamos que a proposta não tenha atendido às suas expectativas. Por favor, nos informe o motivo da recusa para que possamos melhorar ou tentar uma nova abordagem.
+        </p>
+        <div class="space-y-2">
+          <label for="decline-notes" class="block text-xs font-black text-gray-600 uppercase tracking-widest">
+            Motivo da Recusa *
+          </label>
+          <textarea
+            id="decline-notes"
+            v-model="actionNotes"
+            rows="4"
+            placeholder="Escreva aqui o motivo..."
+            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#3147F6] focus:border-transparent outline-none font-medium text-sm text-gray-800 placeholder:text-gray-400 resize-none"
+            required
+          ></textarea>
+        </div>
+      </div>
+      <template #footer>
+        <div class="flex justify-end gap-3 px-6 pb-6">
+          <BaseButton variant="outline" @click="isActionModalOpen = false">Cancelar</BaseButton>
+          <BaseButton 
+            variant="danger" 
+            :disabled="isSubmittingAction || !actionNotes.trim()" 
+            @click="handleAction"
+          >
+            <Loader2 v-if="isSubmittingAction" class="w-4 h-4 animate-spin mr-2" />
+            Recusar Proposta
+          </BaseButton>
+        </div>
+      </template>
     </BaseDialog>
   </div>
 </template>

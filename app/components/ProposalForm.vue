@@ -250,7 +250,7 @@ defineExpose({ submit, isEditingNonDraft: computed(() => props.isEditing && prop
 
       <div class="space-y-6">
         <div class="flex items-center justify-between ml-1">
-          <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Itens do Catálogo</label>
+          <label class="block text-xs font-black text-gray-600 uppercase tracking-widest">Itens do Catálogo</label>
           <div class="relative w-48">
             <input 
               v-model="catalogSearch" 
@@ -300,18 +300,19 @@ defineExpose({ submit, isEditingNonDraft: computed(() => props.isEditing && prop
 
     <!-- Tabela de Itens Selecionados -->
     <div class="space-y-6">
-      <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Escopo do Orçamento</h3>
+      <h3 class="text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Escopo do Orçamento</h3>
       <div class="space-y-4">
         <div v-for="(item, idx) in form.items" :key="idx" class="bg-white p-6 rounded-[2.5rem] border-2 border-gray-100 shadow-sm space-y-4">
           <div class="flex justify-between items-start gap-4">
             <div class="flex-1 space-y-4">
-              <input v-model="item.name" class="w-full text-xl font-black text-gray-900 bg-transparent border-none focus:ring-0 p-0" placeholder="Nome do Serviço">
+              <input v-model="item.name" class="w-full text-xl font-black text-gray-900 bg-transparent border-b-2 border-transparent hover:border-gray-200 focus:border-blue-500 focus:ring-0 p-1 outline-none transition-all" placeholder="Nome do Serviço" aria-label="Nome do Serviço">
               <div class="relative">
                 <textarea 
                   v-model="item.description" 
                   rows="2" 
-                  class="w-full text-sm font-medium text-gray-500 bg-gray-50 p-4 rounded-2xl border-none focus:ring-4 focus:ring-blue-500/5 outline-none resize-none" 
+                  class="w-full text-sm font-medium text-gray-600 bg-gray-50 p-4 rounded-2xl border-2 border-transparent hover:border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none resize-none transition-all" 
                   placeholder="Descreva o que será entregue..."
+                  aria-label="Descrição do Serviço"
                 ></textarea>
                 <button 
                   type="button"
@@ -330,15 +331,15 @@ defineExpose({ submit, isEditingNonDraft: computed(() => props.isEditing && prop
           
           <div class="flex flex-wrap items-center gap-6 pt-2">
             <div class="flex items-center gap-3">
-              <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Preço R$</span>
-              <input v-model.number="item.price" type="number" class="w-24 bg-gray-50 px-4 py-2 rounded-xl font-bold text-sm border-none focus:ring-2 focus:ring-blue-500">
+              <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Preço R$</span>
+              <input v-model.number="item.price" type="number" class="w-24 bg-gray-50 px-4 py-2 rounded-xl font-bold text-sm border border-transparent focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all" aria-label="Preço R$">
             </div>
             <div class="flex items-center gap-3">
-              <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Qtd</span>
-              <input v-model.number="item.quantity" type="number" class="w-16 bg-gray-50 px-4 py-2 rounded-xl font-bold text-sm border-none focus:ring-2 focus:ring-blue-500">
+              <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Qtd</span>
+              <input v-model.number="item.quantity" type="number" class="w-16 bg-gray-50 px-4 py-2 rounded-xl font-bold text-sm border border-transparent focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all" aria-label="Quantidade">
             </div>
             <div class="ml-auto text-right">
-              <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Subtotal</span>
+              <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-1">Subtotal</span>
               <span class="text-lg font-black text-gray-900">R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
             </div>
           </div>
@@ -353,9 +354,9 @@ defineExpose({ submit, isEditingNonDraft: computed(() => props.isEditing && prop
           <h3 class="text-xs font-black text-gray-900 uppercase tracking-widest">Execução & Pagamento</h3>
           
           <div class="space-y-3">
-            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Data de Execução (Opcional)</label>
-            <input v-model="form.executionDate" type="datetime-local" class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold">
-            <p class="text-[9px] text-gray-400 font-bold ml-1 uppercase">Sincroniza com Google Agenda se conectado.</p>
+            <label class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Data de Execução (Opcional)</label>
+            <input v-model="form.executionDate" type="datetime-local" class="w-full px-5 py-4 bg-white border-2 border-gray-200 hover:border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all outline-none font-bold">
+            <p class="text-[9px] text-gray-500 font-bold ml-1 uppercase">Sincroniza com Google Agenda se conectado.</p>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
@@ -364,20 +365,24 @@ defineExpose({ submit, isEditingNonDraft: computed(() => props.isEditing && prop
           </div>
 
           <div class="space-y-3">
-            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Método de Envio</label>
-            <div class="flex gap-2 p-1 bg-white rounded-2xl border border-gray-100">
+            <label class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Método de Envio</label>
+            <div role="radiogroup" aria-label="Método de Envio" class="flex gap-2 p-1 bg-white rounded-2xl border border-gray-200">
               <button 
                 type="button"
+                role="radio"
+                :aria-checked="form.sendMethod === SendMethod.AUTO"
                 @click="form.sendMethod = SendMethod.AUTO"
-                :class="form.sendMethod === SendMethod.AUTO ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:bg-gray-50'"
+                :class="form.sendMethod === SendMethod.AUTO ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 outline-none'"
                 class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
               >
                 Auto (E-mail)
               </button>
               <button 
                 type="button"
+                role="radio"
+                :aria-checked="form.sendMethod === SendMethod.MANUAL"
                 @click="form.sendMethod = SendMethod.MANUAL"
-                :class="form.sendMethod === SendMethod.MANUAL ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:bg-gray-50'"
+                :class="form.sendMethod === SendMethod.MANUAL ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 outline-none'"
                 class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
               >
                 Manual (Link)
@@ -414,7 +419,7 @@ defineExpose({ submit, isEditingNonDraft: computed(() => props.isEditing && prop
 
             <div class="pt-6 border-t border-white/20">
               <p class="text-5xl font-black tracking-tighter">R$ {{ finalTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
-              <p class="text-[10px] font-black uppercase tracking-widest mt-4 text-blue-200">
+              <p class="text-[10px] font-black uppercase tracking-widest mt-4 text-blue-100">
                 À vista com {{ form.paymentConfig.cashDiscount }}% desc. ou {{ form.paymentConfig.installments }}x sem juros
               </p>
             </div>

@@ -75,7 +75,7 @@ const inputId = useId()
 
 <template>
   <div class="space-y-2">
-    <label v-if="label" :for="inputId" class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">
+    <label v-if="label" :for="inputId" class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">
       {{ label }} <span v-if="required" class="text-red-500">*</span>
     </label>
     <input
@@ -86,8 +86,8 @@ const inputId = useId()
       @accept="onAccept"
       :type="type || 'text'"
       :placeholder="placeholder"
-      class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-300 disabled:opacity-50 disabled:bg-gray-50"
-      :class="{ 'border-red-200 focus:border-red-500 focus:ring-red-500/10': error }"
+      class="w-full px-5 py-4 bg-white border-2 border-gray-200 hover:border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400 disabled:opacity-50 disabled:bg-gray-50"
+      :class="{ 'border-red-300 focus:border-red-500 focus:ring-red-500/20': error }"
     >
     <span v-if="error" class="text-[10px] font-bold text-red-500 ml-1 uppercase">{{ error }}</span>
   </div>

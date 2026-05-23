@@ -33,14 +33,14 @@ const modelValue = defineModel<string>()
 
 <template>
   <div class="space-y-2">
-    <label v-if="label" class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">
+    <label v-if="label" class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">
       {{ label }}
     </label>
     
     <SelectRoot v-model="modelValue" :disabled="disabled">
       <SelectTrigger
-        class="inline-flex items-center justify-between w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 group disabled:opacity-50 disabled:cursor-not-allowed"
-        :class="{ 'border-red-200 focus:border-red-500 focus:ring-red-500/10': error }"
+        class="inline-flex items-center justify-between w-full px-5 py-4 bg-white border-2 border-gray-200 hover:border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all outline-none font-bold text-gray-900 group disabled:opacity-50 disabled:cursor-not-allowed"
+        :class="{ 'border-red-300 focus:border-red-500 focus:ring-red-500/20': error }"
       >
         <SelectValue :placeholder="placeholder || 'Selecione...'" />
         <SelectIcon>
@@ -50,7 +50,7 @@ const modelValue = defineModel<string>()
 
       <SelectPortal>
         <SelectContent
-          class="z-[9999] min-w-[var(--radix-select-trigger-width)] bg-white rounded-2xl border-2 border-gray-100 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+          class="z-[9999] min-w-[var(--radix-select-trigger-width)] bg-white rounded-2xl border-2 border-gray-200 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
           position="popper"
           :side-offset="8"
           :avoid-collisions="true"
@@ -75,7 +75,7 @@ const modelValue = defineModel<string>()
               </SelectItemIndicator>
               <SelectItemText>{{ option.label }}</SelectItemText>
             </SelectItem>
-            <div v-if="!options || options.length === 0" class="px-8 py-4 text-[10px] font-black text-gray-300 uppercase tracking-[0.2em] text-center">
+            <div v-if="!options || options.length === 0" class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">
               Sem Opções
             </div>
           </SelectViewport>

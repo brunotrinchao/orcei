@@ -25,38 +25,21 @@ const isAccepting = ref(false)
 const isTermsOpen = ref(false)
 const isChatModalOpen = ref(false)
 
-// Mark messages as read when opening modal
-watch(isChatModalOpen, async (val) => {
-  if (val) {
-    scrollToBottom()
-    if (proposal.value?.unreadMessages > 0) {
-      try {
-        await $fetch(`/api/proposals/public/messages/read`, {
-          method: 'POST',
-          query: { slug: route.params.slug, t: token }
-        })
-        proposal.value.unreadMessages = 0
-      } catch (e) {
-        console.error('Failed to mark messages as read')
-      }
-    }
-  }
+const {
+  messages,
+  newMessage,
+  isSendingMessage,
+  groupedMessages,
+  loadMessages,
+  sendMessage,
+  markAsRead,
+  connectPusher
+} = useProposalChat({
+  role: 'client',
+  slug: route.params.slug as string,
+  token: token as string
 })
 
-const isActionModalOpen = ref(false)
-const actionType = ref<'decline' | 'request_changes' | null>(null)
-const actionNotes = ref('')
-const isSubmittingAction = ref(false)
-
-const selectedMethod = ref<'cash' | 'credit_card'>('cash')
-
-// Interactions
-const { data: messages, refresh: refreshMessages } = useFetch<any[]>(`/api/proposals/public/messages`, {
-  query: computed(() => ({ slug: route.params.slug, t: token })),
-  transform: (msgs) => msgs.map(m => ({ ...m, status: 'sent' }))
-})
-const newMessage = ref('')
-const isSendingMessage = ref(false)
 const chatMessagesRef = ref<HTMLElement | null>(null)
 
 function scrollToBottom() {
@@ -66,6 +49,18 @@ function scrollToBottom() {
     }
   })
 }
+
+// Mark messages as read and load when opening modal
+watch(isChatModalOpen, async (val) => {
+  if (val) {
+    scrollToBottom()
+    await loadMessages()
+    if (proposal.value?.unreadMessages > 0) {
+      await markAsRead()
+      proposal.value.unreadMessages = 0
+    }
+  }
+})
 
 // Watch chat modal open to scroll
 watch(isChatModalOpen, (val) => {
@@ -81,104 +76,11 @@ watch(messages, () => {
   }
 }, { deep: true })
 
-// Pusher Integration
-let pusherInstance: any = null
-let chatChannel: any = null
-
 watch(proposal, (newProposal) => {
-  if (newProposal && !pusherInstance) {
-    const { pusher } = usePusher({
-      slug: route.params.slug,
-      token: token,
-      chatRole: 'client'
-    })
-    
-    if (pusher) {
-      pusherInstance = pusher
-      chatChannel = pusher.subscribe(`private-proposal-${newProposal._id}`)
-      chatChannel.bind('new-message', (data: any) => {
-        if (messages.value) {
-          // Se for do cliente (eu), apenas atualizamos o status para 'sent' se acharmos pelo ID temporário ou texto
-          // Mas o Pusher envia o objeto real do DB.
-          const existingIdx = messages.value.findIndex(m => m._id === data._id || (m.status === 'pending' && m.text === data.text))
-          if (existingIdx !== -1) {
-            const newMessages = [...messages.value]
-            newMessages[existingIdx] = { ...data, status: 'sent' }
-            messages.value = newMessages
-          } else {
-            messages.value = [...messages.value, { ...data, status: 'sent' }]
-          }
-        }
-      })
-    }
+  if (newProposal) {
+    connectPusher(newProposal._id)
   }
 }, { immediate: true })
-
-onUnmounted(() => {
-  if (chatChannel) chatChannel.unbind_all()
-  if (pusherInstance) pusherInstance.disconnect()
-})
-
-async function sendMessage() {
-  if (!newMessage.value.trim() || isSendingMessage.value) return
-  
-  const text = newMessage.value
-  newMessage.value = ''
-  
-  // Envio otimista
-  const tempId = Date.now().toString()
-  const optimisticMessage = {
-    _id: tempId,
-    text,
-    sender: 'client',
-    createdAt: new Date().toISOString(),
-    status: 'pending'
-  }
-  
-  if (!messages.value) messages.value = []
-  // Força reatividade criando novo array
-  messages.value = [...messages.value, optimisticMessage]
-
-  try {
-    const sentMessage = await $fetch<any>(`/api/proposals/public/messages`, {
-      method: 'POST',
-      query: { slug: route.params.slug, t: token },
-      body: { text }
-    })
-    
-    // Atualiza a mensagem otimista com o ID real de forma reativa
-    messages.value = messages.value.map(m => 
-      m._id === tempId ? { ...sentMessage, status: 'sent' } : m
-    )
-    
-    await refresh() // Atualiza status da proposta
-  } catch (e) {
-    // Remove se falhar
-    messages.value = messages.value.filter(m => m._id !== tempId)
-    notify('Erro', 'Erro ao enviar mensagem')
-  }
-}
-
-// Group messages by date
-const groupedMessages = computed(() => {
-  if (!messages.value) return []
-  const groups: { date: string, items: any[] }[] = []
-  
-  messages.value.forEach(msg => {
-    const date = new Date(msg.createdAt)
-    let label = ''
-    
-    if (isToday(date)) label = 'Hoje'
-    else if (isYesterday(date)) label = 'Ontem'
-    else label = format(date, "d 'de' MMMM", { locale: ptBR })
-    
-    const group = groups.find(g => g.date === label)
-    if (group) group.items.push(msg)
-    else groups.push({ date: label, items: [msg] })
-  })
-  
-  return groups
-})
 
 const formatMessageTime = (date: any) => {
   return format(new Date(date), 'HH:mm')

@@ -1,6 +1,33 @@
 import { processVariables } from './variables'
 import puppeteer from 'puppeteer'
-import DOMPurify from 'isomorphic-dompurify'
+import sanitizeHtml from 'sanitize-html'
+
+const sanitizeOptions = {
+  allowedTags: [
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
+    'nl', 'li', 'ins', 'del', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div',
+    'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'span'
+  ],
+  allowedAttributes: {
+    a: [ 'href', 'name', 'target' ],
+    span: [ 'style', 'class' ],
+    p: [ 'style', 'class' ],
+    div: [ 'style', 'class' ],
+    table: [ 'style', 'class' ],
+    tr: [ 'style', 'class' ],
+    td: [ 'style', 'class' ]
+  },
+  allowedStyles: {
+    '*': {
+      'text-align': [ /^left$/, /^right$/, /^center$/, /^justify$/ ],
+      'color': [ /^#(?:[0-9a-fA-F]{3}){1,2}$/, /^rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)$/ ],
+      'background-color': [ /^#(?:[0-9a-fA-F]{3}){1,2}$/, /^rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)$/ ],
+      'font-size': [ /^\d+(?:px|em|rem|%)$/ ],
+      'font-weight': [ /^bold$/, /^normal$/, /^\d+$/ ],
+      'padding-left': [ /^\d+(?:px|em|rem|%)$/ ]
+    }
+  }
+}
 
 export async function generateProposalPdfBuffer(proposal: any, profile: any, appName: string = 'ORCEI') {
   const htmlContent = generateProposalHtml(proposal, profile, appName)
@@ -14,8 +41,8 @@ export async function generateProposalPdfBuffer(proposal: any, profile: any, app
 
 export function generateProposalHtml(proposal: any, profile: any, appName: string = 'ORCEI') {
   // Processar variáveis e sanitizar contra injeção de script
-  const contractHtml = DOMPurify.sanitize(processVariables(proposal.contractText || '', proposal, profile))
-  const termsHtml = DOMPurify.sanitize(processVariables(proposal.termsAndConditions || '', proposal, profile))
+  const contractHtml = sanitizeHtml(processVariables(proposal.contractText || '', proposal, profile), sanitizeOptions)
+  const termsHtml = sanitizeHtml(processVariables(proposal.termsAndConditions || '', proposal, profile), sanitizeOptions)
 
   const logoHtml = process.env.APP_DOCUMENT_LOGO 
     ? `<img src="${process.env.APP_DOCUMENT_LOGO}" width="150" height="108">` 
@@ -157,7 +184,7 @@ export function generateReportHtml(report: any, profile: any, appName: string = 
       <div class="date">Gerado em: ${new Date(report.createdAt).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</div>
 
       <div class="content">
-        ${DOMPurify.sanitize(report.contentHtml)}
+        ${sanitizeHtml(report.contentHtml, sanitizeOptions)}
       </div>
 
       <div class="footer">

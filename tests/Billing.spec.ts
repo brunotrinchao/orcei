@@ -9,6 +9,7 @@ const { mockUseFetch, mockNotify } = vi.hoisted(() => ({
 }))
 
 mockNuxtImport('useFetch', () => mockUseFetch)
+mockNuxtImport('useLazyFetch', () => mockUseFetch)
 
 mockNuxtImport('useAlerts', () => {
   return () => ({

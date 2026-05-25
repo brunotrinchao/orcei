@@ -1,3 +1,9 @@
+<script lang="ts">
+import { ref, watch, onUnmounted } from 'vue'
+
+const activeDialogsCount = ref(0)
+</script>
+
 <script setup lang="ts">
 import {
   DialogRoot,
@@ -22,6 +28,25 @@ const props = defineProps<DialogRootProps & {
 const emits = defineEmits<DialogRootEmits>()
 
 const open = useVModel(props, 'open', emits)
+
+const currentZIndex = ref(0)
+
+watch(open, (isOpen) => {
+  if (isOpen) {
+    activeDialogsCount.value++
+    currentZIndex.value = activeDialogsCount.value
+  } else {
+    setTimeout(() => {
+      activeDialogsCount.value = Math.max(0, activeDialogsCount.value - 1)
+    }, 300) // wait for exit animation
+  }
+})
+
+onUnmounted(() => {
+  if (open.value) {
+    activeDialogsCount.value = Math.max(0, activeDialogsCount.value - 1)
+  }
+})
 </script>
 
 <template>
@@ -38,7 +63,8 @@ const open = useVModel(props, 'open', emits)
         leave-to-class="opacity-0"
       >
         <DialogOverlay
-          class="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm"
+          :style="{ zIndex: 100 + (currentZIndex * 2) }"
+          class="fixed inset-0 bg-black/40 backdrop-blur-sm"
         />
       </Transition>
 
@@ -51,14 +77,15 @@ const open = useVModel(props, 'open', emits)
         leave-to-class="opacity-0 scale-95 translate-y-4"
       >
         <DialogContent
+          :style="{ zIndex: 101 + (currentZIndex * 2) }"
           :class="[
-            'fixed left-[50%] top-[50%] z-[101] flex flex-col w-full translate-x-[-50%] translate-y-[-50%] bg-white shadow-2xl rounded-[2.5rem] border-4 border-white max-h-[90vh] overflow-hidden outline-none',
-            size === 'sm' ? 'max-w-sm' : '',
-            size === 'md' ? 'max-w-lg' : '',
-            size === 'lg' ? 'max-w-2xl' : '',
-            size === 'xl' ? 'max-w-5xl' : '',
-            size === 'full' ? 'max-w-[95vw] h-[95vh]' : '',
-            !size ? 'max-w-lg' : ''
+            'fixed left-[50%] top-[50%] flex flex-col w-[100vw] sm:w-full h-[100dvh] sm:h-auto translate-x-[-50%] translate-y-[-50%] bg-white shadow-2xl rounded-none sm:rounded-[2.5rem] sm:border-4 border-white max-h-[100dvh] sm:max-h-[90vh] overflow-hidden outline-none',
+            size === 'sm' ? 'sm:max-w-sm' : '',
+            size === 'md' ? 'sm:max-w-lg' : '',
+            size === 'lg' ? 'sm:max-w-2xl' : '',
+            size === 'xl' ? 'sm:max-w-5xl' : '',
+            size === 'full' ? 'sm:max-w-[95vw] sm:h-[95vh]' : '',
+            !size ? 'sm:max-w-lg' : ''
           ]"
         >
           <!-- Header fixo -->

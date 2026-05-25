@@ -25,7 +25,7 @@ const fetchQuery = computed(() => {
   }
 })
 
-const { data: stats, refresh, status } = useFetch<any>('/api/dashboard/stats', {
+const { data: stats, refresh, status } = useLazyFetch<any>('/api/dashboard/stats', {
   key: 'dashboard-stats',
   query: fetchQuery,
   watch: [period]

@@ -1,0 +1,193 @@
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
+import {
+  PopoverRoot,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverPortal,
+} from 'radix-vue'
+import { Calendar, Clock, X } from 'lucide-vue-next'
+
+const props = defineProps<{
+  modelValue?: string
+  label?: string
+  description?: string
+}>()
+
+const emit = defineEmits(['update:modelValue'])
+
+const isOpen = ref(false)
+
+// Separamos a data e a hora para o usuário preencher de forma mais amigável
+const internalDate = ref('')
+const internalTime = ref('')
+
+function syncInternalFromProps(val?: string) {
+  if (!val) {
+    internalDate.value = ''
+    internalTime.value = ''
+    return
+  }
+  // val expected in format YYYY-MM-DDTHH:mm
+  const parts = val.split('T')
+  if (parts.length === 2) {
+    internalDate.value = parts[0]
+    internalTime.value = parts[1]
+  } else {
+    // If we only have date
+    internalDate.value = parts[0]
+    internalTime.value = '12:00'
+  }
+}
+
+watch(() => props.modelValue, syncInternalFromProps, { immediate: true })
+
+const formattedDateTime = computed(() => {
+  if (!props.modelValue) return 'Selecionar Data e Hora'
+  
+  const dateObj = new Date(props.modelValue)
+  if (isNaN(dateObj.getTime())) return props.modelValue
+  
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(dateObj)
+})
+
+function apply() {
+  if (internalDate.value) {
+    const time = internalTime.value || '12:00'
+    emit('update:modelValue', `${internalDate.value}T${time}`)
+  } else {
+    emit('update:modelValue', '')
+  }
+  isOpen.value = false
+}
+
+function clear() {
+  internalDate.value = ''
+  internalTime.value = ''
+  emit('update:modelValue', '')
+  isOpen.value = false
+}
+
+function setPreset(daysToAdd: number) {
+  const targetDate = new Date()
+  targetDate.setDate(targetDate.getDate() + daysToAdd)
+  
+  internalDate.value = targetDate.toISOString().split('T')[0]
+  internalTime.value = '14:00' // Horário comercial padrão
+  apply()
+}
+</script>
+
+<template>
+  <div class="space-y-2">
+    <label v-if="label" class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">
+      {{ label }}
+    </label>
+
+    <PopoverRoot v-model:open="isOpen">
+      <div class="relative">
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            class="w-full flex items-center gap-3 px-5 py-4 bg-white border-2 border-gray-200 hover:border-gray-300 rounded-2xl transition-all text-left focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 outline-none group"
+          >
+            <Calendar class="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
+            <span :class="[!modelValue ? 'text-gray-400' : 'text-gray-900', 'font-bold text-sm truncate flex-1']">
+              {{ formattedDateTime }}
+            </span>
+            <X 
+              v-if="modelValue" 
+              @click.stop="clear"
+              class="w-4 h-4 text-gray-400 hover:text-red-500 transition-all cursor-pointer"
+            />
+          </button>
+        </PopoverTrigger>
+
+        <p v-if="description" class="text-[9px] text-gray-500 font-bold ml-1 uppercase mt-2">
+          {{ description }}
+        </p>
+
+        <PopoverPortal>
+          <PopoverContent
+            side="bottom"
+            :side-offset="8"
+            align="start"
+            class="z-[100] bg-white rounded-[2.5rem] border-2 border-gray-100 shadow-2xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-200 min-w-[320px] max-w-[90vw]"
+          >
+            <div class="space-y-8">
+              
+              <!-- Sugestões Rápidas -->
+              <div class="space-y-3">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sugestões Rápidas</label>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <button 
+                    v-for="p in [
+                      { label: 'Hoje', days: 0 },
+                      { label: 'Amanhã', days: 1 },
+                      { label: 'Em 7 dias', days: 7 },
+                      { label: 'Em 15 dias', days: 15 }
+                    ]"
+                    :key="p.label"
+                    @click="setPreset(p.days)"
+                    class="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 transition-all border border-transparent hover:border-blue-100"
+                  >
+                    {{ p.label }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- Inputs Nativos Separados para melhor UX mobile/desktop -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                  <div class="flex items-center gap-2">
+                    <Calendar class="w-4 h-4 text-blue-500" />
+                    <label class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Data</label>
+                  </div>
+                  <input 
+                    v-model="internalDate" 
+                    type="date"
+                    class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 hover:border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-bold text-sm text-gray-900 transition-all cursor-pointer"
+                  >
+                </div>
+                
+                <div class="space-y-2">
+                  <div class="flex items-center gap-2">
+                    <Clock class="w-4 h-4 text-blue-500" />
+                    <label class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Horário</label>
+                  </div>
+                  <input 
+                    v-model="internalTime" 
+                    type="time"
+                    class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 hover:border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-bold text-sm text-gray-900 transition-all cursor-pointer"
+                  >
+                </div>
+              </div>
+
+              <!-- Footer do Popover -->
+              <div class="pt-4 border-t border-gray-50 flex gap-3">
+                <button 
+                  @click="clear"
+                  class="flex-1 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-all"
+                >
+                  Limpar
+                </button>
+                <button 
+                  @click="apply"
+                  class="flex-[2] px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest bg-gray-900 text-white hover:bg-black transition-all shadow-lg"
+                >
+                  Confirmar Data
+                </button>
+              </div>
+            </div>
+          </PopoverContent>
+        </PopoverPortal>
+      </div>
+    </PopoverRoot>
+  </div>
+</template>

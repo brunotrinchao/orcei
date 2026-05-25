@@ -9,8 +9,8 @@ import { Plus, MapPin, Calendar, Clock, FileText, Trash2, X } from 'lucide-vue-n
 import type { ProposalDTO } from '../../../../types'
 
 const { notify, confirm: confirmAlert } = useAlerts()
-const { data: events, refresh: refreshEvents } = useFetch<any[]>('/api/events')
-const { data: proposals } = useFetch<ProposalDTO[]>('/api/proposals')
+const { data: events, refresh: refreshEvents, pending: pendingEvents } = useLazyFetch<any[]>('/api/events')
+const { data: proposals, pending: pendingProposals } = useLazyFetch<ProposalDTO[]>('/api/proposals')
 
 const isModalOpen = ref(false)
 const isSubmitting = ref(false)

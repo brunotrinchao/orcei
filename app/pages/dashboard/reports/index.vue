@@ -5,7 +5,7 @@ const searchQuery = ref('')
 const startDate = ref('')
 const endDate = ref('')
 
-const { data: reports, refresh, pending } = useFetch<any[]>('/api/reports', {
+const { data: reports, refresh, pending } = useLazyFetch<any[]>('/api/reports', {
   query: computed(() => ({
     start: startDate.value,
     end: endDate.value

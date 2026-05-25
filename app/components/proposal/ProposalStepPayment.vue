@@ -20,9 +20,11 @@ const props = defineProps<{
           <h3 class="text-xs font-black text-gray-900 uppercase tracking-widest">Execução & Pagamento</h3>
           
           <div class="space-y-3">
-            <label class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Data de Execução (Opcional)</label>
-            <input v-model="form.executionDate" type="datetime-local" class="w-full px-5 py-4 bg-white border-2 border-gray-200 hover:border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all outline-none font-bold">
-            <p class="text-[9px] text-gray-500 font-bold ml-1 uppercase">Sincroniza com Google Agenda se conectado.</p>
+            <BaseDateTimePicker 
+              v-model="form.executionDate" 
+              label="Data de Execução (Opcional)"
+              description="Sincroniza com Google Agenda se conectado."
+            />
           </div>
 
           <div class="grid grid-cols-2 gap-4">

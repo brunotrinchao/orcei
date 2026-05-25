@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Plus, Trash2, Sparkles, Search, ChevronDown, ChevronUp, GripVertical } from 'lucide-vue-next'
+import { Plus, Trash2, ArrowDown, Search, ChevronDown, ChevronUp, GripVertical } from 'lucide-vue-next'
+import CatalogItemFormDialog from '../catalog/CatalogItemFormDialog.vue'
 
 const props = defineProps<{
   form: any
@@ -13,7 +14,7 @@ const props = defineProps<{
 const emit = defineEmits([
   'update:catalogSearch', 
   'generateDescription', 
-  'addCustomItem'
+  'catalog-updated'
 ])
 
 const internalSearch = computed({
@@ -22,8 +23,14 @@ const internalSearch = computed({
 })
 
 const showCatalogDropdown = ref(false)
+const showCatalogItemFormDialog = ref(false)
 const expandedItemIdx = ref<number | null>(null)
 const expandedUpsellIdx = ref<number | null>(null)
+
+function onCatalogItemCreated(item: any) {
+  selectCatalogItem(item)
+  emit('catalog-updated')
+}
 
 function toggleItemExpansion(idx: number, isUpsell = false) {
   if (isUpsell) {
@@ -55,8 +62,6 @@ function selectCatalogItem(item: any) {
       price: item.price,
       quantity: 1
     })
-    // Auto-expand the newly added item
-    expandedItemIdx.value = props.form.items.length - 1
   }
   showCatalogDropdown.value = false
   internalSearch.value = ''
@@ -72,16 +77,6 @@ function moveToItems(index: number) {
   const item = props.form.upsellItems.splice(index, 1)[0]
   props.form.items.push(item)
   if (expandedUpsellIdx.value === index) expandedUpsellIdx.value = null
-}
-
-function addCustomItem() {
-  props.form.items.push({
-    name: 'Novo Item Customizado',
-    description: '',
-    price: 0,
-    quantity: 1
-  })
-  expandedItemIdx.value = props.form.items.length - 1
 }
 
 function isItemSelected(item: any) {
@@ -110,9 +105,9 @@ function isItemSelected(item: any) {
           >
           <Search class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
         </div>
-        <BaseButton variant="secondary" @click="addCustomItem" class="shrink-0 h-[56px] px-6 rounded-2xl">
+        <BaseButton type="button" variant="secondary" @click="showCatalogItemFormDialog = true" class="shrink-0 h-[56px] px-6 rounded-2xl">
           <Plus class="w-5 h-5 mr-2" />
-          Item Avulso
+          Novo
         </BaseButton>
       </div>
 
@@ -161,7 +156,7 @@ function isItemSelected(item: any) {
       </h3>
       
       <div v-if="form.items.length === 0" class="p-8 border-2 border-dashed border-gray-200 rounded-3xl text-center text-gray-400 font-medium">
-        Adicione itens buscando no catálogo acima ou clicando em "Item Avulso".
+        Adicione itens buscando no catálogo acima ou clicando em "Novo".
       </div>
 
       <div class="space-y-3">
@@ -174,11 +169,16 @@ function isItemSelected(item: any) {
           <div class="p-4 flex items-center gap-4">
             <div class="flex-1 flex items-center gap-3 min-w-0">
               <GripVertical class="w-5 h-5 text-gray-300 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block shrink-0" />
-              <input 
-                v-model="item.name" 
-                class="flex-1 text-sm sm:text-base font-black text-gray-900 bg-transparent border-b border-transparent focus:border-blue-500 focus:ring-0 p-1 outline-none transition-all truncate" 
-                placeholder="Nome do Serviço" 
-              >
+              <template v-if="!item.catalogItemId">
+                <input 
+                  v-model="item.name" 
+                  class="flex-1 text-sm sm:text-base font-black text-gray-900 bg-transparent border-b border-transparent focus:border-blue-500 focus:ring-0 p-1 outline-none transition-all truncate" 
+                  placeholder="Nome do Serviço" 
+                >
+              </template>
+              <template v-else>
+                <span class="flex-1 text-sm sm:text-base font-black text-gray-900 p-1 truncate">{{ item.name }}</span>
+              </template>
             </div>
             
             <div class="flex items-center gap-3 sm:gap-6 shrink-0">
@@ -203,7 +203,7 @@ function isItemSelected(item: any) {
                 <ChevronDown v-else class="w-5 h-5" />
               </button>
               <button @click="moveToUpsell(idx)" type="button" class="hidden sm:block p-2 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Mover para Opcionais">
-                <Sparkles class="w-4 h-4" />
+                <ArrowDown class="w-4 h-4" />
               </button>
               <button @click="form.items.splice(idx, 1)" type="button" class="p-2 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Remover Item">
                 <Trash2 class="w-4 h-4" />
@@ -215,19 +215,17 @@ function isItemSelected(item: any) {
           <div v-show="expandedItemIdx === idx" class="px-4 pb-4 sm:pl-[4.5rem] bg-gray-50/50 border-t border-gray-100">
             <div class="pt-4 flex flex-col gap-3">
               <div class="relative">
-                <textarea 
-                  v-model="item.description" 
-                  rows="3" 
-                  class="w-full text-sm font-medium text-gray-600 bg-white p-4 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none resize-none transition-all shadow-sm" 
-                  placeholder="Descreva detalhadamente o que será entregue (visível para o cliente)..."
-                ></textarea>
-                <button 
-                  type="button"
-                  @click="emit('generateDescription', { index: idx, isUpsell: false })"
-                  class="absolute bottom-3 right-3 flex items-center gap-2 px-3 py-1.5 bg-white rounded-lg shadow-sm border border-gray-200 text-blue-600 hover:scale-105 transition-all text-xs font-bold"
-                >
-                  <Sparkles class="w-3 h-3" /> <span class="hidden sm:inline">Gerar com IA</span>
-                </button>
+                <template v-if="!item.catalogItemId">
+                  <textarea 
+                    v-model="item.description" 
+                    rows="3" 
+                    class="w-full text-sm font-medium text-gray-600 bg-transparent p-0 border-0 focus:ring-0 outline-none resize-none transition-all" 
+                    placeholder="Descreva detalhadamente o que será entregue (visível para o cliente)..."
+                  ></textarea>
+                </template>
+                <template v-else>
+                  <div class="w-full text-sm font-medium text-gray-600 whitespace-pre-wrap">{{ item.description || 'Nenhuma descrição fornecida para este item do catálogo.' }}</div>
+                </template>
               </div>
               <div class="flex sm:hidden justify-between items-center mt-2">
                 <span class="text-sm font-black text-gray-900">Total: R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
@@ -256,11 +254,16 @@ function isItemSelected(item: any) {
           <div class="p-4 flex items-center gap-4">
             <div class="flex-1 flex items-center gap-3 min-w-0">
               <GripVertical class="w-5 h-5 text-blue-200 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block shrink-0" />
-              <input 
-                v-model="item.name" 
-                class="flex-1 text-sm sm:text-base font-black text-gray-900 bg-transparent border-b border-transparent focus:border-blue-500 focus:ring-0 p-1 outline-none transition-all truncate" 
-                placeholder="Nome do Opcional" 
-              >
+              <template v-if="!item.catalogItemId">
+                <input 
+                  v-model="item.name" 
+                  class="flex-1 text-sm sm:text-base font-black text-gray-900 bg-transparent border-b border-transparent focus:border-blue-500 focus:ring-0 p-1 outline-none transition-all truncate" 
+                  placeholder="Nome do Opcional" 
+                >
+              </template>
+              <template v-else>
+                <span class="flex-1 text-sm sm:text-base font-black text-gray-900 p-1 truncate">{{ item.name }}</span>
+              </template>
             </div>
             
             <div class="flex items-center gap-3 sm:gap-6 shrink-0">
@@ -296,19 +299,17 @@ function isItemSelected(item: any) {
           <div v-show="expandedUpsellIdx === idx" class="px-4 pb-4 sm:pl-[4.5rem] bg-white/50 border-t border-blue-100">
             <div class="pt-4 flex flex-col gap-3">
               <div class="relative">
-                <textarea 
-                  v-model="item.description" 
-                  rows="3" 
-                  class="w-full text-sm font-medium text-gray-600 bg-white p-4 rounded-xl border border-blue-100 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none resize-none transition-all shadow-sm" 
-                  placeholder="Por que o cliente deveria adquirir este pacote adicional?"
-                ></textarea>
-                <button 
-                  type="button"
-                  @click="emit('generateDescription', { index: idx, isUpsell: true })"
-                  class="absolute bottom-3 right-3 flex items-center gap-2 px-3 py-1.5 bg-white rounded-lg shadow-sm border border-blue-100 text-blue-600 hover:scale-105 transition-all text-xs font-bold"
-                >
-                  <Sparkles class="w-3 h-3" /> <span class="hidden sm:inline">Gerar com IA</span>
-                </button>
+                <template v-if="!item.catalogItemId">
+                  <textarea 
+                    v-model="item.description" 
+                    rows="3" 
+                    class="w-full text-sm font-medium text-gray-600 bg-transparent p-0 border-0 focus:ring-0 outline-none resize-none transition-all" 
+                    placeholder="Por que o cliente deveria adquirir este pacote adicional?"
+                  ></textarea>
+                </template>
+                <template v-else>
+                  <div class="w-full text-sm font-medium text-gray-600 whitespace-pre-wrap">{{ item.description || 'Nenhuma descrição fornecida para este opcional do catálogo.' }}</div>
+                </template>
               </div>
               <div class="flex sm:hidden justify-between items-center mt-2">
                 <span class="text-sm font-black text-gray-900">Total: R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
@@ -321,5 +322,10 @@ function isItemSelected(item: any) {
         </div>
       </div>
     </div>
+    <!-- Modal para criar novo item no catálogo diretamente daqui -->
+    <CatalogItemFormDialog 
+      v-model:open="showCatalogItemFormDialog"
+      @saved="onCatalogItemCreated"
+    />
   </div>
 </template>

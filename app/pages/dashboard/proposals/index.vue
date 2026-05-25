@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles, Send, CheckCheck, X } from 'lucide-vue-next'
+import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles, Send, CheckCheck, X, ArrowLeft, ArrowRight } from 'lucide-vue-next'
 import { isToday, isYesterday, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import type { ProposalDTO } from '../../../../types'
@@ -26,7 +26,7 @@ function clearFilters() {
   currentPage.value = 1
 }
 
-const { data: proposalsData, refresh, pending } = useFetch<any>('/api/proposals', {
+const { data: proposalsData, refresh, pending } = useLazyFetch<any>('/api/proposals', {
   query: computed(() => ({
     page: currentPage.value,
     limit: itemsPerPage,
@@ -472,22 +472,54 @@ const formatTime = (date: any) => {
         :is-submitting="isSubmitting"
         @submit="handleProposalSubmit"
       />
-
       <template #footer>
-        <template v-if="selectedProposal && selectedProposal.status !== 'draft'">
-          <BaseButton type="button" :disabled="isSubmitting" :loading="isSubmitting" @click="proposalFormRef?.submit()">
-            Salvar Alterações
-          </BaseButton>
-        </template>
-        <template v-else>
-          <BaseButton type="button" variant="outline" :disabled="isSubmitting" @click="proposalFormRef?.submit('draft')">
-            <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin mr-2" />
-            Rascunho
-          </BaseButton>
-          <BaseButton type="button" :disabled="isSubmitting" @click="proposalFormRef?.submit('created')">
-            <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin mr-2" />
-            Criar e Enviar
-          </BaseButton>
+        <!-- Voltar -->
+        <BaseButton 
+          v-if="proposalFormRef?.currentStep > 1" 
+          type="button" 
+          variant="secondary" 
+          @click="proposalFormRef.prevStep()" 
+          :disabled="isSubmitting"
+        >
+          <ArrowLeft class="w-4 h-4 mr-2" /> Voltar
+        </BaseButton>
+
+        <div class="flex-1"></div>
+
+        <!-- Total Parcial no passo 2 -->
+        <div v-if="proposalFormRef?.currentStep === 2" class="hidden sm:block text-center mr-4">
+          <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Total Parcial</span>
+          <span class="text-lg font-black text-blue-600">R$ {{ (proposalFormRef?.finalTotal || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+        </div>
+
+        <!-- Próximo (Passo < totalSteps) -->
+        <BaseButton 
+          v-if="proposalFormRef?.currentStep < proposalFormRef?.totalSteps" 
+          type="button" 
+          variant="primary" 
+          @click="proposalFormRef.nextStep()"
+        >
+          Próximo Passo
+          <ArrowRight class="w-4 h-4 ml-2" />
+        </BaseButton>
+
+        <!-- Finalizar (Último passo) -->
+        <template v-else-if="proposalFormRef?.currentStep === proposalFormRef?.totalSteps">
+          <template v-if="proposalFormRef?.isEditingNonDraft">
+            <BaseButton type="button" :disabled="isSubmitting" :loading="isSubmitting" @click="proposalFormRef.submit()">
+              Salvar Alterações
+            </BaseButton>
+          </template>
+          <template v-else>
+            <BaseButton type="button" variant="outline" :disabled="isSubmitting" @click="proposalFormRef.submit('draft')">
+              <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin mr-2" />
+              Salvar Rascunho
+            </BaseButton>
+            <BaseButton type="button" :disabled="isSubmitting" @click="proposalFormRef.submit('created')" class="bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-200">
+              <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin mr-2" />
+              Criar e Enviar
+            </BaseButton>
+          </template>
         </template>
       </template>
     </BaseDialog>

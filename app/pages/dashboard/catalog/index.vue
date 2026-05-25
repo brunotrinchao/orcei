@@ -12,7 +12,7 @@ const searchQuery = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 10
 
-const { data: catalogData, refresh, pending } = useFetch<any>('/api/catalog', {
+const { data: catalogData, refresh, pending } = useLazyFetch<any>('/api/catalog', {
   query: computed(() => ({
     page: currentPage.value,
     limit: itemsPerPage,
@@ -141,74 +141,8 @@ function openModal(item: CatalogItemDTO | null = null) {
   showForm.value = true
 }
 
-function generateWithIA() {
-  if (!form.value.name) return notify('Aviso', 'Digite o nome do item primeiro')
-  if (form.value.type === 'service') {
-    aiPromptText.value = ''
-    showAIDialog.value = true
-  } else {
-    runAIGenerate('')
-  }
-}
-
-async function runAIGenerate(context: string) {
-  isGenerating.value = true
-  try {
-    const data: any = await $fetch('/api/ai/catalog-suggest', {
-      method: 'POST',
-      body: { name: form.value.name, type: form.value.type, context: context || undefined }
-    })
-
-    if (data.description) form.value.description = data.description
-    if (data.price) form.value.price = data.price
-    if (data.unit) form.value.unit = data.unit
-
-    notify('IA aplicada', 'Descrição, preço e unidade sugeridos. Revise antes de salvar.')
-  } catch (e) {
-    notify('Erro', 'Erro ao gerar sugestões com IA')
-  } finally {
-    isGenerating.value = false
-  }
-}
-
-function confirmAIGenerate() {
-  showAIDialog.value = false
-  runAIGenerate(aiPromptText.value)
-}
-
-async function saveItem() {
-  isSubmitting.value = true
-  try {
-    const method = selectedItem.value ? 'PUT' : 'POST'
-    const endpoint = selectedItem.value ? `/api/catalog/${selectedItem.value._id}` : '/api/catalog'
-
-    const priceValue = typeof form.value.price === 'string'
-      ? parseFloat(form.value.price.replace(/[R$\s.]/g, '').replace(',', '.'))
-      : form.value.price
-
-    const payload = {
-      type: form.value.type,
-      name: form.value.name,
-      description: form.value.description,
-      price: priceValue,
-      unit: form.value.unit,
-      sku: form.value.sku,
-      imageUrl: form.value.imageUrl || undefined,
-      icon: form.value.icon
-    }
-
-    await $fetch(endpoint, {
-      method,
-      body: payload
-    })
-    showForm.value = false
-    refresh()
-  } catch (e: any) {
-    const html = parseApiErrors(e)
-    notify(html ? 'Dados inválidos' : 'Erro', html ?? (e.data?.statusMessage || 'Erro ao salvar item'))
-  } finally {
-    isSubmitting.value = false
-  }
+function handleItemSaved() {
+  refresh()
 }
 
 async function deleteItem(id: string) {
@@ -255,143 +189,11 @@ function getIcon(name: string) {
     </div>
 
     <!-- Modal de Formulário -->
-    <BaseDialog
-      v-model:open="showForm"
-      :title="showCropper ? 'Ajustar Imagem' : (selectedItem ? 'Editar Item' : 'Novo Item')"
-      size="lg"
-    >
-      <div v-if="showCropper" class="flex flex-col gap-6">
-        <p class="text-sm text-gray-500 font-bold">Arraste e redimensione para o enquadramento ideal (1:1)</p>
-        <div class="bg-gray-100 rounded-3xl overflow-hidden min-h-[400px]">
-          <Cropper
-            ref="cropperRef"
-            :src="rawImage"
-            :stencil-props="{
-              aspectRatio: 1/1,
-              movable: true,
-              resizable: true
-            }"
-            class="w-full h-[400px]"
-          />
-        </div>
-      </div>
-
-      <form v-else id="catalog-form" @submit.prevent="saveItem" class="space-y-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-          <!-- Visual Identity -->
-          <div class="space-y-4">
-            <div class="flex items-center justify-between px-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Identidade Visual</label>
-              <div class="flex bg-gray-100 p-1 rounded-xl">
-                <button 
-                  type="button"
-                  @click="form.imageUrl = ''"
-                  :class="[!form.imageUrl ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400']"
-                  class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all"
-                >Ícone</button>
-                <button 
-                  type="button"
-                  class="relative px-3 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all overflow-hidden"
-                  :class="[form.imageUrl ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400']"
-                >
-                  Imagem
-                  <input type="file" accept="image/*" @change="onFileChange" class="absolute inset-0 opacity-0 cursor-pointer">
-                </button>
-              </div>
-            </div>
-
-            <!-- Icon Selector -->
-            <div v-if="!form.imageUrl" class="animate-in fade-in zoom-in-95 duration-200">
-              <BaseIconSelect v-model="form.icon" />
-            </div>
-
-            <!-- Image Preview -->
-            <div v-else class="relative group aspect-square bg-gray-50 rounded-[2.5rem] border-2 border-dashed border-gray-200 overflow-hidden flex items-center justify-center animate-in fade-in zoom-in-95 duration-200">
-              <img :src="form.imageUrl" class="w-full h-full object-cover">
-              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                <label class="p-3 bg-white rounded-xl text-gray-900 cursor-pointer hover:scale-110 transition-transform">
-                  <Pencil class="w-5 h-5" />
-                  <input type="file" accept="image/*" @change="onFileChange" class="hidden">
-                </label>
-                <button type="button" @click="form.imageUrl = ''" class="p-3 bg-white rounded-xl text-red-600 hover:scale-110 transition-transform">
-                  <Trash2 class="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="space-y-6">
-            <BaseSelect 
-              v-model="form.type" 
-              label="Tipo de Item" 
-              :options="typeOptions" 
-            />
-            <BaseInput 
-              v-model="form.name" 
-              label="Nome do Item" 
-              placeholder="Ex: Desenvolvimento Web" 
-              required 
-            />
-            <div class="grid grid-cols-2 gap-4">
-              <BaseInput 
-                v-model="form.price" 
-                label="Preço (R$)" 
-                mask="currency"
-                required 
-              />
-              <BaseSelect 
-                v-model="form.unit" 
-                label="Unidade" 
-                :options="unitOptions" 
-              />
-            </div>
-          </div>
-        </div>
-
-        <div class="space-y-3">
-          <div class="flex justify-between items-center px-1">
-            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Descrição Comercial</label>
-            <button
-              type="button"
-              @click="generateWithIA"
-              :disabled="isGenerating || !form.name"
-              class="text-[10px] font-black text-blue-600 hover:text-blue-800 flex items-center gap-2 disabled:opacity-40 uppercase tracking-widest transition-colors"
-            >
-              <Sparkles class="w-4 h-4" />
-              {{ isGenerating ? 'Gerando...' : 'Sugestão IA' }}
-            </button>
-          </div>
-          <textarea 
-            v-model="form.description" 
-            rows="3" 
-            class="w-full px-6 py-5 bg-white border-2 border-gray-100 rounded-[1.5rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 shadow-inner"
-            placeholder="Descreva o que está incluído..."
-          ></textarea>
-        </div>
-
-        <BaseInput 
-          v-model="form.sku" 
-          label="SKU / Código Interno" 
-          placeholder="Opcional" 
-        />
-      </form>
-
-      <template #footer>
-        <template v-if="showCropper">
-          <button type="button" @click="showCropper = false" class="px-8 py-3 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-900 transition-all">Cancelar</button>
-          <BaseButton type="button" @click="cropImage" :disabled="isSubmitting">
-            <RefreshCcw v-if="isSubmitting" class="w-4 h-4 animate-spin mr-2" />
-            Confirmar Corte
-          </BaseButton>
-        </template>
-        <template v-else>
-          <BaseButton type="button" @click="saveItem" :disabled="isSubmitting">
-            <RefreshCcw v-if="isSubmitting" class="w-4 h-4 animate-spin mr-2" />
-            {{ isSubmitting ? 'Salvando...' : (selectedItem ? 'Atualizar Item' : 'Salvar no Catálogo') }}
-          </BaseButton>
-        </template>
-      </template>
-    </BaseDialog>
+    <CatalogItemFormDialog 
+      v-model:open="showForm" 
+      :itemToEdit="selectedItem" 
+      @saved="handleItemSaved" 
+    />
 
     <!-- Listagem Unificada -->
     <BaseDataList
@@ -485,22 +287,6 @@ function getIcon(name: string) {
         </tr>
       </template>
     </BaseDataList>
-
-    <!-- Dialog IA -->
-    <BaseDialog v-model:open="showAIDialog" title="Sugestão com IA" size="sm">
-      <div class="space-y-4">
-        <p class="text-sm text-gray-500 font-bold">Descreva o serviço <span class="text-gray-900">{{ form.name }}</span> para a IA.</p>
-        <textarea
-          v-model="aiPromptText"
-          rows="4"
-          placeholder="Ex: Criação de identidade visual completa..."
-          class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none font-bold text-gray-900 text-sm resize-none"
-        />
-      </div>
-      <template #footer>
-        <BaseButton type="button" @click="confirmAIGenerate" :disabled="isGenerating">Gerar Sugestão</BaseButton>
-      </template>
-    </BaseDialog>
   </div>
 </template>
 

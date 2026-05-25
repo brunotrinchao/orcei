@@ -12,6 +12,8 @@ const props = defineProps<{
   error?: string
   type?: string
   required?: boolean
+  disabled?: boolean
+  readonly?: boolean
 }>()
 
 const emit = defineEmits(['update:modelValue'])
@@ -86,7 +88,9 @@ const inputId = useId()
       @accept="onAccept"
       :type="type || 'text'"
       :placeholder="placeholder"
-      class="w-full px-5 py-4 bg-white border-2 border-gray-200 hover:border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400 disabled:opacity-50 disabled:bg-gray-50"
+      :disabled="disabled"
+      :readonly="readonly"
+      class="w-full px-5 py-4 bg-white border-2 border-gray-200 hover:border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400 disabled:opacity-50 disabled:bg-gray-50 disabled:cursor-not-allowed"
       :class="{ 'border-red-300 focus:border-red-500 focus:ring-red-500/20': error }"
     >
     <span v-if="error" class="text-[10px] font-bold text-red-500 ml-1 uppercase">{{ error }}</span>

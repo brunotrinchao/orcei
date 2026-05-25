@@ -9,7 +9,7 @@ const searchQuery = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 10
 
-const { data: clientsData, refresh, pending } = useFetch<any>('/api/clients', {
+const { data: clientsData, refresh, pending } = useLazyFetch<any>('/api/clients', {
   query: computed(() => ({
     page: currentPage.value,
     limit: itemsPerPage,

@@ -3,10 +3,10 @@ import { SubscriptionPlan } from '../../../types/enums'
 import { CreditCard, History, Zap, CheckCircle2, Loader2, ArrowRight, Download, AlertTriangle } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../../types'
 
-const { data: profile, refresh: refreshProfile } = useFetch<ProfileDTO>('/api/profile')
+const { data: profile, refresh: refreshProfile, pending: pendingProfile } = useLazyFetch<ProfileDTO>('/api/profile')
 const { notify } = useAlerts()
 
-const { data: plans, pending: loadingPlans } = useFetch<any[]>('/api/stripe/plans')
+const { data: plans, pending: loadingPlans } = useLazyFetch<any[]>('/api/stripe/plans')
 
 const billingCycle = ref<'monthly' | 'annual'>('monthly')
 const isLoading = ref<string | null>(null)
@@ -66,7 +66,7 @@ const route = useRoute()
 const success = computed(() => route.query.success === 'true')
 const portal = computed(() => route.query.portal === 'true')
 
-const { data: history, refresh: refreshInvoices } = useFetch<any[]>('/api/stripe/invoices')
+const { data: history, refresh: refreshInvoices, pending: pendingHistory } = useLazyFetch<any[]>('/api/stripe/invoices')
 
 // Refresh profile when user returns from Stripe Portal (e.g. after cancellation)
 onMounted(() => {

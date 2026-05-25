@@ -34,6 +34,9 @@ jobs:
 
       - name: Executar testes End-to-End (E2E)
         run: npm run test:e2e
+        env:
+          NUXT_SESSION_PASSWORD: "dummy-password-for-testing-at-least-32-characters-long"
+          SKIP_DB_CHECK: "true"
 
   deploy-to-vercel:
     name: Deploy na Vercel

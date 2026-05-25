@@ -32,7 +32,8 @@ export default defineConfig({
     env: {
       CLOUDINARY_CLOUD_NAME: 'dummy',
       CLOUDINARY_NAME: 'dummy',
-      SKIP_DB_CHECK: 'true'
+      SKIP_DB_CHECK: 'true',
+      NUXT_SESSION_PASSWORD: 'dummy-password-for-testing-at-least-32-characters-long'
     }
   },
 })

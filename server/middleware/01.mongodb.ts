@@ -4,6 +4,10 @@ export default defineEventHandler(async (event) => {
   // Apenas para rotas de API
   if (!event.path.startsWith('/api/')) return
 
+  if (import.meta.prerender || process.env.SKIP_DB_CHECK === 'true') {
+    return
+  }
+
   // Se já está conectado, segue o fluxo
   if (mongoose.connection.readyState === 1) return
 
@@ -32,10 +36,6 @@ export default defineEventHandler(async (event) => {
 
   // Se ainda não estiver conectado, erro 503
   if (mongoose.connection.readyState !== 1) {
-    if (import.meta.prerender || process.env.SKIP_DB_CHECK === 'true') {
-      console.warn(`[Middleware DB] Banco offline. Modo prerender ou SKIP_DB_CHECK ativo. Ignorando erro 503.`)
-      return
-    }
     console.error(`[Middleware DB] Erro crítico: Banco offline (${mongoose.connection.readyState}) após 10s. Verifique Whitelist IP Atlas.`)
     throw createError({
       statusCode: 503,

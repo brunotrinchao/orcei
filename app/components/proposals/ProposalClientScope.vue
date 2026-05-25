@@ -2,11 +2,28 @@
 import { FileText } from 'lucide-vue-next'
 import type { ProposalDTO } from '../../../types'
 
-defineProps<{
+const props = defineProps<{
   items: ProposalDTO['items']
-  totals: ProposalDTO['totals']
+  upsellItems?: ProposalDTO['upsellItems']
+  totals: {
+    subtotal: number
+    additional?: number
+    discount: number
+    final: number
+  }
   finalTotal: number
 }>()
+
+const selectedUpsells = defineModel<string[]>('selectedUpsells', { default: () => [] })
+
+function toggleUpsell(itemId: string) {
+  const index = selectedUpsells.value.indexOf(itemId)
+  if (index === -1) {
+    selectedUpsells.value.push(itemId)
+  } else {
+    selectedUpsells.value.splice(index, 1)
+  }
+}
 </script>
 
 <template>
@@ -49,6 +66,64 @@ defineProps<{
           <p class="font-black text-gray-900 text-lg">
             R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
           </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upsell Items list (Serviços adicionais sugeridos) -->
+    <div v-if="upsellItems && upsellItems.length > 0" class="bg-blue-50/10 border-t border-b border-blue-50/30">
+      <div class="px-8 py-5 bg-gradient-to-r from-blue-50/40 via-indigo-50/10 to-transparent flex items-center justify-between border-b border-blue-50/20">
+        <h3 class="text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
+          <span class="inline-block w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+          Serviços Opcionais (Sugestão de Upsell)
+        </h3>
+        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Opcional</span>
+      </div>
+
+      <div class="divide-y divide-blue-50/20">
+        <div
+          v-for="item in upsellItems"
+          :key="item._id"
+          @click="toggleUpsell(item._id!)"
+          class="px-8 py-6 flex items-start gap-4 sm:gap-6 cursor-pointer select-none transition-all duration-300 hover:bg-blue-50/30 relative active:scale-[0.995]"
+        >
+          <!-- Switch checkbox -->
+          <div class="shrink-0 pt-1">
+            <div
+              class="w-10 h-6 rounded-full p-1 transition-colors duration-300 relative shadow-inner"
+              :class="selectedUpsells.includes(item._id!) ? 'bg-blue-600' : 'bg-gray-200'"
+            >
+              <div
+                class="w-4 h-4 rounded-full bg-white shadow-md transform transition-transform duration-300"
+                :class="selectedUpsells.includes(item._id!) ? 'translate-x-4' : 'translate-x-0'"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <h4 class="font-black text-gray-900 text-sm tracking-tight leading-snug">{{ item.name }}</h4>
+              <span
+                v-if="selectedUpsells.includes(item._id!)"
+                class="px-2 py-0.5 bg-blue-100 text-blue-700 text-[8px] font-black uppercase tracking-widest rounded"
+              >
+                Adicionado
+              </span>
+            </div>
+            <p v-if="item.description" class="text-xs text-gray-500 font-medium leading-relaxed">{{ item.description }}</p>
+            <div class="mt-2 text-[10px] font-black text-blue-600 bg-blue-50/40 inline-block px-2.5 py-1 rounded-md border border-blue-100/30">
+              R$ {{ item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }} × {{ item.quantity }}
+            </div>
+          </div>
+
+          <!-- Subtotal -->
+          <div class="shrink-0 text-right">
+            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Investimento</p>
+            <p class="font-black text-gray-900 text-base">
+              + R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
+            </p>
+          </div>
         </div>
       </div>
     </div>

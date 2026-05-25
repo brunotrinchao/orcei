@@ -26,6 +26,7 @@ const isTermsOpen = ref(false)
 const isChatModalOpen = ref(false)
 
 const selectedMethod = ref<'cash' | 'credit_card'>('cash')
+const selectedUpsells = ref<string[]>([])
 const actionType = ref<'decline' | 'request_changes'>('decline')
 const actionNotes = ref('')
 const isActionModalOpen = ref(false)
@@ -92,14 +93,36 @@ const formatMessageTime = (date: any) => {
   return format(new Date(date), 'HH:mm')
 }
 
-const finalTotal = computed(() => {
-  if (!proposal.value) return 0
-  const base = proposal.value.totals.subtotal + (proposal.value.totals.additional || 0) - (proposal.value.totals.discount || 0)
-  if (selectedMethod.value === 'cash') {
-    return base * (1 - (proposal.value.paymentConfig.cashDiscount / 100))
-  }
-  return base
+const selectedUpsellList = computed(() => {
+  if (!proposal.value?.upsellItems) return []
+  return proposal.value.upsellItems.filter(item => selectedUpsells.value.includes(item._id!))
 })
+
+const activeUpsellTotal = computed(() => {
+  return selectedUpsellList.value.reduce((acc, item) => acc + (item.price * item.quantity), 0)
+})
+
+const computedTotals = computed(() => {
+  if (!proposal.value) return { subtotal: 0, discount: 0, additional: 0, final: 0 }
+  const subtotalBase = proposal.value.totals.subtotal + activeUpsellTotal.value
+  const additional = proposal.value.totals.additional || 0
+  const discount = proposal.value.totals.discount || 0
+  const base = subtotalBase + additional - discount
+  
+  let final = base
+  if (selectedMethod.value === 'cash') {
+    final = base * (1 - (proposal.value.paymentConfig.cashDiscount / 100))
+  }
+  
+  return {
+    subtotal: subtotalBase,
+    discount,
+    additional,
+    final
+  }
+})
+
+const finalTotal = computed(() => computedTotals.value.final)
 
 async function handleAccept() {
   if (isPreview.value) return
@@ -110,7 +133,8 @@ async function handleAccept() {
       body: { 
         slug: route.params.slug,
         token: token,
-        paymentMethod: selectedMethod.value
+        paymentMethod: selectedMethod.value,
+        selectedUpsells: selectedUpsells.value
       }
     })
     await refresh()
@@ -330,7 +354,9 @@ const statusMap: any = {
       <!-- ── ITEMS TABLE ─────────────────────────────────────────── -->
       <ProposalClientScope
         :items="proposal.items"
-        :totals="proposal.totals"
+        :upsell-items="proposal.upsellItems"
+        v-model:selected-upsells="selectedUpsells"
+        :totals="computedTotals"
         :final-total="finalTotal"
       />
 
@@ -339,7 +365,7 @@ const statusMap: any = {
         v-if="!['accepted', 'expired'].includes(proposal.status)"
         v-model="selectedMethod"
         :payment-config="proposal.paymentConfig"
-        :totals="proposal.totals"
+        :totals="computedTotals"
       />
 
       <!-- ── CONTRACT (collapsible) ──────────────────────────────── -->
@@ -374,7 +400,7 @@ const statusMap: any = {
               <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.25em] mb-3">Total do Investimento</p>
               <div class="flex flex-col">
                 <span v-if="selectedMethod === 'cash' && proposal.paymentConfig.cashDiscount > 0" class="text-sm font-bold text-gray-400 line-through decoration-red-500/50 mb-1">
-                  R$ {{ (proposal.totals.subtotal + (proposal.totals.additional || 0) - (proposal.totals.discount || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
+                  R$ {{ (computedTotals.subtotal + (computedTotals.additional || 0) - (computedTotals.discount || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
                 </span>
                 <p class="text-4xl sm:text-5xl font-black text-white tracking-tight">
                   R$ {{ finalTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}

@@ -18,7 +18,7 @@ export const ProposalService = {
 
   async getBySlug(slug: string) {
     // Populamos o profileId apenas com campos necessários para evitar vazamento de tokens sensíveis
-    return await Proposal.findOne({ slug }).populate('profileId', 'name avatar brandConfig address company contact email')
+    return await Proposal.findOne({ slug }).populate('profileId', 'name avatar brandConfig address company contact email userId')
   },
 
   async logHistory(proposalId: any, action: string, type: 'system' | 'email' = 'system', details?: any) {
@@ -255,9 +255,19 @@ export const ProposalService = {
     return updated
   },
 
-  async acceptProposal(slug: string, paymentMethod: PaymentMethod) {
+  async acceptProposal(slug: string, paymentMethod: PaymentMethod, selectedUpsells?: string[]) {
     const proposal = await Proposal.findOne({ slug }).populate('profileId')
     if (!proposal) return null
+
+    // Se houver upsellItems selecionados pelo cliente, adiciona-os nos itens principais da proposta
+    if (selectedUpsells && selectedUpsells.length > 0 && proposal.upsellItems) {
+      const activeUpsells = proposal.upsellItems.filter((item: any) => selectedUpsells.includes(item._id.toString()))
+      if (activeUpsells.length > 0) {
+        proposal.items.push(...activeUpsells)
+        proposal.upsellItems = proposal.upsellItems.filter((item: any) => !selectedUpsells.includes(item._id.toString()))
+        await proposal.save()
+      }
+    }
     
     // Calculate final totals based on client choice
     const totals = this.calculateTotals(proposal.items, proposal.totals?.additional || 0, proposal.totals?.discount || 0, {
@@ -270,6 +280,8 @@ export const ProposalService = {
       { 
         status: ProposalStatus.ACCEPTED,
         'paymentConfig.method': paymentMethod,
+        items: proposal.items,
+        upsellItems: proposal.upsellItems,
         totals
       }, 
       { returnDocument: 'after' }

@@ -105,6 +105,7 @@ export interface ProposalDTO {
     phone?: string
   }
   items: ProposalItemDTO[]
+  upsellItems?: ProposalItemDTO[]
   totals: {
     subtotal: number
     additional?: number

@@ -74,6 +74,9 @@ const form = ref({
   items: props.initialData?.items 
     ? [...props.initialData.items] 
     : (props.prefilledItems ? [...props.prefilledItems] : []) as any[],
+  upsellItems: props.initialData?.upsellItems 
+    ? [...props.initialData.upsellItems] 
+    : [] as any[],
   totals: {
     additional: props.initialData?.totals?.additional || 0,
     discount: props.initialData?.totals?.discount || 0
@@ -111,6 +114,7 @@ watch(() => props.initialData, (newVal) => {
         phone: newVal.client.phone || ''
       },
       items: [...newVal.items],
+      upsellItems: newVal.upsellItems ? [...newVal.upsellItems] : [],
       totals: {
         additional: newVal.totals?.additional || 0,
         discount: newVal.totals?.discount || 0
@@ -138,19 +142,31 @@ watch(() => props.prefilledItems, (newVal) => {
 }, { deep: true })
 
 function isItemSelected(item: CatalogItemDTO) {
-  return form.value.items.some(i => 
+  const inItems = form.value.items.some(i => 
     i.catalogItemId?.toString() === item._id?.toString() || 
     (i.name === item.name && i.price === item.price)
   )
+  const inUpsells = form.value.upsellItems.some(i => 
+    i.catalogItemId?.toString() === item._id?.toString() || 
+    (i.name === item.name && i.price === item.price)
+  )
+  return inItems || inUpsells
 }
 
 function toggleItem(item: CatalogItemDTO) {
-  const index = form.value.items.findIndex((i: any) => 
+  const indexItems = form.value.items.findIndex((i: any) => 
     i.catalogItemId?.toString() === item._id?.toString() ||
     (i.name === item.name && i.price === item.price)
   )
-  if (index > -1) {
-    form.value.items.splice(index, 1)
+  const indexUpsells = form.value.upsellItems.findIndex((i: any) => 
+    i.catalogItemId?.toString() === item._id?.toString() ||
+    (i.name === item.name && i.price === item.price)
+  )
+
+  if (indexItems > -1) {
+    form.value.items.splice(indexItems, 1)
+  } else if (indexUpsells > -1) {
+    form.value.upsellItems.splice(indexUpsells, 1)
   } else {
     form.value.items.push({
       catalogItemId: item._id,
@@ -162,10 +178,20 @@ function toggleItem(item: CatalogItemDTO) {
   }
 }
 
+function moveToUpsell(index: number) {
+  const item = form.value.items.splice(index, 1)[0]
+  form.value.upsellItems.push(item)
+}
+
+function moveToItems(index: number) {
+  const item = form.value.upsellItems.splice(index, 1)[0]
+  form.value.items.push(item)
+}
+
 const isGenerating = ref(false)
 
-async function generateDescription(itemIndex: number) {
-  const item = form.value.items[itemIndex]
+async function generateDescription(itemIndex: number, isUpsell: boolean = false) {
+  const item = isUpsell ? form.value.upsellItems[itemIndex] : form.value.items[itemIndex]
   if (!item.name) return notify('Aviso', 'O item precisa de um nome para gerar a descrição.')
   
   isGenerating.value = true
@@ -204,8 +230,9 @@ async function submit(status: ProposalStatus = ProposalStatus.DRAFT) {
 
   if (form.value.items.length === 0) return notify('Aviso', 'Selecione pelo menos um item do catálogo')
   
-  for (const item of form.value.items) {
-    if (!item.name.trim()) return notify('Aviso', 'Todos os itens no escopo precisam de um nome')
+  const allItems = [...form.value.items, ...form.value.upsellItems]
+  for (const item of allItems) {
+    if (!item.name.trim()) return notify('Aviso', 'Todos os itens no escopo/opcionais precisam de um nome')
     if (item.price < 0) return notify('Aviso', 'O preço de um item não pode ser negativo')
     if (item.quantity <= 0) return notify('Aviso', 'A quantidade de um item deve ser maior que zero')
   }
@@ -324,9 +351,14 @@ defineExpose({ submit, isEditingNonDraft: computed(() => props.isEditing && prop
                 </button>
               </div>
             </div>
-            <button @click="form.items.splice(idx, 1)" type="button" class="p-3 text-red-300 hover:text-red-500 transition-colors">
-              <Trash2 class="w-5 h-5" />
-            </button>
+            <div class="flex flex-col gap-2">
+              <button @click="form.items.splice(idx, 1)" type="button" class="p-3 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors self-end" title="Remover Item">
+                <Trash2 class="w-5 h-5" />
+              </button>
+              <button @click="moveToUpsell(idx)" type="button" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-700 hover:underline px-2 text-right">
+                Tornar Opcional
+              </button>
+            </div>
           </div>
           
           <div class="flex flex-wrap items-center gap-6 pt-2">
@@ -341,6 +373,59 @@ defineExpose({ submit, isEditingNonDraft: computed(() => props.isEditing && prop
             <div class="ml-auto text-right">
               <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-1">Subtotal</span>
               <span class="text-lg font-black text-gray-900">R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="form.upsellItems.length > 0" class="space-y-4 pt-6 border-t border-gray-100">
+        <h3 class="text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Itens Opcionais (Upsell)</h3>
+        <p class="text-[10px] font-bold text-gray-400 ml-1 mb-4 uppercase tracking-widest">Estes itens não entram no total obrigatório, o cliente pode selecioná-los ao aceitar.</p>
+        
+        <div v-for="(item, idx) in form.upsellItems" :key="'upsell_'+idx" class="bg-gray-50 p-6 rounded-[2.5rem] border-2 border-dashed border-gray-200 shadow-sm space-y-4">
+          <div class="flex justify-between items-start gap-4">
+            <div class="flex-1 space-y-4">
+              <input v-model="item.name" class="w-full text-xl font-black text-gray-900 bg-transparent border-b-2 border-transparent hover:border-gray-200 focus:border-blue-500 focus:ring-0 p-1 outline-none transition-all" placeholder="Nome do Serviço Opcional" aria-label="Nome do Serviço Opcional">
+              <div class="relative">
+                <textarea 
+                  v-model="item.description" 
+                  rows="2" 
+                  class="w-full text-sm font-medium text-gray-600 bg-white p-4 rounded-2xl border-2 border-transparent hover:border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none resize-none transition-all" 
+                  placeholder="Descreva o benefício deste opcional..."
+                  aria-label="Descrição do Serviço Opcional"
+                ></textarea>
+                <button 
+                  type="button"
+                  @click="generateDescription(idx, true)"
+                  class="absolute bottom-3 right-3 p-2 bg-white rounded-xl shadow-lg border border-gray-100 text-blue-600 hover:scale-110 transition-all"
+                  title="Melhorar com IA"
+                >
+                  <Sparkles class="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            <div class="flex flex-col gap-2">
+              <button @click="form.upsellItems.splice(idx, 1)" type="button" class="p-3 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors self-end" title="Remover Opcional">
+                <Trash2 class="w-5 h-5" />
+              </button>
+              <button @click="moveToItems(idx)" type="button" class="text-[10px] font-black text-green-600 uppercase tracking-widest hover:text-green-700 hover:underline px-2 text-right">
+                Tornar Obrigatório
+              </button>
+            </div>
+          </div>
+          
+          <div class="flex flex-wrap items-center gap-6 pt-2">
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Preço R$</span>
+              <input v-model.number="item.price" type="number" class="w-24 bg-white px-4 py-2 rounded-xl font-bold text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all" aria-label="Preço R$">
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Qtd</span>
+              <input v-model.number="item.quantity" type="number" class="w-16 bg-white px-4 py-2 rounded-xl font-bold text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all" aria-label="Quantidade">
+            </div>
+            <div class="ml-auto text-right">
+              <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-1">Custo Adicional</span>
+              <span class="text-lg font-black text-gray-900">+ R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
             </div>
           </div>
         </div>

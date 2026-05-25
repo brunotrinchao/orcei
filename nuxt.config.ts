@@ -11,6 +11,9 @@ export default defineNuxtConfig({
     pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       title: process.env.APP_NAME || 'Orcei Fácil',
+      htmlAttrs: {
+        lang: 'pt-BR' // Otimização técnica de SEO e acessibilidade
+      },
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/images/favicon/favicon.ico' },
         { rel: 'icon', type: 'image/png', sizes: '96x96', href: '/images/favicon/favicon-96x96.png' },
@@ -20,7 +23,8 @@ export default defineNuxtConfig({
         { rel: 'manifest', href: '/images/favicon/site.webmanifest' }
       ],
       meta: [
-        { name: 'apple-mobile-web-app-title', content: process.env.APP_NAME || 'Orcei Fácil' }
+        { name: 'apple-mobile-web-app-title', content: process.env.APP_NAME || 'Orcei Fácil' },
+        { name: 'theme-color', content: '#020617' } // Cor do fundo Slate 950
       ]
     }
   },

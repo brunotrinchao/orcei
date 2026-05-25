@@ -44,6 +44,68 @@ export const AIService = {
     return await this.generateWithCloudflare(prompt)
   },
 
+  async extractClientInfo(text: string) {
+    const config = this._getConfig()
+    const prompt = `
+      Você é um assistente comercial e especialista em extração de informações.
+      Analise o texto abaixo, que representa uma mensagem de cliente, e-mail ou transcrição de áudio, e extraia de forma estruturada as informações de contato.
+
+      Texto do Cliente:
+      "${text}"
+
+      Extraia as seguintes informações em formato JSON:
+      - name: Nome do cliente (ou o nome da empresa se o nome pessoal não for encontrado, NUNCA deixe vazio)
+      - email: E-mail de contato do cliente (se encontrado)
+      - phone: Telefone/WhatsApp do cliente (se encontrado, formate com DDD + número, apenas números)
+      - segment: Segmento/Nicho de atuação da empresa (se mencionado)
+      - companySize: Porte da empresa (ex: Pequena, Média, Grande, se mencionado)
+
+      Responda EXCLUSIVAMENTE com o JSON abaixo.
+      Não inclua explicações, markdown ou blocos de código.
+      O primeiro caractere da resposta deve ser { e o último deve ser }.
+
+      {
+        "name": "<string>",
+        "email": "<string | null>",
+        "phone": "<string | null>",
+        "segment": "<string | null>",
+        "companySize": "<string | null>"
+      }
+    `
+
+    try {
+      if (config.geminiApiKey) {
+        const genAI = new GoogleGenerativeAI(config.geminiApiKey)
+        const model = genAI.getGenerativeModel({ 
+          model: 'gemini-2.5-flash',
+          generationConfig: {
+            temperature: 0.1,
+            responseMimeType: "application/json"
+          }
+        })
+        const result = await model.generateContent(prompt)
+        return result.response.text()
+      }
+    } catch (e) {
+      console.error('Gemini client extraction error:', e)
+    }
+
+    // Fallback: Tentar Cloudflare se o Gemini falhar
+    const response = await this.generateWithCloudflare(prompt)
+    try {
+      let cleanJson = response.trim()
+      cleanJson = cleanJson.replace(/```json/g, '').replace(/```/g, '').trim()
+      const jsonStart = cleanJson.indexOf('{')
+      const jsonEnd = cleanJson.lastIndexOf('}')
+      if (jsonStart !== -1 && jsonEnd !== -1) {
+        return cleanJson.substring(jsonStart, jsonEnd + 1)
+      }
+      return cleanJson
+    } catch (e) {
+      return response
+    }
+  },
+
   async suggestProposalItems(prompt: string, catalog: any[]) {
     const config = this._getConfig()
     

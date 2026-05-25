@@ -92,29 +92,25 @@ function setPreset(daysToAdd: number) {
 
     <PopoverRoot v-model:open="isOpen">
       <div class="relative">
-        <PopoverTrigger asChild>
-          <button
-            type="button"
-            class="w-full flex items-center gap-3 px-5 py-4 bg-white border-2 border-gray-200 hover:border-gray-300 rounded-2xl transition-all text-left focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 outline-none group"
-          >
-            <Calendar class="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
-            <span :class="[!modelValue ? 'text-gray-400' : 'text-gray-900', 'font-bold text-sm truncate flex-1']">
-              {{ formattedDateTime }}
-            </span>
-            <X 
-              v-if="modelValue" 
-              @click.stop="clear"
-              class="w-4 h-4 text-gray-400 hover:text-red-500 transition-all cursor-pointer"
-            />
-          </button>
+        <PopoverTrigger
+          class="w-full flex items-center gap-3 px-5 py-4 bg-white border-2 border-gray-200 hover:border-gray-300 rounded-2xl transition-all text-left focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 outline-none group"
+        >
+          <Calendar class="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
+          <span :class="[!modelValue ? 'text-gray-400' : 'text-gray-900', 'font-bold text-sm truncate flex-1']">
+            {{ formattedDateTime }}
+          </span>
+          <X 
+            v-if="modelValue" 
+            @click.stop="clear"
+            class="w-4 h-4 text-gray-400 hover:text-red-500 transition-all cursor-pointer"
+          />
         </PopoverTrigger>
 
         <p v-if="description" class="text-[9px] text-gray-500 font-bold ml-1 uppercase mt-2">
           {{ description }}
         </p>
 
-        <PopoverPortal>
-          <PopoverContent
+        <PopoverContent
             side="bottom"
             :side-offset="8"
             align="start"
@@ -186,7 +182,6 @@ function setPreset(daysToAdd: number) {
               </div>
             </div>
           </PopoverContent>
-        </PopoverPortal>
       </div>
     </PopoverRoot>
   </div>

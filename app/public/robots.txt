@@ -1,0 +1,11 @@
+# robots.txt para Orcei Fácil
+User-agent: *
+Allow: /
+
+# Evitar desperdício de rastreamento em rotas privadas
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /api/
+
+# Apontamento do Sitemap
+Sitemap: https://orceifacil.com.br/sitemap.xml

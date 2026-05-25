@@ -22,7 +22,15 @@ const internalSearch = computed({
   set: (val) => emit('update:catalogSearch', val)
 })
 
-const showCatalogDropdown = ref(false)
+const selectedCatalogItemId = ref('')
+
+const catalogOptions = computed(() => {
+  return props.catalogItems.map((c: any) => ({
+    label: `${c.name} - R$ ${((c.price ?? 0) as number).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} / ${c.unit}`,
+    value: c._id
+  })) || []
+})
+
 const showCatalogItemFormDialog = ref(false)
 const expandedItemIdx = ref<number | null>(null)
 const expandedUpsellIdx = ref<number | null>(null)
@@ -63,8 +71,18 @@ function selectCatalogItem(item: any) {
       quantity: 1
     })
   }
-  showCatalogDropdown.value = false
-  internalSearch.value = ''
+}
+
+function onCatalogItemSelect(itemId: string | undefined) {
+  if (!itemId) return
+  const item = props.catalogItems.find((c: any) => c._id === itemId)
+  if (item) {
+    selectCatalogItem(item)
+  }
+  // Remove a seleção do combobox logo após adicionar para permitir nova busca
+  setTimeout(() => {
+    selectedCatalogItemId.value = ''
+  }, 0)
 }
 
 function moveToUpsell(index: number) {
@@ -95,59 +113,23 @@ function isItemSelected(item: any) {
     <!-- Smart Catalog Search -->
     <div class="relative z-20">
       <div class="flex items-center gap-3">
-        <div class="relative flex-1">
-          <input 
-            v-model="internalSearch" 
-            @focus="showCatalogDropdown = true"
-            type="text" 
-            placeholder="Buscar serviço no catálogo..." 
-            class="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400"
-          >
-          <Search class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+        <div class="flex-1">
+          <BaseCombobox 
+            v-model="selectedCatalogItemId" 
+            v-model:search="internalSearch"
+            :options="catalogOptions"
+            :loading="isGenerating"
+            placeholder="Buscar serviço no catálogo..."
+            empty-message="Nenhum serviço encontrado"
+            @update:model-value="onCatalogItemSelect"
+          />
         </div>
         <BaseButton type="button" variant="secondary" @click="showCatalogItemFormDialog = true" class="shrink-0 h-[56px] px-6 rounded-2xl">
           <Plus class="w-5 h-5 mr-2" />
           Novo
         </BaseButton>
       </div>
-
-      <!-- Catalog Dropdown -->
-      <div 
-        v-if="showCatalogDropdown" 
-        class="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden max-h-80 overflow-y-auto"
-      >
-        <div class="p-2 flex justify-between items-center border-b border-gray-50 bg-gray-50/50">
-          <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Itens do Catálogo ({{ totalCatalogItems }})</span>
-          <button @click="showCatalogDropdown = false" class="text-xs text-blue-600 font-bold hover:underline px-2">Fechar</button>
-        </div>
-        <div 
-          v-for="item in catalogItems" 
-          :key="item._id"
-          @click="selectCatalogItem(item)"
-          class="p-4 flex items-center justify-between cursor-pointer hover:bg-blue-50 transition-colors border-b border-gray-50 last:border-0"
-        >
-          <div class="flex items-center gap-4">
-            <div 
-              :class="isItemSelected(item) ? 'bg-blue-600 border-blue-600' : 'bg-white border-gray-200'"
-              class="w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all shrink-0"
-            >
-              <div v-if="isItemSelected(item)" class="w-2 h-2 bg-white rounded-full"></div>
-            </div>
-            <div>
-              <p class="font-bold text-gray-900">{{ item.name }}</p>
-              <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">R$ {{ ((item.price ?? 0) as number).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }} / {{ item.unit }}</p>
-            </div>
-          </div>
-          <Plus v-if="!isItemSelected(item)" class="w-4 h-4 text-gray-300" />
-        </div>
-        <div v-if="!catalogItems?.length" class="p-8 text-center text-gray-400 text-sm font-medium">
-          Nenhum item encontrado no catálogo.
-        </div>
-      </div>
     </div>
-    
-    <!-- Backdrop para fechar o dropdown -->
-    <div v-if="showCatalogDropdown" @click="showCatalogDropdown = false" class="fixed inset-0 z-10"></div>
 
     <!-- Escopo Principal -->
     <div class="space-y-4 relative z-0">

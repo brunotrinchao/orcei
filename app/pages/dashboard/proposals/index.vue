@@ -272,10 +272,13 @@ const formatTime = (date: any) => {
   <div class="max-w-6xl mx-auto px-4 sm:px-6">
     <PageHeader title="Seus Orçamentos" subtitle="Acompanhe e gerencie seus orçamentos comerciais.">
       <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-        <BaseButton variant="secondary" @click="isAIWizardOpen = true" class="shadow-xl shadow-blue-50">
-          <Sparkles class="w-5 h-5 mr-2 text-blue-600" />
+        <button 
+          @click="isAIWizardOpen = true" 
+          class="px-6 py-3 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-violet-500/20 active:scale-98 transition-all flex items-center justify-center gap-2 self-stretch sm:self-auto"
+        >
+          <Sparkles class="w-4 h-4 text-white animate-pulse" />
           Criar com IA
-        </BaseButton>
+        </button>
         <BaseButton @click="openModal()" class="shadow-2xl shadow-gray-200">
           <Plus class="w-5 h-5 mr-2" />
           Novo Orçamento

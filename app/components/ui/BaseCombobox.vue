@@ -15,6 +15,7 @@ const props = defineProps<{
   error?: string
   disabled?: boolean
   loading?: boolean
+  emptyMessage?: string
 }>()
 
 const modelValue = defineModel<string>()
@@ -162,7 +163,7 @@ const selectOption = (option: Option) => {
               </button>
               
               <div v-if="!options || options.length === 0" class="px-6 py-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">
-                {{ loading ? 'Buscando...' : 'Nenhum cliente encontrado' }}
+                {{ loading ? 'Buscando...' : (emptyMessage || 'Nenhum item encontrado') }}
               </div>
             </template>
           </div>

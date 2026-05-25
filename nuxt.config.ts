@@ -9,6 +9,7 @@ export default defineNuxtConfig({
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
     head: {
+      title: process.env.APP_NAME || 'Orcei Fácil',
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/images/favicon/favicon.ico' },
         { rel: 'icon', type: 'image/png', sizes: '96x96', href: '/images/favicon/favicon-96x96.png' },

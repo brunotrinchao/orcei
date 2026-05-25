@@ -1,4 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -7,8 +10,11 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
+  expect: {
+    timeout: 15000,
+  },
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: 'http://localhost:3001',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
@@ -19,9 +25,13 @@ export default defineConfig({
     }
   ],
   webServer: {
-    command: process.env.CI ? 'npm run build && npm run preview' : 'npm run dev',
-    url: 'http://localhost:3000',
+    command: process.env.CI ? 'NITRO_PRESET=node-server PORT=3001 npm run build && PORT=3001 node .output/server/index.mjs' : 'PORT=3001 npm run dev',
+    url: 'http://localhost:3001',
     reuseExistingServer: !process.env.CI,
     timeout: 5 * 60 * 1000,
+    env: {
+      CLOUDINARY_CLOUD_NAME: 'dummy',
+      CLOUDINARY_NAME: 'dummy',
+    }
   },
 })

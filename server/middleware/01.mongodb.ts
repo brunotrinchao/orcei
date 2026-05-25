@@ -32,8 +32,8 @@ export default defineEventHandler(async (event) => {
 
   // Se ainda não estiver conectado, erro 503
   if (mongoose.connection.readyState !== 1) {
-    if (import.meta.prerender) {
-      console.warn(`[Middleware DB] Banco offline durante prerender. Ignorando erro 503.`)
+    if (import.meta.prerender || process.env.SKIP_DB_CHECK === 'true') {
+      console.warn(`[Middleware DB] Banco offline. Modo prerender ou SKIP_DB_CHECK ativo. Ignorando erro 503.`)
       return
     }
     console.error(`[Middleware DB] Erro crítico: Banco offline (${mongoose.connection.readyState}) após 10s. Verifique Whitelist IP Atlas.`)

@@ -32,6 +32,7 @@ export default defineConfig({
     env: {
       CLOUDINARY_CLOUD_NAME: 'dummy',
       CLOUDINARY_NAME: 'dummy',
+      SKIP_DB_CHECK: 'true'
     }
   },
 })

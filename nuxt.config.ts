@@ -1,4 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+console.log("IN NUXT CONFIG MONGODB_URI IS: ", process.env.MONGODB_URI);
 export default defineNuxtConfig({
   modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@vueuse/nuxt', '@nuxtjs/cloudinary', '@vercel/speed-insights'],
   
@@ -33,6 +34,9 @@ export default defineNuxtConfig({
   },
 
   vite: {
+    build: {
+      chunkSizeWarningLimit: 1500
+    },
     optimizeDeps: {
       include: [
         '@vue/devtools-core',

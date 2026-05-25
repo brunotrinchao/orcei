@@ -5,7 +5,16 @@ export default defineNitroPlugin(async (nitroApp) => {
   const uri = config.mongodbUri || process.env.MONGODB_URI
 
   if (!uri) {
+    if (import.meta.prerender) {
+      console.log('[MongoDB] Ignorando aviso de URI durante prerender')
+      return
+    }
     console.error('MONGODB_URI não configurado no runtimeConfig ou process.env')
+    return
+  }
+
+  if (import.meta.prerender) {
+    console.log('[MongoDB] Ignorando conexão de banco durante prerender')
     return
   }
 

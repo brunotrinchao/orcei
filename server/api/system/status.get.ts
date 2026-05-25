@@ -1,7 +1,16 @@
 import { PlatformSettings } from '../../models/PlatformSettings'
+import mongoose from 'mongoose'
 
 export default defineEventHandler(async () => {
-  const settings = await PlatformSettings.findOne({}).lean()
+  let settings = null
+  try {
+    if (mongoose.connection.readyState === 1) {
+      settings = await PlatformSettings.findOne({}).lean()
+    }
+  } catch (e) {
+    console.error('[API Status] Erro ao buscar configurações:', e)
+  }
+  
   const config = useRuntimeConfig()
   const appName = config.appName || 'Orcei'
 

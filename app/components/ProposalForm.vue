@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, watch, watchEffect, nextTick } from 'vue'
-import { Plus, Trash2, Sparkles, Loader2, Search } from 'lucide-vue-next'
+import { ref, computed, watch, watchEffect } from 'vue'
+import { Loader2, ArrowRight, ArrowLeft, Check, Sparkles } from 'lucide-vue-next'
 import type { CatalogItemDTO, ProfileDTO, ProposalDTO } from '../../types'
 import { ProposalStatus, PaymentMethod, SendMethod } from '../../types/enums'
+import ProposalStepClient from './proposal/ProposalStepClient.vue'
+import ProposalStepScope from './proposal/ProposalStepScope.vue'
+import ProposalStepPayment from './proposal/ProposalStepPayment.vue'
 
 const props = defineProps<{
   initialData?: ProposalDTO
@@ -12,6 +15,9 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['submit'])
+
+const currentStep = ref(1)
+const totalSteps = 3
 
 const { data: clientsData } = useLazyFetch<any>('/api/clients', {
   key: 'clients-list',
@@ -40,28 +46,6 @@ const catalogItems = computed(() => catalogData.value?.items || [])
 const totalCatalogItems = computed(() => catalogData.value?.total || 0)
 
 const selectedClientId = ref('')
-
-function onClientSelect(clientId: string | undefined) {
-  if (!clientId) return
-  const client = clients.value?.find((c: any) => c._id === clientId)
-  if (client) {
-    form.value.client.name = client.name
-    form.value.client.email = client.email
-    
-    // Reset phone first to trigger reactivity properly in masked inputs
-    form.value.client.phone = ''
-    setTimeout(() => {
-      form.value.client.phone = client.phone || ''
-    }, 0)
-  }
-}
-
-const clientOptions = computed(() => {
-  return clients.value?.map((c: any) => ({
-    label: c.name,
-    value: c._id
-  })) || []
-})
 
 const form = ref({
   title: props.initialData?.title || '',
@@ -138,60 +122,15 @@ watch(() => props.prefilledItems, (newVal) => {
     if (newVal.length > 0 && !form.value.title) {
       form.value.title = `Orçamento para ${newVal[0].name}`
     }
+    // Avancar para o passo 2 automaticamente se houver itens preenchidos?
+    // currentStep.value = 2
   }
 }, { deep: true })
 
-function isItemSelected(item: CatalogItemDTO) {
-  const inItems = form.value.items.some(i => 
-    i.catalogItemId?.toString() === item._id?.toString() || 
-    (i.name === item.name && i.price === item.price)
-  )
-  const inUpsells = form.value.upsellItems.some(i => 
-    i.catalogItemId?.toString() === item._id?.toString() || 
-    (i.name === item.name && i.price === item.price)
-  )
-  return inItems || inUpsells
-}
-
-function toggleItem(item: CatalogItemDTO) {
-  const indexItems = form.value.items.findIndex((i: any) => 
-    i.catalogItemId?.toString() === item._id?.toString() ||
-    (i.name === item.name && i.price === item.price)
-  )
-  const indexUpsells = form.value.upsellItems.findIndex((i: any) => 
-    i.catalogItemId?.toString() === item._id?.toString() ||
-    (i.name === item.name && i.price === item.price)
-  )
-
-  if (indexItems > -1) {
-    form.value.items.splice(indexItems, 1)
-  } else if (indexUpsells > -1) {
-    form.value.upsellItems.splice(indexUpsells, 1)
-  } else {
-    form.value.items.push({
-      catalogItemId: item._id,
-      name: item.name,
-      description: item.description,
-      price: item.price,
-      quantity: 1
-    })
-  }
-}
-
-function moveToUpsell(index: number) {
-  const item = form.value.items.splice(index, 1)[0]
-  form.value.upsellItems.push(item)
-}
-
-function moveToItems(index: number) {
-  const item = form.value.upsellItems.splice(index, 1)[0]
-  form.value.items.push(item)
-}
-
 const isGenerating = ref(false)
 
-async function generateDescription(itemIndex: number, isUpsell: boolean = false) {
-  const item = isUpsell ? form.value.upsellItems[itemIndex] : form.value.items[itemIndex]
+async function generateDescription({ index, isUpsell }: { index: number, isUpsell: boolean }) {
+  const item = isUpsell ? form.value.upsellItems[index] : form.value.items[index]
   if (!item.name) return notify('Aviso', 'O item precisa de um nome para gerar a descrição.')
   
   isGenerating.value = true
@@ -219,24 +158,70 @@ const finalTotal = computed(() => {
   return baseTotal
 })
 
-async function submit(status: ProposalStatus = ProposalStatus.DRAFT) {
-  // Validação
-  if (!form.value.title.trim()) return notify('Aviso', 'Título do orçamento é obrigatório')
-  if (!form.value.client.name.trim()) return notify('Aviso', 'Nome do cliente é obrigatório')
-  if (!form.value.client.email.trim()) return notify('Aviso', 'E-mail do cliente é obrigatório')
-  
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(form.value.client.email)) return notify('Aviso', 'E-mail informado é inválido')
-
-  if (form.value.items.length === 0) return notify('Aviso', 'Selecione pelo menos um item do catálogo')
-  
-  const allItems = [...form.value.items, ...form.value.upsellItems]
-  for (const item of allItems) {
-    if (!item.name.trim()) return notify('Aviso', 'Todos os itens no escopo/opcionais precisam de um nome')
-    if (item.price < 0) return notify('Aviso', 'O preço de um item não pode ser negativo')
-    if (item.quantity <= 0) return notify('Aviso', 'A quantidade de um item deve ser maior que zero')
+function validateStep(step: number): boolean {
+  if (step === 1) {
+    if (!form.value.title.trim()) {
+      notify('Aviso', 'Título do orçamento é obrigatório')
+      return false
+    }
+    if (!form.value.client.name.trim()) {
+      notify('Aviso', 'Nome do cliente é obrigatório')
+      return false
+    }
+    if (!form.value.client.email.trim()) {
+      notify('Aviso', 'E-mail do cliente é obrigatório')
+      return false
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(form.value.client.email)) {
+      notify('Aviso', 'E-mail informado é inválido')
+      return false
+    }
   }
 
+  if (step === 2) {
+    if (form.value.items.length === 0) {
+      notify('Aviso', 'Adicione pelo menos um item obrigatório ao escopo')
+      return false
+    }
+    const allItems = [...form.value.items, ...form.value.upsellItems]
+    for (const item of allItems) {
+      if (!item.name.trim()) {
+        notify('Aviso', 'Todos os itens precisam de um nome')
+        return false
+      }
+      if (item.price < 0) {
+        notify('Aviso', 'O preço não pode ser negativo')
+        return false
+      }
+      if (item.quantity <= 0) {
+        notify('Aviso', 'A quantidade deve ser maior que zero')
+        return false
+      }
+    }
+  }
+
+  return true
+}
+
+function nextStep() {
+  if (validateStep(currentStep.value)) {
+    if (currentStep.value < totalSteps) {
+      currentStep.value++
+    }
+  }
+}
+
+function prevStep() {
+  if (currentStep.value > 1) {
+    currentStep.value--
+  }
+}
+
+async function submit(status: ProposalStatus = ProposalStatus.DRAFT) {
+  // Validate all steps before submitting
+  if (!validateStep(1) || !validateStep(2)) return
+  
   if (form.value.paymentConfig.installments < 1 || form.value.paymentConfig.installments > 12) {
     return notify('Aviso', 'O número de parcelas deve ser entre 1 e 12')
   }
@@ -254,263 +239,102 @@ defineExpose({ submit, isEditingNonDraft: computed(() => props.isEditing && prop
 </script>
 
 <template>
-  <form @submit.prevent="submit" class="space-y-12 py-6">
-    <!-- Cliente & Título -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div class="space-y-6">
-        <BaseInput v-model="form.title" label="Título do Orçamento" placeholder="Ex: Site Institucional - Empresa X" required />
+  <div class="flex flex-col min-h-[60vh] max-h-[85vh]">
+    <!-- Steps Header -->
+    <div class="px-6 pt-6 pb-4 border-b border-gray-100 flex items-center justify-between shrink-0 bg-white sticky top-0 z-20">
+      <div class="flex items-center gap-2">
+        <div 
+          v-for="step in totalSteps" 
+          :key="step"
+          class="flex items-center"
+        >
+          <div 
+            :class="[
+              'flex items-center justify-center w-8 h-8 rounded-full text-xs font-black transition-all',
+              currentStep === step ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 
+              currentStep > step ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-400'
+            ]"
+          >
+            <Check v-if="currentStep > step" class="w-4 h-4" />
+            <span v-else>{{ step }}</span>
+          </div>
+          <div v-if="step < totalSteps" class="w-8 h-1 mx-2 rounded-full" :class="currentStep > step ? 'bg-green-500' : 'bg-gray-100'"></div>
+        </div>
+      </div>
+      <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest text-right hidden sm:block">
+        <span v-if="currentStep === 1">Passo 1: Cliente</span>
+        <span v-else-if="currentStep === 2">Passo 2: Serviços</span>
+        <span v-else-if="currentStep === 3">Passo 3: Finalização</span>
+      </div>
+    </div>
+
+    <!-- Content Area (Scrollable) -->
+    <div class="flex-1 overflow-y-auto p-6 scrollbar-hide">
+      <form @submit.prevent="submit" class="pb-10">
+        <ProposalStepClient 
+          v-show="currentStep === 1"
+          :form="form"
+          :clients="clients"
+          v-model:selectedClientId="selectedClientId"
+        />
+
+        <ProposalStepScope 
+          v-show="currentStep === 2"
+          :form="form"
+          :catalog-items="catalogItems"
+          :total-catalog-items="totalCatalogItems"
+          v-model:catalogSearch="catalogSearch"
+          :is-generating="isGenerating"
+          @generate-description="generateDescription"
+        />
+
+        <ProposalStepPayment 
+          v-show="currentStep === 3"
+          :form="form"
+          :final-total="finalTotal"
+        />
+      </form>
+    </div>
+
+    <!-- Sticky Footer (Navigation & Totals) -->
+    <div class="px-6 py-4 bg-white border-t border-gray-100 shrink-0 flex items-center justify-between sticky bottom-0 z-30 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
+      <div>
+        <BaseButton v-if="currentStep > 1" type="button" variant="secondary" @click="prevStep" :disabled="isSubmitting">
+          <ArrowLeft class="w-4 h-4 mr-2" /> Voltar
+        </BaseButton>
+      </div>
+
+      <!-- Quick Total for Step 2 -->
+      <div v-if="currentStep === 2" class="hidden sm:block text-center animate-in fade-in">
+        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Total Parcial</span>
+        <span class="text-lg font-black text-blue-600">R$ {{ finalTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+      </div>
+
+      <div class="flex gap-3">
+        <template v-if="currentStep < totalSteps">
+          <BaseButton type="button" @click="nextStep">
+            Próximo Passo <ArrowRight class="w-4 h-4 ml-2" />
+          </BaseButton>
+        </template>
         
-        <div class="space-y-4">
-          <BaseSelect 
-            v-model="selectedClientId" 
-            label="Escolher Cliente Cadastrado" 
-            :options="clientOptions"
-            @update:model-value="onClientSelect"
-          />
-          <div class="p-6 bg-gray-50 rounded-3xl border border-gray-100 grid grid-cols-1 gap-4">
-            <BaseInput v-model="form.client.name" label="Nome do Cliente" required />
-            <BaseInput v-model="form.client.email" label="E-mail" required />
-            <BaseInput v-model="form.client.phone" label="WhatsApp (Opcional)" mask="phone" />
-          </div>
-        </div>
-      </div>
-
-      <div class="space-y-6">
-        <div class="flex items-center justify-between ml-1">
-          <label class="block text-xs font-black text-gray-600 uppercase tracking-widest">Itens do Catálogo</label>
-          <div class="relative w-48">
-            <input 
-              v-model="catalogSearch" 
-              type="text" 
-              placeholder="Buscar..." 
-              class="w-full pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-[10px] focus:ring-2 focus:ring-blue-500/20 outline-none"
-            >
-            <Search class="w-3 h-3 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          </div>
-        </div>
-        <div class="bg-white border-2 border-gray-100 rounded-[2.5rem] overflow-hidden flex flex-col">
-          <div class="max-h-[300px] overflow-y-auto divide-y divide-gray-50 scrollbar-hide">
-            <div 
-              v-for="item in catalogItems" 
-              :key="item._id"
-              @click="toggleItem(item)"
-              class="p-5 flex items-center justify-between cursor-pointer hover:bg-blue-50/50 transition-all group"
-            >
-              <div class="flex items-center gap-4">
-                <div 
-                  :class="isItemSelected(item) ? 'bg-blue-600 border-blue-600' : 'bg-white border-gray-200'"
-                  class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all"
-                >
-                  <Plus v-if="!isItemSelected(item)" class="w-3 h-3 text-gray-300" />
-                  <div v-else class="w-2 h-2 bg-white rounded-full"></div>
-                </div>
-                <div>
-                  <p class="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{{ item.name }}</p>
-                  <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">R$ {{ ((item.price ?? 0) as number).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }} / {{ item.unit }}</p>
-                </div>
-              </div>
-            </div>
-            <div v-if="!catalogItems?.length" class="p-10 text-center text-gray-400 text-sm font-medium">
-              Nenhum item encontrado.
-            </div>
-          </div>
-          <div v-if="totalCatalogItems > catalogLimit" class="p-4 bg-gray-50/50 border-t border-gray-100 flex justify-center">
-            <BasePagination 
-              :total="totalCatalogItems" 
-              :items-per-page="catalogLimit" 
-              v-model:page="catalogPage" 
-            />
-          </div>
-        </div>
+        <template v-else>
+          <template v-if="isEditingNonDraft">
+            <BaseButton type="button" :disabled="isSubmitting" :loading="isSubmitting" @click="submit()">
+              Salvar Alterações
+            </BaseButton>
+          </template>
+          <template v-else>
+            <BaseButton type="button" variant="outline" :disabled="isSubmitting" @click="submit('draft')">
+              <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin mr-2" />
+              Salvar Rascunho
+            </BaseButton>
+            <BaseButton type="button" :disabled="isSubmitting" @click="submit('created')" class="bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-200">
+              <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin mr-2" />
+              Criar e Enviar
+            </BaseButton>
+          </template>
+        </template>
       </div>
     </div>
-
-    <!-- Tabela de Itens Selecionados -->
-    <div class="space-y-6">
-      <h3 class="text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Escopo do Orçamento</h3>
-      <div class="space-y-4">
-        <div v-for="(item, idx) in form.items" :key="idx" class="bg-white p-6 rounded-[2.5rem] border-2 border-gray-100 shadow-sm space-y-4">
-          <div class="flex justify-between items-start gap-4">
-            <div class="flex-1 space-y-4">
-              <input v-model="item.name" class="w-full text-xl font-black text-gray-900 bg-transparent border-b-2 border-transparent hover:border-gray-200 focus:border-blue-500 focus:ring-0 p-1 outline-none transition-all" placeholder="Nome do Serviço" aria-label="Nome do Serviço">
-              <div class="relative">
-                <textarea 
-                  v-model="item.description" 
-                  rows="2" 
-                  class="w-full text-sm font-medium text-gray-600 bg-gray-50 p-4 rounded-2xl border-2 border-transparent hover:border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none resize-none transition-all" 
-                  placeholder="Descreva o que será entregue..."
-                  aria-label="Descrição do Serviço"
-                ></textarea>
-                <button 
-                  type="button"
-                  @click="generateDescription(idx)"
-                  class="absolute bottom-3 right-3 p-2 bg-white rounded-xl shadow-lg border border-gray-100 text-blue-600 hover:scale-110 transition-all"
-                  title="Melhorar com IA"
-                >
-                  <Sparkles class="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-            <div class="flex flex-col gap-2">
-              <button @click="form.items.splice(idx, 1)" type="button" class="p-3 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors self-end" title="Remover Item">
-                <Trash2 class="w-5 h-5" />
-              </button>
-              <button @click="moveToUpsell(idx)" type="button" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-700 hover:underline px-2 text-right">
-                Tornar Opcional
-              </button>
-            </div>
-          </div>
-          
-          <div class="flex flex-wrap items-center gap-6 pt-2">
-            <div class="flex items-center gap-3">
-              <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Preço R$</span>
-              <input v-model.number="item.price" type="number" class="w-24 bg-gray-50 px-4 py-2 rounded-xl font-bold text-sm border border-transparent focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all" aria-label="Preço R$">
-            </div>
-            <div class="flex items-center gap-3">
-              <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Qtd</span>
-              <input v-model.number="item.quantity" type="number" class="w-16 bg-gray-50 px-4 py-2 rounded-xl font-bold text-sm border border-transparent focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all" aria-label="Quantidade">
-            </div>
-            <div class="ml-auto text-right">
-              <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-1">Subtotal</span>
-              <span class="text-lg font-black text-gray-900">R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="form.upsellItems.length > 0" class="space-y-4 pt-6 border-t border-gray-100">
-        <h3 class="text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Itens Opcionais (Upsell)</h3>
-        <p class="text-[10px] font-bold text-gray-400 ml-1 mb-4 uppercase tracking-widest">Estes itens não entram no total obrigatório, o cliente pode selecioná-los ao aceitar.</p>
-        
-        <div v-for="(item, idx) in form.upsellItems" :key="'upsell_'+idx" class="bg-gray-50 p-6 rounded-[2.5rem] border-2 border-dashed border-gray-200 shadow-sm space-y-4">
-          <div class="flex justify-between items-start gap-4">
-            <div class="flex-1 space-y-4">
-              <input v-model="item.name" class="w-full text-xl font-black text-gray-900 bg-transparent border-b-2 border-transparent hover:border-gray-200 focus:border-blue-500 focus:ring-0 p-1 outline-none transition-all" placeholder="Nome do Serviço Opcional" aria-label="Nome do Serviço Opcional">
-              <div class="relative">
-                <textarea 
-                  v-model="item.description" 
-                  rows="2" 
-                  class="w-full text-sm font-medium text-gray-600 bg-white p-4 rounded-2xl border-2 border-transparent hover:border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none resize-none transition-all" 
-                  placeholder="Descreva o benefício deste opcional..."
-                  aria-label="Descrição do Serviço Opcional"
-                ></textarea>
-                <button 
-                  type="button"
-                  @click="generateDescription(idx, true)"
-                  class="absolute bottom-3 right-3 p-2 bg-white rounded-xl shadow-lg border border-gray-100 text-blue-600 hover:scale-110 transition-all"
-                  title="Melhorar com IA"
-                >
-                  <Sparkles class="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-            <div class="flex flex-col gap-2">
-              <button @click="form.upsellItems.splice(idx, 1)" type="button" class="p-3 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors self-end" title="Remover Opcional">
-                <Trash2 class="w-5 h-5" />
-              </button>
-              <button @click="moveToItems(idx)" type="button" class="text-[10px] font-black text-green-600 uppercase tracking-widest hover:text-green-700 hover:underline px-2 text-right">
-                Tornar Obrigatório
-              </button>
-            </div>
-          </div>
-          
-          <div class="flex flex-wrap items-center gap-6 pt-2">
-            <div class="flex items-center gap-3">
-              <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Preço R$</span>
-              <input v-model.number="item.price" type="number" class="w-24 bg-white px-4 py-2 rounded-xl font-bold text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all" aria-label="Preço R$">
-            </div>
-            <div class="flex items-center gap-3">
-              <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Qtd</span>
-              <input v-model.number="item.quantity" type="number" class="w-16 bg-white px-4 py-2 rounded-xl font-bold text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all" aria-label="Quantidade">
-            </div>
-            <div class="ml-auto text-right">
-              <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-1">Custo Adicional</span>
-              <span class="text-lg font-black text-gray-900">+ R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Ajustes & Pagamento -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-      <div class="space-y-8">
-        <div class="bg-gray-50 p-8 rounded-[3rem] space-y-6">
-          <h3 class="text-xs font-black text-gray-900 uppercase tracking-widest">Execução & Pagamento</h3>
-          
-          <div class="space-y-3">
-            <label class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Data de Execução (Opcional)</label>
-            <input v-model="form.executionDate" type="datetime-local" class="w-full px-5 py-4 bg-white border-2 border-gray-200 hover:border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all outline-none font-bold">
-            <p class="text-[9px] text-gray-500 font-bold ml-1 uppercase">Sincroniza com Google Agenda se conectado.</p>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <BaseInput v-model.number="form.paymentConfig.installments" label="Max. Parcelas" type="number" />
-            <BaseInput v-model.number="form.paymentConfig.cashDiscount" label="Desc. À Vista (%)" type="number" />
-          </div>
-
-          <div class="space-y-3">
-            <label class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Método de Envio</label>
-            <div role="radiogroup" aria-label="Método de Envio" class="flex gap-2 p-1 bg-white rounded-2xl border border-gray-200">
-              <button 
-                type="button"
-                role="radio"
-                :aria-checked="form.sendMethod === SendMethod.AUTO"
-                @click="form.sendMethod = SendMethod.AUTO"
-                :class="form.sendMethod === SendMethod.AUTO ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 outline-none'"
-                class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
-              >
-                Auto (E-mail)
-              </button>
-              <button 
-                type="button"
-                role="radio"
-                :aria-checked="form.sendMethod === SendMethod.MANUAL"
-                @click="form.sendMethod = SendMethod.MANUAL"
-                :class="form.sendMethod === SendMethod.MANUAL ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 outline-none'"
-                class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
-              >
-                Manual (Link)
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="space-y-8">
-        <div class="bg-blue-600 text-white p-10 rounded-[3.5rem] shadow-2xl shadow-blue-200 relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-          
-          <div class="relative z-10 space-y-6">
-            <div class="flex justify-between items-center text-blue-100">
-              <span class="text-[10px] font-black uppercase tracking-widest">Resumo Financeiro</span>
-              <span class="bg-white/20 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">Investimento Final</span>
-            </div>
-
-            <div class="space-y-2">
-              <div class="flex justify-between text-sm opacity-80">
-                <span>Subtotal</span>
-                <span>R$ {{ form.items.reduce((acc, i) => acc + (i.price * i.quantity), 0).toLocaleString('pt-BR') }}</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-xs font-bold">Acréscimo R$</span>
-                <input v-model.number="form.totals.additional" type="number" class="w-24 bg-white/10 border-none rounded-xl text-right font-black py-1 focus:ring-2 focus:ring-white/30">
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-xs font-bold">Desconto R$</span>
-                <input v-model.number="form.totals.discount" type="number" class="w-24 bg-white/10 border-none rounded-xl text-right font-black py-1 focus:ring-2 focus:ring-white/30">
-              </div>
-            </div>
-
-            <div class="pt-6 border-t border-white/20">
-              <p class="text-5xl font-black tracking-tighter">R$ {{ finalTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
-              <p class="text-[10px] font-black uppercase tracking-widest mt-4 text-blue-100">
-                À vista com {{ form.paymentConfig.cashDiscount }}% desc. ou {{ form.paymentConfig.installments }}x sem juros
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </form>
+  </div>
 </template>

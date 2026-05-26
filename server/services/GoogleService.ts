@@ -109,8 +109,8 @@ export const GoogleService = {
     try {
       const drive = google.drive({ version: 'v3', auth })
       
-      // Google API espera Stream para uploads no Node.js
-      const stream = Readable.from(buffer)
+      // Converter Uint8Array para Buffer e passar como array de 1 item para o Readable
+      const stream = Readable.from([Buffer.from(buffer)])
 
       const res = await drive.files.create({
         requestBody: { name: fileName, parents: [folderId] },

@@ -105,7 +105,7 @@ async function generateAIReport() {
       paywallReason.value = 'gerar relatório estratégico de IA'
       isPaywallOpen.value = true
     } else if (e.statusCode === 429) {
-      notify('Limite Atingido', e.statusMessage || 'Você já gerou um relatório hoje. Tente novamente amanhã.')
+      notify('Limite Atingido', 'Você fez muitas requisições seguidas. Tente novamente em um minuto.')
     } else {
       notify('Erro', e.data?.statusMessage || 'Erro ao gerar relatório estratégico')
     }
@@ -265,20 +265,20 @@ function formatRelativeTime(minutesAgo: number) {
               <div class="space-y-2">
                 <div class="flex justify-between text-xs font-bold text-slate-300">
                   <span class="uppercase tracking-widest text-[9px] text-slate-400">Adoção IA em Propostas</span>
-                  <span>{{ stats.proposalsCount > 0 ? '75%' : '0%' }}</span>
+                  <span>{{ Math.round(stats.aiRoi?.adoptionRates?.proposals || 0) }}%</span>
                 </div>
                 <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
-                  <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full" :style="{ width: stats.proposalsCount > 0 ? '75%' : '0%' }"></div>
+                  <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full" :style="{ width: (stats.aiRoi?.adoptionRates?.proposals || 0) + '%' }"></div>
                 </div>
               </div>
               
               <div class="space-y-2">
                 <div class="flex justify-between text-xs font-bold text-slate-300">
                   <span class="uppercase tracking-widest text-[9px] text-slate-400">Adoção IA em Catálogo</span>
-                  <span>{{ stats.servicesCount > 0 ? '60%' : '0%' }}</span>
+                  <span>{{ Math.round(stats.aiRoi?.adoptionRates?.catalog || 0) }}%</span>
                 </div>
                 <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
-                  <div class="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full" :style="{ width: stats.servicesCount > 0 ? '60%' : '0%' }"></div>
+                  <div class="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full" :style="{ width: (stats.aiRoi?.adoptionRates?.catalog || 0) + '%' }"></div>
                 </div>
               </div>
             </div>

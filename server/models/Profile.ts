@@ -35,6 +35,11 @@ const profileSchema = new Schema({
   },
   creditsBalance: { type: Number, default: 1 },
   creditsUsed: { type: Number, default: 0 },
+  aiUsage: {
+    reports: { type: Number, default: 0 },
+    proposals: { type: Number, default: 0 },
+    catalog: { type: Number, default: 0 }
+  },
   subscriptionPlan: { type: String, enum: Object.values(SubscriptionPlan), default: SubscriptionPlan.FREE },
   stripeCustomerId: String,
   stripeSubscriptionId: String,
@@ -49,7 +54,37 @@ const profileSchema = new Schema({
   defaultValidityDays: { type: Number, default: 7 },
   defaultInstallments: { type: Number, default: 1 },
   defaultCashDiscount: { type: Number, default: 0 },
-  defaultContractTemplate: { type: String, default: '<h2>Contrato de Prestação de Serviços</h2><p>Pelo presente instrumento, {{nome_empresa}} se compromete a realizar os serviços para {{nome_cliente}} conforme detalhado nesta proposta.</p>' },
+  defaultContractTemplate: { type: String, default: `<h2>CONTRATO DE PRESTAÇÃO DE SERVIÇOS</h2><p>
+
+ENTRE:
+
+CONTRATANTE (CLIENTE): {nome_cliente}, doravante designado apenas por Contratante.
+
+E
+
+CONTRATADO (PRESTADOR/FREELANCER): {nome_fantasia} (Razão Social: {razao_social}), com sede em {rua}, {numero}, {bairro}, {cidade} - {estado}, CEP: {cep}, titular do CNPJ {cnpj}, telefone {telefone}, doravante designado apenas por Contratado.
+
+As partes, agindo de boa-fé, acordam e celebram o presente Contrato de Prestação de Serviços, que se regerá pelas seguintes cláusulas:
+
+CLÁUSULA 1ª (Objeto do Contrato) O presente contrato tem como objeto a prestação de serviços por parte do Contratado ao Contratante, conforme detalhado na proposta comercial aprovada a qual este documento integra.
+
+CLÁUSULA 2ª (Regime de Trabalho e Autonomia) O Contratado executará as suas funções com total autonomia técnica e organizativa, não existindo qualquer vínculo laboral ou relação de subordinação jurídica entre as partes. O trabalho será realizado em regime remoto, utilizando o Contratado os seus próprios equipamentos e ferramentas de trabalho.
+
+CLÁUSULA 3ª (Prazos e Entregas) O presente contrato entra em vigor na data da sua assinatura e terá a duração de {dias_validade} dias, ou a duração necessária para a conclusão dos serviços acordados.
+
+CLÁUSULA 4ª (Preço e Forma de Pagamento) Como contrapartida pelos serviços prestados, o Contratante pagará ao Contratado o valor total de R$ {valor_total}. O pagamento será efetuado através da modalidade: {forma_pagamento}. Detalhes adicionais de pagamento estipulados: {detalhes_pagamento}.
+
+O Contratado emitirá a respectiva Nota Fiscal de Serviços após a compensação de cada pagamento.
+
+CLÁUSULA 5ª (Propriedade Intelectual) Os direitos de propriedade intelectual dos materiais criados no âmbito deste contrato serão transmitidos em exclusivo para o Contratante apenas e só após o pagamento integral do valor acordado na Cláusula 4ª.
+
+CLÁUSULA 6ª (Confidencialidade) Ambas as partes obrigam-se a manter sigilo absoluto sobre todas as informações comerciais, técnicas ou dados pessoais a que tenham acesso durante a vigência deste contrato, não os podendo divulgar a terceiros sem autorização prévia por escrito.
+
+CLÁUSULA 7ª (Rescisão) Qualquer uma das partes poderá rescindir o presente contrato mediante aviso prévio por escrito com a antecedência mínima de 15 dias. Em caso de rescisão por iniciativa do Contratante sem justa causa, os valores já pagos a título de sinal ou setup não serão devolvidos.
+
+CLÁUSULA 8ª (Lei Aplicável e Foro) Para a resolução de qualquer litígio emergente deste contrato, as partes elegem o foro da comarca de {cidade} / {estado}.
+
+Por estarem de pleno acordo, as partes concordam com os termos supracitados na aceitação deste orçamento.</p>` },
   defaultTermsAndConditions: { type: String, default: `<h2>Termos e Condições de Contratação</h2>
 <p><strong>1. Validade do Orçamento</strong><br>
 A presente proposta comercial tem validade de {{dias_validade}} dias contados a partir da data de sua emissão. Após este prazo, os valores e prazos estipulados estarão sujeitos a revisão e reajuste.</p>

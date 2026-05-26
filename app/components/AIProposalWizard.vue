@@ -79,7 +79,8 @@ async function saveToCatalog(item: any) {
         name: item.name,
         description: item.description,
         price: item.price,
-        unit: item.unit || 'UN'
+        unit: item.unit || 'UN',
+        aiAssisted: true
       }
     })
     
@@ -111,7 +112,8 @@ async function handleFinish() {
             name: item.name,
             description: item.description,
             price: item.price,
-            unit: item.unit || 'UN'
+            unit: item.unit || 'UN',
+            aiAssisted: true
           }
         })
       )

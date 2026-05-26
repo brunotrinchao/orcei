@@ -4,9 +4,6 @@ import { ProposalService } from '../../services/ProposalService'
 function validateProposal(body: any) {
   const errors: { field: string; message: string }[] = []
 
-  if (!body?.title?.trim()) {
-    errors.push({ field: 'title', message: 'Título da proposta é obrigatório' })
-  }
 
   if (!body.client?.name?.trim()) {
     errors.push({ field: 'client.name', message: 'Nome do cliente é obrigatório' })

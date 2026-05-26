@@ -42,7 +42,8 @@ const proposalSchema = new Schema({
   termsAndConditions: String,
   expiresAt: Date,
   executionDate: { type: Date, default: null },
-  lastEmailId: String
+  lastEmailId: String,
+  aiAssisted: { type: Boolean, default: false }
 }, { timestamps: true })
 
 proposalSchema.index({ profileId: 1 })

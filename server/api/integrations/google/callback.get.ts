@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
       }
     )
 
-    return sendRedirect(event, '/dashboard/settings?google=connected')
+    return sendRedirect(event, '/configuracoes?google=connected')
   } catch (error: any) {
     console.error('[Google Callback] Error:', error)
     throw createError({

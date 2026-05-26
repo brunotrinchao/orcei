@@ -2,6 +2,8 @@ import { CatalogItem } from '../../models/CatalogItem'
 import { AIService } from '../../services/AIService'
 import { checkRateLimit } from '../../utils/rate-limit'
 
+import { ProfileService } from '../../services/ProfileService'
+
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
   if (!session.user) {
@@ -10,6 +12,28 @@ export default defineEventHandler(async (event) => {
 
   // Rate Limit: 5 requests per 1 minute for AI
   checkRateLimit(event, { max: 5, windowMs: 60 * 1000, keyPrefix: 'ai-catalog' })
+
+  const profile = await ProfileService.getByUserId((session.user as any).id)
+  if (!profile) {
+    throw createError({ statusCode: 404, statusMessage: 'Perfil não encontrado' })
+  }
+
+  // Verificação de saldo de créditos
+  if (profile.creditsBalance < 1 && (session.user as any).role !== 'admin') {
+    throw createError({
+      statusCode: 402,
+      statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para usar a IA.'
+    })
+  }
+
+  // Dedução de 1 crédito
+  if ((session.user as any).role !== 'admin') {
+    profile.creditsBalance = Math.max(0, profile.creditsBalance - 1)
+    profile.creditsUsed = (profile.creditsUsed || 0) + 1
+    if (!profile.aiUsage) profile.aiUsage = { reports: 0, proposals: 0, catalog: 0 }
+    profile.aiUsage.catalog = (profile.aiUsage.catalog || 0) + 1
+    await profile.save()
+  }
 
   const { name, type, context } = await readBody(event)
   if (!name) {

@@ -12,7 +12,8 @@ const catalogItemSchema = new Schema({
   imageUrl: String,
   icon: { type: String, default: 'Package' },
   embedding: [Number],
-  embeddingUpdatedAt: Date
+  embeddingUpdatedAt: Date,
+  aiAssisted: { type: Boolean, default: false }
 }, { timestamps: true })
 
 catalogItemSchema.index({ profileId: 1 })

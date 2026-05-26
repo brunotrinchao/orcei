@@ -26,6 +26,9 @@ export default defineEventHandler(async (event) => {
   // Dedução de 1 crédito de IA
   if ((session.user as any).role !== 'admin') {
     profile.creditsBalance = Math.max(0, profile.creditsBalance - 1)
+    profile.creditsUsed = (profile.creditsUsed || 0) + 1
+    if (!profile.aiUsage) profile.aiUsage = { reports: 0, proposals: 0, catalog: 0 }
+    profile.aiUsage.reports = (profile.aiUsage.reports || 0) + 1
     await profile.save()
   }
 

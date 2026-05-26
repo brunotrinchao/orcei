@@ -92,6 +92,7 @@ const selectedProposal = ref<ProposalDTO | null>(null)
 const selectedProposalHistory = ref<any[]>([])
 const isLoadingHistory = ref(false)
 const prefilledItems = ref<any[] | null>(null)
+const isAiAssistedProposal = ref(false)
 const isSubmitting = ref(false)
 const isResending = ref<string | null>(null)
 const proposalFormRef = ref<any>(null)
@@ -167,9 +168,10 @@ async function shareProposal(proposal: ProposalDTO) {
   }
 }
 
-function openModal(proposal: ProposalDTO | null = null, items: any[] | null = null) {
+function openModal(proposal: ProposalDTO | null = null, items: any[] | null = null, aiAssisted: boolean = false) {
   selectedProposal.value = proposal
   prefilledItems.value = items
+  isAiAssistedProposal.value = aiAssisted
   isModalOpen.value = true
 }
 
@@ -181,7 +183,7 @@ function onAIWizardSuccess(items: any[]) {
     price: item.price,
     quantity: 1
   }))
-  openModal(null, formattedItems)
+  openModal(null, formattedItems, true)
 }
 
 function openPreview(proposal: ProposalDTO) {
@@ -205,6 +207,10 @@ async function handleProposalSubmit(formData: Partial<ProposalDTO>) {
     const endpoint = isNew 
       ? '/api/proposals'
       : `/api/proposals/${selectedProposal.value?._id}`
+
+    if (isNew && isAiAssistedProposal.value) {
+      formData.aiAssisted = true
+    }
 
     const res: any = await $fetch(endpoint, {
       method,

@@ -67,12 +67,16 @@ export default defineEventHandler(async (event) => {
     : 100
 
   // 3. ROI de IA (Tempo Economizado em horas)
+  const aiProposalsCount = proposals.filter((p: any) => p.aiAssisted).length
+  const aiCatalogCount = await CatalogItem.countDocuments({ profileId: profile._id, aiAssisted: true })
+
   // Cada proposta criada gera em média economia de 12 minutos manual por IA integrada
   // Cada catálogo de serviços cadastrado gera economia de 5 minutos
-  const totalIAGenerations = proposalsCount * 3 + itemsCount
-  const timeSavedMinutes = totalIAGenerations * 12
+  const timeSavedMinutes = (aiProposalsCount * 12) + (aiCatalogCount * 5)
   const timeSavedHours = Math.floor(timeSavedMinutes / 60)
   const timeSavedRemainingMins = Math.round(timeSavedMinutes % 60)
+
+  const aiUsage = (profile as any).aiUsage || { reports: 0, proposals: 0, catalog: 0 }
 
   // 4. Tracking de Abertura de Propostas (Simulado com base no status e datas)
   // Cria logs realistas de aberturas de propostas públicas para o feed em tempo real
@@ -182,10 +186,19 @@ export default defineEventHandler(async (event) => {
     
     // Estruturas de dados complexas
     aiRoi: {
-      creditsUsed: totalIAGenerations,
-      creditsLimit: profile.creditsBalance + totalIAGenerations,
+      creditsUsed: profile.creditsUsed || 0,
+      creditsLimit: profile.creditsBalance + (profile.creditsUsed || 0),
       timeSavedHours,
-      timeSavedMinutes: timeSavedRemainingMins
+      timeSavedMinutes: timeSavedRemainingMins,
+      usageStats: {
+        reports: aiUsage.reports || 0,
+        proposals: aiUsage.proposals || 0,
+        catalog: aiUsage.catalog || 0
+      },
+      adoptionRates: {
+        proposals: proposalsCount > 0 ? (aiProposalsCount / proposalsCount) * 100 : 0,
+        catalog: itemsCount > 0 ? (aiCatalogCount / itemsCount) * 100 : 0
+      }
     },
     trackingViews,
     followUpAlerts

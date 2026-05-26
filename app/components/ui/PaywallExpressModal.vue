@@ -17,51 +17,61 @@ const isOpen = computed({
 })
 
 const isLoading = ref<string | null>(null)
-const selectedPack = ref('pro_pack')
-
 const { notify } = useAlerts()
 
-const packages = [
-  {
-    id: 'starter_pack',
-    name: 'Starter',
-    credits: 10,
-    price: 'R$ 29,90',
-    unitPrice: 'R$ 2,99',
-    discount: '49%',
-    highlight: false,
-    badge: 'Iniciantes'
-  },
-  {
-    id: 'pro_pack',
-    name: 'Profissional',
-    credits: 30,
-    price: 'R$ 69,90',
-    unitPrice: 'R$ 2,33',
-    discount: '60%',
-    highlight: true,
-    badge: 'Melhor Valor'
-  },
-  {
-    id: 'agency_pack',
-    name: 'Agência',
-    credits: 100,
-    price: 'R$ 149,90',
-    unitPrice: 'R$ 1,50',
-    discount: '74%',
-    highlight: false,
-    badge: 'Uso Comercial'
-  }
-]
+const { data: stripePackages } = useFetch<any[]>('/api/stripe/plans')
 
-const activePack = computed(() => packages.find(p => p.id === selectedPack.value) || packages[1])
+const packages = computed(() => {
+  const stripeData = stripePackages.value || []
+  
+  if (!stripeData.length) {
+    return [
+      { id: 'starter_pack', name: 'Starter', credits: 10, price: 'R$ 29,90', unitPrice: 'R$ 2,99', discount: '49%', highlight: false, badge: 'Iniciantes' },
+      { id: 'pro_pack', name: 'Profissional', credits: 30, price: 'R$ 69,90', unitPrice: 'R$ 2,33', discount: '60%', highlight: true, badge: 'Melhor Valor' },
+      { id: 'agency_pack', name: 'Agência', credits: 100, price: 'R$ 149,90', unitPrice: 'R$ 1,50', discount: '74%', highlight: false, badge: 'Uso Comercial' }
+    ]
+  }
+
+  return stripeData.map(pack => {
+    const id = (pack.tier || pack.id || '').toLowerCase()
+    const isPro = id.includes('pro') || id.includes('premium') || id.includes('profissional')
+    const isStarter = id.includes('starter')
+    const isSingle = id.includes('single') || id.includes('avulso')
+    
+    return {
+      id: pack.priceId || pack.id,
+      name: pack.name,
+      credits: pack.credits || (isSingle ? 1 : isStarter ? 10 : isPro ? 30 : 100),
+      price: pack.price,
+      unitPrice: pack.unitPrice || 'R$ 2,33',
+      discount: isStarter ? '49%' : isPro ? '60%' : '74%',
+      highlight: pack.highlight ?? isPro,
+      badge: isSingle ? 'Avulso' : isStarter ? 'Iniciantes' : isPro ? 'Melhor Valor' : 'Uso Comercial'
+    }
+  }).filter(p => p.credits >= 10) // Foca apenas nos pacotes de recarga (não avulso) no modal
+})
+
+const selectedPack = ref<string | null>(null)
+const activePack = computed(() => {
+  if (selectedPack.value) {
+    return packages.value.find(p => p.id === selectedPack.value) || packages.value[1]
+  }
+  return packages.value.find(p => p.highlight) || packages.value[1] || packages.value[0]
+})
+
+watch(isOpen, (val) => {
+  if (val && !selectedPack.value && packages.value.length > 0) {
+    selectedPack.value = (packages.value.find(p => p.highlight) || packages.value[1] || packages.value[0]).id
+  }
+})
 
 async function handleCheckout() {
-  isLoading.value = selectedPack.value
+  if (!activePack.value?.id) return
+  isLoading.value = activePack.value.id
   try {
     const { url } = await $fetch<any>('/api/stripe/checkout', {
       method: 'POST',
-      body: { tier: selectedPack.value, type: 'credits' }
+      body: { tier: activePack.value.id, type: 'credits' }
     })
     if (url) window.location.href = url
   } catch (e: any) {

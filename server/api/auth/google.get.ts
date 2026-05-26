@@ -20,6 +20,10 @@ export default defineOAuthGoogleEventHandler({
     const profile = await ProfileService.createForUser(userData)
     if (profile) {
       profile.lastLoginAt = new Date()
+      // Fix for legacy profiles with empty subscriptionPlan
+      if (!profile.subscriptionPlan) {
+        profile.subscriptionPlan = 'free'
+      }
       await profile.save()
     }
 

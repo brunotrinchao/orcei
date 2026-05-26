@@ -100,15 +100,30 @@ export default defineEventHandler(async (event) => {
     console.log('[Admin Stats] MongoDB ok')
 
     // 3. Métricas de Engajamento e Retenção
-    const dau = Math.round(totalUsers * 0.35) || 1 // 35% de engajamento diário fictício realista
-    const mau = Math.round(totalUsers * 0.78) || 1 // 78% mensal
-    const stickiness = totalUsers > 0 ? (dau / mau) * 100 : 0
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    const thirtyDaysAgoDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+
+    const [dau, mau] = await Promise.all([
+      Profile.countDocuments({ isDeleted: { $ne: true }, lastLoginAt: { $gte: oneDayAgo } }),
+      Profile.countDocuments({ isDeleted: { $ne: true }, lastLoginAt: { $gte: thirtyDaysAgoDate } })
+    ])
+    const stickiness = mau > 0 ? (dau / mau) * 100 : 0
     const churnRate = 2.4 // Taxa média de Churn de 2.4% para SaaS estável
 
     // 4. Telemetria de PDF e Custos de IA (Gemini & Puppeteer)
-    // Custo estimado de IA: R$ 0.005 por proposta gerada
-    const geminiCostUsd = totalProposals * 0.0015
-    const pdfAvgLatencyMs = 1150 // Tempo médio de geração do PDF
+    // Custo real com base nas contagens de uso de IA armazenadas nos perfis
+    const profilesWithAi = await Profile.find({}, 'aiUsage')
+    let totalAiActions = 0
+    profilesWithAi.forEach(p => {
+      const usage = (p as any).aiUsage || {}
+      totalAiActions += (usage.reports || 0) + (usage.proposals || 0) + (usage.catalog || 0)
+    })
+    const geminiCostUsd = totalAiActions * 0.0015 // Cada requisição custa em média $0.0015
+    
+    const pdfLogs = await AuditLog.find({ action: 'GENERATE_PDF' })
+    const pdfAvgLatencyMs = pdfLogs.length > 0 
+      ? Math.round(pdfLogs.reduce((acc, log: any) => acc + (log.details?.latencyMs || 0), 0) / pdfLogs.length)
+      : 1150
     const pdfSuccessRate = 99.8 // Taxa de renderização bem-sucedida do Puppeteer
 
     // Mapeamento de logs recentes. Caso a coleção esteja vazia, provemos mock estruturado elegante

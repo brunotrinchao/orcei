@@ -332,7 +332,7 @@ const formatPhone = (phone: string) => {
               <span class="text-sm font-bold text-gray-600">{{ client.email }}</span>
               <div class="flex items-center gap-2 mt-1">
                 <span class="text-xs font-black text-gray-400">{{ formatPhone(client.phone) }}</span>
-                <div v-if="client.isWhatsapp" class="i-simple-icons-whatsapp w-3.5 h-3.5 text-green-500"></div>
+                <img v-if="client.isWhatsapp" :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5" alt="WhatsApp" />
               </div>
             </div>
           </td>

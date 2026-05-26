@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SubscriptionPlan } from '../../types/enums'
 import { onClickOutside } from '@vueuse/core'
-import { Shield, ArrowLeft } from 'lucide-vue-next'
+import { Shield, ArrowLeft, Home, FileText, Plus, Users, Settings } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../types'
 const { loggedIn, user, clear } = useUserSession()
 const { data: profile, refresh: refreshLayoutProfile } = useFetch<ProfileDTO>('/api/profile')
@@ -191,32 +191,70 @@ onMounted(() => {
       </div>
     </footer>
 
-    <!-- Mobile Tab Bar (Refined) -->
-    <nav v-if="loggedIn" class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around items-center h-16 px-4 z-50 pb-[env(safe-area-inset-bottom,0px)]">
-      <NuxtLink to="/dashboard" class="flex flex-col items-center gap-1 text-gray-400 py-2" active-class="text-gray-900">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-        <span class="text-[9px] font-bold">Início</span>
-      </NuxtLink>
-      <NuxtLink to="/orcamentos" class="flex flex-col items-center gap-1 text-gray-400 py-2" active-class="text-gray-900">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        <span class="text-[9px] font-bold">Propostas</span>
-      </NuxtLink>
-      <NuxtLink to="/clientes" class="flex flex-col items-center gap-1 text-gray-400 py-2" active-class="text-gray-900">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-        <span class="text-[9px] font-bold">Clientes</span>
-      </NuxtLink>
-      <NuxtLink to="/catalogo" class="flex flex-col items-center gap-1 text-gray-400 py-2" active-class="text-gray-900">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-        <span class="text-[9px] font-bold">Catálogo</span>
-      </NuxtLink>
-      <NuxtLink v-if="user?.role === 'admin'" to="/admin" class="flex flex-col items-center gap-1 text-red-400 py-2" active-class="text-red-700">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.233-2.047-.618-3.016z"/></svg>
-        <span class="text-[9px] font-bold">Admin</span>
-      </NuxtLink>
-      <NuxtLink to="/configuracoes" class="flex flex-col items-center gap-1 text-gray-400 py-2" active-class="text-gray-900">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-        <span class="text-[9px] font-bold">Ajustes</span>
-      </NuxtLink>
+    <nav
+      v-if="loggedIn"
+      aria-label="Navegação principal mobile"
+      class="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] pb-[env(safe-area-inset-bottom,0px)]"
+    >
+      <ul class="flex items-center justify-around h-16 px-2">
+        <li class="flex-1 flex justify-center h-full relative">
+          <NuxtLink
+            to="/dashboard"
+            class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 hover:text-gray-900"
+            active-class="text-blue-600"
+          >
+            <Home class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
+            <span class="text-[9px] font-bold tracking-wide transition-colors">Início</span>
+          </NuxtLink>
+        </li>
+
+        <li class="flex-1 flex justify-center h-full relative">
+          <NuxtLink
+            to="/orcamentos"
+            class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 hover:text-gray-900"
+            active-class="text-blue-600"
+          >
+            <FileText class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
+            <span class="text-[9px] font-bold tracking-wide transition-colors">Propostas</span>
+          </NuxtLink>
+        </li>
+
+        <li class="flex-1 flex justify-center h-full relative">
+          <NuxtLink
+            to="/orcamentos?new=true"
+            class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200"
+          >
+            <div class="absolute -top-6 flex flex-col items-center justify-center">
+              <div class="flex items-center justify-center w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg shadow-blue-200 active:scale-95 transition-transform duration-200 ring-4 ring-white">
+                <Plus class="w-6 h-6" aria-hidden="true" />
+              </div>
+              <span class="text-[9px] font-bold tracking-wide mt-1 text-gray-500">Novo</span>
+            </div>
+          </NuxtLink>
+        </li>
+
+        <li class="flex-1 flex justify-center h-full relative">
+          <NuxtLink
+            to="/clientes"
+            class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 hover:text-gray-900"
+            active-class="text-blue-600"
+          >
+            <Users class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
+            <span class="text-[9px] font-bold tracking-wide transition-colors">Clientes</span>
+          </NuxtLink>
+        </li>
+
+        <li class="flex-1 flex justify-center h-full relative">
+          <NuxtLink
+            to="/configuracoes"
+            class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 hover:text-gray-900"
+            active-class="text-blue-600"
+          >
+            <Settings class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
+            <span class="text-[9px] font-bold tracking-wide transition-colors">Ajustes</span>
+          </NuxtLink>
+        </li>
+      </ul>
     </nav>
   </div>
 </template>

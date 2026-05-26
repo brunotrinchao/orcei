@@ -11,7 +11,8 @@ export async function uploadToCloudinary(
   const config = useRuntimeConfig()
   const projectName = config.appName
   const folderMain = config.appEnv
-  const folderPath = `${folderMain}/${projectName}`
+  const sanitize = (str: string) => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-').toLowerCase() : ''
+  const folderPath = `${sanitize(folderMain)}/${sanitize(projectName)}`
 
   cloudinary.config({
     cloud_name: config.cloudinaryName,
@@ -40,7 +41,8 @@ export async function uploadToCloudinary(
               resource_type: 'raw',
               type: 'upload',
               secure: true,
-              sign_url: true
+              sign_url: true,
+              flags: 'attachment'
             });
           }
 
@@ -63,7 +65,8 @@ export async function uploadToCloudinary(
       resource_type: 'raw',
       type: 'upload',
       secure: true,
-      sign_url: true
+      sign_url: true,
+      flags: 'attachment'
     });
   }
 

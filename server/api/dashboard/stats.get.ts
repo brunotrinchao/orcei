@@ -58,13 +58,14 @@ export default defineEventHandler(async (event) => {
   const slaRate = acceptedCount > 0 ? (slaUnder48hCount / acceptedCount) * 100 : 100 // Padrão 100% se não há dados
 
   // 2. Cálculo de FCR (First Contact Resolution comercial)
-  // Propostas aceitas de imediato sem revisões ou propostas duplicadas para o mesmo cliente nos últimos 30 dias
-  // Simulamos / calculamos comparando emails de clientes únicos que fecharam de primeira
-  const emailsTotal = proposals.map(p => p.client?.email?.toLowerCase()).filter(Boolean)
-  const uniqueEmails = [...new Set(emailsTotal)]
-  const fcrRate = proposalsCount > 0 
-    ? Math.min(100, Math.max(65, (uniqueEmails.length / proposalsCount) * 100 + (approvalRate * 0.15))) 
-    : 100
+  // Propostas aceitas que NUNCA passaram pelo status 'pending' (solicitação de revisão)
+  const { ProposalHistory } = await import('../../models/ProposalHistory')
+  const revisions = await ProposalHistory.find({ 
+    proposalId: { $in: acceptedProposals.map(p => p._id) }, 
+    action: 'pending' 
+  })
+  const proposalsWithRevisions = new Set(revisions.map(r => r.proposalId.toString())).size
+  const fcrRate = acceptedCount > 0 ? ((acceptedCount - proposalsWithRevisions) / acceptedCount) * 100 : 100
 
   // 3. ROI de IA (Tempo Economizado em horas)
   const aiProposalsCount = proposals.filter((p: any) => p.aiAssisted).length
@@ -78,27 +79,31 @@ export default defineEventHandler(async (event) => {
 
   const aiUsage = (profile as any).aiUsage || { reports: 0, proposals: 0, catalog: 0 }
 
-  // 4. Tracking de Abertura de Propostas (Simulado com base no status e datas)
-  // Cria logs realistas de aberturas de propostas públicas para o feed em tempo real
-  const trackingViews = proposals
-    .filter(p => ['pending', 'accepted'].includes(p.status))
-    .slice(0, 5)
-    .map((p, idx) => {
-      const locales = ['São Paulo, BR', 'Rio de Janeiro, BR', 'Belo Horizonte, BR', 'Porto Alegre, BR', 'Curitiba, BR']
-      const browsers = ['Chrome no Windows 11', 'Safari no iPhone', 'Firefox no macOS', 'Chrome no Android']
-      const minutesAgo = (idx + 1) * 45
-      const date = new Date(Date.now() - minutesAgo * 60 * 1000)
-      
-      return {
-        proposalCode: p.code,
-        proposalTitle: p.title,
-        clientName: p.client?.name,
-        location: locales[idx % locales.length],
-        browser: browsers[idx % browsers.length],
-        date: date.toISOString(),
-        minutesAgo
-      }
-    })
+  // 4. Tracking de Abertura de Propostas
+  const parseUserAgent = (ua: string) => {
+    if (!ua || ua === 'unknown') return 'Dispositivo Desconhecido'
+    const browser = ua.includes('Chrome') ? 'Chrome' : ua.includes('Firefox') ? 'Firefox' : ua.includes('Safari') ? 'Safari' : ua.includes('Edge') ? 'Edge' : 'Navegador'
+    const os = ua.includes('Windows') ? 'Windows' : ua.includes('Mac OS') ? 'macOS' : ua.includes('Linux') ? 'Linux' : ua.includes('Android') ? 'Android' : ua.includes('iPhone') ? 'iPhone' : 'Sistema'
+    return `${browser} no ${os}`
+  }
+
+  const trackingViews = proposals.reduce((acc: any[], p: any) => {
+    if (p.views && p.views.length > 0) {
+      p.views.forEach((v: any) => {
+        const minutesAgo = Math.floor((Date.now() - new Date(v.createdAt).getTime()) / 60000)
+        acc.push({
+          proposalCode: p.code,
+          proposalTitle: p.title,
+          clientName: p.client?.name,
+          location: v.location || 'Desconhecido',
+          browser: parseUserAgent(v.browser),
+          date: v.createdAt,
+          minutesAgo
+        })
+      })
+    }
+    return acc
+  }, []).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5)
 
   // 5. Alertas de Follow-ups Inteligentes
   const followUpAlerts = proposals
@@ -134,7 +139,18 @@ export default defineEventHandler(async (event) => {
     created: 'Criado',
     pending: 'Pendente',
     accepted: 'Aceito',
-    expired: 'Expirado'
+    expired: 'Expirado',
+    sent: 'Enviado',
+    delivered: 'Entregue',
+    opened: 'Aberto',
+    clicked: 'Clicado',
+    bounced: 'Devolvido',
+    viewed: 'Visualizado',
+    scheduled: 'Agendado',
+    received: 'Recebido',
+    delayed: 'Atrasado',
+    failed: 'Falha',
+    suppressed: 'Suprimido'
   }
 
   const statusDistribution = proposals.reduce((acc: any, p) => {
@@ -156,10 +172,11 @@ export default defineEventHandler(async (event) => {
     .slice(0, 5)
 
   // 6. Conversão de Opcionais (Upsell)
-  // Calcula o montante adicional de receitas gerado por upsells aceitos
-  const upsellRevenue = acceptedProposals.reduce((acc, p) => {
-    const hasUpsell = p.upsellItems && p.upsellItems.length > 0
-    return acc + (hasUpsell ? (p.totals?.final || 0) * 0.15 : 0) // Assume 15% do valor se houver itens adicionais
+  // Calcula o montante de receitas gerado por upsells aceitos (flags isUpsell)
+  const upsellRevenue = acceptedProposals.reduce((acc, p: any) => {
+    const upsellItems = p.items?.filter((item: any) => item.isUpsell) || []
+    const upsellSum = upsellItems.reduce((sum: number, item: any) => sum + ((item.price || 0) * (item.quantity || 1)), 0)
+    return acc + upsellSum
   }, 0)
 
   return {

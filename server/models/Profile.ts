@@ -109,6 +109,7 @@ Para dirimir quaisquer controvérsias oriundas desta proposta, fica eleito o for
   isDeleted: { type: Boolean, default: false },
   deletedAt: { type: Date, default: null },
   role: { type: String, enum: Object.values(UserRole), default: UserRole.USER },
+  lastLoginAt: { type: Date, default: null },
   googleIntegration: {
     email: String,
     accessToken: String,

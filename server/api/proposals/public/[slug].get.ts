@@ -37,10 +37,17 @@ export default defineEventHandler(async (event) => {
   // Log view event only if consent is given and NOT owner preview
   if (!isPreviewRequest && hasConsent) {
     const headers = getHeaders(event)
+    const ip = headers['x-forwarded-for'] || headers['x-real-ip'] || 'unknown'
+    const browser = headers['user-agent'] || 'unknown'
+    
     await ProposalService.logHistory(proposal._id as any, 'viewed', 'system', {
-      ip: headers['x-forwarded-for'] || headers['x-real-ip'],
-      userAgent: headers['user-agent']
+      ip,
+      userAgent: browser
     })
+
+    // Adiciona ao array nativo de views para telemetria no dashboard
+    proposal.views.push({ ip, browser, location: 'Desconhecido', createdAt: new Date() })
+    await proposal.save()
 
     // If it was just created or sent/delivered, move to viewed
     const statusHierarchy: Record<string, number> = {

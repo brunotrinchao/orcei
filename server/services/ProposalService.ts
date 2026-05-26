@@ -252,7 +252,8 @@ export const ProposalService = {
     if (selectedUpsells && selectedUpsells.length > 0 && proposal.upsellItems) {
       const activeUpsells = proposal.upsellItems.filter((item: any) => selectedUpsells.includes(item._id.toString()))
       if (activeUpsells.length > 0) {
-        proposal.items.push(...activeUpsells)
+        const mappedUpsells = activeUpsells.map((u: any) => ({ ...u.toObject(), isUpsell: true }))
+        proposal.items.push(...mappedUpsells)
         proposal.upsellItems = proposal.upsellItems.filter((item: any) => !selectedUpsells.includes(item._id.toString()))
         await proposal.save()
       }

@@ -6,11 +6,20 @@ const itemSnapshotSchema = new Schema({
   description: String,
   price: Number,
   quantity: { type: Number, default: 1 },
+  isUpsell: { type: Boolean, default: false },
   discount: {
     value: { type: Number, default: 0 },
     type: { type: String, enum: Object.values(DiscountType), default: DiscountType.PERCENT }
   }
 })
+
+const viewTrackingSchema = new Schema({
+  ip: { type: String, default: null },
+  browser: { type: String, default: null },
+  location: { type: String, default: null },
+  createdAt: { type: Date, default: Date.now }
+}, { _id: false })
+
 const proposalSchema = new Schema({
   profileId: { type: Schema.Types.ObjectId, ref: 'Profile', required: true },
   title: { type: String, required: true },
@@ -24,6 +33,7 @@ const proposalSchema = new Schema({
   },
   slug: { type: String, required: true, unique: true },
   status: { type: String, enum: Object.values(ProposalStatus), default: ProposalStatus.DRAFT },
+  views: [viewTrackingSchema],
   items: [itemSnapshotSchema],
   upsellItems: [itemSnapshotSchema],
   totals: {

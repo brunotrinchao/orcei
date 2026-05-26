@@ -161,73 +161,73 @@ function formatRelativeTime(minutesAgo: number) {
     <template v-else-if="stats">
       
       <!-- Seção Principal de Métricas Claves -->
-      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         
         <!-- Receita Confirmada -->
-        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-col justify-between">
-          <div class="flex justify-between items-start mb-4">
-            <div class="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-colors">
-              <DollarSign class="w-6 h-6" />
+        <div class="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-col justify-between">
+          <div class="flex justify-between items-start mb-3 md:mb-4">
+            <div class="w-8 h-8 md:w-12 md:h-12 bg-green-50 text-green-600 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-colors">
+              <DollarSign class="w-4 h-4 md:w-6 md:h-6" />
             </div>
-            <span class="text-[9px] font-black text-green-500 uppercase tracking-widest bg-green-50 px-2.5 py-1 rounded-lg">Faturado</span>
+            <span class="hidden md:inline-block text-[9px] font-black text-green-500 uppercase tracking-widest bg-green-50 px-2.5 py-1 rounded-lg">Faturado</span>
           </div>
           <div>
-            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Faturamento Aceito</p>
-            <h3 class="text-3xl font-black text-gray-900 tracking-tight">
-              R$ {{ (stats.totalRevenue ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+            <p class="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 truncate">Faturamento</p>
+            <h3 class="text-lg md:text-3xl font-black text-gray-900 tracking-tight truncate">
+              R$ {{ (stats.totalRevenue ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) }}
             </h3>
-            <p class="text-[10px] text-gray-400 mt-1 font-semibold">{{ stats.acceptedCount }} orçamentos convertidos</p>
+            <p class="hidden md:block text-[10px] text-gray-400 mt-1 font-semibold truncate">{{ stats.acceptedCount }} orçamentos convertidos</p>
           </div>
         </div>
 
         <!-- Conversão Geral -->
-        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-col justify-between">
-          <div class="flex justify-between items-start mb-4">
-            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
-              <TrendingUp class="w-6 h-6" />
+        <div class="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-col justify-between">
+          <div class="flex justify-between items-start mb-3 md:mb-4">
+            <div class="w-8 h-8 md:w-12 md:h-12 bg-blue-50 text-blue-600 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
+              <TrendingUp class="w-4 h-4 md:w-6 md:h-6" />
             </div>
-            <span class="text-[9px] font-black text-blue-500 uppercase tracking-widest bg-blue-50 px-2.5 py-1 rounded-lg">Sucesso</span>
+            <span class="hidden md:inline-block text-[9px] font-black text-blue-500 uppercase tracking-widest bg-blue-50 px-2.5 py-1 rounded-lg">Sucesso</span>
           </div>
           <div>
-            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Taxa de Conversão</p>
-            <h3 class="text-3xl font-black text-gray-900 tracking-tight">
+            <p class="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 truncate">Conversão</p>
+            <h3 class="text-xl md:text-3xl font-black text-gray-900 tracking-tight">
               {{ Math.round(stats.approvalRate ?? 0) }}%
             </h3>
-            <p class="text-[10px] text-gray-400 mt-1 font-semibold">{{ stats.proposalsCount }} orçamentos totais gerados</p>
+            <p class="hidden md:block text-[10px] text-gray-400 mt-1 font-semibold truncate">{{ stats.proposalsCount }} orçamentos totais</p>
           </div>
         </div>
 
         <!-- TMA (Tempo Médio de Atendimento/Fechamento) -->
-        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-col justify-between">
-          <div class="flex justify-between items-start mb-4">
-            <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
-              <Clock class="w-6 h-6" />
+        <div class="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-col justify-between">
+          <div class="flex justify-between items-start mb-3 md:mb-4">
+            <div class="w-8 h-8 md:w-12 md:h-12 bg-purple-50 text-purple-600 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
+              <Clock class="w-4 h-4 md:w-6 md:h-6" />
             </div>
-            <span class="text-[9px] font-black text-purple-500 uppercase tracking-widest bg-purple-50 px-2.5 py-1 rounded-lg">Agilidade</span>
+            <span class="hidden md:inline-block text-[9px] font-black text-purple-500 uppercase tracking-widest bg-purple-50 px-2.5 py-1 rounded-lg">Agilidade</span>
           </div>
           <div>
-            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">TMA (Média de Fechamento)</p>
-            <h3 class="text-3xl font-black text-gray-900 tracking-tight">
+            <p class="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 truncate">TMA</p>
+            <h3 class="text-xl md:text-3xl font-black text-gray-900 tracking-tight">
               {{ stats.tmaHours > 24 ? `${Math.round(stats.tmaHours / 24)}d` : `${Math.round(stats.tmaHours || 0)}h` }}
             </h3>
-            <p class="text-[10px] text-gray-400 mt-1 font-semibold">desde o envio até o aceite</p>
+            <p class="hidden md:block text-[10px] text-gray-400 mt-1 font-semibold truncate">tempo médio p/ aceite</p>
           </div>
         </div>
 
         <!-- SLA Comercial (Fechados em < 48h) -->
-        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-col justify-between">
-          <div class="flex justify-between items-start mb-4">
-            <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-colors">
-              <ShieldCheck class="w-6 h-6" />
+        <div class="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-col justify-between">
+          <div class="flex justify-between items-start mb-3 md:mb-4">
+            <div class="w-8 h-8 md:w-12 md:h-12 bg-orange-50 text-orange-600 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-colors">
+              <ShieldCheck class="w-4 h-4 md:w-6 md:h-6" />
             </div>
-            <span class="text-[9px] font-black text-orange-500 uppercase tracking-widest bg-orange-50 px-2.5 py-1 rounded-lg">Meta</span>
+            <span class="hidden md:inline-block text-[9px] font-black text-orange-500 uppercase tracking-widest bg-orange-50 px-2.5 py-1 rounded-lg">Meta</span>
           </div>
           <div>
-            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">SLA Comercial (48h)</p>
-            <h3 class="text-3xl font-black text-gray-900 tracking-tight">
+            <p class="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 truncate">SLA 48h</p>
+            <h3 class="text-xl md:text-3xl font-black text-gray-900 tracking-tight">
               {{ Math.round(stats.slaRate ?? 0) }}%
             </h3>
-            <p class="text-[10px] text-gray-400 mt-1 font-semibold">orçamentos fechados na meta</p>
+            <p class="hidden md:block text-[10px] text-gray-400 mt-1 font-semibold truncate">fechados na meta</p>
           </div>
         </div>
 
@@ -416,7 +416,7 @@ function formatRelativeTime(minutesAgo: number) {
                   target="_blank"
                   class="flex-1 flex items-center justify-center gap-1.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
                 >
-                  <MessageSquare class="w-3.5 h-3.5" /> Chamar WhatsApp
+                  <img :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5" alt="WhatsApp" /> Chamar WhatsApp
                 </a>
                 <NuxtLink 
                   to="/orcamentos"

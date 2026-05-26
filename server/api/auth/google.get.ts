@@ -16,8 +16,12 @@ export default defineOAuthGoogleEventHandler({
       avatar: user.picture
     }
 
-    // Vincular/Criar perfil no MongoDB
+    // Vincular/Criar perfil no MongoDB e atualizar lastLoginAt
     const profile = await ProfileService.createForUser(userData)
+    if (profile) {
+      profile.lastLoginAt = new Date()
+      await profile.save()
+    }
 
     await setUserSession(event, {
       user: {

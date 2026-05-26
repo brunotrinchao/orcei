@@ -109,6 +109,22 @@ export const sendBackupEmail = async (userEmail: string, userName: string, uploa
     const { appName, appLogo, appUrl, resendTestTo, templates } = getEmailConfig()
     const recipient = resendTestTo || userEmail
 
+    const formattedDate = new Date(uploadResult.created_at).toLocaleString('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).replace(',', ' às');
+
+      let formattedSize = '';
+      if (uploadResult.size < 1024 * 1024) {
+        formattedSize = `${(uploadResult.size / 1024).toFixed(1)} KB`;
+      } else {
+        formattedSize = `${(uploadResult.size / (1024 * 1024)).toFixed(2)} MB`;
+      }
+
     const { data, error } = await resend.emails.send({
       from: `${appName} <contato@orceifacil.com.br>`,
       to: recipient,
@@ -121,8 +137,8 @@ export const sendBackupEmail = async (userEmail: string, userName: string, uploa
           appLogo,
           appUrl,
           backupUrl: uploadResult.url,
-          backupSize: uploadResult.size,
-          backupDate: uploadResult.created_at,
+          backupSize: formattedSize,
+          backupDate: formattedDate,
         }
       },
     })

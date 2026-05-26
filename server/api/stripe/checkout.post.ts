@@ -49,9 +49,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const stripe = useStripe()
-  
   try {
+    const stripe = useStripe()
+    
     const sessionParams: any = {
       customer: profile.stripeCustomerId || undefined,
       customer_email: profile.stripeCustomerId ? undefined : profile.email,
@@ -82,9 +82,12 @@ export default defineEventHandler(async (event) => {
     return { url: checkoutSession.url }
   } catch (error: any) {
     console.error('Stripe Checkout Error:', error)
+    const isMissingKey = error.message?.includes('Stripe API Key is missing') || error.message?.includes('STRIPE_SECRET_KEY')
     throw createError({
-      statusCode: 500,
-      statusMessage: error.message || 'Internal Server Error'
+      statusCode: isMissingKey ? 422 : 500,
+      statusMessage: isMissingKey
+        ? 'A integração com o gateway de pagamentos não está ativa neste ambiente. Configure a STRIPE_SECRET_KEY no .env'
+        : (error.message || 'Internal Server Error')
     })
   }
 })

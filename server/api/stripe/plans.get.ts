@@ -2,9 +2,9 @@ import { useStripe } from '../../utils/stripe'
 import { SubscriptionPlan } from '../../../types/enums'
 
 export default defineEventHandler(async (event) => {
-  const stripe = useStripe()
-  
   try {
+    const stripe = useStripe()
+    
     // Fetch active prices (both recurring and one-time) and expand the associated product
     const prices = await stripe.prices.list({
       active: true,
@@ -119,10 +119,7 @@ export default defineEventHandler(async (event) => {
       return aCredits - bCredits
     })
   } catch (error: any) {
-    console.error('Stripe Plans Error:', error)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Erro ao buscar planos do Stripe'
-    })
+    console.error('Stripe Plans Error (falling back to local default packs):', error.message || error)
+    return []
   }
 })

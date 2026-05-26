@@ -9,20 +9,31 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, statusMessage: 'Acesso negado' })
   }
 
-  const stripe = useStripe()
   const config = useRuntimeConfig()
-
+ 
   try {
     console.log('[Admin Stats] Iniciando busca de métricas...')
     
-    // 1. Métricas do Stripe
-    const thirtyDaysAgo = Math.floor(Date.now() / 1000) - (30 * 24 * 60 * 60)
-    console.log('[Admin Stats] Buscando dados do Stripe...')
-    const [invoices, activeSubscriptions] = await Promise.all([
-      stripe.invoices.list({ created: { gte: thirtyDaysAgo }, limit: 100 }),
-      stripe.subscriptions.list({ status: 'active', limit: 100 })
-    ])
-    console.log(`[Admin Stats] Stripe ok: ${invoices.data.length} faturas, ${activeSubscriptions.data.length} assinaturas`)
+    // 1. Métricas do Stripe (Com tratamento de falha/ausência de chaves de API!)
+    let invoices = { data: [] } as any
+    let activeSubscriptions = { data: [] } as any
+    let hasStripe = false
+
+    try {
+      const stripe = useStripe()
+      const thirtyDaysAgo = Math.floor(Date.now() / 1000) - (30 * 24 * 60 * 60)
+      console.log('[Admin Stats] Buscando dados do Stripe...')
+      const [fetchedInvoices, fetchedSubs] = await Promise.all([
+        stripe.invoices.list({ created: { gte: thirtyDaysAgo }, limit: 100 }),
+        stripe.subscriptions.list({ status: 'active', limit: 100 })
+      ])
+      invoices = fetchedInvoices
+      activeSubscriptions = fetchedSubs
+      hasStripe = true
+      console.log(`[Admin Stats] Stripe ok: ${invoices.data.length} faturas, ${activeSubscriptions.data.length} assinaturas`)
+    } catch (stripeErr: any) {
+      console.warn('[Admin Stats] O gateway de pagamentos Stripe não está ativo ou configurado neste ambiente:', stripeErr.message || stripeErr)
+    }
 
     const revenueBreakdown = {
       annual: 0,

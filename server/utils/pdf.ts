@@ -1,5 +1,4 @@
 import { processVariables } from './variables'
-import puppeteer from 'puppeteer'
 import sanitizeHtml from 'sanitize-html'
 
 const sanitizeOptions = {
@@ -31,7 +30,25 @@ const sanitizeOptions = {
 
 export async function generateProposalPdfBuffer(proposal: any, profile: any, appName: string = 'ORCEI') {
   const htmlContent = generateProposalHtml(proposal, profile, appName)
-  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] })
+  
+  let browser
+  const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL
+  
+  if (isProd) {
+    const puppeteerCore = await import('puppeteer-core').then(m => m.default || m)
+    const chromium = await import('@sparticuz/chromium').then(m => m.default || m)
+    
+    browser = await puppeteerCore.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    })
+  } else {
+    const puppeteer = await import('puppeteer').then(m => m.default || m)
+    browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] })
+  }
+
   const page = await browser.newPage()
   await page.setContent(htmlContent)
   const pdf = await page.pdf({ format: 'A4', printBackground: true })

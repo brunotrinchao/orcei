@@ -9,7 +9,15 @@ import { ProposalService } from '../../services/ProposalService'
 import { GoogleService } from '../../services/GoogleService'
 import { generateProposalPdfBuffer } from '../../utils/pdf'
 import { jsonToCsv } from '../../utils/csv'
-import { sendBackupEmail, sendProposalEmail } from '../../utils/email'
+import { 
+  sendBackupEmail, 
+  sendProposalEmail,
+  sendWelcomeEmail,
+  sendCreditPurchaseEmail,
+  sendPlanActivationEmail,
+  sendPlanCancellationEmail
+} from '../../utils/email'
+import { uploadToCloudinary } from '../../utils/cloudinary'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -69,6 +77,22 @@ export default defineEventHandler(async (event) => {
         await handleSendEmailProposal(body)
         break
 
+      case 'SEND_EMAIL_WELCOME':
+        await handleSendEmailWelcome(body)
+        break
+
+      case 'SEND_EMAIL_BUY_CREDIT':
+        await handleSendEmailBuyCredit(body)
+        break
+
+      case 'SEND_EMAIL_PLAN_ACTIVATION':
+        await handleSendEmailPlanActivation(body)
+        break
+
+      case 'SEND_EMAIL_PLAN_CANCELLATION':
+        await handleSendEmailPlanCancellation(body)
+        break
+
       case 'REGISTER_AUDIT_LOG':
         await handleRegisterAuditLog(body)
         break
@@ -117,12 +141,25 @@ async function handleGenerateBackupCsv(payload: any) {
   zip.file('catalogo.csv', jsonToCsv(catalog))
 
   const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' })
+
+  try {
+    console.log(`[Job] Iniciando upload do ZIP para o Cloudinary...`)
+    
+    const uploadResult = await uploadToCloudinary(zipBuffer, {
+      targetFolder: 'backups',
+      resourceType: 'raw', // Essencial para o ZIP não quebrar
+      publicId: `backup-${profileId}-${Date.now()}.zip`
+    })
+
+    console.log(`[Job] Backup salvo no Cloudinary com sucesso! URL: ${uploadResult.url}`)
+  } catch (cloudinaryError) {
+    console.error(`[Job][Erro] Falha ao enviar ZIP para o Cloudinary:`, cloudinaryError)
+  }
   
-  await sendBackupEmail(profile.email, profile.name, zipBuffer)
+  await sendBackupEmail(profile.email, profile.name, uploadResult.url)
   
   console.log(`[Job] Backup CSV enviado para e-mail: ${profile.email}`)
 }
-
 async function handleProposalAccepted(payload: any) {
   const { proposalId } = payload
 
@@ -160,7 +197,7 @@ async function handleProposalAccepted(payload: any) {
 
 async function handleSendEmailProposal(payload: any) {
   const { clientEmail, clientName, url, profileName, proposalId } = payload
-  console.log(`[Job] Enviando e-mail para: ${clientEmail}`)
+  console.log(`[Job] Enviando e-mail de proposta para: ${clientEmail}`)
   
   const emailRes = await sendProposalEmail(clientEmail, clientName, url, profileName)
 
@@ -168,4 +205,28 @@ async function handleSendEmailProposal(payload: any) {
     await Proposal.findByIdAndUpdate(proposalId, { lastEmailId: emailRes.id })
     console.log(`[Job] Proposta ${proposalId} atualizada com emailId: ${emailRes.id}`)
   }
+}
+
+async function handleSendEmailWelcome(payload: any) {
+  const { userEmail, userName } = payload
+  console.log(`[Job] Enviando e-mail de boas-vindas para: ${userEmail}`)
+  await sendWelcomeEmail(userEmail, userName)
+}
+
+async function handleSendEmailBuyCredit(payload: any) {
+  const { userEmail, userName, creditsAdded, newBalance, amountPaid } = payload
+  console.log(`[Job] Enviando e-mail de compra de créditos para: ${userEmail}`)
+  await sendCreditPurchaseEmail(userEmail, userName, creditsAdded, newBalance, amountPaid)
+}
+
+async function handleSendEmailPlanActivation(payload: any) {
+  const { userEmail, userName, planName, credits, planPrice, billingCycle } = payload
+  console.log(`[Job] Enviando e-mail de ativação de plano para: ${userEmail}`)
+  await sendPlanActivationEmail(userEmail, userName, planName, credits, planPrice, billingCycle)
+}
+
+async function handleSendEmailPlanCancellation(payload: any) {
+  const { userEmail, userName, planName, cancellationDate, effectiveEndDate } = payload
+  console.log(`[Job] Enviando e-mail de cancelamento de plano para: ${userEmail}`)
+  await sendPlanCancellationEmail(userEmail, userName, planName, cancellationDate, effectiveEndDate)
 }

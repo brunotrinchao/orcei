@@ -1,6 +1,6 @@
 import { Profile } from '../../models/Profile'
 import { StripeEvent } from '../../models/StripeEvent'
-import { sendPlanActivationEmail, sendCreditPurchaseEmail, sendPlanCancellationEmail } from '../../utils/email'
+import { QueueService } from '../../services/QueueService'
 
 export default defineEventHandler(async (event) => {
   setResponseStatus(event, 200)
@@ -92,7 +92,14 @@ export default defineEventHandler(async (event) => {
           if (updated?.email) {
             const amount = session.amount_total ? (session.amount_total / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00'
             const billingCycle = (priceId === config.public.stripePriceAnnual) ? 'Anual' : 'Mensal'
-            await sendPlanActivationEmail(updated.email, updated.name, plan, credits, amount, billingCycle)
+            await QueueService.publish('SEND_EMAIL_PLAN_ACTIVATION', {
+              userEmail: updated.email,
+              userName: updated.name,
+              planName: plan,
+              credits,
+              planPrice: amount,
+              billingCycle
+            })
           }
         }
       } else if (type === 'credits' && session.mode === 'payment') {
@@ -148,7 +155,13 @@ export default defineEventHandler(async (event) => {
 
         if (updated?.email) {
           const amount = session.amount_total ? (session.amount_total / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00'
-          await sendCreditPurchaseEmail(updated.email, updated.name, creditsToAdd, updated.creditsBalance, amount)
+          await QueueService.publish('SEND_EMAIL_BUY_CREDIT', {
+            userEmail: updated.email,
+            userName: updated.name,
+            creditsAdded: creditsToAdd,
+            newBalance: updated.creditsBalance,
+            amountPaid: amount
+          })
         }
       }
     }
@@ -245,7 +258,14 @@ export default defineEventHandler(async (event) => {
           if (updated?.email) {
             const amount = session.amount_paid ? (session.amount_paid / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00'
             const billingCycle = (priceId === config.public.stripePriceAnnual) ? 'Anual' : 'Mensal'
-            await sendPlanActivationEmail(updated.email, updated.name, plan, novoCreditsBalance, amount, billingCycle)
+            await QueueService.publish('SEND_EMAIL_PLAN_ACTIVATION', {
+              userEmail: updated.email,
+              userName: updated.name,
+              planName: plan,
+              credits: novoCreditsBalance,
+              planPrice: amount,
+              billingCycle
+            })
           }
         }
       }
@@ -278,7 +298,13 @@ export default defineEventHandler(async (event) => {
           ? new Date(oldProfile.subscriptionEndsAt).toLocaleDateString('pt-BR')
           : 'Imediato'
           
-        await sendPlanCancellationEmail(updated.email, updated.name, oldProfile?.subscriptionPlan || 'Premium', cancellationDate, effectiveEndDate)
+        await QueueService.publish('SEND_EMAIL_PLAN_CANCELLATION', {
+          userEmail: updated.email,
+          userName: updated.name,
+          planName: oldProfile?.subscriptionPlan || 'Premium',
+          cancellationDate,
+          effectiveEndDate
+        })
       }
     }
 

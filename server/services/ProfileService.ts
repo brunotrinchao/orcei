@@ -1,6 +1,6 @@
 import { Profile } from '../models/Profile'
 import type { UserDTO } from '../../types/user'
-import { sendWelcomeEmail } from '../utils/email'
+import { QueueService } from './QueueService'
 
 export const ProfileService = {
   async createForUser(user: UserDTO) {
@@ -52,9 +52,12 @@ export const ProfileService = {
         subscriptionPlan: 'free'
       })
 
-      // Send Welcome Email
+      // Enfileira o envio do e-mail de Boas-Vindas no QStash para processamento assíncrono
       if (profile.email) {
-        await sendWelcomeEmail(profile.email, profile.name)
+        await QueueService.publish('SEND_EMAIL_WELCOME', {
+          userEmail: profile.email,
+          userName: profile.name
+        })
       }
 
       return profile

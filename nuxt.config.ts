@@ -4,7 +4,9 @@ export default defineNuxtConfig({
   modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@vueuse/nuxt', '@nuxtjs/cloudinary', '@vercel/speed-insights'],
   
   cloudinary: {
-    cloudName: process.env.CLOUDINARY_NAME || process.env.NUXT_CLOUDINARY_CLOUD_NAME
+    cloudName: process.env.CLOUDINARY_NAME || process.env.NUXT_CLOUDINARY_CLOUD_NAME,
+    apiKey: process.env.CLOUDINARY_API_KEY,
+    apiSecret: process.env.CLOUDINARY_API_SECRET,
   },
 
   app: {

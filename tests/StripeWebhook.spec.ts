@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mocking models and global functions via elevated hoisted references to guarantee correct instance testing
-const { mockProfile, mockStripeEvent, mockSubscriptionsRetrieve, mockConstructEvent } = vi.hoisted(() => {
+const { mockProfile, mockStripeEvent, mockSubscriptionsRetrieve, mockConstructEvent, mockQueuePublish } = vi.hoisted(() => {
   const mockProfile = {
     findOneAndUpdate: vi.fn(),
     findOne: vi.fn()
@@ -12,6 +12,7 @@ const { mockProfile, mockStripeEvent, mockSubscriptionsRetrieve, mockConstructEv
   }
   const mockSubscriptionsRetrieve = vi.fn()
   const mockConstructEvent = vi.fn()
+  const mockQueuePublish = vi.fn().mockResolvedValue({ messageId: 'mock-msg-id-123' })
 
   vi.stubGlobal('useStripe', () => ({
     webhooks: {
@@ -26,12 +27,18 @@ const { mockProfile, mockStripeEvent, mockSubscriptionsRetrieve, mockConstructEv
     mockProfile,
     mockStripeEvent,
     mockSubscriptionsRetrieve,
-    mockConstructEvent
+    mockConstructEvent,
+    mockQueuePublish
   }
 })
 
 vi.mock('../server/models/Profile', () => ({ Profile: mockProfile }))
 vi.mock('../server/models/StripeEvent', () => ({ StripeEvent: mockStripeEvent }))
+vi.mock('../server/services/QueueService', () => ({
+  QueueService: {
+    publish: mockQueuePublish
+  }
+}))
 
 // Mock mongoose partially
 vi.mock('mongoose', async (importOriginal) => {
@@ -58,13 +65,6 @@ vi.stubGlobal('createError', (e: any) => {
   return err
 })
 vi.stubGlobal('defineEventHandler', (handler: any) => handler)
-
-// Mocking Emails utils
-vi.mock('../server/utils/email', () => ({
-  sendPlanActivationEmail: vi.fn().mockResolvedValue({}),
-  sendCreditPurchaseEmail: vi.fn().mockResolvedValue({}),
-  sendPlanCancellationEmail: vi.fn().mockResolvedValue({})
-}))
 
 describe('Stripe Webhook Integration', () => {
   let handler: any
@@ -183,6 +183,13 @@ describe('Stripe Webhook Integration', () => {
       }),
       { returnDocument: 'after' }
     )
+    expect(mockQueuePublish).toHaveBeenCalledWith('SEND_EMAIL_PLAN_ACTIVATION', expect.objectContaining({
+      userEmail: 'cliente@orcei.com',
+      userName: 'Cliente Premium',
+      planName: 'premium',
+      credits: 9999,
+      billingCycle: 'Mensal'
+    }))
   })
 
   it('should process single credit purchase completed successfully', async () => {
@@ -225,6 +232,12 @@ describe('Stripe Webhook Integration', () => {
       }),
       { returnDocument: 'after' }
     )
+    expect(mockQueuePublish).toHaveBeenCalledWith('SEND_EMAIL_BUY_CREDIT', expect.objectContaining({
+      userEmail: 'cliente@orcei.com',
+      userName: 'Cliente Avulsos',
+      creditsAdded: 5,
+      newBalance: 15
+    }))
   })
 
   it('should preserve add-on credits during invoice.payment_succeeded (Renewal)', async () => {
@@ -283,6 +296,13 @@ describe('Stripe Webhook Integration', () => {
       }),
       { returnDocument: 'after' }
     )
+    expect(mockQueuePublish).toHaveBeenCalledWith('SEND_EMAIL_PLAN_ACTIVATION', expect.objectContaining({
+      userEmail: 'cliente@orcei.com',
+      userName: 'Cliente Starter',
+      planName: 'starter',
+      credits: 10,
+      billingCycle: 'Mensal'
+    }))
   })
 
   it('should process customer.subscription.deleted successfully and revert to free', async () => {
@@ -326,6 +346,11 @@ describe('Stripe Webhook Integration', () => {
       }),
       { returnDocument: 'after' }
     )
+    expect(mockQueuePublish).toHaveBeenCalledWith('SEND_EMAIL_PLAN_CANCELLATION', expect.objectContaining({
+      userEmail: 'cliente@orcei.com',
+      userName: 'Cliente Ex-Starter',
+      planName: 'starter'
+    }))
   })
 
   it('should log and simulate checkout recovery when checkout.session.expired is received', async () => {

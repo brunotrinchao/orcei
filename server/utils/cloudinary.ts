@@ -30,7 +30,12 @@ export async function uploadToCloudinary(
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(finalOptions, (error, result) => {
         if (error) return reject(error)
-        resolve({ url: result?.secure_url, public_id: result?.public_id })
+        resolve({ 
+          url: result?.secure_url, 
+          public_id: result?.public_id,
+          size: result?.bytes,              // Tamanho em bytes
+          created_at: result?.created_at    // Data de geração enviada pelo Cloudinary (ISO String)
+        })
       })
       Readable.from(file).pipe(uploadStream)
     })
@@ -41,5 +46,7 @@ export async function uploadToCloudinary(
   return {
     url: uploadResponse.secure_url,
     public_id: uploadResponse.public_id,
+    size: uploadResponse.bytes,             // Tamanho em bytes
+    created_at: uploadResponse.created_at
   }
 }

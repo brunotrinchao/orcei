@@ -101,7 +101,7 @@ export const sendWelcomeEmail = async (userEmail: string, userName: string) => {
   }
 }
 
-export const sendBackupEmail = async (userEmail: string, userName: string, zipUrl: string) => {
+export const sendBackupEmail = async (userEmail: string, userName: string, uploadResult: { url: string; public_id: string, size: number, created_at: string }) => {
   const resend = getResend()
   if (!resend) return null
 
@@ -120,7 +120,9 @@ export const sendBackupEmail = async (userEmail: string, userName: string, zipUr
           appName,
           appLogo,
           appUrl,
-          backupUrl: zipUrl,
+          backupUrl: uploadResult.url,
+          backupSize: uploadResult.size,
+          backupDate: uploadResult.created_at,
         }
       },
     })

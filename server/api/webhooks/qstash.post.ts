@@ -142,12 +142,16 @@ async function handleGenerateBackupCsv(payload: any) {
 
   const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' })
 
+  // 1. Declaramos a variável aqui fora com escopo amplo
+  let uploadResult: { url: string; public_id: string } | null = null
+
   try {
     console.log(`[Job] Iniciando upload do ZIP para o Cloudinary...`)
     
-    const uploadResult = await uploadToCloudinary(zipBuffer, {
+    // 2. Atribuímos o resultado sem o "const" para não criar um novo escopo interno
+    uploadResult = await uploadToCloudinary(zipBuffer, {
       targetFolder: 'backups',
-      resourceType: 'raw', // Essencial para o ZIP não quebrar
+      resourceType: 'raw',
       publicId: `backup-${profileId}-${Date.now()}.zip`
     })
 
@@ -156,9 +160,13 @@ async function handleGenerateBackupCsv(payload: any) {
     console.error(`[Job][Erro] Falha ao enviar ZIP para o Cloudinary:`, cloudinaryError)
   }
   
-  await sendBackupEmail(profile.email, profile.name, uploadResult.url)
-  
-  console.log(`[Job] Backup CSV enviado para e-mail: ${profile.email}`)
+  // 3. Só envia o e-mail se o upload de fato deu certo e temos a URL
+  if (uploadResult && uploadResult.url) {
+    await sendBackupEmail(profile.email, profile.name, uploadResult.url)
+    console.log(`[Job] Backup CSV enviado para e-mail: ${profile.email}`)
+  } else {
+    console.error(`[Job][Abortado] E-mail de backup não enviado pois o upload falhou.`)
+  }
 }
 async function handleProposalAccepted(payload: any) {
   const { proposalId } = payload

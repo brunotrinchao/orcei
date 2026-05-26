@@ -203,39 +203,28 @@ export const ProposalService = {
       const updatedProfile = await Profile.findOneAndUpdate(
         {
           _id: profileId,
-          $or: [
-            // Usuários Pro/Premium com plano ativo passam livremente
-            { subscriptionPlan: { $ne: 'free' }, subscriptionStatus: { $in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING] } },
-            // Usuários Free só passam se o uso acumulado for estritamente menor que o saldo contratado
-            { $expr: { $lt: ['$creditsUsed', '$creditsBalance'] } }
-          ]
+          creditsBalance: { $gte: 1 }
         },
-        { $inc: { creditsUsed: 1 } },
+        { $inc: { creditsBalance: -1, creditsUsed: 1 } },
         { new: true, session }
       )
 
       if (!updatedProfile) {
         throw createError({
-          statusCode: 403,
-          statusMessage: 'Créditos insuficientes. Faça um upgrade do seu plano.'
+          statusCode: 402,
+          statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para continuar.'
         })
       }
     } else {
-      // Fallback para ambiente de testes unitários onde Mongoose está mockado de forma leve
+      // Fallback para ambiente de testes unitários
       const profile = await Profile.findById(profileId)
-      if (profile) {
-        const hasActiveSubscription =
-          profile.subscriptionPlan !== 'free' &&
-          (profile.subscriptionStatus === SubscriptionStatus.ACTIVE || profile.subscriptionStatus === SubscriptionStatus.TRIALING)
-
-        if (!hasActiveSubscription && profile.creditsUsed >= profile.creditsBalance) {
-          throw createError({
-            statusCode: 403,
-            statusMessage: 'Créditos insuficientes. Faça um upgrade do seu plano.'
-          })
-        }
+      if (!profile || profile.creditsBalance < 1) {
+        throw createError({
+          statusCode: 402,
+          statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para continuar.'
+        })
       }
-      await Profile.findByIdAndUpdate(profileId, { $inc: { creditsUsed: 1 } })
+      await Profile.findByIdAndUpdate(profileId, { $inc: { creditsBalance: -1, creditsUsed: 1 } })
     }
   },
 

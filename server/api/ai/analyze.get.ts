@@ -15,22 +15,18 @@ export default defineEventHandler(async (event) => {
   const profile = await ProfileService.getByUserId((session.user as any).id)
   if (!profile) throw createError({ statusCode: 404 })
 
-  // Daily Limit Check for non-admins (1 report per day)
-  if ((session.user as any).role !== 'admin') {
-    const startOfToday = new Date()
-    startOfToday.setHours(0, 0, 0, 0)
-    
-    const reportCount = await Report.countDocuments({
-      profileId: profile._id,
-      createdAt: { $gte: startOfToday }
+  // Verificação de saldo de créditos para IA (Relatório Analítico)
+  if (profile.creditsBalance < 1 && (session.user as any).role !== 'admin') {
+    throw createError({
+      statusCode: 402,
+      statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para gerar relatórios com IA.'
     })
+  }
 
-    if (reportCount >= 1) {
-      throw createError({
-        statusCode: 429,
-        statusMessage: 'Limite atingido: Você só pode gerar 1 relatório estratégico por dia.'
-      })
-    }
+  // Dedução de 1 crédito de IA
+  if ((session.user as any).role !== 'admin') {
+    profile.creditsBalance = Math.max(0, profile.creditsBalance - 1)
+    await profile.save()
   }
 
   const { start, end } = getQuery(event)

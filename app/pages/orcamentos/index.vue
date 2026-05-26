@@ -49,6 +49,9 @@ const isAIWizardOpen = ref(false)
 const isPreviewOpen = ref(false)
 const isHistoryOpen = ref(false)
 const isChatOpen = ref(false)
+const isPaywallOpen = ref(false)
+const paywallReason = ref('')
+
 
 // Pusher Integration
 let notificationChannel: any = null
@@ -218,11 +221,17 @@ async function handleProposalSubmit(formData: Partial<ProposalDTO>) {
       notify('Sucesso', 'Orçamento processado com sucesso!')
     }
   } catch (e: any) {
-    const html = parseApiErrors(e)
-    notify(html ? 'Dados inválidos' : 'Erro', html ?? (e.data?.statusMessage || 'Erro ao processar orçamento'))
+    if (e.statusCode === 402) {
+      paywallReason.value = 'criar e enviar orçamentos'
+      isPaywallOpen.value = true
+    } else {
+      const html = parseApiErrors(e)
+      notify(html ? 'Dados inválidos' : 'Erro', html ?? (e.data?.statusMessage || 'Erro ao processar orçamento'))
+    }
   } finally {
     isSubmitting.value = false
   }
+
 }
 
 const statusMap: any = {
@@ -737,5 +746,11 @@ const formatTime = (date: any) => {
       :proposal="selectedProposal"
       @refresh="refresh"
     />
+    <!-- Modal de Paywall Express -->
+    <PaywallExpressModal 
+      v-model:open="isPaywallOpen" 
+      :reason="paywallReason" 
+    />
+
   </div>
 </template>

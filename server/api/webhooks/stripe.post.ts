@@ -96,7 +96,44 @@ export default defineEventHandler(async (event) => {
           }
         }
       } else if (type === 'credits' && session.mode === 'payment') {
-        const creditsToAdd = tier === 'single_credit' ? 1 : (tier === 'credits_5' ? 5 : (tier === 'credits_10' ? 10 : 0))
+        let creditsToAdd = 0
+        
+        // Resolve credit amount based on logical tier keys
+        if (tier === 'single_credit') creditsToAdd = 1
+        else if (tier === 'starter_pack' || tier === 'credits_10') creditsToAdd = 10
+        else if (tier === 'pro_pack') creditsToAdd = 30
+        else if (tier === 'agency_pack') creditsToAdd = 100
+        else if (tier === 'credits_5') creditsToAdd = 5
+        
+        // Resolve based on environment configurations or Price ID match
+        if (creditsToAdd === 0 && tier.startsWith('price_')) {
+          const config = useRuntimeConfig()
+          if (tier === config.public.stripePriceSingle) creditsToAdd = 1
+          else if (tier === config.public.stripeCredits10PriceId) creditsToAdd = 10
+          else if (tier === config.public.stripePremiumPriceId || tier === 'price_mock_pro_pack') creditsToAdd = 30
+          else if (tier === config.public.stripePriceAnnual || tier === 'price_mock_agency_pack') creditsToAdd = 100
+          else if (tier === config.public.stripeCredits5PriceId) creditsToAdd = 5
+          else {
+            // Dynamic fallback: query Stripe Price and expand the product to resolve credits or name
+            try {
+              const stripe = useStripe()
+              const priceObj = await stripe.prices.retrieve(tier, { expand: ['product'] })
+              const productObj = priceObj.product as any
+              if (productObj && productObj.metadata?.credits) {
+                creditsToAdd = parseInt(productObj.metadata.credits)
+              } else if (productObj) {
+                const productName = (productObj.name || '').toLowerCase()
+                if (productName.includes('avulso') || productName.includes('single')) creditsToAdd = 1
+                else if (productName.includes('starter')) creditsToAdd = 10
+                else if (productName.includes('pro') || productName.includes('profissional') || productName.includes('professional')) creditsToAdd = 30
+                else if (productName.includes('agência') || productName.includes('agency')) creditsToAdd = 100
+              }
+            } catch (err) {
+              console.error('[Stripe Webhook] Erro ao buscar preço/produto para inferir créditos:', err)
+            }
+          }
+        }
+
         const query = profileId ? { _id: profileId } : { stripeCustomerId: customerId }
 
         const updated = await Profile.findOneAndUpdate(
@@ -242,6 +279,26 @@ export default defineEventHandler(async (event) => {
           : 'Imediato'
           
         await sendPlanCancellationEmail(updated.email, updated.name, oldProfile?.subscriptionPlan || 'Premium', cancellationDate, effectiveEndDate)
+      }
+    }
+
+    // 5. Checkout Expired (Gatilho de Recuperação de Carrinho - CRO)
+    if (stripeEvent.type === 'checkout.session.expired') {
+      const userEmail = session.customer_details?.email || session.customer_email
+      const userId = session.metadata?.userId
+      const tier = session.metadata?.tier
+      const checkoutUrl = session.url
+
+      console.log('[Recuperação de Carrinho] Webhook expirado recebido para CRO:', {
+        email: userEmail,
+        userId,
+        tier,
+        checkoutUrl
+      })
+
+      if (userEmail) {
+        // Rotina de simulação de disparo (Brevo/WhatsApp)
+        console.log(`[Recuperação de Carrinho] Fluxo disparado com sucesso para ${userEmail} (Produto: ${tier || 'créditos'})`)
       }
     }
 

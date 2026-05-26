@@ -327,4 +327,40 @@ describe('Stripe Webhook Integration', () => {
       { returnDocument: 'after' }
     )
   })
+
+  it('should log and simulate checkout recovery when checkout.session.expired is received', async () => {
+    const event = { node: { req: {}, res: {} } } as any
+    const { getHeader, readRawBody } = (global as any)
+    vi.mocked(getHeader).mockReturnValue('valid_sig')
+    vi.mocked(readRawBody).mockResolvedValue(Buffer.from('{}'))
+
+    mockConstructEvent.mockReturnValue({
+      id: 'evt_expired123',
+      type: 'checkout.session.expired',
+      data: {
+        object: {
+          customer_email: 'cliente_abandonado@orcei.com',
+          url: 'https://checkout.stripe.com/pay/cs_test_123',
+          metadata: {
+            userId: 'usr_abandoned123',
+            tier: 'starter_pack'
+          }
+        }
+      }
+    })
+
+    mockStripeEvent.create.mockResolvedValue({} as any)
+
+    const spyLog = vi.spyOn(console, 'log')
+    const result = await handler(event)
+
+    expect(result).toEqual({ received: true })
+    expect(spyLog).toHaveBeenCalledWith(
+      expect.stringContaining('[Recuperação de Carrinho] Webhook expirado recebido para CRO'),
+      expect.any(Object)
+    )
+    expect(spyLog).toHaveBeenCalledWith(
+      expect.stringContaining('Fluxo disparado com sucesso para cliente_abandonado@orcei.com')
+    )
+  })
 })

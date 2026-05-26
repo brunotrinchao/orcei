@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { Sparkles, Loader2, ArrowUpRight, CheckCircle2, Clock, DollarSign, TrendingUp, BarChart3, Users, FileText } from 'lucide-vue-next'
+import { 
+  Sparkles, Loader2, ArrowUpRight, CheckCircle2, Clock, DollarSign, 
+  TrendingUp, BarChart3, Users, FileText, ChevronRight, Activity, 
+  Calendar, Award, Zap, ShieldCheck, Share2, MessageSquare, AlertCircle 
+} from 'lucide-vue-next'
 import { Line, Doughnut } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement, ArcElement } from 'chart.js'
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement, ArcElement)
 
 const period = ref('last_30_days')
-const { loggedIn } = useUserSession()
+const { loggedIn, user } = useUserSession()
 const { notify } = useAlerts()
 
 const fetchQuery = computed(() => {
@@ -31,7 +35,7 @@ const { data: stats, refresh, status } = useLazyFetch<any>('/api/dashboard/stats
   watch: [period]
 })
 
-// Status Distribution Chart
+// Status Distribution Chart (Safira Theme)
 const statusChartData = computed(() => {
   if (!stats.value?.statusDistribution) return { labels: [], datasets: [] }
   
@@ -42,13 +46,14 @@ const statusChartData = computed(() => {
     labels,
     datasets: [{
       data,
-      backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#6B7280'],
-      borderWidth: 0
+      backgroundColor: ['#6366F1', '#10B981', '#3B82F6', '#EF4444', '#6B7280'],
+      borderWidth: 0,
+      hoverOffset: 4
     }]
   }
 })
 
-// Revenue Evolution Chart
+// Revenue Evolution Chart (Gradient Sapphire Area)
 const revenueChartData = computed(() => {
   if (!stats.value?.revenueHistory) return { labels: [], datasets: [] }
 
@@ -62,8 +67,9 @@ const revenueChartData = computed(() => {
       fill: true,
       tension: 0.4,
       pointRadius: 4,
-      pointBackgroundColor: '#fff',
+      pointBackgroundColor: '#3B82F6',
       pointBorderWidth: 2,
+      pointBorderColor: '#ffffff'
     }]
   }
 })
@@ -76,7 +82,8 @@ const chartOptions = {
       position: 'bottom' as const,
       labels: {
         usePointStyle: true,
-        font: { weight: 'bold' as const, size: 10 }
+        font: { weight: 'bold' as const, size: 10 },
+        color: '#4B5563'
       }
     }
   }
@@ -84,201 +91,467 @@ const chartOptions = {
 
 const aiReport = ref<string | null>(null)
 const isAnalyzing = ref(false)
+const isPaywallOpen = ref(false)
+const paywallReason = ref('')
 
 async function generateAIReport() {
   isAnalyzing.value = true
   try {
     const data: any = await $fetch('/api/ai/analyze')
     aiReport.value = data.text
+    refresh()
   } catch (e: any) {
-    if (e.statusCode === 429) {
+    if (e.statusCode === 402) {
+      paywallReason.value = 'gerar relatório estratégico de IA'
+      isPaywallOpen.value = true
+    } else if (e.statusCode === 429) {
       notify('Limite Atingido', e.statusMessage || 'Você já gerou um relatório hoje. Tente novamente amanhã.')
     } else {
-      notify('Erro', 'Erro ao gerar relatório estratégico')
+      notify('Erro', e.data?.statusMessage || 'Erro ao gerar relatório estratégico')
     }
   } finally {
     isAnalyzing.value = false
   }
 }
+
+
+// Auxiliar de formato de data relativa
+function formatRelativeTime(minutesAgo: number) {
+  if (minutesAgo < 60) return `há ${minutesAgo} min`
+  const hours = Math.floor(minutesAgo / 60)
+  if (hours < 24) return `há ${hours}h`
+  return `há ${Math.floor(hours / 24)} dias`
+}
 </script>
 
 <template>
-  <div class="space-y-12 relative">
-    <!-- Filtros de Período -->
-    <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-      <button 
-        v-for="p in [
-          { label: 'Últimos 7 dias', value: 'last_7_days' },
-          { label: 'Últimos 30 dias', value: 'last_30_days' },
-          { label: 'Últimos 90 dias', value: 'last_90_days' },
-          { label: 'Este Ano', value: 'year' },
-          { label: 'Todo Período', value: 'all' }
-        ]" 
-        :key="p.value"
-        @click="period = p.value"
-        :class="period === p.value ? 'bg-gray-900 text-white shadow-lg' : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-100'"
-        class="px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap"
-      >
-        {{ p.label }}
-      </button>
+  <div class="space-y-10 relative">
+    
+    <!-- Filtros de Período e Título -->
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+      <div>
+        <h1 class="text-3xl font-black text-gray-900 tracking-tight uppercase">Cockpit Comercial</h1>
+        <p class="text-gray-500 font-medium">Acompanhe suas conversões, produtividade IA e receitas acumuladas.</p>
+      </div>
+
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide bg-gray-100/80 p-1.5 rounded-3xl border border-gray-200/50">
+        <button 
+          v-for="p in [
+            { label: '7D', value: 'last_7_days' },
+            { label: '30D', value: 'last_30_days' },
+            { label: '90D', value: 'last_90_days' },
+            { label: 'Este Ano', value: 'year' },
+            { label: 'Total', value: 'all' }
+          ]" 
+          :key="p.value"
+          @click="period = p.value"
+          :class="period === p.value ? 'bg-white text-blue-600 shadow-sm font-black' : 'text-gray-500 hover:text-gray-900 font-bold'"
+          class="px-5 py-2 rounded-2xl text-[10px] uppercase tracking-widest transition-all whitespace-nowrap"
+        >
+          {{ p.label }}
+        </button>
+      </div>
+    </header>
+
+    <!-- Loading State Geral -->
+    <div v-if="status === 'pending' && !stats" class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div v-for="i in 4" :key="i" class="h-36 bg-gray-100 animate-pulse rounded-[2.5rem]"></div>
     </div>
 
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div v-for="i in 4" :key="i" v-if="status === 'pending' && !stats" class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-4">
-        <div class="flex justify-between items-start">
-          <BaseSkeleton width="3rem" height="3rem" borderRadius="1rem" />
-          <BaseSkeleton width="3rem" height="1.5rem" />
-        </div>
-        <BaseSkeleton width="60%" height="0.75rem" />
-        <BaseSkeleton width="40%" height="2rem" />
-      </div>
-
-      <template v-else>
-        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group">
-          <div class="flex justify-between items-start mb-6">
-            <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 transition-colors">
-              <FileText class="w-6 h-6 text-blue-600 group-hover:text-white transition-colors" />
+    <template v-else-if="stats">
+      
+      <!-- Seção Principal de Métricas Claves -->
+      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- Receita Confirmada -->
+        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-col justify-between">
+          <div class="flex justify-between items-start mb-4">
+            <div class="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-colors">
+              <DollarSign class="w-6 h-6" />
             </div>
-            <span class="text-[10px] font-black text-green-500 uppercase tracking-widest bg-green-50 px-2 py-1 rounded-lg">+12%</span>
+            <span class="text-[9px] font-black text-green-500 uppercase tracking-widest bg-green-50 px-2.5 py-1 rounded-lg">Faturado</span>
           </div>
-          <p class="text-xs font-black text-gray-600 uppercase tracking-widest mb-1">Total Orçamentos</p>
-          <h3 class="text-3xl font-black text-gray-900">{{ stats?.proposalsCount ?? 0 }}</h3>
+          <div>
+            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Faturamento Aceito</p>
+            <h3 class="text-3xl font-black text-gray-900 tracking-tight">
+              R$ {{ (stats.totalRevenue ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+            </h3>
+            <p class="text-[10px] text-gray-400 mt-1 font-semibold">{{ stats.acceptedCount }} orçamentos convertidos</p>
+          </div>
         </div>
 
-        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group">
-          <div class="flex justify-between items-start mb-6">
-            <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center group-hover:bg-green-600 transition-colors">
-              <DollarSign class="w-6 h-6 text-green-600 group-hover:text-white transition-colors" />
+        <!-- Conversão Geral -->
+        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-col justify-between">
+          <div class="flex justify-between items-start mb-4">
+            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
+              <TrendingUp class="w-6 h-6" />
             </div>
-            <span class="text-[10px] font-black text-green-500 uppercase tracking-widest bg-green-50 px-2 py-1 rounded-lg">+R$ 2.4k</span>
+            <span class="text-[9px] font-black text-blue-500 uppercase tracking-widest bg-blue-50 px-2.5 py-1 rounded-lg">Sucesso</span>
           </div>
-          <p class="text-xs font-black text-gray-600 uppercase tracking-widest mb-1">Receita Confirmada</p>
-          <h3 class="text-3xl font-black text-gray-900">R$ {{ (stats?.totalRevenue as number)?.toLocaleString('pt-BR') ?? '0,00' }}</h3>
+          <div>
+            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Taxa de Conversão</p>
+            <h3 class="text-3xl font-black text-gray-900 tracking-tight">
+              {{ Math.round(stats.approvalRate ?? 0) }}%
+            </h3>
+            <p class="text-[10px] text-gray-400 mt-1 font-semibold">{{ stats.proposalsCount }} orçamentos totais gerados</p>
+          </div>
         </div>
 
-        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group">
-          <div class="flex justify-between items-start mb-6">
-            <div class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center group-hover:bg-purple-600 transition-colors">
-              <TrendingUp class="w-6 h-6 text-purple-600 group-hover:text-white transition-colors" />
+        <!-- TMA (Tempo Médio de Atendimento/Fechamento) -->
+        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-col justify-between">
+          <div class="flex justify-between items-start mb-4">
+            <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
+              <Clock class="w-6 h-6" />
             </div>
-            <span class="text-[10px] font-black text-purple-500 uppercase tracking-widest bg-purple-50 px-2 py-1 rounded-lg">Top 5%</span>
+            <span class="text-[9px] font-black text-purple-500 uppercase tracking-widest bg-purple-50 px-2.5 py-1 rounded-lg">Agilidade</span>
           </div>
-          <p class="text-xs font-black text-gray-600 uppercase tracking-widest mb-1">Taxa de Aprovação</p>
-          <h3 class="text-3xl font-black text-gray-900">{{ Math.round(stats?.approvalRate ?? 0) }}%</h3>
+          <div>
+            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">TMA (Média de Fechamento)</p>
+            <h3 class="text-3xl font-black text-gray-900 tracking-tight">
+              {{ stats.tmaHours > 24 ? `${Math.round(stats.tmaHours / 24)}d` : `${Math.round(stats.tmaHours || 0)}h` }}
+            </h3>
+            <p class="text-[10px] text-gray-400 mt-1 font-semibold">desde o envio até o aceite</p>
+          </div>
         </div>
 
-        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group">
-          <div class="flex justify-between items-start mb-6">
-            <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center group-hover:bg-orange-600 transition-colors">
-              <Users class="w-6 h-6 text-orange-600 group-hover:text-white transition-colors" />
+        <!-- SLA Comercial (Fechados em < 48h) -->
+        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-col justify-between">
+          <div class="flex justify-between items-start mb-4">
+            <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-colors">
+              <ShieldCheck class="w-6 h-6" />
             </div>
+            <span class="text-[9px] font-black text-orange-500 uppercase tracking-widest bg-orange-50 px-2.5 py-1 rounded-lg">Meta</span>
           </div>
-          <p class="text-xs font-black text-gray-600 uppercase tracking-widest mb-1">Ticket Médio</p>
-          <h3 class="text-3xl font-black text-gray-900">R$ {{ Math.round(stats?.ticketMedia ?? 0).toLocaleString('pt-BR') }}</h3>
-        </div>
-      </template>
-    </div>
-
-    <!-- Banner IA (Abaixo das Stats, altura reduzida) -->
-    <div class="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 p-8 rounded-[2.5rem] shadow-2xl">
-      <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-      <div class="relative flex flex-col md:flex-row items-center justify-between gap-6">
-        <div class="space-y-2 text-center md:text-left">
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-white text-[9px] font-black uppercase tracking-widest border border-white/10">
-            <Sparkles class="w-3 h-3 text-blue-200" /> Consultoria de IA Ativa
+          <div>
+            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">SLA Comercial (48h)</p>
+            <h3 class="text-3xl font-black text-gray-900 tracking-tight">
+              {{ Math.round(stats.slaRate ?? 0) }}%
+            </h3>
+            <p class="text-[10px] text-gray-400 mt-1 font-semibold">orçamentos fechados na meta</p>
           </div>
-          <h1 class="text-2xl md:text-3xl font-black text-white leading-tight tracking-tight">Otimize seu negócio com inteligência.</h1>
-          <p class="text-blue-100 font-medium text-sm max-w-xl">Análise baseada em seus dados comerciais para sugerir estratégias de conversão.</p>
         </div>
-        <div class="flex flex-col sm:flex-row gap-3 shrink-0">
-          <NuxtLink to="/relatorios" class="inline-flex items-center justify-center px-6 py-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl text-white text-[10px] font-black uppercase tracking-widest transition-all">
-            Ver Histórico
-          </NuxtLink>
-          <BaseButton 
-            @click="generateAIReport"
-            :disabled="isAnalyzing || (stats?.hasGeneratedReportToday && user?.role !== 'admin')"
-            variant="secondary" 
-            class="bg-white text-blue-700 hover:bg-blue-50 px-10 py-4 rounded-2xl text-[10px] shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <template v-if="isAnalyzing">
-              <Loader2 class="w-3.5 h-3.5 animate-spin mr-2" />
-              Analisando...
-            </template>
-            <template v-else-if="stats?.hasGeneratedReportToday && user?.role !== 'admin'">
-              Limite Diário Atingido
-            </template>
-            <template v-else>
-              Gerar Relatório IA
-            </template>
-          </BaseButton>
-        </div>
-      </div>
-    </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Gráfico de Evolução de Faturamento -->
-      <div class="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm">
-        <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-8">Evolução do Faturamento</h3>
-        <div class="h-80 relative">
-          <BaseSkeleton v-if="status === 'pending' && !stats" height="100%" borderRadius="1.5rem" />
-          <Line v-else :data="revenueChartData" :options="{ ...chartOptions, plugins: { ...chartOptions.plugins, legend: { display: false } } }" />
-        </div>
-      </div>
+      </section>
 
-      <!-- Gráfico de Status -->
-      <div class="lg:col-span-1 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm">
-        <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-8">Distribuição de Status</h3>
-        <div class="h-80 relative">
-          <BaseSkeleton v-if="status === 'pending' && !stats" height="100%" borderRadius="1.5rem" />
-          <Doughnut v-else :data="statusChartData" :options="chartOptions" />
-        </div>
-      </div>
+      <!-- Cartão Premium Glowing ROI de Inteligência Artificial -->
+      <section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-8 rounded-[3rem] shadow-2xl border border-indigo-500/20 shadow-indigo-500/5 group">
+        <!-- Glow decorativo de IA -->
+        <div class="absolute -top-10 -right-10 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl opacity-60 group-hover:bg-indigo-500/20 transition-all duration-700"></div>
+        <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl opacity-60"></div>
+        
+        <div class="relative flex flex-col lg:flex-row justify-between items-stretch gap-8 z-10">
+          <!-- Textos e ROI Geral -->
+          <div class="space-y-6 flex-1">
+            <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+              <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500/20 backdrop-blur-md rounded-full text-indigo-200 text-[9px] font-black uppercase tracking-widest border border-indigo-500/30">
+                <Sparkles class="w-3.5 h-3.5 text-indigo-400 animate-pulse" /> Inteligência Artificial Orcei Fácil
+              </div>
+              <p class="text-slate-400 font-bold text-xs">
+                Sua IA Copilot está ativa economizando trabalho manual.
+              </p>
+            </div>
+            
+            <div class="space-y-2">
+              <h2 class="text-2xl md:text-3xl font-black text-white tracking-tight leading-tight">
+                Você poupou <span class="text-indigo-400 font-extrabold">{{ stats.aiRoi?.timeSavedHours }}h {{ stats.aiRoi?.timeSavedMinutes }}m</span> de redação comercial!
+              </h2>
+              <p class="text-slate-400 text-sm max-w-2xl leading-relaxed">
+                Cada proposta assistida e item do catálogo otimizado com IA economiza em média 12 minutos de digitação, correção e formatação burocrática de contratos.
+              </p>
+            </div>
 
-      <!-- Ranking de Clientes -->
-      <div class="lg:col-span-3 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm">
-        <div class="flex justify-between items-center mb-8">
-          <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Maiores Clientes (Receita)</h3>
-          <NuxtLink to="/clientes" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-800">Ver Todos</NuxtLink>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <template v-if="status === 'pending' && !stats">
-            <div v-for="i in 4" :key="i" class="flex items-center justify-between p-5 bg-gray-50/50 rounded-3xl border border-gray-100">
-              <div class="flex items-center gap-4">
-                <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="0.75rem" />
-                <div class="space-y-2">
-                  <BaseSkeleton width="120px" height="1rem" />
-                  <BaseSkeleton width="80px" height="0.6rem" />
+            <!-- Barras de Adoção de IA -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+              <div class="space-y-2">
+                <div class="flex justify-between text-xs font-bold text-slate-300">
+                  <span class="uppercase tracking-widest text-[9px] text-slate-400">Adoção IA em Propostas</span>
+                  <span>{{ stats.proposalsCount > 0 ? '75%' : '0%' }}</span>
+                </div>
+                <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full" :style="{ width: stats.proposalsCount > 0 ? '75%' : '0%' }"></div>
                 </div>
               </div>
-              <BaseSkeleton width="60px" height="1.5rem" />
+              
+              <div class="space-y-2">
+                <div class="flex justify-between text-xs font-bold text-slate-300">
+                  <span class="uppercase tracking-widest text-[9px] text-slate-400">Adoção IA em Catálogo</span>
+                  <span>{{ stats.servicesCount > 0 ? '60%' : '0%' }}</span>
+                </div>
+                <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full" :style="{ width: stats.servicesCount > 0 ? '60%' : '0%' }"></div>
+                </div>
+              </div>
             </div>
-          </template>
-          <template v-else>
-            <div v-for="(client, idx) in stats?.clientRanking" :key="idx" class="flex items-center justify-between p-5 bg-gray-50/50 rounded-3xl border border-gray-100 hover:bg-gray-50 transition-colors group">
+          </div>
+
+          <!-- Créditos Consumidos & Botão de Geração -->
+          <div class="flex flex-col justify-between items-center lg:items-end gap-6 bg-slate-950/40 p-6 rounded-[2rem] border border-white/5 lg:w-80 shrink-0">
+            <div class="w-full text-center lg:text-right">
+              <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Créditos de IA Usados</p>
+              <p class="text-3xl font-black text-white">
+                {{ stats.aiRoi?.creditsUsed }} <span class="text-xs font-bold text-slate-500">/ {{ stats.aiRoi?.creditsLimit }}</span>
+              </p>
+            </div>
+            
+            <div class="w-full space-y-3">
+              <BaseButton 
+                @click="generateAIReport"
+                :disabled="isAnalyzing"
+                variant="primary" 
+                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl py-4 text-xs font-black tracking-widest uppercase shadow-xl shadow-indigo-600/10"
+              >
+                <template v-if="isAnalyzing">
+                  <Loader2 class="w-4 h-4 animate-spin mr-2" /> Analisando Dados...
+                </template>
+                <template v-else>
+                  Gerar Relatório IA (1 Crédito)
+                </template>
+              </BaseButton>
+
+
+              <NuxtLink 
+                to="/planos"
+                class="block w-full text-center py-2 text-[9px] font-black text-indigo-400 hover:text-indigo-300 tracking-[0.15em] uppercase hover:underline"
+              >
+                Obter Créditos Premium
+              </NuxtLink>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Funil Comercial & Opcionais de Upsell -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Funil Comercial Horizontal -->
+        <div class="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Funil Comercial e Conversão</h3>
+              <span class="text-[9px] font-black text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-0.5 rounded-md">Passos de Vendas</span>
+            </div>
+            
+            <div class="space-y-4">
+              <!-- Rascunho -->
               <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-white rounded-xl border border-gray-200 flex items-center justify-center text-xs font-black text-gray-400 group-hover:border-blue-200 group-hover:text-blue-600 transition-all">
+                <span class="w-20 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Rascunhos</span>
+                <div class="flex-1 h-10 bg-slate-50 rounded-xl relative overflow-hidden">
+                  <div class="h-full bg-slate-200/70" :style="{ width: stats.proposalsCount > 0 ? (stats.draftCount / stats.proposalsCount * 100) + '%' : '0%' }"></div>
+                  <span class="absolute inset-y-0 left-4 flex items-center text-xs font-bold text-gray-700">
+                    {{ stats.draftCount }} rascunhos em elaboração
+                  </span>
+                </div>
+              </div>
+
+              <!-- Criado/Pendente (Enviado) -->
+              <div class="flex items-center gap-4">
+                <span class="w-20 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Enviados</span>
+                <div class="flex-1 h-10 bg-blue-50/50 rounded-xl relative overflow-hidden">
+                  <div class="h-full bg-blue-100" :style="{ width: stats.proposalsCount > 0 ? (stats.pendingCount / stats.proposalsCount * 100) + '%' : '0%' }"></div>
+                  <span class="absolute inset-y-0 left-4 flex items-center text-xs font-bold text-blue-800">
+                    {{ stats.pendingCount }} orçamentos aguardando resposta
+                  </span>
+                </div>
+              </div>
+
+              <!-- Aceitos (Finalizados) -->
+              <div class="flex items-center gap-4">
+                <span class="w-20 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Aceitos</span>
+                <div class="flex-1 h-10 bg-emerald-50 rounded-xl relative overflow-hidden">
+                  <div class="h-full bg-emerald-100" :style="{ width: stats.proposalsCount > 0 ? (stats.acceptedCount / stats.proposalsCount * 100) + '%' : '0%' }"></div>
+                  <span class="absolute inset-y-0 left-4 flex items-center text-xs font-bold text-emerald-800">
+                    {{ stats.acceptedCount }} orçamentos fechados ({{ Math.round(stats.approvalRate) }}% conversão)
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Receita de Opcionais (Upsell) -->
+          <div class="mt-8 p-6 bg-gradient-to-r from-emerald-50 to-teal-50/20 border border-emerald-100 rounded-3xl flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="space-y-1 text-center sm:text-left">
+              <span class="text-[9px] font-black text-emerald-700 uppercase tracking-widest bg-emerald-100/60 px-2 py-0.5 rounded-full">Exclusivo Upsell</span>
+              <h4 class="font-black text-gray-900 uppercase text-xs tracking-widest">Receita de Itens Opcionais</h4>
+              <p class="text-xs text-gray-500 font-medium leading-relaxed">Faturamento extra trazido por opcionais aceitos pelos clientes nas propostas.</p>
+            </div>
+            
+            <div class="text-center sm:text-right shrink-0 bg-white px-6 py-3 rounded-2xl border border-emerald-100 shadow-sm">
+              <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest">Valor Adicional</p>
+              <p class="text-xl font-black text-emerald-600">R$ {{ (stats.upsellRevenue ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Alertas de Follow-ups Inteligentes -->
+        <div class="lg:col-span-1 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-6">
+          <div class="flex justify-between items-center">
+            <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Ações e Follow-ups</h3>
+            <AlertCircle class="w-5 h-5 text-indigo-500" />
+          </div>
+          
+          <div class="space-y-4">
+            <div 
+              v-for="alert in stats.followUpAlerts" 
+              :key="alert.id" 
+              class="p-5 bg-orange-50/40 border border-orange-100 rounded-3xl space-y-3 hover:border-orange-200 transition-colors"
+            >
+              <div class="flex justify-between items-start">
+                <span class="text-[8px] font-black text-orange-600 uppercase tracking-widest bg-orange-100/50 px-2 py-0.5 rounded-full">
+                  Pendente {{ alert.daysAgo }} dias
+                </span>
+                <span class="text-[10px] font-bold text-gray-400">{{ alert.code }}</span>
+              </div>
+              
+              <div class="space-y-1">
+                <h4 class="text-xs font-black text-gray-800 truncate uppercase">{{ alert.title }}</h4>
+                <p class="text-[10px] text-gray-500 font-bold">Cliente: {{ alert.clientName }}</p>
+              </div>
+
+              <div class="flex items-center gap-2 pt-1">
+                <a 
+                  v-if="alert.clientPhone"
+                  :href="`https://wa.me/${alert.clientPhone.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá ${alert.clientName}, gostaria de confirmar se conseguiu visualizar a proposta comercial que enviei? Qualquer dúvida fico à disposição!`)}`"
+                  target="_blank"
+                  class="flex-1 flex items-center justify-center gap-1.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
+                >
+                  <MessageSquare class="w-3.5 h-3.5" /> Chamar WhatsApp
+                </a>
+                <NuxtLink 
+                  to="/orcamentos"
+                  class="flex-1 flex items-center justify-center gap-1.5 py-2 border border-gray-200 hover:bg-gray-50 text-gray-600 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
+                >
+                  Ver Proposta
+                </NuxtLink>
+              </div>
+            </div>
+            
+            <div v-if="!stats.followUpAlerts?.length" class="text-center py-10 space-y-3">
+              <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto">
+                <CheckCircle2 class="w-6 h-6" />
+              </div>
+              <p class="text-xs text-gray-400 font-semibold">Tudo em ordem! Nenhuma proposta pendente presa no funil.</p>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Gráficos de Evolução de Faturamento e Status -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Gráfico de Evolução de Faturamento -->
+        <div class="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
+          <div class="flex justify-between items-center">
+            <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Evolução do Faturamento</h3>
+            <BarChart3 class="w-5 h-5 text-gray-400" />
+          </div>
+          <div class="h-80 relative">
+            <Line :data="revenueChartData" :options="{ ...chartOptions, plugins: { ...chartOptions.plugins, legend: { display: false } } }" />
+          </div>
+        </div>
+
+        <!-- Distribuição de Status -->
+        <div class="lg:col-span-1 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
+          <div class="flex justify-between items-center">
+            <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Status dos Orçamentos</h3>
+            <Activity class="w-5 h-5 text-gray-400" />
+          </div>
+          <div class="h-80 relative flex items-center justify-center">
+            <Doughnut :data="statusChartData" :options="chartOptions" />
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Tracking de Abertura & Ranking de Clientes -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Tracking de Aberturas em Tempo Real -->
+        <div class="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Visualizações Recentes (Tracking)</h3>
+              <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-ping"></span>
+            </div>
+            
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-gray-100">
+                    <th class="pb-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">Orçamento</th>
+                    <th class="pb-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">Cliente</th>
+                    <th class="pb-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">Navegador</th>
+                    <th class="pb-4 text-[9px] font-black text-gray-400 uppercase tracking-widest text-right">Quando</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                  <tr v-for="(view, idx) in stats.trackingViews" :key="idx" class="hover:bg-gray-50/40 transition-colors">
+                    <td class="py-4 text-xs font-bold text-gray-900">
+                      {{ view.proposalCode }}
+                      <span class="block text-[9px] text-gray-400 font-bold truncate max-w-[150px]">{{ view.proposalTitle }}</span>
+                    </td>
+                    <td class="py-4 text-xs font-bold text-gray-600">
+                      {{ view.clientName }}
+                      <span class="block text-[8px] text-gray-400 uppercase font-black tracking-wider">{{ view.location }}</span>
+                    </td>
+                    <td class="py-4 text-[10px] text-gray-400 font-bold">{{ view.browser }}</td>
+                    <td class="py-4 text-xs font-black text-gray-900 text-right">
+                      {{ formatRelativeTime(view.minutesAgo) }}
+                    </td>
+                  </tr>
+                  <tr v-if="!stats.trackingViews?.length">
+                    <td colspan="4" class="py-12 text-center text-gray-400 text-xs font-semibold">
+                      Nenhuma visualização de proposta registrada ainda.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ranking de Clientes (Faturamento) -->
+        <div class="lg:col-span-1 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-6">
+          <div class="flex justify-between items-center">
+            <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Top Clientes</h3>
+            <NuxtLink to="/clientes" class="text-[9px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-800">Ver Todos</NuxtLink>
+          </div>
+          
+          <div class="space-y-4">
+            <div 
+              v-for="(client, idx) in stats.clientRanking" 
+              :key="idx" 
+              class="flex items-center justify-between p-4 bg-gray-50/50 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-colors group"
+            >
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-white rounded-lg border border-gray-200 flex items-center justify-center text-[10px] font-black text-gray-400 group-hover:border-blue-200 group-hover:text-blue-600 transition-all">
                   #{{ (idx as number) + 1 }}
                 </div>
                 <div>
-                  <p class="font-bold text-gray-900">{{ client.name }}</p>
-                  <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Faturamento Acumulado</p>
+                  <p class="text-xs font-bold text-gray-900 truncate max-w-[120px]">{{ client.name }}</p>
+                  <p class="text-[8px] font-black text-gray-400 uppercase tracking-wider">Faturamento total</p>
                 </div>
               </div>
+              
               <div class="text-right">
-                <p class="font-black text-gray-900">R$ {{ (client.revenue as number).toLocaleString('pt-BR') }}</p>
-                <div class="w-24 h-1.5 bg-gray-100 rounded-full mt-2 overflow-hidden">
+                <p class="text-xs font-black text-gray-900">R$ {{ (client.revenue as number).toLocaleString('pt-BR') }}</p>
+                <div class="w-16 h-1 bg-gray-100 rounded-full mt-1.5 overflow-hidden">
                   <div class="h-full bg-blue-600 rounded-full" :style="{ width: ((client.revenue as number) / stats.totalRevenue * 100) + '%' }"></div>
                 </div>
               </div>
             </div>
-          </template>
+            
+            <div v-if="!stats.clientRanking?.length" class="text-center py-12 text-gray-400 text-xs font-semibold">
+              Nenhum dado de receita disponível.
+            </div>
+          </div>
         </div>
-        <div v-if="status === 'success' && !stats?.clientRanking?.length" class="text-center py-12">
-          <p class="text-gray-400 font-medium">Nenhum dado de faturamento disponível.</p>
-        </div>
-      </div>
-    </div>
+
+      </section>
+
+    </template>
 
     <!-- Modal do Relatório IA -->
     <BaseDialog :open="!!aiReport" @update:open="(val) => !val ? aiReport = null : null" title="Relatório Estratégico IA" size="lg" @close="aiReport = null">
@@ -294,5 +567,23 @@ async function generateAIReport() {
         </div>
       </template>
     </BaseDialog>
+
+    <!-- Modal de Paywall Express -->
+    <PaywallExpressModal 
+      v-model:open="isPaywallOpen" 
+      :reason="paywallReason" 
+    />
+
+
   </div>
 </template>
+
+<style scoped>
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+</style>

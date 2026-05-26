@@ -23,6 +23,8 @@ export async function uploadToCloudinary(
     folder: `${folderPath.toLowerCase()}/${options.targetFolder}`,
     resource_type: options.resourceType || 'image',
     access_mode: 'public',
+    use_filename: true,
+    unique_filename: true,
     ...(options.publicId && { public_id: options.publicId })
   }
 

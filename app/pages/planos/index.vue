@@ -76,7 +76,7 @@ onMounted(() => {
   // Clear query params after success or portal return
   if (import.meta.client && (success.value || portal.value)) {
     setTimeout(() => {
-      navigateTo('/dashboard/billing', { replace: true })
+      navigateTo('/planos', { replace: true })
     }, 5000)
   }
 

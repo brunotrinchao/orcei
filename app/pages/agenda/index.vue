@@ -201,7 +201,7 @@ const proposalOptions = computed(() => {
         <div v-if="linkedProposal" class="p-6 bg-blue-50/50 rounded-2xl border border-blue-100 space-y-4">
           <div class="flex items-center justify-between">
             <h3 class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Orçamento Vinculado</h3>
-            <NuxtLink :to="`/dashboard/proposals`" class="text-[9px] font-black text-blue-400 hover:text-blue-600 uppercase">Ver Orçamento</NuxtLink>
+            <NuxtLink :to="`/orcamentos`" class="text-[9px] font-black text-blue-400 hover:text-blue-600 uppercase">Ver Orçamento</NuxtLink>
           </div>
           <div class="flex flex-col gap-1">
             <span class="font-bold text-gray-900">{{ linkedProposal.title }}</span>

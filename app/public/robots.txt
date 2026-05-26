@@ -2,9 +2,15 @@
 User-agent: *
 Allow: /
 
-# Evitar desperdício de rastreamento em rotas privadas
 Disallow: /admin/
 Disallow: /dashboard/
+Disallow: /clientes/
+Disallow: /catalogo/
+Disallow: /orcamentos/
+Disallow: /agenda/
+Disallow: /relatorios/
+Disallow: /planos/
+Disallow: /configuracoes/
 Disallow: /api/
 
 # Apontamento do Sitemap

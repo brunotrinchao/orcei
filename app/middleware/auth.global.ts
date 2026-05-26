@@ -14,8 +14,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
     }
   }
 
-  // Se não estiver logado e tentar acessar dashboard ou admin, manda pro login
-  if (!loggedIn.value && (to.path.startsWith('/dashboard') || to.path.startsWith('/admin'))) {
+  const privateRoutes = ['/dashboard', '/clientes', '/catalogo', '/orcamentos', '/agenda', '/relatorios', '/planos', '/configuracoes']
+  const isPrivateRoute = privateRoutes.some(route => to.path === route || to.path.startsWith(route + '/'))
+
+  // Se não estiver logado e tentar acessar uma rota privada ou admin, manda pro login
+  if (!loggedIn.value && (isPrivateRoute || to.path.startsWith('/admin'))) {
     return navigateTo('/auth/login')
   }
 

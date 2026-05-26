@@ -192,7 +192,7 @@ async function generateAIReport() {
           <p class="text-blue-100 font-medium text-sm max-w-xl">Análise baseada em seus dados comerciais para sugerir estratégias de conversão.</p>
         </div>
         <div class="flex flex-col sm:flex-row gap-3 shrink-0">
-          <NuxtLink to="/dashboard/reports" class="inline-flex items-center justify-center px-6 py-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl text-white text-[10px] font-black uppercase tracking-widest transition-all">
+          <NuxtLink to="/relatorios" class="inline-flex items-center justify-center px-6 py-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl text-white text-[10px] font-black uppercase tracking-widest transition-all">
             Ver Histórico
           </NuxtLink>
           <BaseButton 
@@ -239,7 +239,7 @@ async function generateAIReport() {
       <div class="lg:col-span-3 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm">
         <div class="flex justify-between items-center mb-8">
           <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Maiores Clientes (Receita)</h3>
-          <NuxtLink to="/dashboard/clients" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-800">Ver Todos</NuxtLink>
+          <NuxtLink to="/clientes" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-800">Ver Todos</NuxtLink>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <template v-if="status === 'pending' && !stats">
@@ -287,7 +287,7 @@ async function generateAIReport() {
       </div>
       <template #footer>
         <div class="flex justify-between w-full items-center">
-          <NuxtLink to="/dashboard/reports" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">
+          <NuxtLink to="/relatorios" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">
             Ver todos os relatórios
           </NuxtLink>
           <BaseButton @click="aiReport = null">Entendido</BaseButton>

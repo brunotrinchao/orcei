@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { ref } from 'vue'
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
-import Billing from '../app/pages/dashboard/billing.vue'
+import Billing from '../app/pages/planos/index.vue'
 
 const { mockUseFetch, mockNotify } = vi.hoisted(() => ({
   mockUseFetch: vi.fn(),

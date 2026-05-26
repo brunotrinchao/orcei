@@ -42,10 +42,10 @@ export default defineEventHandler(async (event) => {
     mode = 'payment'
   }
 
-  if (!priceId) {
+  if (!priceId || priceId.includes('mock_')) {
     throw createError({ 
       statusCode: 400, 
-      statusMessage: `Configuração de preço ausente para o nível: ${tier}. Verifique o arquivo .env` 
+      statusMessage: `Configuração de preço ausente ou modo local não configurado para o pacote: ${tier}. Configure as variáveis NUXT_PUBLIC_STRIPE_... no seu arquivo .env para testar pagamentos.` 
     })
   }
 

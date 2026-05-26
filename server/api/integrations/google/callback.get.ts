@@ -39,18 +39,21 @@ export default defineEventHandler(async (event) => {
     const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client })
     const userInfo = await oauth2.userinfo.get()
 
+    const updateSet: any = {
+      'googleIntegration.email': userInfo.data.email,
+      'googleIntegration.accessToken': tokens.access_token,
+      'googleIntegration.expiryDate': tokens.expiry_date,
+    }
+    
+    // O Google só envia refresh_token na primeira autorização ou se prompt=consent.
+    // Se recebemos um novo, atualizamos. Se não, mantemos o que já está no banco.
+    if (tokens.refresh_token) {
+      updateSet['googleIntegration.refreshToken'] = tokens.refresh_token
+    }
+
     await Profile.findOneAndUpdate(
       { userId: (session.user as any).id },
-      { 
-        $set: {
-          googleIntegration: {
-            email: userInfo.data.email,
-            accessToken: tokens.access_token,
-            refreshToken: tokens.refresh_token,
-            expiryDate: tokens.expiry_date,
-          }
-        }
-      }
+      { $set: updateSet }
     )
 
     return sendRedirect(event, '/configuracoes?google=connected')

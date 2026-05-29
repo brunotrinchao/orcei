@@ -163,10 +163,11 @@ export default {
       features: [
         'Criação e envio de orçamentos comerciais digitais',
         'Gestão de clientes e catálogo de serviços/produtos',
-        'Agenda integrada com orçamentos',
-        'Geração de PDF de propostas',
+        'Agenda comercial integrada com propostas',
+        'Geração de PDF de propostas comerciais',
         'Sugestões de precificação via Inteligência Artificial',
-        'Integração com pagamentos via Stripe'
+        'Integração com pagamentos via Stripe',
+        'Integrações opcionais com serviços do ecossistema Google (Google Drive para arquivamento de PDFs, Google Agenda para sincronização de compromissos e Google Planilhas para consolidação de dados)'
       ],
       forbiddenUses: [
         'Atividades ilegais ou que violem direitos de terceiros',

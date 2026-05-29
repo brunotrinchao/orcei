@@ -49,6 +49,25 @@ const dynamicAppName = computed(() => systemInfo.value?.landingPage?.appName || 
               <h3 class="text-sm font-black text-gray-900 mb-2">Dados de Cadastro</h3>
               <p class="text-sm text-gray-500 font-medium leading-relaxed">Nome, e-mail e foto de perfil obtidos via autenticação Google OAuth. Utilizados para identificação e acesso à plataforma.</p>
             </div>
+            <div class="bg-white rounded-2xl border border-gray-100 p-6 border-indigo-100 bg-indigo-50/10">
+              <h3 class="text-sm font-black text-indigo-900 mb-2 flex items-center gap-2">
+                Dados de Integrações Google APIs
+              </h3>
+              <p class="text-sm text-gray-600 font-medium leading-relaxed mb-3">
+                Quando o usuário opta por conectar sua conta do Google para automação comercial, nossa plataforma acessa escopos específicos por meio de consentimento explícito:
+              </p>
+              <ul class="list-disc pl-5 space-y-2 text-xs text-gray-500 font-bold mb-4">
+                <li><strong class="text-gray-700">Google Drive:</strong> Utilizado unicamente para criar uma pasta de arquivos própria da plataforma e realizar o upload automático em formato PDF das propostas comerciais aceitas pelos clientes do usuário.</li>
+                <li><strong class="text-gray-700">Google Agenda (Calendar):</strong> Utilizado para cadastrar, editar ou deletar compromissos comerciais referentes à execução das propostas aceitas, sincronizando o cronograma do usuário diretamente.</li>
+                <li><strong class="text-gray-700">Google Planilhas (Sheets):</strong> Utilizado para exportar e consolidar a lista de clientes, catálogo e propostas em relatórios de planilhas de propriedade e acesso exclusivo do usuário.</li>
+              </ul>
+              <div class="p-4 bg-white rounded-xl border border-indigo-100 text-[11px] text-gray-500 font-medium leading-relaxed">
+                <span class="text-indigo-600 font-black uppercase tracking-wider block mb-1">Conformidade e Uso Limitado (Limited Use)</span>
+                O uso e a transferência de informações recebidas de qualquer API do Google por meio da plataforma {{ dynamicAppName }} para qualquer outro aplicativo seguirão estritamente a 
+                <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" class="text-blue-500 underline font-black">Google API Services User Data Policy</a>, 
+                incluindo os requisitos de <strong>Uso Limitado (Limited Use Requirements)</strong>. Não transferimos, não vendemos e não compartilhamos esses dados com terceiros para fins de publicidade, nem os utilizamos para treinar modelos de inteligência artificial de linguagem (LLMs).
+              </div>
+            </div>
             <div class="bg-white rounded-2xl border border-gray-100 p-6">
               <h3 class="text-sm font-black text-gray-900 mb-2">Dados da Empresa</h3>
               <p class="text-sm text-gray-500 font-medium leading-relaxed">Razão social, CNPJ, logotipo, endereço e telefone. Utilizados para personalização das propostas comerciais e documentos enviados aos clientes.</p>

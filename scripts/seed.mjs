@@ -115,6 +115,7 @@ async function seed() {
         title: `Projeto ${faker.commerce.productAdjective()} ${faker.commerce.product()}`,
         slug: faker.helpers.slugify(faker.commerce.productName() + '-' + i + '-' + Date.now()),
         token: faker.string.alphanumeric(12),
+        sequenceNumber: i + 1,
         code: `ORC-2026-${String(i+1).padStart(3, '0')}`,
         status,
         client: {

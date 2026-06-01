@@ -450,7 +450,7 @@ const statusMap: any = {
           <!-- Contact row -->
           <div class="mt-10 pt-8 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <a
-              :href="`mailto:${proposal.client.email}`"
+              :href="`mailto:${proposal.profileId.email}`"
               class="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10 transition-all group outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <div class="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
@@ -458,12 +458,12 @@ const statusMap: any = {
               </div>
               <div>
                 <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">E-mail</p>
-                <p class="text-xs font-bold text-gray-300 truncate">{{ proposal.client.email }}</p>
+                <p class="text-xs font-bold text-gray-300 truncate">{{ proposal.profileId.email }}</p>
               </div>
             </a>
             <a
-              v-if="proposal.client.phone"
-              :href="`https://wa.me/${proposal.client.phone.replace(/\D/g, '')}`"
+              v-if="proposal.profileId?.contact?.phone || proposal.profileId?.contact?.whatsapp"
+              :href="`https://wa.me/${(proposal.profileId.contact?.phone || proposal.profileId.contact?.whatsapp).replace(/\D/g, '')}`"
               target="_blank"
               class="flex items-center gap-3 p-4 bg-white/5 hover:bg-green-500/10 rounded-2xl border border-white/10 hover:border-green-500/30 transition-all group outline-none focus-visible:ring-2 focus-visible:ring-green-500"
             >
@@ -472,7 +472,7 @@ const statusMap: any = {
               </div>
               <div>
                 <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">WhatsApp</p>
-                <p class="text-xs font-bold text-gray-300">{{ proposal.client.phone }}</p>
+                <p class="text-xs font-bold text-gray-300">{{ proposal.profileId.contact?.phone || proposal.profileId.contact?.whatsapp }}</p>
               </div>
             </a>
           </div>
@@ -509,6 +509,13 @@ const statusMap: any = {
       v-if="!['draft', 'accepted', 'expired'].includes(proposal.status) && !isPreview"
       class="fixed bottom-0 left-0 right-0 sm:hidden z-50 bg-white/90 backdrop-blur-xl border-t border-gray-100 px-5 pt-4 pb-safe"
     >
+      <button
+        v-if="!isPreview"
+        @click="openActionModal('decline')"
+        class="w-full text-center text-[9px] font-black text-gray-400 uppercase tracking-widest py-1 hover:text-red-400 transition-colors"
+      >
+        Recusar Proposta
+      </button>
       <div class="flex gap-3 pb-4">
         <button
           @click="isChatModalOpen = true"

@@ -116,7 +116,8 @@ export default defineEventHandler(async (event) => {
       title: p.title,
       clientName: p.client?.name,
       clientPhone: p.client?.phone,
-      daysAgo: Math.floor((Date.now() - p.createdAt.getTime()) / (1000 * 60 * 60 * 24))
+      daysAgo: Math.floor((Date.now() - p.createdAt.getTime()) / (1000 * 60 * 60 * 24)),
+      slug: p.slug,
     }))
 
   // Revenue History (últimos 30 dias ou período)

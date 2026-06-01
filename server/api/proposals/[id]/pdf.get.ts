@@ -1,7 +1,6 @@
-import puppeteer from 'puppeteer'
 import { Proposal } from '../../../models/Proposal'
 import { Profile } from '../../../models/Profile'
-import { generateProposalHtml } from '../../../utils/pdf'
+import { generateProposalPdfBuffer } from '../../../utils/pdf'
 
 export default defineEventHandler(async (event) => {
   const { id } = event.context.params as { id: string }
@@ -24,16 +23,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const config = useRuntimeConfig()
-  const htmlContent = generateProposalHtml(proposal, profile, config.appName)
-
-  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] })
-  const page = await browser.newPage()
-  await page.setContent(htmlContent)
-  const pdf = await page.pdf({ format: 'A4', printBackground: true })
-  await browser.close()
+  const pdf = await generateProposalPdfBuffer(proposal, profile, config.appName)
 
   event.node.res.setHeader('Content-Type', 'application/pdf')
   event.node.res.setHeader('Content-Disposition', `attachment; filename=proposta-${proposal.slug}.pdf`)
-  
+
   return pdf
 })

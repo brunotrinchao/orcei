@@ -56,10 +56,6 @@ vi.mock('../server/services/ProposalService', () => ({
 
 // Globals
 vi.stubGlobal('defineEventHandler', (h: any) => h)
-vi.stubGlobal('useRuntimeConfig', () => ({
-  qstashCurrentSigningKey: 'mock',
-  qstashNextSigningKey: 'mock'
-}))
 vi.stubGlobal('getHeaders', vi.fn())
 vi.stubGlobal('readBody', vi.fn())
 vi.stubGlobal('createError', (e: any) => {
@@ -73,6 +69,10 @@ describe('Google Automation (QStash Webhook)', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
+    // Mutate the real reactive useRuntimeConfig instance provided by Nuxt Vitest environment
+    const config = useRuntimeConfig()
+    config.qstashCurrentSigningKey = 'mock-current-key'
+    config.qstashNextSigningKey = 'mock-next-key'
     const module = await import('../server/api/webhooks/qstash.post')
     handler = module.default
   })

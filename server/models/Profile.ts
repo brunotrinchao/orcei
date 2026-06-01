@@ -33,7 +33,7 @@ const profileSchema = new Schema({
       youtube: String
     }
   },
-  creditsBalance: { type: Number, default: 1 },
+  creditsBalance: { type: Number, default: 5 },
   creditsUsed: { type: Number, default: 0 },
   aiUsage: {
     reports: { type: Number, default: 0 },

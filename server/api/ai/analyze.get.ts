@@ -75,31 +75,61 @@ export default defineEventHandler(async (event) => {
     }))
   }
 
-  const prompt = `Analise os dados comerciais deste profissional/empresa e forneça um relatório estratégico de crescimento.
-  
-DADOS DO NEGÓCIO (${start && end ? `Período: ${start} a ${end}` : 'Todo o período'}):
-- Total de Orçamentos: ${context.totalProposals}
+  const approvalRate = Math.round((context.acceptedCount / (context.totalProposals || 1)) * 100)
+
+  const prompt = `Você é um consultor de negócios sênior especializado em freelancers e pequenas empresas brasileiras. Analise os dados abaixo e produza um relatório estratégico COMPLETO e DETALHADO.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DADOS DO NEGÓCIO — ${start && end ? `Período: ${start} a ${end}` : 'Todo o período'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Total de Orçamentos enviados: ${context.totalProposals}
 - Orçamentos Aceitos: ${context.acceptedCount}
 - Orçamentos Pendentes: ${context.pendingCount}
-- Taxa de Aprovação: ${Math.round((context.acceptedCount / (context.totalProposals || 1)) * 100)}%
-- Faturamento Total: R$ ${context.totalRevenue.toFixed(2)}
-- Ticket Médio: R$ ${context.averageValue.toFixed(2)}
-- Itens no Catálogo: ${context.catalogItems.length}
+- Orçamentos Recusados/Expirados: ${context.totalProposals - context.acceptedCount - context.pendingCount}
+- Taxa de Aprovação: ${approvalRate}%
+- Faturamento Total (aceitos): R$ ${context.totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+- Ticket Médio: R$ ${context.averageValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
 
-ITENS DO CATÁLOGO (Sugira combinações para Upsell):
-${JSON.stringify(context.catalogItems.map(i => ({ nome: i.name, preco: i.price, tipo: i.type })))}
+CATÁLOGO DE SERVIÇOS:
+${JSON.stringify(context.catalogItems.map(i => ({ nome: i.name, preco: i.price, tipo: i.type })), null, 2)}
 
-HISTÓRICO RECENTE:
-${JSON.stringify(context.recentHistory)}
+HISTÓRICO RECENTE (últimos 10 orçamentos):
+${JSON.stringify(context.recentHistory, null, 2)}
 
-SUA TAREFA:
-Escreva um relatório Markdown estruturado com:
-1.  **Diagnóstico de Saúde**: Analise a taxa de aprovação e o ticket médio.
-2.  **Estratégia de Precificação**: Com base na taxa de aprovação, sugira ajustes (ex: aumentar se > 70%, rever se < 30%).
-3.  **Mix de Vendas (Upsell/Cross-sell)**: Sugira como combinar itens do catálogo para aumentar o valor de cada venda.
-4.  **Dica de Ouro**: Um insight prático e imediato para escalar o faturamento.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+INSTRUÇÕES DE FORMATO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Produza um relatório Markdown completo com EXATAMENTE estas 5 seções. Cada seção deve ser aprofundada, com no mínimo 3 parágrafos ou bullets concretos. Use tabelas onde comparar dados fizer sentido. Cite os números reais fornecidos. Seja específico, não genérico.
 
-Tom: Consultor sênior, direto, prático e motivador.`
+## 📊 1. Diagnóstico de Saúde Comercial
+- Interprete a taxa de aprovação de ${approvalRate}% com contexto (benchmark: 40-60% é saudável para o mercado BR)
+- Avalie o ticket médio de R$ ${context.averageValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} frente ao portfólio
+- Identifique padrões no histórico recente (sazonalidade, tendência de crescimento ou queda)
+- Calcule a perda de receita potencial nos orçamentos não convertidos
+
+## 💰 2. Estratégia de Precificação
+- Com base na taxa de aprovação de ${approvalRate}%, indique se os preços estão abaixo, adequados ou acima do mercado
+- Sugira um percentual concreto de ajuste (ex: "aumente 15% nos serviços X e Y")
+- Explique a psicologia de precificação aplicada ao contexto (ex: ancoragem, valor percebido)
+- Proponha ao menos 2 estratégias de pacote/bundle usando os itens do catálogo
+
+## 🚀 3. Mix de Vendas — Upsell e Cross-sell
+- Analise cada item do catálogo e sugira combinações estratégicas
+- Crie ao menos 2 pacotes comerciais com nome, composição e preço sugerido
+- Explique qual perfil de cliente se beneficia de cada pacote
+- Calcule o impacto potencial no ticket médio se 30% dos clientes migrarem para os pacotes
+
+## ⚡ 4. Plano de Ação — Próximas 2 Semanas
+Liste 5 ações concretas, priorizadas por impacto/esforço, no formato:
+| Ação | Impacto | Esforço | Prazo |
+|------|---------|---------|-------|
+
+Cada ação deve ser específica e executável imediatamente.
+
+## 🎯 5. Dica de Ouro
+Um insight estratégico profundo e não-óbvio, específico para este negócio com base nos dados apresentados. Deve ser algo que um consultor de R$500/hora diria.
+
+Tom: Consultor sênior, direto, baseado em dados, sem frases motivacionais vazias. Use os números reais para embasar cada recomendação.`
 
   try {
     const analysis = await AIService.generateDescription(prompt)

@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Rate Limit: 10 requests per 1 minute for general generation
-  checkRateLimit(event, { max: 10, windowMs: 60 * 1000, keyPrefix: 'ai-generate' })
+  await checkRateLimit(event, { max: 10, windowMs: 60 * 1000, keyPrefix: 'ai-generate' })
 
   const profile = await ProfileService.getByUserId((session.user as any).id)
   if (!profile) {

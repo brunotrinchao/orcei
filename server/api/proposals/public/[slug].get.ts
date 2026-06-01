@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
 
   if (!slug) throw createError({ statusCode: 400, statusMessage: 'Missing Slug' })
 
-  checkRateLimit(event, { max: 60, windowMs: 60 * 1000, keyPrefix: 'public-proposal-view' })
+  await checkRateLimit(event, { max: 60, windowMs: 60 * 1000, keyPrefix: 'public-proposal-view' })
 
   const proposal = await ProposalService.getBySlug(slug)
   if (!proposal) throw createError({ statusCode: 404, statusMessage: 'Proposal not found' })

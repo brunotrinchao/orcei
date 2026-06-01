@@ -6,7 +6,7 @@ import { checkRateLimit } from '../../../utils/rate-limit'
 
 export default defineEventHandler(async (event) => {
   const { slug, t: token } = getQuery(event)
-  checkRateLimit(event, { max: 20, windowMs: 60 * 1000, keyPrefix: 'public-proposal-msg' })
+  await checkRateLimit(event, { max: 20, windowMs: 60 * 1000, keyPrefix: 'public-proposal-msg' })
   const body = await readBody(event)
 
   if (!slug) throw createError({ statusCode: 400, statusMessage: 'Missing Slug' })

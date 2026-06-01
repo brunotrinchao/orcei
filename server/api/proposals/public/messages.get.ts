@@ -4,7 +4,7 @@ import { ProposalMessage } from '../../../models/ProposalMessage'
 import { checkRateLimit } from '../../../utils/rate-limit'
 
 export default defineEventHandler(async (event) => {
-  checkRateLimit(event, { max: 60, windowMs: 60 * 1000, keyPrefix: 'public-proposal-msgs' })
+  await checkRateLimit(event, { max: 60, windowMs: 60 * 1000, keyPrefix: 'public-proposal-msgs' })
 
   const { slug, t: token } = getQuery(event)
 

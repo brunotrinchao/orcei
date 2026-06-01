@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Rate Limit: 5 requests per 1 minute for AI
-  checkRateLimit(event, { max: 5, windowMs: 60 * 1000, keyPrefix: 'ai-proposal' })
+  await checkRateLimit(event, { max: 5, windowMs: 60 * 1000, keyPrefix: 'ai-proposal' })
 
   const { prompt } = await readBody(event)
   if (!prompt) {

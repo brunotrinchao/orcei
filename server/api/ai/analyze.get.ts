@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   if (!session?.user) throw createError({ statusCode: 401 })
 
   // Rate Limit: 5 requests per 1 minute for AI
-  checkRateLimit(event, { max: 5, windowMs: 60 * 1000, keyPrefix: 'ai-analyze' })
+  await checkRateLimit(event, { max: 5, windowMs: 60 * 1000, keyPrefix: 'ai-analyze' })
 
   const profile = await ProfileService.getByUserId((session.user as any).id)
   if (!profile) throw createError({ statusCode: 404 })

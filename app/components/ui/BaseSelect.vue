@@ -29,16 +29,18 @@ const props = defineProps<{
 }>()
 
 const modelValue = defineModel<string>()
+const id = useId()
 </script>
 
 <template>
   <div class="space-y-2">
-    <label v-if="label" class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">
+    <label v-if="label" :id="`label-${id}`" class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">
       {{ label }}
     </label>
     
     <SelectRoot v-model="modelValue" :disabled="disabled">
       <SelectTrigger
+        :aria-labelledby="label ? `label-${id}` : undefined"
         class="inline-flex items-center justify-between w-full px-5 py-4 bg-white border-2 border-gray-200 hover:border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all outline-none font-bold text-gray-900 group disabled:opacity-50 disabled:cursor-not-allowed"
         :class="{ 'border-red-300 focus:border-red-500 focus:ring-red-500/20': error }"
       >

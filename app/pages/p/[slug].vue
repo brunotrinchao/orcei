@@ -546,7 +546,7 @@ const statusMap: any = {
         <!-- Messages list -->
         <div 
           ref="chatMessagesRef"
-          class="flex-1 p-6 space-y-4 overflow-y-auto scrollbar-hide relative bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat bg-center"
+          class="flex-1 p-6 space-y-4 overflow-y-auto scrollbar-hide relative bg-[#dfe4ea]"
         >
           <div v-if="!groupedMessages?.length" class="text-center py-10 bg-white/60 backdrop-blur-sm rounded-3xl p-8 max-w-xs mx-auto mt-10">
             <MessageCircle class="w-8 h-8 text-gray-300 mx-auto mb-3" />

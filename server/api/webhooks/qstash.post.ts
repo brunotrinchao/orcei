@@ -43,26 +43,29 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // Validação de Segurança via SDK
-  if (config.qstashCurrentSigningKey && config.qstashNextSigningKey) {
-    const receiver = new Receiver({
-      currentSigningKey: config.qstashCurrentSigningKey,
-      nextSigningKey: config.qstashNextSigningKey,
-    })
+  // Validação de Segurança via SDK — obrigatória
+  if (!config.qstashCurrentSigningKey || !config.qstashNextSigningKey) {
+    console.error('[QStash Webhook] Chaves de assinatura QStash não configuradas.')
+    throw createError({ statusCode: 500, statusMessage: 'QStash signing keys not configured' })
+  }
 
-    // No SDK Receiver.verify, o body deve ser a string exata recebida
-    const isValid = await receiver.verify({
-      signature: signature || '',
-      body: typeof body === 'string' ? body : JSON.stringify(body),
-    }).catch((e) => {
-      console.error('[QStash Webhook] Erro na verificação:', e.message)
-      return false
-    })
+  const receiver = new Receiver({
+    currentSigningKey: config.qstashCurrentSigningKey,
+    nextSigningKey: config.qstashNextSigningKey,
+  })
 
-    if (!isValid) {
-      console.error('[QStash Webhook] Assinatura inválida detectada.')
-      throw createError({ statusCode: 401, statusMessage: 'Assinatura QStash inválida' })
-    }
+  // No SDK Receiver.verify, o body deve ser a string exata recebida
+  const isValid = await receiver.verify({
+    signature: signature || '',
+    body: typeof body === 'string' ? body : JSON.stringify(body),
+  }).catch((e) => {
+    console.error('[QStash Webhook] Erro na verificação:', e.message)
+    return false
+  })
+
+  if (!isValid) {
+    console.error('[QStash Webhook] Assinatura inválida detectada.')
+    throw createError({ statusCode: 401, statusMessage: 'Assinatura QStash inválida' })
   }
 
   console.log(`[QStash Webhook] Recebido job: ${action}`)

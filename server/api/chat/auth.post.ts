@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
         authorized = true
         console.log(`[Pusher Auth] Cliente autorizado via Slug/Token para canal: ${channelName}`)
       } else {
-        console.warn(`[Pusher Auth] Cliente negado. Recebido slug=${slug}, token=${token}. Esperado slug=${proposal.slug}`)
+        console.warn(`[Pusher Auth] Cliente negado. slug=${slug}, token=${token ? token.slice(0, 4) + '***' : 'ausente'}`)
       }
     }
   }

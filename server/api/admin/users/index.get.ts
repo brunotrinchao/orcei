@@ -8,11 +8,14 @@ export default defineEventHandler(async (event) => {
 
   const { page = 1, limit = 20, search = '' } = getQuery(event)
 
+  const escapeRegex = (str: string): string => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
   const query: any = { isDeleted: { $ne: true } }
   if (search) {
+    const safeSearch = escapeRegex(String(search))
     query.$or = [
-      { name: { $regex: search, $options: 'i' } },
-      { email: { $regex: search, $options: 'i' } }
+      { name: { $regex: safeSearch, $options: 'i' } },
+      { email: { $regex: safeSearch, $options: 'i' } }
     ]
   }
 

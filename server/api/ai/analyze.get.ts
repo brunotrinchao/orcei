@@ -1,4 +1,5 @@
 import { ProfileService } from '../../services/ProfileService'
+import { Profile } from '../../models/Profile'
 import { Proposal } from '../../models/Proposal'
 import { CatalogItem } from '../../models/CatalogItem'
 import { Report } from '../../models/Report'
@@ -23,13 +24,16 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Dedução de 1 crédito de IA
+  // Dedução de 1 crédito de IA (atômica — previne race condition)
   if ((session.user as any).role !== 'admin') {
-    profile.creditsBalance = Math.max(0, profile.creditsBalance - 1)
-    profile.creditsUsed = (profile.creditsUsed || 0) + 1
-    if (!profile.aiUsage) profile.aiUsage = { reports: 0, proposals: 0, catalog: 0 }
-    profile.aiUsage.reports = (profile.aiUsage.reports || 0) + 1
-    await profile.save()
+    const updated = await Profile.findOneAndUpdate(
+      { _id: profile._id, creditsBalance: { $gte: 1 } },
+      { $inc: { creditsBalance: -1, creditsUsed: 1, 'aiUsage.reports': 1 } },
+      { new: true }
+    )
+    if (!updated) {
+      throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para gerar relatórios com IA.' })
+    }
   }
 
   const { start, end } = getQuery(event)

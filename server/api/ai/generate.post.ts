@@ -2,6 +2,7 @@ import { AIService } from '../../services/AIService'
 import { checkRateLimit } from '../../utils/rate-limit'
 
 import { ProfileService } from '../../services/ProfileService'
+import { Profile } from '../../models/Profile'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -25,13 +26,16 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Dedução de 1 crédito
+  // Dedução de 1 crédito (atômica — previne race condition)
   if ((session.user as any).role !== 'admin') {
-    profile.creditsBalance = Math.max(0, profile.creditsBalance - 1)
-    profile.creditsUsed = (profile.creditsUsed || 0) + 1
-    if (!profile.aiUsage) profile.aiUsage = { reports: 0, proposals: 0, catalog: 0 }
-    profile.aiUsage.proposals = (profile.aiUsage.proposals || 0) + 1
-    await profile.save()
+    const updated = await Profile.findOneAndUpdate(
+      { _id: profile._id, creditsBalance: { $gte: 1 } },
+      { $inc: { creditsBalance: -1, creditsUsed: 1, 'aiUsage.proposals': 1 } },
+      { new: true }
+    )
+    if (!updated) {
+      throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para usar a IA.' })
+    }
   }
 
   const { prompt } = await readBody(event)

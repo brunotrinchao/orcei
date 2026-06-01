@@ -83,7 +83,7 @@ const formatMessageTime = (date: any) => {
       </div>
 
       <!-- Messages Area -->
-      <div ref="chatMessagesRef" class="flex-1 overflow-y-auto p-6 space-y-4 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat bg-center scrollbar-hide">
+      <div ref="chatMessagesRef" class="flex-1 overflow-y-auto p-6 space-y-4 bg-[#dfe4ea] scrollbar-hide">
         <div v-if="!groupedMessages?.length" class="text-center py-20 bg-white/60 backdrop-blur-sm rounded-3xl p-8 max-w-xs mx-auto mt-10">
           <div class="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mx-auto mb-4 border border-gray-100 shadow-sm">
             <MessageCircle class="w-6 h-6 text-gray-300" />

@@ -10,12 +10,15 @@ export default defineEventHandler(async (event) => {
 
   const { page = 1, limit = 10, search = '' } = getQuery(event)
   
+  const escapeRegex = (str: string): string => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
   const query: any = { profileId: profile._id }
   if (search) {
+    const safeSearch = escapeRegex(String(search))
     query.$or = [
-      { name: { $regex: search, $options: 'i' } },
-      { description: { $regex: search, $options: 'i' } },
-      { sku: { $regex: search, $options: 'i' } }
+      { name: { $regex: safeSearch, $options: 'i' } },
+      { description: { $regex: safeSearch, $options: 'i' } },
+      { sku: { $regex: safeSearch, $options: 'i' } }
     ]
   }
 

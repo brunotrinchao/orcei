@@ -17,10 +17,6 @@ vi.mock('mongoose', async (importOriginal) => {
 })
 
 // Mocking Nuxt global functions
-vi.stubGlobal('useRuntimeConfig', () => ({
-  qstashCurrentSigningKey: 'mock',
-  qstashNextSigningKey: 'mock'
-}))
 vi.stubGlobal('getHeader', vi.fn())
 vi.stubGlobal('getHeaders', vi.fn())
 vi.stubGlobal('readBody', vi.fn())
@@ -47,6 +43,10 @@ describe('QStash Webhook Integration', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
+    // Mutate the real reactive useRuntimeConfig instance provided by Nuxt Vitest environment
+    const config = useRuntimeConfig()
+    config.qstashCurrentSigningKey = 'mock-current-key'
+    config.qstashNextSigningKey = 'mock-next-key'
     const module = await import('../server/api/webhooks/qstash.post')
     handler = module.default
   })

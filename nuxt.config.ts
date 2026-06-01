@@ -1,12 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-console.log("IN NUXT CONFIG MONGODB_URI IS: ", process.env.MONGODB_URI);
 export default defineNuxtConfig({
   modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@vueuse/nuxt', '@nuxtjs/cloudinary', '@vercel/speed-insights'],
   
   cloudinary: {
     cloudName: process.env.CLOUDINARY_NAME || process.env.NUXT_CLOUDINARY_CLOUD_NAME,
-    apiKey: process.env.CLOUDINARY_API_KEY,
-    apiSecret: process.env.CLOUDINARY_API_SECRET,
   },
 
   app: {
@@ -139,5 +136,5 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: '2024-04-03',
-  devtools: { enabled: true }
+  devtools: { enabled: process.env.NODE_ENV !== 'production' }
 })

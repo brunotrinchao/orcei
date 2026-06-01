@@ -166,8 +166,10 @@ export function useProposalChat(options: UseProposalChatOptions) {
   }
 
   function disconnectPusher() {
-    if (chatChannel) chatChannel.unbind_all()
-    if (pusherInstance) pusherInstance.disconnect()
+    if (chatChannel) {
+      chatChannel.unbind_all()
+      chatChannel.unsubscribe()
+    }
     pusherInstance = null
     chatChannel = null
   }

@@ -1,13 +1,19 @@
+import { timingSafeEqual } from 'node:crypto'
 import { Proposal } from '../../../models/Proposal'
 import { ProposalMessage } from '../../../models/ProposalMessage'
 import { ProposalService } from '../../../services/ProposalService'
+import { checkRateLimit } from '../../../utils/rate-limit'
 
 export default defineEventHandler(async (event) => {
   const { slug, t: token } = getQuery(event)
+  checkRateLimit(event, { max: 20, windowMs: 60 * 1000, keyPrefix: 'public-proposal-msg' })
   const body = await readBody(event)
 
   if (!slug) throw createError({ statusCode: 400, statusMessage: 'Missing Slug' })
   if (!body.text) throw createError({ statusCode: 400, statusMessage: 'Missing Message Text' })
+  if (typeof body.text !== 'string' || body.text.length > 5000) {
+    throw createError({ statusCode: 400, statusMessage: 'Mensagem inválida ou muito longa (máximo 5000 caracteres)' })
+  }
 
   let proposal
   try {
@@ -19,9 +25,11 @@ export default defineEventHandler(async (event) => {
 
   if (!proposal) throw createError({ statusCode: 404, statusMessage: 'Proposal not found' })
 
-  // Security check
-  if (proposal.token && proposal.token !== token) {
-    throw createError({ statusCode: 403, statusMessage: 'Token inválido' })
+  // Security check — timingSafeEqual previne timing attack
+  if (proposal.token) {
+    if (!token || !timingSafeEqual(Buffer.from(String(proposal.token)), Buffer.from(String(token)))) {
+      throw createError({ statusCode: 403, statusMessage: 'Token inválido' })
+    }
   }
 
   const message = await ProposalMessage.create({

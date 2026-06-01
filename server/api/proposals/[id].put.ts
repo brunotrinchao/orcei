@@ -11,7 +11,9 @@ export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
   const body = await readBody(event)
 
-  const proposal = await ProposalService.update(id!, profile._id as any, body)
+  const ALLOWED_FIELDS = ['title', 'client', 'items', 'upsellItems', 'paymentConfig', 'contractText', 'termsAndConditions', 'status', 'sendMethod', 'notes', 'executionDate', 'totals']
+  const safeBody = Object.fromEntries(Object.entries(body).filter(([k]) => ALLOWED_FIELDS.includes(k)))
+  const proposal = await ProposalService.update(id!, profile._id as any, safeBody)
   if (!proposal) {
     throw createError({ 
       statusCode: 404, 

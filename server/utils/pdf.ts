@@ -56,6 +56,32 @@ export async function generateProposalPdfBuffer(proposal: any, profile: any, app
   return pdf
 }
 
+export async function generatePdfFromHtml(htmlContent: string): Promise<Buffer> {
+  let browser
+  const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL
+
+  if (isProd) {
+    const puppeteerCore = await import('puppeteer-core').then(m => m.default || m)
+    const chromium = await import('@sparticuz/chromium').then(m => m.default || m)
+
+    browser = await puppeteerCore.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    })
+  } else {
+    const puppeteer = await import('puppeteer').then(m => m.default || m)
+    browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] })
+  }
+
+  const page = await browser.newPage()
+  await page.setContent(htmlContent)
+  const pdf = await page.pdf({ format: 'A4', printBackground: true })
+  await browser.close()
+  return pdf as Buffer
+}
+
 export function generateProposalHtml(proposal: any, profile: any, appName: string = 'ORCEI') {
   // Processar variáveis e sanitizar contra injeção de script
   const contractHtml = sanitizeHtml(processVariables(proposal.contractText || '', proposal, profile), sanitizeOptions)

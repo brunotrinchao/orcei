@@ -18,13 +18,16 @@ export default defineEventHandler(async (event) => {
   const endDate = String(queryParams.endDate || '')
   const pendingChat = queryParams.pendingChat === 'true'
 
+  const escapeRegex = (str: string): string => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
   const query: any = { profileId: profile._id }
-  
+
   if (search) {
+    const safeSearch = escapeRegex(search)
     query.$or = [
-      { title: { $regex: search, $options: 'i' } },
-      { 'client.name': { $regex: search, $options: 'i' } },
-      { code: { $regex: search, $options: 'i' } }
+      { title: { $regex: safeSearch, $options: 'i' } },
+      { 'client.name': { $regex: safeSearch, $options: 'i' } },
+      { code: { $regex: safeSearch, $options: 'i' } }
     ]
   }
 

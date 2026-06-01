@@ -59,6 +59,7 @@ export const ProposalService = {
         { upsert: true, returnDocument: 'after', session: session || undefined }
       )
 
+      if (!counter) throw new Error('Falha ao gerar número de sequência')
       const sequenceNumber = counter.lastSequence
       const code = `#ORC-${currentYear}-${String(sequenceNumber).padStart(3, '0')}`
 
@@ -306,7 +307,7 @@ export const ProposalService = {
   async requestChanges(slug: string, notes?: string) {
     const updated = await Proposal.findOneAndUpdate({ slug }, { status: ProposalStatus.PENDING }, { returnDocument: 'after' })
     if (updated) {
-      await this.logHistory(updated._id, ProposalStatus.VIEWED, 'system', { notes })
+      await this.logHistory(updated._id, ProposalStatus.PENDING, 'system', { notes })
     }
     return updated
   },

@@ -3,6 +3,14 @@ import { ref } from 'vue'
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
 import Billing from '../app/pages/planos/index.vue'
 
+vi.mock('/home/brunotrinchao/Documentos/Bruno/Orcei/app/components/ui/BaseButton.vue', () => ({
+  default: {
+    name: 'BaseButton',
+    props: ['variant', 'size', 'disabled', 'loading', 'to'],
+    template: '<button :disabled="disabled"><slot /></button>'
+  }
+}))
+
 const { mockUseFetch, mockNotify } = vi.hoisted(() => ({
   mockUseFetch: vi.fn(),
   mockNotify: vi.fn()

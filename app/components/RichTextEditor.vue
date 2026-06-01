@@ -40,6 +40,10 @@ watch(() => props.modelValue, (newVal) => {
     editor.value.commands.setContent(newVal, { emitUpdate: false })
   }
 })
+
+onUnmounted(() => {
+  editor.value?.destroy()
+})
 </script>
 
 <template>

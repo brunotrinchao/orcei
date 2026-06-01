@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Cliente sem e-mail cadastrado' })
   }
 
-  const proposalUrl = `${process.env.PUBLIC_URL || 'https://orcei.com.br'}/p/${proposal.slug}?t=${proposal.token}`
+  const proposalUrl = `${process.env.PUBLIC_URL || 'https://orceifacil.com.br'}/p/${proposal.slug}?t=${proposal.token}`
   
   await QueueService.publish('SEND_EMAIL_PROPOSAL', {
     clientEmail: proposal.client.email,

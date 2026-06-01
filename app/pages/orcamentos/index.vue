@@ -642,7 +642,7 @@ const formatTime = (date: any) => {
 
       <template #footer>
         <NuxtLink
-          :to="selectedProposal ? `/p/${selectedProposal.slug}` : '#'"
+          :to="selectedProposal ? `/p/${selectedProposal.slug}${selectedProposal.token ? `?t=${selectedProposal.token}` : ''}` : '#'"
           target="_blank"
           class="mr-auto flex items-center gap-2 text-xs font-black text-gray-400 hover:text-blue-600 uppercase tracking-widest transition-colors"
         >

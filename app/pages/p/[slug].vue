@@ -276,10 +276,10 @@ const statusMap: any = {
     <!-- ─── STICKY HEADER ──────────────────────────────────────────── -->
     <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100/80">
       <div class="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
-        <!-- Logo -->
+        <!-- Logo da empresa do profissional -->
         <img
-          :src="useRuntimeConfig().public.appDocumentLogo || 'https://res.cloudinary.com/dpeaqezkb/image/upload/v1778873300/orcafacil/logo-default.png'"
-          :alt="systemInfo?.landingPage?.appName || 'Orcei'"
+          :src="proposal.profileId?.brandConfig?.logoUrl || useRuntimeConfig().public.appDocumentLogo || 'https://res.cloudinary.com/dpeaqezkb/image/upload/v1778873300/orcafacil/logo-default.png'"
+          :alt="proposal.profileId?.name || systemInfo?.landingPage?.appName || 'Orcei'"
           class="h-7 w-auto object-contain"
         />
         <!-- Code + Status -->

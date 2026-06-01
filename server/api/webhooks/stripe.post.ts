@@ -322,9 +322,16 @@ export default defineEventHandler(async (event) => {
         checkoutUrl
       })
 
-      if (userEmail) {
-        // Rotina de simulação de disparo (Brevo/WhatsApp)
-        console.log(`[Recuperação de Carrinho] Fluxo disparado com sucesso para ${userEmail} (Produto: ${tier || 'créditos'})`)
+      if (userEmail && checkoutUrl) {
+        try {
+          await QueueService.publish('SEND_EMAIL_CART_RECOVERY', {
+            userEmail,
+            checkoutUrl
+          })
+          console.log(`[Recuperação de Carrinho] Email enfileirado para ${userEmail} (Produto: ${tier || 'créditos'})`)
+        } catch (emailErr: any) {
+          console.error('[Recuperação de Carrinho] Falha ao enfileirar email:', emailErr.message)
+        }
       }
     }
 

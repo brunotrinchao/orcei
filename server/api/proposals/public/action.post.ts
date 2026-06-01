@@ -4,7 +4,7 @@ import { Proposal } from '../../../models/Proposal'
 import { checkRateLimit } from '../../../utils/rate-limit'
 
 export default defineEventHandler(async (event) => {
-  checkRateLimit(event, { max: 10, windowMs: 60 * 1000, keyPrefix: 'public-proposal-action' })
+  await checkRateLimit(event, { max: 10, windowMs: 60 * 1000, keyPrefix: 'public-proposal-action' })
 
   const body = await readBody(event)
   const { slug, token, action, notes } = body

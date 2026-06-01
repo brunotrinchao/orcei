@@ -384,8 +384,9 @@ describe('Stripe Webhook Integration', () => {
       expect.stringContaining('[Recuperação de Carrinho] Webhook expirado recebido para CRO'),
       expect.any(Object)
     )
-    expect(spyLog).toHaveBeenCalledWith(
-      expect.stringContaining('Fluxo disparado com sucesso para cliente_abandonado@orcei.com')
-    )
+    expect(mockQueuePublish).toHaveBeenCalledWith('SEND_EMAIL_CART_RECOVERY', expect.objectContaining({
+      userEmail: 'cliente_abandonado@orcei.com',
+      checkoutUrl: 'https://checkout.stripe.com/pay/cs_test_123'
+    }))
   })
 })

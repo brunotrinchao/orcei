@@ -418,8 +418,8 @@ function formatRelativeTime(minutesAgo: number) {
                 >
                   <img :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5" alt="WhatsApp" /> Chamar WhatsApp
                 </a>
-                <NuxtLink 
-                  to="/orcamentos"
+                <NuxtLink
+                  :to="`/orcamentos?slug=${alert.slug}`"
                   class="flex-1 flex items-center justify-center gap-1.5 py-2 border border-gray-200 hover:bg-gray-50 text-gray-600 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
                 >
                   Ver Proposta

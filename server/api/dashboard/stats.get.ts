@@ -38,7 +38,8 @@ export default defineEventHandler(async (event) => {
   
   const totalRevenue = acceptedProposals.reduce((acc, p) => acc + (p.totals?.final || 0), 0)
   const ticketMedia = acceptedCount > 0 ? totalRevenue / acceptedCount : 0
-  const approvalRate = proposalsCount > 0 ? (acceptedCount / proposalsCount) * 100 : 0
+  const nonDraftCount = proposalsCount - draftCount
+  const approvalRate = nonDraftCount > 0 ? (acceptedCount / nonDraftCount) * 100 : 0
 
   // 1. Cálculo de TMA (Tempo Médio de Fechamento comercial em horas)
   // Utiliza a diferença entre updatedAt (aceite) e createdAt (criação/publicação)
@@ -115,7 +116,8 @@ export default defineEventHandler(async (event) => {
       title: p.title,
       clientName: p.client?.name,
       clientPhone: p.client?.phone,
-      daysAgo: Math.floor((Date.now() - p.createdAt.getTime()) / (1000 * 60 * 60 * 24))
+      daysAgo: Math.floor((Date.now() - p.createdAt.getTime()) / (1000 * 60 * 60 * 24)),
+      slug: p.slug,
     }))
 
   // Revenue History (últimos 30 dias ou período)

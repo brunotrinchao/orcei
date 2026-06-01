@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)
 
   // Rate Limit: 5 uploads per 1 minute
-  checkRateLimit(event, { max: 5, windowMs: 60 * 1000, keyPrefix: 'upload' })
+  await checkRateLimit(event, { max: 5, windowMs: 60 * 1000, keyPrefix: 'upload' })
 
   const config = useRuntimeConfig()
 

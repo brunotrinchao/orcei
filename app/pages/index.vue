@@ -184,7 +184,10 @@ useHead({
     <!-- 5. Fluxo de 3 Etapas (Como Funciona) -->
     <LandingHowItWorks />
 
-    <!-- 6. FAQ com Respostas de objeções WAI-ARIA -->
+    <!-- 6. Planos e Preços -->
+    <LandingPricing />
+
+    <!-- 7. FAQ com Respostas de objeções WAI-ARIA -->
     <LandingFAQ />
 
     <!-- 7. CTA Final de alta conversão -->

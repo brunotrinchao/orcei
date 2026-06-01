@@ -5,8 +5,16 @@ export default defineNuxtRouteMiddleware(async (to) => {
   // Ignorar check para rota de manutenção e assets
   if (to.path !== '/maintenance' && !to.path.startsWith('/_')) {
     try {
-      const status: any = await $fetch('/api/system/status')
-      if (status.maintenanceMode && user.value?.role !== 'admin') {
+      const systemStatus = useState<{ data: any; fetchedAt: number } | null>('system-status', () => null)
+      const now = Date.now()
+      const CACHE_TTL = 5 * 60 * 1000 // 5 minutos
+
+      if (!systemStatus.value || now - systemStatus.value.fetchedAt > CACHE_TTL) {
+        const data: any = await $fetch('/api/system/status')
+        systemStatus.value = { data, fetchedAt: now }
+      }
+
+      if (systemStatus.value.data.maintenanceMode && user.value?.role !== 'admin') {
         return navigateTo('/maintenance')
       }
     } catch (e) {

@@ -186,6 +186,10 @@ export function generateProposalHtml(proposal: any, profile: any, appName: strin
         <div class="section-title">Termos e Condições</div>
         ${termsHtml}
       </div>
+
+      <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; font-size: 9px; color: #ccc; font-family: sans-serif; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 900;">
+        Powered by Orcei Fácil · orceifacil.com.br
+      </div>
     </body>
     </html>
   `

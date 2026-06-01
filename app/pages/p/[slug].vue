@@ -488,14 +488,19 @@ const statusMap: any = {
           Termos e Condições de Serviço
         </button>
 
-        <div class="flex flex-col items-center gap-2 pt-4">
+        <a
+          href="https://orceifacil.com.br?utm_source=proposal&utm_medium=powered_by&utm_campaign=viral_loop"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex flex-col items-center gap-2 pt-4 hover:opacity-80 transition-opacity"
+        >
           <img
             :src="useRuntimeConfig().public.appDocumentLogo || 'https://res.cloudinary.com/dpeaqezkb/image/upload/v1778873300/orcafacil/logo-default.png'"
             :alt="systemInfo?.landingPage?.appName || 'Orcei'"
             class="h-5 w-auto object-contain opacity-30"
           />
           <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">Powered by {{ systemInfo?.landingPage?.appName || 'Orcei' }}</p>
-        </div>
+        </a>
       </footer>
     </main>
 

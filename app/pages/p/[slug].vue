@@ -185,21 +185,45 @@ async function handleAction() {
 }
 
 const formatDate = (date: any) => {
-  return new Date(date).toLocaleDateString('pt-BR', {
+  if (!date) return 'Sem validade'
+  const d = new Date(date)
+  if (isNaN(d.getTime())) return 'Sem validade'
+  return d.toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: 'long',
     year: 'numeric'
   })
 }
 
+// Retorna o número de WhatsApp do perfil (campo phones[])
+const profileWhatsapp = computed(() => {
+  const phones = (proposal.value?.profileId as any)?.contact?.phones
+  if (!phones?.length) return null
+  const wa = phones.find((p: any) => p.isWhatsapp)
+  return (wa || phones[0])?.number || null
+})
+
 const { data: systemInfo } = useFetch<any>('/api/system/status')
 
 const statusMap: any = {
-  draft: { label: 'Rascunho', class: 'bg-gray-100 text-gray-600' },
-  created: { label: 'Enviado', class: 'bg-blue-100 text-blue-600' },
-  pending: { label: 'Pendente', class: 'bg-orange-100 text-orange-600' },
-  accepted: { label: 'Aceito', class: 'bg-green-100 text-green-600' },
-  expired: { label: 'Expirado', class: 'bg-red-100 text-red-600' }
+  draft:      { label: 'Rascunho',   variant: 'default' },
+  created:    { label: 'Enviado',    variant: 'info' },
+  sent:       { label: 'Enviado',    variant: 'info' },
+  delivered:  { label: 'Entregue',   variant: 'info' },
+  opened:     { label: 'Aberto',     variant: 'info' },
+  clicked:    { label: 'Visualizado', variant: 'info' },
+  viewed:     { label: 'Visualizado', variant: 'info' },
+  pending:    { label: 'Pendente',   variant: 'warning' },
+  scheduled:  { label: 'Agendado',   variant: 'info' },
+  received:   { label: 'Recebido',   variant: 'info' },
+  bounced:    { label: 'Enviado',    variant: 'info' },
+  delayed:    { label: 'Enviado',    variant: 'info' },
+  failed:     { label: 'Enviado',    variant: 'info' },
+  suppressed: { label: 'Enviado',    variant: 'info' },
+  accepted:   { label: 'Aceito',     variant: 'success' },
+  expired:    { label: 'Expirado',   variant: 'error' },
+  declined:   { label: 'Recusado',   variant: 'error' },
+  changes_requested: { label: 'Revisão Solicitada', variant: 'warning' }
 }
 </script>
 
@@ -287,8 +311,8 @@ const statusMap: any = {
           <span class="hidden sm:block text-[10px] font-black text-gray-600 uppercase tracking-[0.2em]">
             #{{ proposal.code }}
           </span>
-          <BaseBadge :variant="proposal.status === 'accepted' ? 'success' : proposal.status === 'expired' ? 'error' : 'info'">
-            {{ statusMap[proposal.status]?.label }}
+          <BaseBadge :variant="statusMap[proposal.status]?.variant || 'info'">
+            {{ statusMap[proposal.status]?.label || proposal.status }}
           </BaseBadge>
         </div>
       </div>
@@ -407,7 +431,9 @@ const statusMap: any = {
                 </p>
               </div>
               <p v-if="!['accepted', 'expired'].includes(proposal.status)" class="mt-2 text-xs font-black text-[#6B84FF] uppercase tracking-widest">
-                {{ selectedMethod === 'cash' ? `À Vista — ${proposal.paymentConfig.cashDiscount}% OFF` : `Cartão — ${proposal.paymentConfig.installments}x sem juros` }}
+                {{ selectedMethod === 'cash'
+                ? (proposal.paymentConfig.cashDiscount > 0 ? `À Vista — ${proposal.paymentConfig.cashDiscount}% OFF` : 'À Vista')
+                : (proposal.paymentConfig.installments > 1 ? `Cartão — ${proposal.paymentConfig.installments}x sem juros` : 'À Vista no Cartão') }}
               </p>
             </div>
 
@@ -462,8 +488,8 @@ const statusMap: any = {
               </div>
             </a>
             <a
-              v-if="proposal.profileId?.contact?.phone || proposal.profileId?.contact?.whatsapp"
-              :href="`https://wa.me/${(proposal.profileId.contact?.phone || proposal.profileId.contact?.whatsapp).replace(/\D/g, '')}`"
+              v-if="profileWhatsapp"
+              :href="`https://wa.me/${profileWhatsapp.replace(/\D/g, '')}`"
               target="_blank"
               class="flex items-center gap-3 p-4 bg-white/5 hover:bg-green-500/10 rounded-2xl border border-white/10 hover:border-green-500/30 transition-all group outline-none focus-visible:ring-2 focus-visible:ring-green-500"
             >
@@ -472,7 +498,7 @@ const statusMap: any = {
               </div>
               <div>
                 <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">WhatsApp</p>
-                <p class="text-xs font-bold text-gray-300">{{ proposal.profileId.contact?.phone || proposal.profileId.contact?.whatsapp }}</p>
+                <p class="text-xs font-bold text-gray-300">{{ profileWhatsapp }}</p>
               </div>
             </a>
           </div>

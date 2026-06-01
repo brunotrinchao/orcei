@@ -233,6 +233,38 @@ export const sendCreditPurchaseEmail = async (
   }
 }
 
+export const sendCartRecoveryEmail = async (
+  userEmail: string,
+  checkoutUrl: string
+) => {
+  const resend = getResend()
+  if (!resend) return null
+
+  try {
+    const { appName, resendTestTo } = getEmailConfig()
+    const recipient = resendTestTo || userEmail
+
+    const { data, error } = await resend.emails.send({
+      from: `${appName} <contato@orceifacil.com.br>`,
+      to: recipient,
+      subject: 'Você esqueceu algo no carrinho — Orcei Fácil',
+      html: `<div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 40px; color: #333;">
+    <h2 style="color: #3147F6;">Ei, você esqueceu algo! 👋</h2>
+    <p>Você começou a assinar o <strong>Orcei Fácil</strong> mas não finalizou.</p>
+    <p>Seus créditos estão te esperando para gerar propostas profissionais com IA.</p>
+    <a href="${checkoutUrl}" style="display: inline-block; margin-top: 20px; padding: 12px 24px; background: #3147F6; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">Finalizar minha assinatura →</a>
+    <p style="margin-top: 30px; font-size: 12px; color: #999;">Se precisar de ajuda, responda este email.</p>
+  </div>`
+    })
+
+    if (error) console.error('[Resend] Cart Recovery Email Error:', JSON.stringify(error))
+    return data
+  } catch (err) {
+    console.error('[Resend] Cart Recovery Email Exception:', err)
+    return null
+  }
+}
+
 export const sendPlanCancellationEmail = async (
   userEmail: string, 
   userName: string, 

@@ -10,12 +10,13 @@ import { GoogleService } from '../../services/GoogleService'
 import { generateProposalPdfBuffer } from '../../utils/pdf'
 import { jsonToCsv } from '../../utils/csv'
 import { 
-  sendBackupEmail, 
+  sendBackupEmail,
   sendProposalEmail,
   sendWelcomeEmail,
   sendCreditPurchaseEmail,
   sendPlanActivationEmail,
-  sendPlanCancellationEmail
+  sendPlanCancellationEmail,
+  sendCartRecoveryEmail
 } from '../../utils/email'
 import { uploadToCloudinary } from '../../utils/cloudinary'
 
@@ -94,6 +95,10 @@ export default defineEventHandler(async (event) => {
 
       case 'SEND_EMAIL_PLAN_CANCELLATION':
         await handleSendEmailPlanCancellation(body)
+        break
+
+      case 'SEND_EMAIL_CART_RECOVERY':
+        await handleSendEmailCartRecovery(body)
         break
 
       case 'REGISTER_AUDIT_LOG':
@@ -240,4 +245,10 @@ async function handleSendEmailPlanCancellation(payload: any) {
   const { userEmail, userName, planName, cancellationDate, effectiveEndDate } = payload
   console.log(`[Job] Enviando e-mail de cancelamento de plano para: ${userEmail}`)
   await sendPlanCancellationEmail(userEmail, userName, planName, cancellationDate, effectiveEndDate)
+}
+
+async function handleSendEmailCartRecovery(payload: any) {
+  const { userEmail, checkoutUrl } = payload
+  console.log(`[Job] Enviando e-mail de recuperação de carrinho para: ${userEmail}`)
+  await sendCartRecoveryEmail(userEmail, checkoutUrl)
 }

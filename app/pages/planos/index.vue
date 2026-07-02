@@ -6,109 +6,12 @@ import {
 import type { ProfileDTO } from '../../../types'
 
 const { data: profile, refresh: refreshProfile, pending: pendingProfile } = useLazyFetch<ProfileDTO>('/api/profile', { key: 'profile' })
-const { data: stripePackages, refresh: refreshPackages, pending: pendingPackages } = useLazyFetch<any[]>('/api/stripe/plans')
 const { notify } = useAlerts()
 
 const isLoading = ref<string | null>(null)
 
-// Novos Pacotes Transacionais de Créditos (Obtidos dinamicamente do Stripe com fallback local!)
-const packages = computed(() => {
-  const stripeData = stripePackages.value || []
-  
-  if (!stripeData.length) {
-    return [
-      {
-        id: 'single_credit',
-        name: 'Crédito Avulso',
-        credits: 1,
-        price: 'R$ 5,90',
-        unitPrice: 'R$ 5,90 / crédito',
-        description: 'Ideal para orçar um projeto avulso rápido sem compromisso.',
-        features: [
-          'Gere 1 Orçamento ou Relatório IA',
-          'Valor avulso sem mensalidades',
-          'Créditos Vitalícios (Nunca expiram)',
-          'Contratos e PDFs incluídos',
-          'Assinatura digital padrão'
-        ],
-        highlight: false,
-        badge: 'Consumo Único'
-      },
-      {
-        id: 'starter_pack',
-        name: 'Pacote Starter',
-        credits: 10,
-        price: 'R$ 29,90',
-        unitPrice: 'R$ 2,99 / crédito',
-        description: 'Para freelancers iniciantes com fluxo regular de propostas.',
-        features: [
-          'Gere 10 Orçamentos ou Relatórios',
-          'Economia real de 49.3% por crédito',
-          'Créditos Vitalícios (Nunca expiram)',
-          'Contratos e PDFs incluídos',
-          'Assinatura digital padrão'
-        ],
-        highlight: false,
-        badge: 'Popular para Iniciantes'
-      },
-      {
-        id: 'pro_pack',
-        name: 'Pacote Profissional',
-        credits: 30,
-        price: 'R$ 69,90',
-        unitPrice: 'R$ 2,33 / crédito',
-        description: 'Focado em profissionais autônomos ativos com volume comercial constante.',
-        features: [
-          'Gere 30 Orçamentos ou Relatórios',
-          'Economia gigante de 60.5% por crédito',
-          'Créditos Vitalícios (Nunca expiram)',
-          'Contratos e PDFs incluídos',
-          'Assinatura digital padrão'
-        ],
-        highlight: true,
-        badge: 'Melhor Valor'
-      },
-      {
-        id: 'agency_pack',
-        name: 'Pacote Agência',
-        credits: 100,
-        price: 'R$ 149,90',
-        unitPrice: 'R$ 1,50 / crédito',
-        description: 'Para agências, estúdios ou autônomos com escala de contratações.',
-        features: [
-          'Gere 100 Orçamentos ou Relatórios',
-          'Economia máxima de 74.5% por crédito',
-          'Créditos Vitalícios (Nunca expiram)',
-          'Contratos e PDFs incluídos',
-          'Assinatura digital padrão'
-        ],
-        highlight: false,
-        badge: 'Uso Comercial Elevado'
-      }
-    ]
-  }
-
-  // Mapeia e decora cada produto e preço dinâmico do Stripe
-  return stripeData.map(pack => {
-    const id = (pack.tier || pack.id || '').toLowerCase()
-    const isPro = id.includes('pro') || id.includes('premium') || id.includes('profissional')
-    const isStarter = id.includes('starter')
-    const isAgency = id.includes('agency') || id.includes('annual') || id.includes('agencia')
-    const isSingle = id.includes('single') || id.includes('credit') || id.includes('avulso')
-    
-    return {
-      id: pack.priceId || pack.id,
-      name: pack.name,
-      credits: pack.credits || (isSingle ? 1 : isStarter ? 10 : isPro ? 30 : isAgency ? 100 : 1),
-      price: pack.price,
-      unitPrice: pack.unitPrice || (isSingle ? 'R$ 5,90 / crédito' : isStarter ? 'R$ 2,99 / crédito' : isPro ? 'R$ 2,33 / crédito' : 'R$ 1,50 / crédito'),
-      description: pack.description || '',
-      features: pack.features || [],
-      highlight: pack.highlight ?? isPro,
-      badge: isSingle ? 'Consumo Único' : isStarter ? 'Popular para Iniciantes' : isPro ? 'Melhor Valor' : 'Uso Comercial Elevado'
-    }
-  })
-})
+// Fonte única de pacotes (mesma usada na landing page)
+const { packages, refresh: refreshPackages, pending: pendingPackages } = useCreditPackages()
 
 const couponCode = ref('')
 const couponLoading = ref(false)

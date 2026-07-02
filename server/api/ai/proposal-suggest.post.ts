@@ -2,6 +2,7 @@ import { CatalogItem } from '../../models/CatalogItem'
 import { AIService } from '../../services/AIService'
 import { CatalogMatchingService } from '../../services/CatalogMatchingService'
 import { ProfileService } from '../../services/ProfileService'
+import { Profile } from '../../models/Profile'
 import { checkRateLimit } from '../../utils/rate-limit'
 
 export default defineEventHandler(async (event) => {
@@ -31,15 +32,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Dedução de 1 crédito
-  if ((session.user as any).role !== 'admin') {
-    profile.creditsBalance = Math.max(0, profile.creditsBalance - 1)
-    profile.creditsUsed = (profile.creditsUsed || 0) + 1
-    if (!profile.aiUsage) profile.aiUsage = { reports: 0, proposals: 0, catalog: 0 }
-    profile.aiUsage.proposals = (profile.aiUsage.proposals || 0) + 1
-    await profile.save()
-  }
-
   // Get full catalog to find relevant items via embeddings
   const fullCatalog = await CatalogItem.find({ profileId: profile._id }).lean()
 
@@ -62,10 +54,22 @@ export default defineEventHandler(async (event) => {
     if (!responseText) throw new Error('IA retornou resposta vazia')
 
     const aiResult = JSON.parse(responseText)
-    
+
+    // Dedução de 1 crédito SOMENTE após a IA retornar sugestão válida (atômica)
+    if ((session.user as any).role !== 'admin') {
+      const updated = await Profile.findOneAndUpdate(
+        { _id: profile._id, creditsBalance: { $gte: 1 } },
+        { $inc: { creditsBalance: -1, creditsUsed: 1, 'aiUsage.proposals': 1 } },
+        { new: true }
+      )
+      if (!updated) {
+        throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para usar a IA.' })
+      }
+    }
+
     // Mapear para o formato que o frontend (AIProposalWizard.vue) espera
     const hasNewItems = aiResult.items.some((i: any) => i.source === 'new')
-    
+
     return {
       type: hasNewItems ? 'suggested' : 'existing',
       reasoning: aiResult.reasoning,
@@ -79,6 +83,7 @@ export default defineEventHandler(async (event) => {
       }))
     }
   } catch (e: any) {
+    if (e.statusCode) throw e
     console.error('AI Proposal Suggest Error:', e)
     throw createError({
       statusCode: 500,

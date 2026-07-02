@@ -3,6 +3,7 @@ import { AIService } from '../../services/AIService'
 import { checkRateLimit } from '../../utils/rate-limit'
 
 import { ProfileService } from '../../services/ProfileService'
+import { Profile } from '../../models/Profile'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -24,15 +25,6 @@ export default defineEventHandler(async (event) => {
       statusCode: 402,
       statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para usar a IA.'
     })
-  }
-
-  // Dedução de 1 crédito
-  if ((session.user as any).role !== 'admin') {
-    profile.creditsBalance = Math.max(0, profile.creditsBalance - 1)
-    profile.creditsUsed = (profile.creditsUsed || 0) + 1
-    if (!profile.aiUsage) profile.aiUsage = { reports: 0, proposals: 0, catalog: 0 }
-    profile.aiUsage.catalog = (profile.aiUsage.catalog || 0) + 1
-    await profile.save()
   }
 
   const { name, type, context } = await readBody(event)
@@ -114,6 +106,18 @@ Regras:
     const raw = text.trim().replace(/```json|```/g, '').trim()
     const json = JSON.parse(raw)
 
+    // Dedução de 1 crédito SOMENTE após a IA retornar sugestão válida (atômica)
+    if ((session.user as any).role !== 'admin') {
+      const updated = await Profile.findOneAndUpdate(
+        { _id: profile._id, creditsBalance: { $gte: 1 } },
+        { $inc: { creditsBalance: -1, creditsUsed: 1, 'aiUsage.catalog': 1 } },
+        { new: true }
+      )
+      if (!updated) {
+        throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para usar a IA.' })
+      }
+    }
+
     return {
       description: json.description || '',
       price: typeof json.price === 'number' && json.price > 0 ? json.price : null,
@@ -121,6 +125,7 @@ Regras:
       similarCount: similarItems.length
     }
   } catch (e: any) {
+    if (e.statusCode) throw e
     console.error('AI Catalog Suggest Error:', e)
     throw createError({
       statusCode: 500,

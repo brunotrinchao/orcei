@@ -19,37 +19,23 @@ const isOpen = computed({
 const isLoading = ref<string | null>(null)
 const { notify } = useAlerts()
 
-const { data: stripePackages } = useFetch<any[]>('/api/stripe/plans')
+// Mesma fonte de dados usada em /planos e na landing page
+const { packages: allPackages } = useCreditPackages()
 
-const packages = computed(() => {
-  const stripeData = stripePackages.value || []
-  
-  if (!stripeData.length) {
-    return [
-      { id: 'starter_pack', name: 'Starter', credits: 10, price: 'R$ 29,90', unitPrice: 'R$ 2,99', discount: '49%', highlight: false, badge: 'Iniciantes' },
-      { id: 'pro_pack', name: 'Profissional', credits: 30, price: 'R$ 69,90', unitPrice: 'R$ 2,33', discount: '60%', highlight: true, badge: 'Melhor Valor' },
-      { id: 'agency_pack', name: 'Agência', credits: 100, price: 'R$ 149,90', unitPrice: 'R$ 1,50', discount: '74%', highlight: false, badge: 'Uso Comercial' }
-    ]
-  }
+const discountByBadge: Record<string, string> = {
+  'Popular para Iniciantes': '52%',
+  'Melhor Valor': '62%',
+  'Uso Comercial Elevado': '75%'
+}
 
-  return stripeData.map(pack => {
-    const id = (pack.tier || pack.id || '').toLowerCase()
-    const isPro = id.includes('pro') || id.includes('premium') || id.includes('profissional')
-    const isStarter = id.includes('starter')
-    const isSingle = id.includes('single') || id.includes('avulso')
-    
-    return {
-      id: pack.priceId || pack.id,
-      name: pack.name,
-      credits: pack.credits || (isSingle ? 1 : isStarter ? 10 : isPro ? 30 : 100),
-      price: pack.price,
-      unitPrice: pack.unitPrice || 'R$ 2,33',
-      discount: isStarter ? '49%' : isPro ? '60%' : '74%',
-      highlight: pack.highlight ?? isPro,
-      badge: isSingle ? 'Avulso' : isStarter ? 'Iniciantes' : isPro ? 'Melhor Valor' : 'Uso Comercial'
-    }
-  }).filter(p => p.credits >= 10) // Foca apenas nos pacotes de recarga (não avulso) no modal
-})
+const packages = computed(() =>
+  allPackages.value
+    .filter(p => p.credits >= 10) // Foca apenas nos pacotes de recarga (não avulso) no modal
+    .map(p => ({
+      ...p,
+      discount: discountByBadge[p.badge] || '0%'
+    }))
+)
 
 const selectedPack = ref<string | null>(null)
 const activePack = computed(() => {

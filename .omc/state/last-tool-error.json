@@ -1,0 +1,7 @@
+{
+  "tool_name": "Read",
+  "tool_input_preview": "{\"file_path\":\"/home/brunotrinchao/onfly/orcei/app/pages/planos/index.vue\"}",
+  "error": "File does not exist. Note: your current working directory is /home/brunotrinchao/Documentos/Bruno/Orcei.",
+  "timestamp": "2026-07-02T18:18:11.275Z",
+  "retry_count": 2
+}

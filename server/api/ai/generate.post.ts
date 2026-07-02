@@ -26,18 +26,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Dedução de 1 crédito (atômica — previne race condition)
-  if ((session.user as any).role !== 'admin') {
-    const updated = await Profile.findOneAndUpdate(
-      { _id: profile._id, creditsBalance: { $gte: 1 } },
-      { $inc: { creditsBalance: -1, creditsUsed: 1, 'aiUsage.proposals': 1 } },
-      { new: true }
-    )
-    if (!updated) {
-      throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para usar a IA.' })
-    }
-  }
-
   const { prompt } = await readBody(event)
   if (!prompt) {
     throw createError({ statusCode: 400, statusMessage: 'Prompt é obrigatório' })
@@ -45,12 +33,26 @@ export default defineEventHandler(async (event) => {
 
   try {
     const text = await AIService.generateDescription(prompt)
+
+    // Dedução de 1 crédito SOMENTE após geração bem-sucedida (atômica — previne race condition)
+    if ((session.user as any).role !== 'admin') {
+      const updated = await Profile.findOneAndUpdate(
+        { _id: profile._id, creditsBalance: { $gte: 1 } },
+        { $inc: { creditsBalance: -1, creditsUsed: 1, 'aiUsage.proposals': 1 } },
+        { new: true }
+      )
+      if (!updated) {
+        throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para usar a IA.' })
+      }
+    }
+
     return { text }
   } catch (e: any) {
+    if (e.statusCode) throw e
     console.error('AI Generation Error:', e)
-    throw createError({ 
-      statusCode: 500, 
-      statusMessage: 'Erro ao gerar texto com IA. Tente novamente.' 
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Erro ao gerar texto com IA. Tente novamente.'
     })
   }
 })

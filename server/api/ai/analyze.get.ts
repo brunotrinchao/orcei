@@ -24,18 +24,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Dedução de 1 crédito de IA (atômica — previne race condition)
-  if ((session.user as any).role !== 'admin') {
-    const updated = await Profile.findOneAndUpdate(
-      { _id: profile._id, creditsBalance: { $gte: 1 } },
-      { $inc: { creditsBalance: -1, creditsUsed: 1, 'aiUsage.reports': 1 } },
-      { new: true }
-    )
-    if (!updated) {
-      throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para gerar relatórios com IA.' })
-    }
-  }
-
   const { start, end } = getQuery(event)
   const query: any = { profileId: profile._id }
 
@@ -133,7 +121,7 @@ Tom: Consultor sênior, direto, baseado em dados, sem frases motivacionais vazia
 
   try {
     const analysis = await AIService.generateDescription(prompt)
-    
+
     // Save report to database
     await Report.create({
       profileId: profile._id,
@@ -145,8 +133,21 @@ Tom: Consultor sênior, direto, baseado em dados, sem frases motivacionais vazia
       }
     })
 
+    // Dedução de 1 crédito SOMENTE após relatório gerado e salvo com sucesso (atômica)
+    if ((session.user as any).role !== 'admin') {
+      const updated = await Profile.findOneAndUpdate(
+        { _id: profile._id, creditsBalance: { $gte: 1 } },
+        { $inc: { creditsBalance: -1, creditsUsed: 1, 'aiUsage.reports': 1 } },
+        { new: true }
+      )
+      if (!updated) {
+        throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para gerar relatórios com IA.' })
+      }
+    }
+
     return { text: analysis }
   } catch (e: any) {
+    if (e.statusCode) throw e
     console.error('AI Analysis Error:', e)
     throw createError({
       statusCode: 500,

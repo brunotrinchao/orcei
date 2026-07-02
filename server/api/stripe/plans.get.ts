@@ -82,8 +82,8 @@ export default defineEventHandler(async (event) => {
         const unitVal = priceVal / credits
         unitPriceText = `R$ ${unitVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / crédito`
         
-        // Calcula a porcentagem de economia real baseada na âncora de preço avulso (R$ 5,90)
-        const avulsoPrice = 5.90
+        // Calcula a porcentagem de economia real baseada na âncora de preço avulso (R$ 5,99)
+        const avulsoPrice = 5.99
         economyPercent = Math.max(0, Math.round((1 - (unitVal / avulsoPrice)) * 100))
       }
 
@@ -93,7 +93,7 @@ export default defineEventHandler(async (event) => {
         credits === 1 ? 'Valor avulso sem mensalidades' : `Economia real de ${economyPercent}% por crédito`,
         'Créditos Vitalícios (Nunca expiram)',
         'Contratos e PDFs incluídos',
-        'Assinatura digital padrão'
+        'Aceita orçamento digital '
       ]
 
       return {

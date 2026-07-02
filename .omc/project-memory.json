@@ -284,6 +284,12 @@
       "type": "directory"
     },
     {
+      "path": "app/pages/planos/index.vue",
+      "accessCount": 13,
+      "lastAccessed": 1783016939311,
+      "type": "file"
+    },
+    {
       "path": "app/pages/orcamentos/index.vue",
       "accessCount": 9,
       "lastAccessed": 1783011655904,
@@ -302,22 +308,22 @@
       "type": "file"
     },
     {
-      "path": "app/pages/planos/index.vue",
-      "accessCount": 8,
-      "lastAccessed": 1783013993458,
+      "path": "server/api/stripe/checkout.post.ts",
+      "accessCount": 7,
+      "lastAccessed": 1783016323214,
       "type": "file"
+    },
+    {
+      "path": "server",
+      "accessCount": 7,
+      "lastAccessed": 1783017026309,
+      "type": "directory"
     },
     {
       "path": "server/api",
       "accessCount": 6,
       "lastAccessed": 1783008564607,
       "type": "directory"
-    },
-    {
-      "path": "server/api/stripe/checkout.post.ts",
-      "accessCount": 6,
-      "lastAccessed": 1783009785254,
-      "type": "file"
     },
     {
       "path": "server/api/stripe/manage.post.ts",
@@ -362,15 +368,27 @@
       "type": "file"
     },
     {
-      "path": "server",
+      "path": "server/api/ai/generate.post.ts",
       "accessCount": 5,
-      "lastAccessed": 1783012321370,
-      "type": "directory"
+      "lastAccessed": 1783017067739,
+      "type": "file"
+    },
+    {
+      "path": "server/api/ai/analyze.get.ts",
+      "accessCount": 5,
+      "lastAccessed": 1783017085740,
+      "type": "file"
     },
     {
       "path": "server/utils/validate.ts",
       "accessCount": 4,
       "lastAccessed": 1783011654486,
+      "type": "file"
+    },
+    {
+      "path": "server/api/stripe/plans.get.ts",
+      "accessCount": 4,
+      "lastAccessed": 1783016944782,
       "type": "file"
     },
     {
@@ -383,12 +401,6 @@
       "path": "server/api/webhooks/stripe.post.ts",
       "accessCount": 3,
       "lastAccessed": 1783008657389,
-      "type": "file"
-    },
-    {
-      "path": "server/api/ai/generate.post.ts",
-      "accessCount": 3,
-      "lastAccessed": 1783008670182,
       "type": "file"
     },
     {
@@ -413,12 +425,6 @@
       "path": "server/api/proposals/index.post.ts",
       "accessCount": 2,
       "lastAccessed": 1783008559833,
-      "type": "file"
-    },
-    {
-      "path": "server/api/ai/analyze.get.ts",
-      "accessCount": 2,
-      "lastAccessed": 1783008649515,
       "type": "file"
     },
     {
@@ -498,12 +504,6 @@
       "accessCount": 1,
       "lastAccessed": 1783008529598,
       "type": "directory"
-    },
-    {
-      "path": "server/api/stripe/plans.get.ts",
-      "accessCount": 1,
-      "lastAccessed": 1783008534073,
-      "type": "file"
     },
     {
       "path": "server/api/clients/[id].delete.ts",

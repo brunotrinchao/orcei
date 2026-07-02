@@ -94,10 +94,20 @@ const isAnalyzing = ref(false)
 const isPaywallOpen = ref(false)
 const paywallReason = ref('')
 
+const periodLabels: Record<string, string> = {
+  last_7_days: 'Últimos 7 dias',
+  last_30_days: 'Últimos 30 dias',
+  last_90_days: 'Últimos 90 dias',
+  year: 'Este Ano',
+  all: 'Todo o período'
+}
+const periodLabel = computed(() => periodLabels[period.value] || 'Todo o período')
+
 async function generateAIReport() {
   isAnalyzing.value = true
   try {
-    const data: any = await $fetch('/api/ai/analyze')
+    // Relatório usa o mesmo filtro de período selecionado no dashboard
+    const data: any = await $fetch('/api/ai/analyze', { query: fetchQuery.value })
     aiReport.value = data.text
     refresh()
   } catch (e: any) {
@@ -106,6 +116,8 @@ async function generateAIReport() {
       isPaywallOpen.value = true
     } else if (e.statusCode === 429) {
       notify('Limite Atingido', 'Você fez muitas requisições seguidas. Tente novamente em um minuto.')
+    } else if (e.statusCode === 400) {
+      notify('Orçamento aprovado necessário', e.data?.statusMessage || 'É necessário ter pelo menos 1 orçamento aprovado para gerar um relatório estratégico.')
     } else {
       notify('Erro', e.data?.statusMessage || 'Erro ao gerar relatório estratégico')
     }
@@ -307,6 +319,9 @@ function formatRelativeTime(minutesAgo: number) {
                   Gerar Relatório IA (1 Crédito)
                 </template>
               </BaseButton>
+              <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest text-center lg:text-right">
+                Baseado no período: {{ periodLabel }}
+              </p>
 
 
               <NuxtLink 

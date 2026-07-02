@@ -23,9 +23,13 @@ export default defineEventHandler(async (event) => {
   const startOfToday = new Date()
   startOfToday.setHours(0, 0, 0, 0)
 
+  // Catálogo escopado pelo mesmo filtro de período das propostas (consistência com "Baseado no período")
+  const catalogQuery: any = { profileId: profile._id }
+  if (query.createdAt) catalogQuery.createdAt = query.createdAt
+
   const [proposals, itemsCount, reportCount] = await Promise.all([
     Proposal.find(query),
-    CatalogItem.countDocuments({ profileId: profile._id }),
+    CatalogItem.countDocuments(catalogQuery),
     Report.countDocuments({ profileId: profile._id, date: { $gte: startOfToday } })
   ])
 
@@ -35,7 +39,9 @@ export default defineEventHandler(async (event) => {
   const pendingCount = proposals.filter(p => ['pending', 'created'].includes(p.status)).length
   const draftCount = proposals.filter(p => p.status === 'draft').length
   const expiredCount = proposals.filter(p => p.status === 'expired').length
-  
+  // Demais status de tracking (sent/delivered/opened/etc.) — garante que a soma dos buckets bata com proposalsCount
+  const otherCount = proposalsCount - acceptedCount - pendingCount - draftCount - expiredCount
+
   const totalRevenue = acceptedProposals.reduce((acc, p) => acc + (p.totals?.final || 0), 0)
   const ticketMedia = acceptedCount > 0 ? totalRevenue / acceptedCount : 0
   const nonDraftCount = proposalsCount - draftCount
@@ -70,7 +76,7 @@ export default defineEventHandler(async (event) => {
 
   // 3. ROI de IA (Tempo Economizado em horas)
   const aiProposalsCount = proposals.filter((p: any) => p.aiAssisted).length
-  const aiCatalogCount = await CatalogItem.countDocuments({ profileId: profile._id, aiAssisted: true })
+  const aiCatalogCount = await CatalogItem.countDocuments({ ...catalogQuery, aiAssisted: true })
 
   // Cada proposta criada gera em média economia de 12 minutos manual por IA integrada
   // Cada catálogo de serviços cadastrado gera economia de 5 minutos
@@ -189,6 +195,7 @@ export default defineEventHandler(async (event) => {
     pendingCount,
     draftCount,
     expiredCount,
+    otherCount,
     totalRevenue,
     ticketMedia,
     approvalRate,

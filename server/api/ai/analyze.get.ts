@@ -16,14 +16,6 @@ export default defineEventHandler(async (event) => {
   const profile = await ProfileService.getByUserId((session.user as any).id)
   if (!profile) throw createError({ statusCode: 404 })
 
-  // Verificação de saldo de créditos para IA (Relatório Analítico)
-  if (profile.creditsBalance < 1 && (session.user as any).role !== 'admin') {
-    throw createError({
-      statusCode: 402,
-      statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para gerar relatórios com IA.'
-    })
-  }
-
   const { start, end } = getQuery(event)
   const query: any = { profileId: profile._id }
 
@@ -34,19 +26,34 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // Coletar dados para análise
+  // Coletar dados para análise (mesmo universo do dashboard, sem truncar por limit)
   const [proposals, catalog] = await Promise.all([
-    Proposal.find(query).sort({ createdAt: -1 }).limit(50),
+    Proposal.find(query).sort({ createdAt: -1 }),
     CatalogItem.find({ profileId: profile._id })
   ])
 
-  if (proposals.length === 0) {
-    return { text: "Você ainda não possui orçamentos suficientes para uma análise estratégica. Gere pelo menos 3 orçamentos para começar." }
+  const acceptedProposals = proposals.filter(p => p.status === 'accepted')
+
+  // Pré-requisito de negócio: precisa de pelo menos 1 orçamento aprovado. Verificado
+  // ANTES da checagem de créditos para o cliente entender o motivo real do bloqueio.
+  if (acceptedProposals.length === 0) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'É necessário ter pelo menos 1 orçamento aprovado para gerar um relatório estratégico.'
+    })
   }
 
-  const acceptedProposals = proposals.filter(p => p.status === 'accepted')
+  // Verificação de saldo de créditos para IA (Relatório Analítico)
+  if (profile.creditsBalance < 1 && (session.user as any).role !== 'admin') {
+    throw createError({
+      statusCode: 402,
+      statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para gerar relatórios com IA.'
+    })
+  }
   const totalRevenue = acceptedProposals.reduce((acc, p) => acc + (p.totals?.final || 0), 0)
   const averageValue = acceptedProposals.length > 0 ? totalRevenue / acceptedProposals.length : 0
+
+  const draftCount = proposals.filter(p => p.status === 'draft').length
 
   const context = {
     totalProposals: proposals.length,
@@ -63,7 +70,9 @@ export default defineEventHandler(async (event) => {
     }))
   }
 
-  const approvalRate = Math.round((context.acceptedCount / (context.totalProposals || 1)) * 100)
+  // Mesma fórmula do dashboard (exclui rascunhos do denominador) para evitar taxas divergentes entre as telas
+  const nonDraftCount = context.totalProposals - draftCount
+  const approvalRate = nonDraftCount > 0 ? Math.round((context.acceptedCount / nonDraftCount) * 100) : 0
 
   const prompt = `Você é um consultor de negócios sênior especializado em freelancers e pequenas empresas brasileiras. Analise os dados abaixo e produza um relatório estratégico COMPLETO e DETALHADO.
 

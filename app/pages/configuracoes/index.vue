@@ -97,6 +97,44 @@ async function exportData() {
   }
 }
 
+const isResetting = ref(false)
+
+async function resetData() {
+  if (!localProfile.value) return
+  const email = localProfile.value.email
+
+  confirmAlert({
+    title: 'Resetar Dados da Conta',
+    description: 'Esta ação é IRREVERSÍVEL. Todos os seus Clientes, Catálogo, Orçamentos e Relatórios serão apagados permanentemente. Sua conta, plano e créditos NÃO serão afetados.',
+    variant: 'destructive',
+    actionText: 'Continuar',
+    onConfirm: () => {
+      // Segunda confirmação (dupla checagem, mesmo padrão de deleteAccount)
+      confirmAlert({
+        title: 'Tem Certeza?',
+        description: 'Todos os Clientes, Catálogo, Orçamentos e Relatórios serão perdidos para sempre. Confirmar reset?',
+        variant: 'destructive',
+        actionText: 'Sim, resetar tudo',
+        onConfirm: async () => {
+          isResetting.value = true
+          try {
+            await $fetch('/api/profile/reset-data', {
+              method: 'POST',
+              body: { confirm: email }
+            })
+            notify('Sucesso', 'Seus dados foram resetados com sucesso.')
+            setTimeout(() => window.location.reload(), 1500)
+          } catch (e: any) {
+            notify('Erro', e.data?.statusMessage || 'Erro ao resetar dados.')
+          } finally {
+            isResetting.value = false
+          }
+        }
+      })
+    }
+  })
+}
+
 async function deleteAccount() {
   if (!localProfile.value) return
 
@@ -344,6 +382,23 @@ onMounted(() => {
                   @click="exportData"
                 >
                   {{ isExporting ? 'Processando...' : 'Exportar Meus Dados' }}
+                </BaseButton>
+              </div>
+
+              <div class="p-8 bg-orange-50/30 rounded-3xl border border-orange-100 space-y-4">
+                <h3 class="text-sm font-black text-orange-900 uppercase tracking-widest">Resetar Dados</h3>
+                <p class="text-sm text-orange-700/70 font-medium leading-relaxed">
+                  Apaga Clientes, Catálogo, Orçamentos e Relatórios. Sua conta, plano e créditos permanecem intactos. Ação irreversível.
+                </p>
+                <BaseButton
+                  variant="outline"
+                  size="sm"
+                  class="w-full sm:w-auto text-orange-600 border-orange-200 hover:bg-orange-50"
+                  :disabled="isResetting"
+                  :loading="isResetting"
+                  @click="resetData"
+                >
+                  {{ isResetting ? 'Resetando...' : 'Resetar Dados' }}
                 </BaseButton>
               </div>
 

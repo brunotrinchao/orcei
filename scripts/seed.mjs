@@ -109,7 +109,11 @@ async function seed() {
       const final = subtotal + additional - discount
       
       const createdAt = faker.date.past({ years: 1 })
-      
+      // Propostas aceitas simulam um aceite dias depois da criação, senão updatedAt = createdAt e o TMA fica zerado
+      const updatedAt = status === 'accepted'
+        ? faker.date.soon({ days: 10, refDate: createdAt })
+        : createdAt
+
       await Proposal.create({
         profileId,
         title: `Projeto ${faker.commerce.productAdjective()} ${faker.commerce.product()}`,
@@ -130,7 +134,8 @@ async function seed() {
           installments: 12,
           cashDiscount: 10
         },
-        createdAt
+        createdAt,
+        updatedAt
       })
     }
 

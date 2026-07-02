@@ -199,6 +199,15 @@ export const ProposalService = {
     }
   },
 
+  async delete(id: string, profileId: string) {
+    const proposal = await Proposal.findOne({ _id: id, profileId })
+    if (!proposal) return null
+    if (proposal.status === ProposalStatus.ACCEPTED) {
+      throw createError({ statusCode: 409, statusMessage: 'Não é possível excluir um orçamento já aceito.' })
+    }
+    return await Proposal.findOneAndDelete({ _id: id, profileId })
+  },
+
   async consumeCredit(profileId: string, session?: any) {
     if (typeof Profile.findOneAndUpdate === 'function') {
       const updatedProfile = await Profile.findOneAndUpdate(

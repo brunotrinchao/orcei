@@ -1,4 +1,5 @@
 import { ProfileService } from '../../services/ProfileService'
+import { sanitizeError } from '../../utils/error-handler'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -83,11 +84,12 @@ export default defineEventHandler(async (event) => {
   } catch (error: any) {
     console.error('Stripe Checkout Error:', error)
     const isMissingKey = error.message?.includes('Stripe API Key is missing') || error.message?.includes('STRIPE_SECRET_KEY')
-    throw createError({
-      statusCode: isMissingKey ? 422 : 500,
-      statusMessage: isMissingKey
-        ? 'A integração com o gateway de pagamentos não está ativa neste ambiente. Configure a STRIPE_SECRET_KEY no .env'
-        : (error.message || 'Internal Server Error')
-    })
+    if (isMissingKey) {
+      throw createError({
+        statusCode: 422,
+        statusMessage: 'A integração com o gateway de pagamentos não está ativa neste ambiente. Configure a STRIPE_SECRET_KEY no .env'
+      })
+    }
+    throw sanitizeError(error, 'Erro ao iniciar checkout')
   }
 })

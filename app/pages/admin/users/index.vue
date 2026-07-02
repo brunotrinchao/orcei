@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { Search, Plus, CreditCard, Mail, Trash2, Shield, User, Loader2, ArrowRight } from 'lucide-vue-next'
+import { Search, Plus, CreditCard, Mail, Trash2, Shield, User, Loader2, ArrowRight, LogIn } from 'lucide-vue-next'
 
 
-const { notify } = useAlerts()
-const { user } = useUserSession()
+const { notify, confirm } = useAlerts()
+const { user, fetch: refreshSession } = useUserSession()
 if (process.client && user.value?.role !== 'admin') {
   navigateTo('/dashboard')
 }
@@ -56,6 +56,28 @@ async function updateCredits() {
 }
 
 const formatDate = (date: string) => new Date(date).toLocaleDateString('pt-BR')
+
+const isImpersonating = ref(false)
+
+function confirmImpersonate(targetUser: any) {
+  confirm({
+    title: 'Personificar Usuário',
+    description: `Você vai acessar a conta de "${targetUser.name}" como se fosse ele. Continuar?`,
+    actionText: 'Personificar',
+    onConfirm: async () => {
+      isImpersonating.value = true
+      try {
+        await $fetch(`/api/admin/users/${targetUser._id}/impersonate`, { method: 'POST' })
+        await refreshSession()
+        navigateTo('/dashboard')
+      } catch (e: any) {
+        notify('Erro', e.data?.statusMessage || 'Erro ao personificar usuário')
+      } finally {
+        isImpersonating.value = false
+      }
+    }
+  })
+}
 </script>
 
 <template>
@@ -129,6 +151,9 @@ const formatDate = (date: string) => new Date(date).toLocaleDateString('pt-BR')
             <div class="flex justify-end gap-2">
               <button @click="openCreditModal(user)" class="p-2.5 text-blue-500 hover:bg-blue-50 rounded-xl transition-all" title="Ajustar Créditos">
                 <CreditCard class="w-5 h-5" />
+              </button>
+              <button v-if="user.role !== 'admin'" :disabled="isImpersonating" @click="confirmImpersonate(user)" class="p-2.5 text-amber-500 hover:bg-amber-50 rounded-xl transition-all disabled:opacity-50" title="Personificar Usuário">
+                <LogIn class="w-5 h-5" />
               </button>
               <button v-if="user.role === 'admin'" class="p-2.5 text-red-500 bg-red-50 rounded-xl" title="Administrador">
                 <Shield class="w-5 h-5" />

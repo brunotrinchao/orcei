@@ -1,4 +1,5 @@
 import { ProfileService } from '../../services/ProfileService'
+import { sanitizeError } from '../../utils/error-handler'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -73,9 +74,6 @@ export default defineEventHandler(async (event) => {
     }
   } catch (error: any) {
     console.error('Stripe Management Error:', error)
-    throw createError({
-      statusCode: 500,
-      statusMessage: error.message || 'Internal Server Error'
-    })
+    throw sanitizeError(error, 'Erro ao gerenciar assinatura')
   }
 })

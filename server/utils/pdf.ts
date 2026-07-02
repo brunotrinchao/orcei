@@ -235,7 +235,7 @@ export function generateReportHtml(report: any, profile: any, appName: string = 
       </div>
 
       <div class="footer">
-        Este relatório foi gerado automaticamente pela Inteligência Artificial do ${appName}.<br>
+        Este relatório foi gerado automaticamente pela Inteligência Artificial do ${appName} e pode conter equívocos — valide as informações antes de tomar decisões críticas.<br>
         © 2026 ${appName} - Todos os direitos reservados.
       </div>
     </body>

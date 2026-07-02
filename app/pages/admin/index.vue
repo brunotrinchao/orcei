@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { 
-  TrendingUp, Users, FileText, CreditCard, ArrowUpRight, DollarSign, 
-  Activity, Settings, ShieldAlert, BarChart3, PieChart, Database, 
-  Cpu, Zap, Calendar, AlertTriangle, ShieldCheck, Terminal 
+import {
+  TrendingUp, Users, FileText, CreditCard, ArrowUpRight, DollarSign,
+  Activity, Settings, ShieldAlert, BarChart3, PieChart, Database,
+  Cpu, Zap, Calendar, AlertTriangle, ShieldCheck, Terminal, Ticket
 } from 'lucide-vue-next'
 import { Line, Doughnut } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement, ArcElement } from 'chart.js'
@@ -235,7 +235,7 @@ function formatLogTime(isoString: string) {
             <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Status do Sistema</h2>
           </div>
           
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <NuxtLink to="/admin/settings" class="p-6 bg-gray-50 rounded-3xl border border-gray-100 hover:border-blue-200 transition-all group flex flex-col justify-between">
               <div>
                 <ShieldAlert class="w-6 h-6 text-red-500 mb-4" />
@@ -248,6 +248,13 @@ function formatLogTime(isoString: string) {
                 <CreditCard class="w-6 h-6 text-emerald-500 mb-4" />
                 <h4 class="font-black text-gray-900 uppercase text-xs tracking-widest mb-1">Logs de Auditoria</h4>
                 <p class="text-xs text-gray-500 font-medium leading-relaxed">Histórico detalhado de ações administrativas.</p>
+              </div>
+            </NuxtLink>
+            <NuxtLink to="/admin/coupons" class="p-6 bg-gray-50 rounded-3xl border border-gray-100 hover:border-blue-200 transition-all group flex flex-col justify-between">
+              <div>
+                <Ticket class="w-6 h-6 text-blue-500 mb-4" />
+                <h4 class="font-black text-gray-900 uppercase text-xs tracking-widest mb-1">Cupons Promocionais</h4>
+                <p class="text-xs text-gray-500 font-medium leading-relaxed">Crie e gerencie cupons de créditos via Stripe.</p>
               </div>
             </NuxtLink>
           </div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FileText, Download, Eye, Search, Calendar, RefreshCcw, Sparkles } from 'lucide-vue-next'
+import { FileText, Download, Eye, Search, Calendar, RefreshCcw, Sparkles, Trash2, AlertTriangle } from 'lucide-vue-next'
 
 const searchQuery = ref('')
 const startDate = ref('')
@@ -23,7 +23,7 @@ const filteredReports = computed(() => {
   )
 })
 
-const { notify } = useAlerts()
+const { notify, confirm } = useAlerts()
 const selectedReport = ref<any>(null)
 const isViewModalOpen = ref(false)
 
@@ -34,6 +34,25 @@ function openView(report: any) {
 
 function downloadPdf(reportId: string) {
   window.open(`/api/reports/${reportId}/pdf`, '_blank')
+}
+
+function confirmDeleteReport(report: any) {
+  confirm({
+    title: 'Excluir Relatório',
+    description: 'Tem certeza que deseja excluir este relatório? Essa ação não pode ser desfeita.',
+    variant: 'destructive',
+    actionText: 'Excluir',
+    onConfirm: async () => {
+      try {
+        await $fetch(`/api/reports/${report._id}`, { method: 'DELETE' })
+        notify('Sucesso', 'Relatório excluído com sucesso.')
+        if (selectedReport.value?._id === report._id) isViewModalOpen.value = false
+        refresh()
+      } catch (e: any) {
+        notify('Erro', e.data?.statusMessage || 'Erro ao excluir relatório')
+      }
+    }
+  })
 }
 
 const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
@@ -106,6 +125,14 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
               <Download class="w-4 h-4 mr-2" />
               Download PDF
             </BaseButton>
+            <button
+              @click="confirmDeleteReport(report)"
+              class="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all"
+              title="Excluir"
+              aria-label="Excluir relatório"
+            >
+              <Trash2 class="w-5 h-5" />
+            </button>
           </div>
         </div>
       </template>
@@ -134,14 +161,24 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
       title="Relatório Estratégico IA"
       size="xl"
     >
-      <div v-if="selectedReport" class="prose prose-blue max-w-none p-6 bg-gray-50 rounded-[2rem] border border-gray-100 min-h-[60vh]">
-        <div v-html="$md.render(selectedReport.content)"></div>
+      <div v-if="selectedReport">
+        <div class="flex items-center gap-3 px-5 py-3 mb-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-800">
+          <AlertTriangle class="w-5 h-5 shrink-0" />
+          <p class="text-xs font-bold">Relatório gerado por Inteligência Artificial. Os dados e recomendações podem conter equívocos — sempre valide antes de tomar decisões críticas.</p>
+        </div>
+        <div class="prose prose-blue prose-headings:font-black prose-h2:text-blue-600 prose-h2:mt-10 prose-h2:mb-4 prose-h2:pb-2 prose-h2:border-b prose-h2:border-blue-100 prose-p:leading-relaxed prose-p:mb-4 prose-table:my-6 prose-li:my-1 max-w-none p-8 bg-gray-50 rounded-[2rem] border border-gray-100 min-h-[60vh]">
+          <div v-html="$md.render(selectedReport.content)"></div>
+        </div>
       </div>
       <template #footer>
         <div class="flex justify-between w-full items-center">
           <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Gerado em {{ formatDate(selectedReport?.createdAt) }}</span>
           <div class="flex gap-3">
             <BaseButton variant="secondary" @click="isViewModalOpen = false">Fechar</BaseButton>
+            <BaseButton @click="confirmDeleteReport(selectedReport)" class="bg-red-600 hover:bg-red-700">
+              <Trash2 class="w-4 h-4 mr-2" />
+              Excluir
+            </BaseButton>
             <BaseButton @click="downloadPdf(selectedReport._id)">
               <Download class="w-4 h-4 mr-2" />
               Download PDF

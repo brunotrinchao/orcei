@@ -35,6 +35,7 @@ const profileSchema = new Schema({
   },
   creditsBalance: { type: Number, default: 5 },
   creditsUsed: { type: Number, default: 0 },
+  redeemedCoupons: { type: [String], default: [] },
   aiUsage: {
     reports: { type: Number, default: 0 },
     proposals: { type: Number, default: 0 },

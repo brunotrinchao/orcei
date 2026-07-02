@@ -3,6 +3,7 @@ declare module '#auth-utils' {
     id: string
     name: string
     email: string
+    avatar?: string
     creditsBalance: number
     role?: 'user' | 'admin'
   }
@@ -10,6 +11,7 @@ declare module '#auth-utils' {
   interface UserSession {
     user: User
     loggedInAt: number
+    impersonatedBy?: { id: string; name: string } | null
   }
 }
 

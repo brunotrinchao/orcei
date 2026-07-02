@@ -1,10 +1,20 @@
 <script setup lang="ts">
 import { SubscriptionPlan } from '../../types/enums'
 import { onClickOutside } from '@vueuse/core'
-import { Shield, ArrowLeft, Home, FileText, Plus, Users, Settings } from 'lucide-vue-next'
+import { Shield, ArrowLeft, Home, FileText, Plus, Users, Settings, LogOut } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../types'
-const { loggedIn, user, clear } = useUserSession()
-const { data: profile, refresh: refreshLayoutProfile } = useFetch<ProfileDTO>('/api/profile')
+const { loggedIn, user, session, clear, fetch: refreshSession } = useUserSession()
+const { data: profile, refresh: refreshLayoutProfile } = useFetch<ProfileDTO>('/api/profile', { key: 'profile' })
+
+watch(() => user.value?.id, (newId, oldId) => {
+  if (newId && newId !== oldId) refreshLayoutProfile()
+})
+
+async function stopImpersonating() {
+  await $fetch('/api/admin/impersonate/stop', { method: 'POST' })
+  await refreshSession()
+  navigateTo('/admin/users')
+}
 
 const isMenuOpen = ref(false)
 
@@ -127,6 +137,14 @@ onMounted(() => {
       </nav>
     </header>
 
+    <!-- Impersonation Banner -->
+    <div v-if="session?.impersonatedBy" class="bg-amber-500 text-white px-6 py-2.5 flex items-center justify-center gap-3 text-xs font-black uppercase tracking-widest sticky top-16 z-40">
+      <span>Personificando: {{ user?.name }}</span>
+      <button @click="stopImpersonating" class="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg transition-all">
+        <LogOut class="w-3.5 h-3.5" />
+        Voltar ao Admin
+      </button>
+    </div>
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-250px)]">

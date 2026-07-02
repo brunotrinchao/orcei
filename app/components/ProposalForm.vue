@@ -37,7 +37,7 @@ const { data: clientsData, pending: pendingClients } = useLazyFetch<any>('/api/c
   watch: [clientSearch],
   server: false
 })
-const { data: profile } = useFetch<ProfileDTO>('/api/profile')
+const { data: profile } = useFetch<ProfileDTO>('/api/profile', { key: 'profile' })
 const { notify } = useAlerts()
 
 const clients = computed(() => clientsData.value?.items || [])

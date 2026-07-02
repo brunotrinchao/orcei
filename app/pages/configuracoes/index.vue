@@ -8,7 +8,7 @@ import SettingsContact from '../../components/settings/SettingsContact.vue'
 import SettingsTemplates from '../../components/settings/SettingsTemplates.vue'
 
 const { notify } = useAlerts()
-const { data: profile, refresh } = useFetch<ProfileDTO>('/api/profile')
+const { data: profile, refresh } = useFetch<ProfileDTO>('/api/profile', { key: 'profile' })
 
 const localProfile = ref<ProfileDTO | null>(null)
 

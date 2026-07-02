@@ -1,4 +1,5 @@
 import { ProfileService } from '../../services/ProfileService'
+import { sanitizeError } from '../../utils/error-handler'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -23,9 +24,6 @@ export default defineEventHandler(async (event) => {
     return { url: portalSession.url }
   } catch (error: any) {
     console.error('Stripe Portal Error:', error)
-    throw createError({
-      statusCode: 500,
-      statusMessage: error.message || 'Erro ao abrir portal de faturamento'
-    })
+    throw sanitizeError(error, 'Erro ao abrir portal de faturamento')
   }
 })

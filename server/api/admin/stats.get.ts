@@ -2,6 +2,7 @@ import { Profile } from '../../models/Profile'
 import { Proposal } from '../../models/Proposal'
 import { AuditLog } from '../../models/AuditLog'
 import { useStripe } from '../../utils/stripe'
+import { sanitizeError } from '../../utils/error-handler'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -176,10 +177,6 @@ export default defineEventHandler(async (event) => {
     }
   } catch (e: any) {
     console.error('[Admin Stats] Erro Fatal:', e)
-    throw createError({ 
-      statusCode: 500, 
-      statusMessage: 'Erro ao buscar estatísticas',
-      data: { error: e.message }
-    })
+    throw sanitizeError(e, 'Erro ao buscar estatísticas')
   }
 })

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles, Send, CheckCheck, X, ArrowLeft, ArrowRight } from 'lucide-vue-next'
+import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles, Send, CheckCheck, X, ArrowLeft, ArrowRight, Trash2 } from 'lucide-vue-next'
 import { isToday, isYesterday, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import type { ProposalDTO } from '../../../../types'
@@ -108,7 +108,7 @@ const isSubmitting = ref(false)
 const isResending = ref<string | null>(null)
 const proposalFormRef = ref<any>(null)
 
-const { notify } = useAlerts()
+const { notify, confirm } = useAlerts()
 const siteOrigin = ref('')
 
 onMounted(() => {
@@ -292,6 +292,24 @@ const formatTime = (date: any) => {
     minute: '2-digit'
   })
 }
+
+function confirmDeleteProposal(proposal: ProposalDTO) {
+  confirm({
+    title: 'Excluir Orçamento',
+    description: `Tem certeza que deseja excluir "${proposal.title || proposal.code}"? Essa ação não pode ser desfeita.`,
+    variant: 'destructive',
+    actionText: 'Excluir',
+    onConfirm: async () => {
+      try {
+        await $fetch(`/api/proposals/${proposal._id}`, { method: 'DELETE' })
+        notify('Sucesso', 'Orçamento excluído com sucesso.')
+        refresh()
+      } catch (e: any) {
+        notify('Erro', e.data?.statusMessage || 'Erro ao excluir orçamento')
+      }
+    }
+  })
+}
 </script>
 
 <template>
@@ -464,6 +482,15 @@ const formatTime = (date: any) => {
                 aria-label="Editar orçamento"
               >
                 <Pencil class="w-5 h-5" />
+              </button>
+              <button
+                v-if="proposal.status !== 'accepted'"
+                @click="confirmDeleteProposal(proposal)"
+                class="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all"
+                title="Excluir"
+                aria-label="Excluir orçamento"
+              >
+                <Trash2 class="w-5 h-5" />
               </button>
             </div>
           </td>

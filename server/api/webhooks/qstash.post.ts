@@ -19,6 +19,7 @@ import {
   sendCartRecoveryEmail
 } from '../../utils/email'
 import { uploadToCloudinary } from '../../utils/cloudinary'
+import { sanitizeError } from '../../utils/error-handler'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -120,7 +121,7 @@ export default defineEventHandler(async (event) => {
     return { success: true }
   } catch (error: any) {
     console.error(`[QStash Webhook] Erro ao processar job ${action}:`, error.message)
-    throw createError({ statusCode: 500, statusMessage: error.message })
+    throw sanitizeError(error, 'Erro ao processar job em segundo plano')
   }
 })
 

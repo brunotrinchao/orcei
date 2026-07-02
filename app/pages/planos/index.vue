@@ -5,7 +5,7 @@ import {
 } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../../types'
 
-const { data: profile, refresh: refreshProfile, pending: pendingProfile } = useLazyFetch<ProfileDTO>('/api/profile')
+const { data: profile, refresh: refreshProfile, pending: pendingProfile } = useLazyFetch<ProfileDTO>('/api/profile', { key: 'profile' })
 const { data: stripePackages, refresh: refreshPackages, pending: pendingPackages } = useLazyFetch<any[]>('/api/stripe/plans')
 const { notify } = useAlerts()
 
@@ -110,6 +110,25 @@ const packages = computed(() => {
   })
 })
 
+const couponCode = ref('')
+const couponLoading = ref(false)
+const couponError = ref('')
+
+async function redeemCoupon() {
+  couponError.value = ''
+  couponLoading.value = true
+  try {
+    const res: any = await $fetch('/api/stripe/coupon/redeem', { method: 'POST', body: { code: couponCode.value } })
+    notify('Sucesso', `${res.creditsAdded} créditos adicionados! Novo saldo: ${res.newBalance}`)
+    couponCode.value = ''
+    refreshProfile()
+  } catch (e: any) {
+    couponError.value = e.data?.statusMessage || 'Erro ao validar cupom'
+  } finally {
+    couponLoading.value = false
+  }
+}
+
 async function handleAction(tier: string) {
   isLoading.value = tier
   try {
@@ -210,6 +229,24 @@ onMounted(() => {
             </div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- Cupom Promocional -->
+    <section class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+      <div class="flex flex-col md:flex-row md:items-end gap-4">
+        <div class="flex-1">
+          <BaseInput
+            v-model="couponCode"
+            label="Tem um cupom?"
+            placeholder="Digite o código do cupom"
+            :error="couponError"
+          />
+        </div>
+        <BaseButton :disabled="couponLoading || !couponCode.trim()" @click="redeemCoupon" class="shrink-0">
+          <Loader2 v-if="couponLoading" class="w-4 h-4 animate-spin mr-2" />
+          Aplicar Cupom
+        </BaseButton>
       </div>
     </section>
 

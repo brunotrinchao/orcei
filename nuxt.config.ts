@@ -105,6 +105,8 @@ export default defineNuxtConfig({
       stripeCredits5PriceId: process.env.STRIPE_CREDITS_5_PRICE_ID,
       stripeCredits10PriceId: process.env.STRIPE_CREDITS_10_PRICE_ID,
       gtmId: process.env.NUXT_PUBLIC_GTM_ID || '',
+      appEnv: process.env.APP_ENVIRONMENT || 'development',
+      sentryDsn: process.env.NUXT_PUBLIC_SENTRY_DSN || '',
       appName: process.env.APP_NAME || 'Orcei Fácil',
       appDocumentLogo: process.env.APP_DOCUMENT_LOGO,
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',

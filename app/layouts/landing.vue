@@ -67,7 +67,7 @@ const { data: systemInfo } = useFetch<any>('/api/system/status', {
             <nav class="flex flex-col gap-3">
               <NuxtLink to="/terms" class="text-xs font-bold text-slate-400 hover:text-blue-400 transition-colors">Termos de Uso</NuxtLink>
               <NuxtLink to="/privacy" class="text-xs font-bold text-slate-400 hover:text-blue-400 transition-colors">Privacidade</NuxtLink>
-              <a href="mailto:contato@orcei.com.br" class="text-xs font-bold text-slate-400 hover:text-blue-400 transition-colors">contato@orcei.com.br</a>
+              <a href="mailto:contato@orceifacil.com.br" class="text-xs font-bold text-slate-400 hover:text-blue-400 transition-colors">contato@orceifacil.com.br</a>
             </nav>
           </div>
         </div>

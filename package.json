@@ -25,7 +25,7 @@
     "@nuxt/content": "^3.13.0",
     "@nuxtjs/cloudinary": "^4.0.0",
     "@nuxtjs/tailwindcss": "^6.14.0",
-    "@sentry/browser": "^10.63.0",
+    "@sentry/nuxt": "^10.63.0",
     "@sparticuz/chromium": "^147.0.0",
     "@tiptap/extension-link": "^3.23.2",
     "@tiptap/extension-underline": "^3.23.2",

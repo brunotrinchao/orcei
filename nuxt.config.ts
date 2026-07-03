@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@vueuse/nuxt', '@nuxtjs/cloudinary', '@vercel/speed-insights'],
+  modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@vueuse/nuxt', '@nuxtjs/cloudinary', '@vercel/speed-insights', '@sentry/nuxt/module'],
   
   cloudinary: {
     cloudName: process.env.CLOUDINARY_NAME || process.env.NUXT_CLOUDINARY_CLOUD_NAME,
@@ -106,7 +106,9 @@ export default defineNuxtConfig({
       stripeCredits10PriceId: process.env.STRIPE_CREDITS_10_PRICE_ID,
       gtmId: process.env.NUXT_PUBLIC_GTM_ID || '',
       appEnv: process.env.APP_ENVIRONMENT || 'development',
-      sentryDsn: process.env.NUXT_PUBLIC_SENTRY_DSN || '',
+      sentry: {
+        dsn: process.env.NUXT_PUBLIC_SENTRY_DSN || ''
+      },
       appName: process.env.APP_NAME || 'Orcei Fácil',
       appDocumentLogo: process.env.APP_DOCUMENT_LOGO,
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
@@ -138,5 +140,14 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: '2024-04-03',
-  devtools: { enabled: process.env.NODE_ENV !== 'production' }
+  devtools: { enabled: process.env.NODE_ENV !== 'production' },
+
+  sentry: {
+    org: process.env.SENTRY_ORG,
+    project: process.env.SENTRY_PROJECT,
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    sourcemaps: {
+      filesToDeleteAfterUpload: ['.output/**/public/**/*.map']
+    }
+  }
 })

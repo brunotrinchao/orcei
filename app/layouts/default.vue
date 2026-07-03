@@ -181,7 +181,7 @@ onMounted(() => {
               <NuxtLink to="/terms" class="text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">Termos de Uso</NuxtLink>
               <NuxtLink to="/privacy" class="text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">Privacidade</NuxtLink>
               <button @click="resetConsent" class="text-left text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">Gerenciar Cookies</button>
-              <a href="mailto:contato@orcei.com.br" class="text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">contato@orcei.com.br</a>
+              <a href="mailto:contato@orceifacil.com.br" class="text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">contato@orceifacil.com.br</a>
             </nav>
           </div>
         </div>

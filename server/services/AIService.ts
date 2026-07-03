@@ -114,7 +114,7 @@ export const AIService = {
         const genAI = new GoogleGenerativeAI(config.geminiApiKey)
         // gemini-1.5-pro foi descontinuado, migrando para gemini-2.5-pro para lógica complexa
         const model = genAI.getGenerativeModel({ 
-          model: 'gemini-2.5-pro',
+          model: 'gemini-2.5-flash',
           generationConfig: {
             temperature: 0.2,
             topP: 0.85,
@@ -193,7 +193,8 @@ export const AIService = {
 
       const result: any = await response.json()
       if (result.success) {
-        return result.result.response
+        const output = result.result.response
+        return typeof output === 'string' ? output : JSON.stringify(output)
       }
       throw new Error('Cloudflare AI failed')
     } catch (e) {

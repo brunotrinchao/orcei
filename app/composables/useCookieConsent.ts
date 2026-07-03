@@ -11,8 +11,21 @@ export function useCookieConsent() {
 
   function loadTracking() {
     const gtmId = config.public.gtmId
+    const gaId = config.public.gaId
     const scripts: any[] = []
     const noscripts: any[] = []
+
+    if (gaId) {
+      scripts.push({
+        key: 'gtag-src',
+        src: `https://www.googletagmanager.com/gtag/js?id=${gaId}`,
+        async: true
+      })
+      scripts.push({
+        key: 'gtag-init',
+        innerHTML: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${gaId}');`
+      })
+    }
 
     if (gtmId) {
       scripts.push({

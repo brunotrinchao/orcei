@@ -76,6 +76,7 @@ export interface CatalogItemDTO {
   sku?: string
   imageUrl?: string
   icon?: string
+  aiAssisted?: boolean
 }
 
 export type ServiceDTO = CatalogItemDTO

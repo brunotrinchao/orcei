@@ -23,9 +23,9 @@ export default defineEventHandler(async (event) => {
   const startOfToday = new Date()
   startOfToday.setHours(0, 0, 0, 0)
 
-  // Catálogo escopado pelo mesmo filtro de período das propostas (consistência com "Baseado no período")
+  // Catálogo NÃO é escopado por período: é um acervo acumulado, não um fluxo temporal como propostas.
+  // Escopar por período causava adoção de IA falseada (ex: 100% quando só o item do dia entra no filtro).
   const catalogQuery: any = { profileId: profile._id }
-  if (query.createdAt) catalogQuery.createdAt = query.createdAt
 
   const [proposals, itemsCount, reportCount] = await Promise.all([
     Proposal.find(query),

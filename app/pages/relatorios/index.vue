@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FileText, Download, Eye, Search, Calendar, RefreshCcw, Sparkles, Trash2, AlertTriangle } from 'lucide-vue-next'
+import { FileText, Download, Eye, Search, Calendar, RefreshCcw, Trash2, AlertTriangle } from 'lucide-vue-next'
 
 const searchQuery = ref('')
 const startDate = ref('')
@@ -98,9 +98,6 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
       <template #item="{ item: report }">
         <div class="p-8 hover:bg-gray-50/50 transition-all group flex flex-col md:flex-row md:items-center justify-between gap-6 border-b last:border-0 border-gray-100">
           <div class="flex items-center gap-6">
-            <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
-              <Sparkles class="w-8 h-8" />
-            </div>
             <div class="space-y-1">
               <h4 class="text-lg font-black text-gray-900 leading-tight">Análise Estratégica IA</h4>
               <div class="flex items-center gap-3">

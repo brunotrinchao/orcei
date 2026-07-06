@@ -5,15 +5,16 @@ export const CatalogService = {
     return await CatalogItem.find({ profileId }).sort({ createdAt: -1 })
   },
 
-  async create(data: { 
-    profileId: string; 
-    name: string; 
-    description?: string; 
-    price: number; 
+  async create(data: {
+    profileId: string;
+    name: string;
+    description?: string;
+    price: number;
     type: 'product' | 'service';
     unit?: string;
     sku?: string;
     imageUrl?: string;
+    aiAssisted?: boolean;
   }) {
     return await CatalogItem.create(data)
   },

@@ -2,7 +2,7 @@
 import { ref, watch, nextTick, computed } from 'vue'
 import { Cropper } from 'vue-advanced-cropper'
 import 'vue-advanced-cropper/dist/style.css'
-import { Pencil, Trash2, RefreshCcw } from 'lucide-vue-next'
+import { Pencil, Trash2, RefreshCcw, Sparkles, Loader2 } from 'lucide-vue-next'
 import type { CatalogItemDTO } from '../../../../types'
 
 const props = defineProps<{
@@ -88,6 +88,8 @@ const form = ref({
 })
 
 const isSubmitting = ref(false)
+const isSuggesting = ref(false)
+const aiAssisted = ref(false)
 
 const unitOptions = [
   { label: 'Unidade (UN)', value: 'UN' },
@@ -117,6 +119,7 @@ watch(() => props.open, (isOpen) => {
         imageUrl: props.itemToEdit.imageUrl || '',
         icon: props.itemToEdit.icon || 'Package'
       }
+      aiAssisted.value = !!props.itemToEdit.aiAssisted
     } else {
       form.value = { 
         type: 'service',
@@ -128,9 +131,40 @@ watch(() => props.open, (isOpen) => {
         imageUrl: '',
         icon: 'Package'
       }
+      aiAssisted.value = false
     }
   }
 })
+
+async function suggestWithAI() {
+  if (!form.value.name.trim()) {
+    notify('Aviso', 'Digite o nome do item antes de pedir sugestão à IA.')
+    return
+  }
+
+  isSuggesting.value = true
+  try {
+    const data: any = await $fetch('/api/ai/catalog-suggest', {
+      method: 'POST',
+      body: {
+        name: form.value.name,
+        type: form.value.type,
+        context: form.value.description || undefined
+      }
+    })
+
+    if (data.description) form.value.description = data.description
+    if (data.price) form.value.price = data.price
+    if (data.unit) form.value.unit = data.unit
+    aiAssisted.value = true
+
+    notify('Sucesso', 'Sugestão da IA aplicada.')
+  } catch (e: any) {
+    notify('Erro', e.data?.statusMessage || 'Erro ao gerar sugestão com IA')
+  } finally {
+    isSuggesting.value = false
+  }
+}
 
 
 async function saveItem() {
@@ -151,7 +185,8 @@ async function saveItem() {
       unit: form.value.unit,
       sku: form.value.sku,
       imageUrl: form.value.imageUrl || undefined,
-      icon: form.value.icon
+      icon: form.value.icon,
+      aiAssisted: aiAssisted.value
     }
 
     const response = await $fetch(endpoint, {
@@ -299,6 +334,16 @@ async function saveItem() {
           <div class="space-y-3 pt-2">
             <div class="flex justify-between items-center px-1">
               <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Descrição Comercial</label>
+              <button
+                type="button"
+                @click="suggestWithAI"
+                :disabled="isSuggesting || !form.name.trim()"
+                class="flex items-center gap-1.5 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-700 disabled:opacity-40 disabled:pointer-events-none transition-all"
+              >
+                <Loader2 v-if="isSuggesting" class="w-3.5 h-3.5 animate-spin" />
+                <Sparkles v-else class="w-3.5 h-3.5" />
+                Sugerir com IA
+              </button>
             </div>
             <textarea 
               v-model="form.description" 

@@ -276,7 +276,7 @@ function formatRelativeTime(minutesAgo: number) {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
               <div class="space-y-2">
                 <div class="flex justify-between text-xs font-bold text-slate-300">
-                  <span class="uppercase tracking-widest text-[9px] text-slate-400">Adoção IA em Propostas</span>
+                  <span class="uppercase tracking-widest text-[9px] text-slate-400">Uso de IA em Propostas</span>
                   <span>{{ Math.round(stats.aiRoi?.adoptionRates?.proposals || 0) }}%</span>
                 </div>
                 <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
@@ -286,7 +286,7 @@ function formatRelativeTime(minutesAgo: number) {
               
               <div class="space-y-2">
                 <div class="flex justify-between text-xs font-bold text-slate-300">
-                  <span class="uppercase tracking-widest text-[9px] text-slate-400">Adoção IA em Catálogo</span>
+                  <span class="uppercase tracking-widest text-[9px] text-slate-400">Uso de IA em Catálogo</span>
                   <span>{{ Math.round(stats.aiRoi?.adoptionRates?.catalog || 0) }}%</span>
                 </div>
                 <div class="h-2 bg-slate-800 rounded-full overflow-hidden">

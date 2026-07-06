@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
     const regex = new RegExp(regexParts, 'i')
 
     similarItems = await CatalogItem.find({
-      profileId: (session.user as any).id,
+      profileId: profile._id,
       type,
       name: { $regex: regex },
       price: { $gt: 0 }
@@ -62,7 +62,7 @@ export default defineEventHandler(async (event) => {
     const escapedFirst = keywords[0].replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     const firstKeyword = new RegExp(escapedFirst, 'i')
     similarItems = await CatalogItem.find({
-      profileId: (session.user as any).id,
+      profileId: profile._id,
       type,
       name: { $regex: firstKeyword },
       price: { $gt: 0 }

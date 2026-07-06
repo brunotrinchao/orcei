@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles, Send, CheckCheck, X, ArrowLeft, ArrowRight, Trash2 } from 'lucide-vue-next'
+import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles, Send, CheckCheck, X, ArrowLeft, ArrowRight, Trash2, MoreVertical } from 'lucide-vue-next'
+import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
 import { isToday, isYesterday, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import type { ProposalDTO } from '../../../../types'
@@ -447,51 +448,65 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
               >
                 <img :src="'/images/icons/whatsapp-svg.svg'" class="w-5 h-5" alt="WhatsApp" />
               </button>
-              <button 
-                @click="openHistory(proposal)"
-                class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all"
-                title="Ver Histórico"
-                aria-label="Ver histórico do orçamento"
-              >
-                <History class="w-5 h-5" />
-              </button>
-              <button 
-                @click="openPreview(proposal)"
-                class="p-2.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-2xl transition-all"
-                title="Visualizar Orçamento"
-                aria-label="Visualizar orçamento"
-              >
-                <Eye class="w-5 h-5" />
-              </button>
-              <button 
-                v-if="proposal.status !== 'draft' && proposal.status !== 'accepted'"
-                @click="resendEmail(proposal._id)"
-                :disabled="isResending === proposal._id"
-                class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all disabled:opacity-50"
-                title="Reenviar E-mail"
-                aria-label="Reenviar e-mail de notificação"
-              >
-                <RefreshCcw v-if="isResending === proposal._id" class="w-5 h-5 animate-spin" />
-                <Mail v-else class="w-5 h-5" />
-              </button>
-              <button 
-                v-if="proposal.status !== 'accepted'"
-                @click="openModal(proposal)"
-                class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all"
-                title="Editar"
-                aria-label="Editar orçamento"
-              >
-                <Pencil class="w-5 h-5" />
-              </button>
-              <button
-                v-if="proposal.status !== 'accepted'"
-                @click="confirmDeleteProposal(proposal)"
-                class="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all"
-                title="Excluir"
-                aria-label="Excluir orçamento"
-              >
-                <Trash2 class="w-5 h-5" />
-              </button>
+              <DropdownMenuRoot>
+                <DropdownMenuTrigger as-child>
+                  <button
+                    class="p-2.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-2xl transition-all"
+                    title="Mais ações"
+                    aria-label="Mais ações do orçamento"
+                  >
+                    <MoreVertical class="w-5 h-5" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuContent
+                    align="end"
+                    :side-offset="6"
+                    class="min-w-[220px] bg-white rounded-2xl shadow-xl border border-gray-100 p-2 z-50"
+                  >
+                    <DropdownMenuItem
+                      @click="openHistory(proposal)"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+                    >
+                      <History class="w-4 h-4" />
+                      Ver Histórico
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      @click="openPreview(proposal)"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+                    >
+                      <Eye class="w-4 h-4" />
+                      Visualizar Orçamento
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      v-if="proposal.status !== 'draft' && proposal.status !== 'accepted'"
+                      :disabled="isResending === proposal._id"
+                      @click="resendEmail(proposal._id)"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all disabled:opacity-50"
+                    >
+                      <RefreshCcw v-if="isResending === proposal._id" class="w-4 h-4 animate-spin" />
+                      <Mail v-else class="w-4 h-4" />
+                      Reenviar E-mail
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      v-if="proposal.status !== 'accepted'"
+                      @click="openModal(proposal)"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+                    >
+                      <Pencil class="w-4 h-4" />
+                      Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      v-if="proposal.status !== 'accepted'"
+                      @click="confirmDeleteProposal(proposal)"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-600 hover:bg-red-50 cursor-pointer outline-none transition-all"
+                    >
+                      <Trash2 class="w-4 h-4" />
+                      Excluir
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenuPortal>
+              </DropdownMenuRoot>
             </div>
           </td>
         </tr>

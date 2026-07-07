@@ -119,6 +119,7 @@ export default defineNuxtConfig({
       pusherKey: process.env.PUSHER_KEY,
       pusherCluster: process.env.PUSHER_CLUSTER,
       integrationGoogleDriveCalendarStatus: process.env.INTEGRATION_GOOGLE_DRIVE_CALENDAR_STATUS === 'true',
+      emailContactDefault: process.env.EMAIL_CONTACT_DEFAULT || 'contato@orceifacil.com.br',
     }
   },
 

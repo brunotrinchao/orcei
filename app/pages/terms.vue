@@ -3,6 +3,7 @@ definePageMeta({ layout: 'blank' })
 const { public: { appName } } = useRuntimeConfig()
 useHead({ title: `Termos de Uso — ${appName}` })
 
+const { public: { emailContactDefault } } = useRuntimeConfig()
 const { data: systemInfo } = useFetch<any>('/api/system/status')
 const dynamicAppName = computed(() => systemInfo.value?.landingPage?.appName || appName)
 </script>
@@ -111,7 +112,7 @@ const dynamicAppName = computed(() => systemInfo.value?.landingPage?.appName || 
             O tratamento de dados pessoais é regido pela nossa
             <NuxtLink to="/privacy" class="text-blue-600 underline font-black">Política de Privacidade</NuxtLink>,
             em conformidade com a LGPD. Você pode solicitar a exclusão da sua conta e de todos os
-            dados associados a qualquer momento via <strong>privacidade@{{ dynamicAppName.toLowerCase() }}.com.br</strong>.
+            dados associados a qualquer momento via <strong>{{ emailContactDefault }}</strong>.
           </p>
         </section>
 
@@ -136,7 +137,7 @@ const dynamicAppName = computed(() => systemInfo.value?.landingPage?.appName || 
         <section>
           <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">11. Contato</h2>
           <p class="text-gray-700 font-medium leading-relaxed">
-            Dúvidas sobre estes Termos: <strong>contato@{{ dynamicAppName.toLowerCase() }}.com.br</strong>
+            Dúvidas sobre estes Termos: <strong>{{ emailContactDefault }}</strong>
           </p>
         </section>
 

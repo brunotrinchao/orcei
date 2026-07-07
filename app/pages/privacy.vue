@@ -3,6 +3,7 @@ definePageMeta({ layout: 'blank' })
 const { public: { appName } } = useRuntimeConfig()
 useHead({ title: `Política de Privacidade — ${appName}` })
 
+const { public: { emailContactDefault } } = useRuntimeConfig()
 const { data: systemInfo } = useFetch<any>('/api/system/status')
 const dynamicAppName = computed(() => systemInfo.value?.landingPage?.appName || appName)
 </script>
@@ -38,7 +39,7 @@ const dynamicAppName = computed(() => systemInfo.value?.landingPage?.appName || 
             O responsável pelo tratamento dos dados (controlador) é a empresa operadora da plataforma {{ dynamicAppName }}.
           </p>
           <p class="text-gray-700 font-medium leading-relaxed mt-3">
-            Para dúvidas sobre privacidade, entre em contato via: <strong>privacidade@{{ dynamicAppName.toLowerCase() }}.com.br</strong>
+            Para dúvidas sobre privacidade, entre em contato via: <strong>{{ emailContactDefault }}</strong>
           </p>
         </section>
 
@@ -59,13 +60,12 @@ const dynamicAppName = computed(() => systemInfo.value?.landingPage?.appName || 
               <ul class="list-disc pl-5 space-y-2 text-xs text-gray-500 font-bold mb-4">
                 <li><strong class="text-gray-700">Google Drive:</strong> Utilizado unicamente para criar uma pasta de arquivos própria da plataforma e realizar o upload automático em formato PDF das propostas comerciais aceitas pelos clientes do usuário.</li>
                 <li><strong class="text-gray-700">Google Agenda (Calendar):</strong> Utilizado para cadastrar, editar ou deletar compromissos comerciais referentes à execução das propostas aceitas, sincronizando o cronograma do usuário diretamente.</li>
-                <li><strong class="text-gray-700">Google Planilhas (Sheets):</strong> Utilizado para exportar e consolidar a lista de clientes, catálogo e propostas em relatórios de planilhas de propriedade e acesso exclusivo do usuário.</li>
               </ul>
               <div class="p-4 bg-white rounded-xl border border-indigo-100 text-[11px] text-gray-500 font-medium leading-relaxed">
                 <span class="text-indigo-600 font-black uppercase tracking-wider block mb-1">Conformidade e Uso Limitado (Limited Use)</span>
-                O uso e a transferência de informações recebidas de qualquer API do Google por meio da plataforma {{ dynamicAppName }} para qualquer outro aplicativo seguirão estritamente a 
-                <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" class="text-blue-500 underline font-black">Google API Services User Data Policy</a>, 
-                incluindo os requisitos de <strong>Uso Limitado (Limited Use Requirements)</strong>. Não transferimos, não vendemos e não compartilhamos esses dados com terceiros para fins de publicidade, nem os utilizamos para treinar modelos de inteligência artificial de linguagem (LLMs).
+                O uso e a transferência de informações recebidas de qualquer API do Google por meio da plataforma {{ dynamicAppName }} para qualquer outro aplicativo seguirão estritamente a
+                <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" class="text-blue-500 underline font-black">Google API Services User Data Policy</a>,
+                incluindo os requisitos de <strong>Uso Limitado (Limited Use Requirements)</strong>. Utilizamos esses dados exclusivamente para fornecer e melhorar as funcionalidades da plataforma solicitadas pelo usuário. Não transferimos, não vendemos e não compartilhamos esses dados com terceiros para fins de publicidade, nem os utilizamos para treinar ou melhorar modelos de inteligência artificial ou machine learning (generalizados ou não), incluindo LLMs.
               </div>
             </div>
             <div class="bg-white rounded-2xl border border-gray-100 p-6">
@@ -148,7 +148,7 @@ const dynamicAppName = computed(() => systemInfo.value?.landingPage?.appName || 
             </li>
           </ul>
           <p class="text-sm text-gray-500 font-medium mt-6">
-            Para exercer seus direitos, envie solicitação para <strong>privacidade@{{ dynamicAppName.toLowerCase() }}.com.br</strong>.
+            Para exercer seus direitos, envie solicitação para <strong>{{ emailContactDefault }}</strong>.
             Responderemos em até 15 dias úteis.
           </p>
         </section>
@@ -200,7 +200,7 @@ const dynamicAppName = computed(() => systemInfo.value?.landingPage?.appName || 
         <section>
           <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">9. Encarregado de Dados (DPO)</h2>
           <p class="text-gray-700 font-medium leading-relaxed">
-            Encarregado de Proteção de Dados: <strong>privacidade@{{ dynamicAppName.toLowerCase() }}.com.br</strong><br>
+            Encarregado de Proteção de Dados: <strong>{{ emailContactDefault }}</strong><br>
             Autoridade Nacional de Proteção de Dados (ANPD): <a href="https://www.gov.br/anpd" target="_blank" class="text-blue-600 underline">www.gov.br/anpd</a>
           </p>
         </section>

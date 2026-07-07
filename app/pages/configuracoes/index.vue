@@ -9,6 +9,8 @@ import SettingsTemplates from '../../components/settings/SettingsTemplates.vue'
 
 const { notify } = useAlerts()
 const { data: profile, refresh } = useFetch<ProfileDTO>('/api/profile', { key: 'profile' })
+const { public: publicConfig } = useRuntimeConfig()
+const integrationGoogleDriveCalendarStatus = publicConfig.integrationGoogleDriveCalendarStatus
 
 const localProfile = ref<ProfileDTO | null>(null)
 
@@ -307,7 +309,10 @@ onMounted(() => {
                   <p class="text-xs text-gray-500 font-bold mt-1 leading-relaxed">Sincronize sua agenda e arquive orçamentos automaticamente.</p>
                 </div>
                 <div class="shrink-0 w-full sm:w-auto">
-                  <div v-if="localProfile.googleIntegration?.email" class="flex flex-col items-center sm:items-end gap-2">
+                  <span v-if="!integrationGoogleDriveCalendarStatus" class="inline-flex items-center justify-center px-6 py-3 bg-gray-100 border-2 border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-400 cursor-not-allowed">
+                    Em breve
+                  </span>
+                  <div v-else-if="localProfile.googleIntegration?.email" class="flex flex-col items-center sm:items-end gap-2">
                     <span class="text-[10px] font-black text-green-600 uppercase tracking-widest bg-green-50 px-3 py-1 rounded-full">Conectado: {{ localProfile.googleIntegration.email }}</span>
                     <button @click="disconnectGoogle" class="text-[10px] font-black text-red-400 uppercase tracking-widest hover:text-red-600 transition-colors">Desconectar</button>
                   </div>

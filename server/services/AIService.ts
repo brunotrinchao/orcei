@@ -31,17 +31,17 @@ export const AIService = {
         const fallbackRegex = config.cloudflareFallbackRegex
         if (fallbackRegex && fallbackRegex !== 'true' && new RegExp(fallbackRegex, 'i').test(text)) {
           console.log('Gemini response matched fallback regex. Switching to Cloudflare.')
-          return await this.generateWithCloudflare(prompt)
+          return await this.generateFallback(prompt)
         }
-        
+
         return text
       }
     } catch (e) {
       console.error('Gemini error:', e)
     }
 
-    // 2. Fallback para Cloudflare
-    return await this.generateWithCloudflare(prompt)
+    // 2. Fallback para Cloudflare / OpenRouter
+    return await this.generateFallback(prompt)
   },
 
   async extractClientInfo(text: string) {
@@ -90,8 +90,8 @@ export const AIService = {
       console.error('Gemini client extraction error:', e)
     }
 
-    // Fallback: Tentar Cloudflare se o Gemini falhar
-    const response = await this.generateWithCloudflare(prompt)
+    // Fallback: Tentar Cloudflare/OpenRouter se o Gemini falhar
+    const response = await this.generateFallback(prompt)
     try {
       let cleanJson = response.trim()
       cleanJson = cleanJson.replace(/```json/g, '').replace(/```/g, '').trim()
@@ -113,14 +113,15 @@ export const AIService = {
       if (config.geminiApiKey) {
         const genAI = new GoogleGenerativeAI(config.geminiApiKey)
         // gemini-1.5-pro foi descontinuado, migrando para gemini-2.5-pro para lógica complexa
-        const model = genAI.getGenerativeModel({ 
+        const model = genAI.getGenerativeModel({
           model: 'gemini-2.5-flash',
           generationConfig: {
             temperature: 0.2,
             topP: 0.85,
             topK: 30,
-            maxOutputTokens: 1500,
-            responseMimeType: "application/json"
+            maxOutputTokens: 4096,
+            responseMimeType: "application/json",
+            thinkingConfig: { thinkingBudget: 0 }
           }
         })
 
@@ -137,11 +138,11 @@ export const AIService = {
       console.error('Gemini suggest error:', e)
     }
 
-    // Fallback para Cloudflare se Gemini falhar ou não estiver configurado
-    console.log('Gemini failed or not configured. Switching to Cloudflare for proposal suggestion.')
+    // Fallback para Cloudflare/OpenRouter se Gemini falhar ou não estiver configurado
+    console.log('Gemini failed or not configured. Switching to fallback for proposal suggestion.')
     const cloudflarePrompt = this.getPrompt(prompt, catalog)
 
-    const response = await this.generateWithCloudflare(cloudflarePrompt)
+    const response = await this.generateFallback(cloudflarePrompt)
 
     // Limpar markdown ou texto extra que a Cloudflare possa ter enviado
     try {
@@ -155,9 +156,11 @@ export const AIService = {
       const jsonEnd = cleanJson.lastIndexOf('}')
       
       if (jsonStart !== -1 && jsonEnd !== -1) {
-        return cleanJson.substring(jsonStart, jsonEnd + 1)
+        // Sanitiza quebras de linha/tabs literais dentro das strings do JSON (comum em modelos Cloudflare),
+        // que quebram o parser com "Unterminated string"
+        return cleanJson.substring(jsonStart, jsonEnd + 1).replace(/[\n\r\t]/g, ' ')
       }
-      
+
       return cleanJson
     } catch (e) {
       console.error('[AIService] Failed to clean Cloudflare JSON:', e)
@@ -186,7 +189,8 @@ export const AIService = {
             messages: [
               { role: 'system', content: 'Você é um redator profissional de orçamentos comerciais.' },
               { role: 'user', content: prompt }
-            ]
+            ],
+            max_tokens: 2048
           })
         }
       )
@@ -200,6 +204,50 @@ export const AIService = {
     } catch (e) {
       console.error('Cloudflare error:', e)
       throw e
+    }
+  },
+
+  async generateWithOpenRouter(prompt: string) {
+    const config = this._getConfig()
+    const { openrouterApiKey: apiKey, openrouterModel: model } = config
+
+    if (!apiKey) {
+      throw new Error('OpenRouter credentials not configured for fallback')
+    }
+
+    try {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: 'Você é um redator profissional de orçamentos comerciais.' },
+            { role: 'user', content: prompt }
+          ],
+          max_tokens: 2048
+        })
+      })
+
+      const result: any = await response.json()
+      const output = result.choices?.[0]?.message?.content
+      if (!output) throw new Error('OpenRouter AI failed')
+      return output
+    } catch (e) {
+      console.error('OpenRouter error:', e)
+      throw e
+    }
+  },
+
+  async generateFallback(prompt: string) {
+    try {
+      return await this.generateWithCloudflare(prompt)
+    } catch (e) {
+      console.error('Cloudflare fallback failed, trying OpenRouter:', e)
+      return await this.generateWithOpenRouter(prompt)
     }
   },
 

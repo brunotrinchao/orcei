@@ -89,6 +89,8 @@ export default defineNuxtConfig({
     cloudflareApiKey: process.env.CLOUDFLARE_API_KEY,
     cloudflareAiModel: process.env.CLOUDFLARE_AI_MODEL || '@cf/meta/llama-2-7b-chat-int8',
     cloudflareFallbackRegex: process.env.CLOUDFLARE_FALLBACK_REGEX,
+    openrouterApiKey: process.env.OPENROUTER_API_KEY,
+    openrouterModel: process.env.OPENROUTER_MODEL || 'meta-llama/llama-3.1-8b-instruct:free',
     qstashToken: process.env.QSTASH_TOKEN || process.env.NUXT_QSTASH_TOKEN,
     qstashCurrentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY || process.env.NUXT_QSTASH_CURRENT_SIGNING_KEY,
     qstashNextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY || process.env.NUXT_QSTASH_NEXT_SIGNING_KEY,

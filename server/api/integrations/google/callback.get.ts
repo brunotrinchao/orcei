@@ -39,21 +39,25 @@ export default defineEventHandler(async (event) => {
     const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client })
     const userInfo = await oauth2.userinfo.get()
 
-    const updateSet: any = {
-      'googleIntegration.email': userInfo.data.email,
-      'googleIntegration.accessToken': tokens.access_token,
-      'googleIntegration.expiryDate': tokens.expiry_date,
-    }
-    
+    const existingProfile = await Profile.findOne({ userId: (session.user as any).id })
+    const existingIntegration = existingProfile?.googleIntegration || {}
+
     // O Google só envia refresh_token na primeira autorização ou se prompt=consent.
     // Se recebemos um novo, atualizamos. Se não, mantemos o que já está no banco.
-    if (tokens.refresh_token) {
-      updateSet['googleIntegration.refreshToken'] = tokens.refresh_token
+    const googleIntegration = {
+      ...existingIntegration,
+      email: userInfo.data.email,
+      accessToken: tokens.access_token,
+      expiryDate: tokens.expiry_date,
+      refreshToken: tokens.refresh_token || existingIntegration.refreshToken
     }
 
+    // Substitui o objeto inteiro (não dot-notation) — evita erro do Mongo
+    // "Cannot create field X in element {googleIntegration: null}" quando
+    // googleIntegration estava null (ex: após desconectar).
     await Profile.findOneAndUpdate(
       { userId: (session.user as any).id },
-      { $set: updateSet }
+      { $set: { googleIntegration } }
     )
 
     return sendRedirect(event, '/configuracoes?google=connected')

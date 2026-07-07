@@ -31,15 +31,22 @@ export const GoogleService = {
     // Add token refresh listener
     oauth2Client.on('tokens', async (tokens) => {
       try {
-        const updateData: any = {}
-        if (tokens.access_token) updateData['googleIntegration.accessToken'] = tokens.access_token
-        if (tokens.expiry_date) updateData['googleIntegration.expiryDate'] = tokens.expiry_date
-        
-        if (Object.keys(updateData).length > 0) {
-          const { Profile } = await import('../models/Profile')
-          await Profile.findByIdAndUpdate(profile._id, { $set: updateData })
-          console.log(`[GoogleService] Tokens refreshed and saved for profile: ${profile._id}`)
+        if (!tokens.access_token && !tokens.expiry_date) return
+
+        const { Profile } = await import('../models/Profile')
+        const current = await Profile.findById(profile._id)
+        const existingIntegration = current?.googleIntegration || {}
+
+        // Substitui o objeto inteiro (não dot-notation) — evita erro do Mongo
+        // "Cannot create field X in element {googleIntegration: null}".
+        const googleIntegration = {
+          ...existingIntegration,
+          accessToken: tokens.access_token || existingIntegration.accessToken,
+          expiryDate: tokens.expiry_date || existingIntegration.expiryDate
         }
+
+        await Profile.findByIdAndUpdate(profile._id, { $set: { googleIntegration } })
+        console.log(`[GoogleService] Tokens refreshed and saved for profile: ${profile._id}`)
       } catch (error) {
         console.error(`[GoogleService] Failed to save refreshed tokens for profile: ${profile._id}`, error)
       }
@@ -93,9 +100,10 @@ export const GoogleService = {
       // 4. Update profile with new/found folderId
       if (folderId && folderId !== profile.googleIntegration?.driveFolderId) {
         const { Profile } = await import('../models/Profile')
-        await Profile.findByIdAndUpdate(profile._id, {
-          $set: { 'googleIntegration.driveFolderId': folderId }
-        })
+        // Substitui o objeto inteiro (não dot-notation) — evita erro do Mongo
+        // "Cannot create field X in element {googleIntegration: null}".
+        const googleIntegration = { ...(profile.googleIntegration || {}), driveFolderId: folderId }
+        await Profile.findByIdAndUpdate(profile._id, { $set: { googleIntegration } })
       }
 
       return folderId

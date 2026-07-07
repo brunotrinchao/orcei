@@ -52,11 +52,14 @@ export default defineEventHandler(async (event) => {
   ])
 
   // 3. Marcar perfil como deletado e limpar dados sensíveis
-  // Mantemos email, userId e NOME para auditoria.
+  // Mantemos email, userId e NOME para auditoria, por até 90 dias (purgeScheduledAt).
   // Mantemos creditsBalance e creditsUsed para quando o usuário voltar.
+  const deletedAt = new Date()
+  const purgeScheduledAt = new Date(deletedAt.getTime() + 90 * 24 * 60 * 60 * 1000)
   await Profile.findByIdAndUpdate(profile._id, {
     isDeleted: true,
-    deletedAt: new Date(),
+    deletedAt,
+    purgeScheduledAt,
     // name: Mantido original
     avatar: null,
     brandConfig: { logoUrl: null, primaryColor: '#3B82F6' },

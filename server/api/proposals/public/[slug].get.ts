@@ -106,8 +106,11 @@ export default defineEventHandler(async (event) => {
     read: false
   })
 
+  const responseObj: any = proposal.toObject ? proposal.toObject() : proposal
+  delete responseObj.token
+
   return {
-    ...proposal.toObject ? proposal.toObject() : proposal,
+    ...responseObj,
     unreadMessages: unreadCount
   }
 })

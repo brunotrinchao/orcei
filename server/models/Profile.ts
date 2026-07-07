@@ -110,6 +110,7 @@ Os direitos autorais e patrimoniais sobre o trabalho final serão integralmente 
 Para dirimir quaisquer controvérsias oriundas desta proposta, fica eleito o foro da comarca de Belo Horizonte, Estado de Minas Gerais, renunciando as partes a qualquer outro, por mais privilegiado que seja.</p>` },
   isDeleted: { type: Boolean, default: false },
   deletedAt: { type: Date, default: null },
+  purgeScheduledAt: { type: Date, default: null },
   role: { type: String, enum: Object.values(UserRole), default: UserRole.USER },
   lastLoginAt: { type: Date, default: null },
   googleIntegration: {

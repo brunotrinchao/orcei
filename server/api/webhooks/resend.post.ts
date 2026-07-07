@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
   const headers = getHeaders(event)
   const config = useRuntimeConfig()
   
-  const webhookSecret = process.env.RESEND_WEBHOOK_SECRET
+  const webhookSecret = config.resendWebhookSecret
   if (!webhookSecret) {
     console.error('[Resend Webhook] RESEND_WEBHOOK_SECRET not set')
     throw createError({ statusCode: 500, statusMessage: 'Webhook secret not configured' })

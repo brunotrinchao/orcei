@@ -248,6 +248,11 @@ export const sendCartRecoveryEmail = async (
       from: `${appName} <contato@orceifacil.com.br>`,
       to: recipient,
       subject: 'Você esqueceu algo no carrinho — Orcei Fácil',
+      // E-mail de lembrete/marketing (não 1:1 transacional) — exige List-Unsubscribe.
+      // mailto (sem endpoint dedicado ainda) — atende requisito sem criar rota nova.
+      headers: {
+        'List-Unsubscribe': '<mailto:contato@orceifacil.com.br?subject=Descadastrar>'
+      },
       html: `<div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 40px; color: #333;">
     <h2 style="color: #3147F6;">Ei, você esqueceu algo! 👋</h2>
     <p>Você começou a assinar o <strong>Orcei Fácil</strong> mas não finalizou.</p>

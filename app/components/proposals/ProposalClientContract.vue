@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { Shield } from 'lucide-vue-next'
 
-defineProps<{
+const props = defineProps<{
   contractText: string
 }>()
+
+const safeContractText = computed(() => useSanitizeHtml(props.contractText))
 </script>
 
 <template>
@@ -20,7 +22,7 @@ defineProps<{
         <span class="text-xs font-black text-gray-600 uppercase tracking-widest hidden group-open:block">Recolher</span>
       </summary>
       <div class="px-8 pb-8 border-t border-gray-50 pt-6 prose-contract">
-        <div v-html="contractText"></div>
+        <div v-html="safeContractText"></div>
       </div>
     </details>
   </section>

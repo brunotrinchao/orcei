@@ -8,6 +8,12 @@ definePageMeta({
   layout: 'blank'
 })
 
+// Token de acesso (?t=) fica na query string: evita repasse via header Referer
+// caso a página tenha links externos, e reduz exposição em logs de proxy/CDN.
+useHead({
+  meta: [{ name: 'referrer', content: 'no-referrer' }]
+})
+
 const { notify, confirm: confirmAlert } = useAlerts()
 const { hasConsent } = useCookieConsent()
 const route = useRoute()
@@ -571,7 +577,7 @@ const statusMap: any = {
     <!-- Terms Dialog -->
     <BaseDialog v-model:open="isTermsOpen" title="Termos e Condições" size="lg">
       <div class="prose-contract p-4 text-sm text-gray-600 leading-relaxed">
-        <div v-html="proposal.termsAndConditions"></div>
+        <div v-html="useSanitizeHtml(proposal?.termsAndConditions)"></div>
       </div>
       <template #footer>
         <BaseButton @click="isTermsOpen = false">Fechar</BaseButton>

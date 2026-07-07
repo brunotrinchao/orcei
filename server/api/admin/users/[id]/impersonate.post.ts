@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import { Profile } from '../../../../models/Profile'
 import { AuditLog } from '../../../../models/AuditLog'
 import { sanitizeError } from '../../../../utils/error-handler'
@@ -12,6 +13,9 @@ export default defineEventHandler(async (event) => {
   }
 
   const id = getRouterParam(event, 'id')
+  if (!id || !mongoose.isValidObjectId(id)) {
+    throw createError({ statusCode: 400, statusMessage: 'ID inválido' })
+  }
   try {
     const target = await Profile.findById(id)
     if (!target) throw createError({ statusCode: 404, statusMessage: 'Usuário não encontrado' })

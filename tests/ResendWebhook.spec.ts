@@ -6,7 +6,6 @@ vi.stubGlobal('readRawBody', vi.fn())
 vi.stubGlobal('getHeaders', vi.fn())
 vi.stubGlobal('setResponseStatus', vi.fn())
 vi.stubGlobal('createError', (err: any) => err)
-vi.stubGlobal('useRuntimeConfig', () => ({}))
 
 // Mocks for models
 const mockProposal = {
@@ -37,6 +36,9 @@ describe('Resend Webhook Integration', () => {
   beforeEach(async () => {
     vi.clearAllMocks()
     process.env.RESEND_WEBHOOK_SECRET = 'test-secret'
+    // Mutate the real reactive useRuntimeConfig instance provided by Nuxt Vitest environment
+    const config = useRuntimeConfig()
+    config.resendWebhookSecret = 'test-secret'
     const module = await import('../server/api/webhooks/resend.post')
     handler = module.default
   }, 10000)

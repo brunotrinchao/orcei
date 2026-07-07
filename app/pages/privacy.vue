@@ -76,6 +76,18 @@ const dynamicAppName = computed(() => systemInfo.value?.landingPage?.appName || 
               <h3 class="text-sm font-black text-gray-900 mb-2">Dados de Clientes</h3>
               <p class="text-sm text-gray-500 font-medium leading-relaxed">Nome, e-mail, telefone, CPF/CNPJ e endereço dos clientes cadastrados pelo usuário. Tratados exclusivamente para emissão de orçamentos e comunicações relacionadas.</p>
             </div>
+            <div class="bg-white rounded-2xl border border-gray-100 p-6 border-violet-100 bg-violet-50/10">
+              <h3 class="text-sm font-black text-violet-900 mb-2">Processamento por Inteligência Artificial</h3>
+              <p class="text-sm text-gray-600 font-medium leading-relaxed">
+                Funcionalidades de IA (extração de dados de leads a partir de texto colado, sugestão de itens de
+                catálogo, geração e análise de propostas) enviam os dados fornecidos pelo usuário — que podem
+                incluir nome, e-mail e telefone de clientes — para processamento por serviços de terceiros:
+                <strong>Google Gemini (Google LLC)</strong>, <strong>Cloudflare Workers AI</strong> e
+                <strong>OpenRouter</strong>, utilizados de forma redundante (fallback) caso um serviço esteja
+                indisponível. Esses dados não são utilizados por esses provedores para treinar modelos próprios de
+                IA e são processados apenas para gerar a resposta solicitada.
+              </p>
+            </div>
             <div class="bg-white rounded-2xl border border-gray-100 p-6">
               <h3 class="text-sm font-black text-gray-900 mb-2">Dados de Pagamento</h3>
               <p class="text-sm text-gray-500 font-medium leading-relaxed">Informações de assinatura e cobrança são processadas pela Stripe Inc. A {{ dynamicAppName }} não armazena dados de cartão de crédito.</p>
@@ -120,6 +132,11 @@ const dynamicAppName = computed(() => systemInfo.value?.landingPage?.appName || 
               <a :href="partner.policy" target="_blank" class="text-[10px] font-black text-blue-500 hover:text-blue-700 uppercase tracking-widest self-center shrink-0">Política →</a>
             </div>
           </div>
+          <p class="text-xs text-gray-500 font-medium mt-4 leading-relaxed">
+            <strong>Transferência internacional:</strong> alguns desses provedores (MongoDB Atlas, Google Gemini,
+            Cloudflare, OpenRouter, Stripe) podem processar ou armazenar dados em servidores localizados fora do
+            Brasil, sempre sob cláusulas contratuais de proteção de dados exigidas pela LGPD (art. 33).
+          </p>
         </section>
 
         <section>

@@ -85,6 +85,7 @@ export default defineNuxtConfig({
     resendTemplateAssignPlan: process.env.RESEND_TEMPLATE_ASSING_PLAN || 'ativar-plano',
     resendTemplateBuyCredit: process.env.RESEND_TEMPLATE_BUY_CREDIT || 'comprar-credito',
     resendTemplateCancelPlan: process.env.RESEND_TEMPLATE_CANCEL_PLAN || 'cancelar-plano',
+    resendWebhookSecret: process.env.RESEND_WEBHOOK_SECRET,
     cloudflareAccountId: process.env.CLOUDFLARE_ACCOUNT_ID,
     cloudflareApiKey: process.env.CLOUDFLARE_API_KEY,
     cloudflareAiModel: process.env.CLOUDFLARE_AI_MODEL || '@cf/meta/llama-2-7b-chat-int8',

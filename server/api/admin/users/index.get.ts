@@ -7,6 +7,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const { page = 1, limit = 20, search = '' } = getQuery(event)
+  const safeLimit = Math.min(Math.max(Number(limit) || 20, 1), 100)
+  const safePage = Math.max(Number(page) || 1, 1)
 
   const escapeRegex = (str: string): string => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
@@ -22,8 +24,8 @@ export default defineEventHandler(async (event) => {
   const [users, total] = await Promise.all([
     Profile.find(query)
       .sort({ createdAt: -1 })
-      .skip((Number(page) - 1) * Number(limit))
-      .limit(Number(limit))
+      .skip((safePage - 1) * safeLimit)
+      .limit(safeLimit)
       .lean(),
     Profile.countDocuments(query)
   ])
@@ -31,7 +33,7 @@ export default defineEventHandler(async (event) => {
   return {
     users,
     total,
-    page: Number(page),
-    limit: Number(limit)
+    page: safePage,
+    limit: safeLimit
   }
 })

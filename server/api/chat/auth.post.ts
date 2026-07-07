@@ -1,3 +1,5 @@
+import { timingSafeEqual } from 'node:crypto'
+import mongoose from 'mongoose'
 import { Proposal } from '../../models/Proposal'
 import { ProfileService } from '../../services/ProfileService'
 
@@ -20,6 +22,9 @@ export default defineEventHandler(async (event) => {
   const proposalMatch = channelName.match(/^private-proposal-(.+)$/)
   if (proposalMatch) {
     const proposalId = proposalMatch[1]
+    if (!mongoose.isValidObjectId(proposalId)) {
+      throw createError({ statusCode: 400, statusMessage: 'Invalid channel' })
+    }
     const proposal = await Proposal.findById(proposalId)
     if (!proposal) {
       console.error(`[Pusher Auth] Proposta ${proposalId} não encontrada`)
@@ -38,7 +43,12 @@ export default defineEventHandler(async (event) => {
 
     // Client: Se não for freelancer, checa via slug/token
     if (!authorized) {
-      if (slug === proposal.slug && (!proposal.token || token === proposal.token)) {
+      const tokenMatches = !proposal.token || (
+        !!token &&
+        Buffer.from(String(token)).length === Buffer.from(String(proposal.token)).length &&
+        timingSafeEqual(Buffer.from(String(proposal.token)), Buffer.from(String(token)))
+      )
+      if (slug === proposal.slug && tokenMatches) {
         authorized = true
         console.log(`[Pusher Auth] Cliente autorizado via Slug/Token para canal: ${channelName}`)
       } else {
@@ -51,6 +61,9 @@ export default defineEventHandler(async (event) => {
   const profileMatch = channelName.match(/^private-profile-(.+)$/)
   if (profileMatch) {
     const profileId = profileMatch[1]
+    if (!mongoose.isValidObjectId(profileId)) {
+      throw createError({ statusCode: 400, statusMessage: 'Invalid channel' })
+    }
     const session = await getUserSession(event)
     if (session?.user) {
       const profile = await ProfileService.getByUserId((session.user as any).id)

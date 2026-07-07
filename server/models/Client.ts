@@ -16,7 +16,10 @@ const clientSchema = new Schema({
     state: { type: String, required: true },
     zip: { type: String, required: true }
   },
-  notes: String
+  notes: String,
+  // Data-limite de retenção deste registro (CPF/CNPJ/endereço), se aplicável.
+  // Sem valor definido = retido enquanto a conta do profileId estiver ativa.
+  retentionUntil: { type: Date, default: null }
 }, { timestamps: true })
 
 // Ensure a user doesn't have duplicate emails for clients if needed, 

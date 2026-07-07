@@ -7,6 +7,16 @@ definePageMeta({
 
 const { loggedIn } = useUserSession()
 const { data: systemInfo } = useFetch<any>('/api/system/status')
+const { notify } = useAlerts()
+
+const acceptedTerms = ref(false)
+
+function onGoogleLoginClick(e: MouseEvent) {
+  if (!acceptedTerms.value) {
+    e.preventDefault()
+    notify('Aceite necessário', 'Você precisa aceitar os Termos de Uso e a Política de Privacidade para continuar.')
+  }
+}
 
 // Redirect authenticated users to dashboard
 watchEffect(() => {
@@ -32,25 +42,34 @@ watchEffect(() => {
           </div>
         </div>
 
+        <!-- Aceite obrigatório de Termos/Privacidade -->
+        <label class="flex items-start gap-3 text-xs text-gray-500 font-medium leading-relaxed cursor-pointer">
+          <input v-model="acceptedTerms" type="checkbox" class="mt-0.5 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 shrink-0">
+          <span>
+            Li e aceito os <NuxtLink to="/terms" target="_blank" class="text-blue-600 underline font-black">Termos de Uso</NuxtLink>
+            e a <NuxtLink to="/privacy" target="_blank" class="text-blue-600 underline font-black">Política de Privacidade</NuxtLink>
+            do {{ systemInfo?.landingPage?.appName || 'Orcei' }}.
+          </span>
+        </label>
+
         <!-- Botão de Login Google com Efeito Hover Avançado -->
         <div class="pt-4">
           <a
             href="/api/auth/google"
-            class="group relative w-full flex items-center justify-center gap-4 bg-white border-2 border-gray-200 hover:border-blue-600 hover:shadow-xl hover:shadow-blue-500/10 py-4 rounded-2xl font-black transition-all duration-300 text-gray-700 hover:text-blue-600 overflow-hidden"
+            :class="[
+              'group relative w-full flex items-center justify-center gap-4 bg-white border-2 border-gray-200 py-4 rounded-2xl font-black transition-all duration-300 text-gray-700 overflow-hidden',
+              acceptedTerms ? 'hover:border-blue-600 hover:shadow-xl hover:shadow-blue-500/10 hover:text-blue-600' : 'opacity-50 cursor-not-allowed'
+            ]"
+            @click="onGoogleLoginClick"
           >
             <!-- Efeito de brilho de fundo -->
             <div class="absolute inset-0 bg-gradient-to-r from-transparent via-blue-50 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
-            
+
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6 h-6 relative z-10" alt="Google">
             <span class="relative z-10 text-lg">Entrar com Google</span>
             <ArrowRight class="w-5 h-5 absolute right-6 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 relative z-10" />
           </a>
         </div>
-
-        <!-- Rodapé do formulário -->
-        <p class="text-center md:text-left text-xs text-gray-400 font-medium leading-relaxed max-w-sm mx-auto md:mx-0">
-          Ao prosseguir, você concorda com os termos de uso e políticas de privacidade do {{ systemInfo?.landingPage?.appName || 'Orcei' }}.
-        </p>
       </div>
     </div>
 

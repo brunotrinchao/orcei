@@ -35,17 +35,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Action missing' })
   }
 
-  // Garantir conexão com MongoDB antes de qualquer operação
-  if (mongoose.connection.readyState !== 1) {
-    console.warn(`[QStash Webhook] MongoDB state is ${mongoose.connection.readyState}. Operation [${action}] might fail.`)
-    // Se estiver desconectado, tentamos forçar a conexão (útil em cold starts severos)
-    if (mongoose.connection.readyState === 0) {
-      const uri = config.mongodbUri || process.env.MONGODB_URI
-      if (uri) await mongoose.connect(uri)
-    }
-  }
-
-  // Validação de Segurança via SDK — obrigatória
+  // Validação de Segurança via SDK — obrigatória (antes de qualquer conexão/operação)
   if (!config.qstashCurrentSigningKey || !config.qstashNextSigningKey) {
     console.error('[QStash Webhook] Chaves de assinatura QStash não configuradas.')
     throw createError({ statusCode: 500, statusMessage: 'QStash signing keys not configured' })
@@ -68,6 +58,16 @@ export default defineEventHandler(async (event) => {
   if (!isValid) {
     console.error('[QStash Webhook] Assinatura inválida detectada.')
     throw createError({ statusCode: 401, statusMessage: 'Assinatura QStash inválida' })
+  }
+
+  // Garantir conexão com MongoDB só depois de assinatura validada
+  if (mongoose.connection.readyState !== 1) {
+    console.warn(`[QStash Webhook] MongoDB state is ${mongoose.connection.readyState}. Operation [${action}] might fail.`)
+    // Se estiver desconectado, tentamos forçar a conexão (útil em cold starts severos)
+    if (mongoose.connection.readyState === 0) {
+      const uri = config.mongodbUri || process.env.MONGODB_URI
+      if (uri) await mongoose.connect(uri)
+    }
   }
 
   console.log(`[QStash Webhook] Recebido job: ${action}`)

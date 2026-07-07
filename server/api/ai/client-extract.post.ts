@@ -1,5 +1,7 @@
 import { AIService } from '../../services/AIService'
 import { checkRateLimit } from '../../utils/rate-limit'
+import { ProfileService } from '../../services/ProfileService'
+import { Profile } from '../../models/Profile'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -9,6 +11,19 @@ export default defineEventHandler(async (event) => {
 
   // Rate Limit: 5 requests per 1 minute for AI
   await checkRateLimit(event, { max: 5, windowMs: 60 * 1000, keyPrefix: 'ai-client-extract' })
+
+  const profile = await ProfileService.getByUserId((session.user as any).id)
+  if (!profile) {
+    throw createError({ statusCode: 404, statusMessage: 'Perfil não encontrado' })
+  }
+
+  // Verificação de saldo de créditos
+  if (profile.creditsBalance < 1 && (session.user as any).role !== 'admin') {
+    throw createError({
+      statusCode: 402,
+      statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para usar a IA.'
+    })
+  }
 
   const { text } = await readBody(event)
   if (!text) {
@@ -22,6 +37,18 @@ export default defineEventHandler(async (event) => {
     const cleanJson = responseText.replace(/```json|```/g, '').trim()
     const extractedData = JSON.parse(cleanJson)
 
+    // Dedução de 1 crédito SOMENTE após extração bem-sucedida (atômica)
+    if ((session.user as any).role !== 'admin') {
+      const updated = await Profile.findOneAndUpdate(
+        { _id: profile._id, creditsBalance: { $gte: 1 } },
+        { $inc: { creditsBalance: -1, creditsUsed: 1, 'aiUsage.leads': 1 } },
+        { new: true }
+      )
+      if (!updated) {
+        throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para usar a IA.' })
+      }
+    }
+
     return {
       name: extractedData.name || '',
       email: extractedData.email || '',
@@ -30,6 +57,7 @@ export default defineEventHandler(async (event) => {
       companySize: extractedData.companySize || ''
     }
   } catch (e: any) {
+    if (e.statusCode) throw e
     console.error('AI Client Extraction Error:', e)
     throw createError({
       statusCode: 500,

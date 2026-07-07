@@ -39,7 +39,8 @@ const profileSchema = new Schema({
   aiUsage: {
     reports: { type: Number, default: 0 },
     proposals: { type: Number, default: 0 },
-    catalog: { type: Number, default: 0 }
+    catalog: { type: Number, default: 0 },
+    leads: { type: Number, default: 0 }
   },
   subscriptionPlan: { type: String, enum: Object.values(SubscriptionPlan), default: SubscriptionPlan.FREE },
   stripeCustomerId: String,

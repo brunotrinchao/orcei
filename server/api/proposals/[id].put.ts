@@ -13,7 +13,8 @@ export default defineEventHandler(async (event) => {
 
   const ALLOWED_FIELDS = ['title', 'client', 'items', 'upsellItems', 'paymentConfig', 'contractText', 'termsAndConditions', 'status', 'sendMethod', 'notes', 'executionDate', 'totals']
   const safeBody = Object.fromEntries(Object.entries(body).filter(([k]) => ALLOWED_FIELDS.includes(k)))
-  const proposal = await ProposalService.update(id!, profile._id as any, safeBody)
+  const isAdmin = (session.user as any).role === 'admin'
+  const proposal = await ProposalService.update(id!, profile._id as any, safeBody, isAdmin)
   if (!proposal) {
     throw createError({ 
       statusCode: 404, 

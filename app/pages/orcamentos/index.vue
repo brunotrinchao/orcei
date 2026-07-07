@@ -588,7 +588,7 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
             </BaseButton>
             <BaseButton type="button" :disabled="isSubmitting" @click="proposalFormRef.submit('created')" class="bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-200">
               <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin mr-2" />
-              Criar e Enviar
+              Criar e Enviar (1 Crédito)
             </BaseButton>
           </template>
         </template>

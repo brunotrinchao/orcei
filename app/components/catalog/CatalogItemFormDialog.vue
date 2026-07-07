@@ -342,7 +342,7 @@ async function saveItem() {
               >
                 <Loader2 v-if="isSuggesting" class="w-3.5 h-3.5 animate-spin" />
                 <Sparkles v-else class="w-3.5 h-3.5" />
-                Sugerir com IA
+                Sugerir com IA (1 Crédito)
               </button>
             </div>
             <textarea 

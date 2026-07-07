@@ -50,8 +50,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const isAdmin = (session.user as any).role === 'admin'
   return await ProposalService.create({
     ...body,
     profileId: profile._id
-  })
+  }, isAdmin)
 })

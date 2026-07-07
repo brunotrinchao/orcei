@@ -39,7 +39,7 @@ export const ProposalService = {
     return await ProposalHistory.find({ proposalId }).sort({ timestamp: -1 })
   },
 
-  async create(data: any) {
+  async create(data: any, isAdmin = false) {
     const slug = nanoid(10)
     const token = nanoid(20)
     const totals = this.calculateTotals(data.items, data.totals?.additional || 0, data.totals?.discount || 0, data.paymentConfig)
@@ -70,6 +70,11 @@ export const ProposalService = {
       const expiresAt = new Date()
       expiresAt.setDate(expiresAt.getDate() + validityDays)
 
+      // Verificação de saldo ANTES de persistir o orçamento
+      if (data.status === ProposalStatus.CREATED && !isAdmin && (!profile || profile.creditsBalance < 1)) {
+        throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para continuar.' })
+      }
+
       let proposal: any
       if (session) {
         const [created] = await Proposal.create([{
@@ -99,7 +104,7 @@ export const ProposalService = {
       // Se criar já como 'created' e sendMethod for 'auto', consome crédito e agenda envio
       let emailQueued = false
       if (data.status === ProposalStatus.CREATED) {
-        await this.consumeCredit(data.profileId, session || undefined)
+        await this.consumeCredit(data.profileId, session || undefined, isAdmin)
 
         if (data.sendMethod !== SendMethod.MANUAL) {
           if (profile && data.client?.email) {
@@ -137,10 +142,19 @@ export const ProposalService = {
     }
   },
 
-  async update(id: string, profileId: string, data: any) {
+  async update(id: string, profileId: string, data: any, isAdmin = false) {
     const oldProposal = await Proposal.findOne({ _id: id, profileId })
     if (!oldProposal) return null
     if (oldProposal.status === ProposalStatus.ACCEPTED) return null
+
+    // Verificação de saldo ANTES de abrir a transação, se a transição for cobrar crédito
+    const willCharge = oldProposal.status === ProposalStatus.DRAFT && data.status !== ProposalStatus.DRAFT
+    if (willCharge && !isAdmin) {
+      const profileCheck = await Profile.findById(profileId)
+      if (!profileCheck || profileCheck.creditsBalance < 1) {
+        throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para continuar.' })
+      }
+    }
 
     let emailQueued = false
     const session = typeof Profile.db?.startSession === 'function' ? await Profile.db.startSession() : null
@@ -150,8 +164,8 @@ export const ProposalService = {
 
     try {
       // Consome crédito se mudar de draft para created/pending/etc
-      if (oldProposal.status === ProposalStatus.DRAFT && data.status !== ProposalStatus.DRAFT) {
-        await this.consumeCredit(profileId, session || undefined)
+      if (willCharge) {
+        await this.consumeCredit(profileId, session || undefined, isAdmin)
 
         // Se mudou para 'created' e não for manual, agenda e-mail
         if (data.status === ProposalStatus.CREATED && data.sendMethod !== SendMethod.MANUAL) {
@@ -208,7 +222,9 @@ export const ProposalService = {
     return await Proposal.findOneAndDelete({ _id: id, profileId })
   },
 
-  async consumeCredit(profileId: string, session?: any) {
+  async consumeCredit(profileId: string, session?: any, isAdmin = false) {
+    if (isAdmin) return // admin não paga crédito, mesmo padrão dos endpoints de IA
+
     if (typeof Profile.findOneAndUpdate === 'function') {
       const updatedProfile = await Profile.findOneAndUpdate(
         {

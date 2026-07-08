@@ -6,8 +6,9 @@ export default defineEventHandler(async (event) => {
   const { code, state } = getQuery(event)
   const session = await getUserSession(event)
 
+  const config = useRuntimeConfig()
   const savedState = getCookie(event, 'google_auth_state')
-  deleteCookie(event, 'google_auth_state')
+  deleteCookie(event, 'google_auth_state', { domain: getCookieDomain(config.public.siteUrl) })
 
   if (!session?.user) {
     throw createError({

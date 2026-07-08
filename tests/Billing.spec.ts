@@ -61,10 +61,10 @@ describe('Billing Page', () => {
     expect(text).toContain('Pacote Agência')
     
     // Preços dos pacotes
-    expect(text).toContain('R$ 5,90')
-    expect(text).toContain('R$ 29,90')
-    expect(text).toContain('R$ 69,90')
-    expect(text).toContain('R$ 149,90')
+    expect(text).toContain('R$ 5,99')
+    expect(text).toContain('R$ 29,00')
+    expect(text).toContain('R$ 69,00')
+    expect(text).toContain('R$ 149,00')
   })
 
   it('allows purchase attempts of credit packs', async () => {

@@ -103,7 +103,7 @@ describe('GoogleService', () => {
         q: expect.stringMatching(/name = 'Orcei( Fácil)?'/)
       }))
       expect(Profile.findByIdAndUpdate).toHaveBeenCalledWith('prof-id', expect.objectContaining({
-        $set: { 'googleIntegration.driveFolderId': 'found-id' }
+        $set: { googleIntegration: { driveFolderId: 'found-id' } }
       }))
     })
 

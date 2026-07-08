@@ -87,8 +87,9 @@ export function generateProposalHtml(proposal: any, profile: any, appName: strin
   const contractHtml = sanitizeHtml(processVariables(proposal.contractText || '', proposal, profile), sanitizeOptions)
   const termsHtml = sanitizeHtml(processVariables(proposal.termsAndConditions || '', proposal, profile), sanitizeOptions)
 
-  const logoHtml = process.env.APP_DOCUMENT_LOGO 
-    ? `<img src="${process.env.APP_DOCUMENT_LOGO}" width="150" height="108">` 
+  const logoUrl = profile?.brandConfig?.logoUrl || process.env.APP_DOCUMENT_LOGO
+  const logoHtml = logoUrl
+    ? `<img src="${logoUrl}" width="150" height="108">`
     : appName.toUpperCase()
 
   return `
@@ -196,8 +197,9 @@ export function generateProposalHtml(proposal: any, profile: any, appName: strin
 }
 
 export function generateReportHtml(report: any, profile: any, appName: string = 'Orcei') {
-  const logoHtml = process.env.APP_DOCUMENT_LOGO 
-    ? `<img src="${process.env.APP_DOCUMENT_LOGO}" width="150" height="108">` 
+  const logoUrl = profile?.brandConfig?.logoUrl || process.env.APP_DOCUMENT_LOGO
+  const logoHtml = logoUrl
+    ? `<img src="${logoUrl}" width="150" height="108">`
     : appName.toUpperCase()
 
   return `

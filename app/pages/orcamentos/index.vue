@@ -324,7 +324,7 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
           <Sparkles class="w-4 h-4 text-white animate-pulse" />
           Criar com IA
         </button>
-        <BaseButton @click="openModal()" class="shadow-2xl shadow-gray-200">
+        <BaseButton data-tour="orcamentos-novo-btn" @click="openModal()" class="shadow-2xl shadow-gray-200">
           <Plus class="w-5 h-5 mr-2" />
           Novo Orçamento
         </BaseButton>
@@ -332,7 +332,7 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
     </PageHeader>
 
     <!-- Busca e Filtros -->
-    <div class="mb-10 space-y-6">
+    <div data-tour="orcamentos-filtros" class="mb-10 space-y-6">
       <div class="relative max-w-xl">
         <input
           v-model="searchQuery"

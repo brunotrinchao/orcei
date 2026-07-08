@@ -146,7 +146,7 @@ function formatRelativeTime(minutesAgo: number) {
         <p class="text-gray-500 font-medium">Acompanhe suas conversões, produtividade IA e receitas acumuladas.</p>
       </div>
 
-      <div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide bg-gray-100/80 p-1.5 rounded-3xl border border-gray-200/50">
+      <div data-tour="dashboard-period-filter" class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide bg-gray-100/80 p-1.5 rounded-3xl border border-gray-200/50">
         <button 
           v-for="p in [
             { label: '7D', value: 'last_7_days' },
@@ -306,7 +306,8 @@ function formatRelativeTime(minutesAgo: number) {
             </div>
             
             <div class="w-full space-y-3">
-              <BaseButton 
+              <BaseButton
+                data-tour="dashboard-ai-report"
                 @click="generateAIReport"
                 :disabled="isAnalyzing"
                 variant="primary" 
@@ -458,7 +459,7 @@ function formatRelativeTime(minutesAgo: number) {
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <!-- Gráfico de Evolução de Faturamento -->
-        <div class="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
+        <div data-tour="dashboard-revenue-chart" class="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
           <div class="flex justify-between items-center">
             <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Evolução do Faturamento</h3>
             <BarChart3 class="w-5 h-5 text-gray-400" />

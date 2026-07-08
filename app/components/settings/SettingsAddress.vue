@@ -45,7 +45,7 @@ async function searchCEP() {
 </script>
 
 <template>
-  <section id="endereco" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
+  <section id="endereco" data-tour="config-endereco" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
     <div class="flex items-center gap-3 mb-8">
       <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center">
         <MapPin class="w-5 h-5 text-orange-600" />

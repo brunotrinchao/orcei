@@ -61,7 +61,7 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
 <template>
   <div class="max-w-6xl mx-auto px-4 sm:px-6">
     <PageHeader title="Meus Relatórios IA" subtitle="Analises estratégicas geradas pela inteligência artificial.">
-      <BaseButton to="/dashboard" variant="secondary">
+      <BaseButton data-tour="relatorios-gerar-btn" to="/dashboard" variant="secondary">
         Gerar Novo Relatório
       </BaseButton>
     </PageHeader>
@@ -89,7 +89,7 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
     </div>
 
     <!-- Listagem Unificada -->
-    <BaseDataList
+    <BaseDataList data-tour="relatorios-lista"
       :items="filteredReports"
       :pending="pending"
       empty-title="Nenhum relatório encontrado"

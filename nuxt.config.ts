@@ -1,7 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@vueuse/nuxt', '@nuxtjs/cloudinary', '@vercel/speed-insights', '@sentry/nuxt/module'],
-  
+
+  css: ['driver.js/dist/driver.css'],
+
+  imports: {
+    dirs: ['composables/onboarding']
+  },
+
   cloudinary: {
     cloudName: process.env.CLOUDINARY_NAME || process.env.NUXT_CLOUDINARY_CLOUD_NAME,
   },

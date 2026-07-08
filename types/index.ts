@@ -56,6 +56,7 @@ export interface ProfileDTO {
   defaultCashDiscount: number
   defaultContractTemplate: string
   defaultTermsAndConditions: string
+  onboardingCompletedTours?: string[]
   googleIntegration?: {
     email?: string
     accessToken?: string

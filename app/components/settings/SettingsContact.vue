@@ -30,7 +30,7 @@ function removePhone(index: number) {
 </script>
 
 <template>
-  <section id="contato" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
+  <section id="contato" data-tour="config-contato" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
     <div class="flex items-center gap-3 mb-8">
       <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
         <Phone class="w-5 h-5 text-blue-600" />

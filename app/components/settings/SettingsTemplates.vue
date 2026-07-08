@@ -67,6 +67,7 @@ const localTermsAndConditions = computed({
     <div class="flex gap-1 p-1 bg-gray-100 rounded-2xl mb-8 max-w-sm">
       <button
         type="button"
+        data-tour="config-modelo-contrato"
         @click="activeTab = 'contract'"
         :class="activeTab === 'contract' ? 'bg-white text-gray-900 shadow-md' : 'text-gray-500 hover:text-gray-700'"
         class="flex-1 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
@@ -75,6 +76,7 @@ const localTermsAndConditions = computed({
       </button>
       <button
         type="button"
+        data-tour="config-modelo-termos"
         @click="activeTab = 'terms'"
         :class="activeTab === 'terms' ? 'bg-white text-gray-900 shadow-md' : 'text-gray-500 hover:text-gray-700'"
         class="flex-1 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-gray-400"

@@ -168,13 +168,13 @@ const proposalOptions = computed(() => {
 <template>
   <div class="max-w-6xl mx-auto px-4 sm:px-6 space-y-8">
     <PageHeader title="Sua Agenda" subtitle="Organize seus serviços e reuniões de forma integrada.">
-      <BaseButton @click="isModalOpen = true" class="w-full sm:w-auto shadow-xl shadow-blue-100">
+      <BaseButton data-tour="agenda-novo-evento-btn" @click="isModalOpen = true" class="w-full sm:w-auto shadow-xl shadow-blue-100">
         <Plus class="w-5 h-5 mr-2" />
         Novo Compromisso
       </BaseButton>
     </PageHeader>
 
-    <div class="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm">
+    <div data-tour="agenda-calendario" class="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm">
       <FullCalendar :options="calendarOptions" />
     </div>
 

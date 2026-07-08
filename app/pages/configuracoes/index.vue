@@ -291,7 +291,7 @@ onMounted(() => {
           />
 
           <!-- Integrações -->
-          <section id="integracoes" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
+          <section id="integracoes" data-tour="config-integracoes" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
             <div class="flex items-center gap-3 mb-8">
               <div class="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center">
                 <Globe class="w-5 h-5 text-sky-600" />
@@ -325,7 +325,7 @@ onMounted(() => {
           </section>
 
           <!-- Regras de Negócio -->
-          <section id="negocio" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
+          <section id="negocio" data-tour="config-regras-negocio" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
             <div class="flex items-center gap-3 mb-8">
               <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
                 <Briefcase class="w-5 h-5 text-emerald-600" />
@@ -364,7 +364,7 @@ onMounted(() => {
           />
 
           <!-- Privacidade e Dados -->
-          <section id="privacidade" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
+          <section id="privacidade" data-tour="config-privacidade" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
             <div class="flex items-center gap-3 mb-8">
               <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
                 <Shield class="w-5 h-5 text-red-600" />

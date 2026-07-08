@@ -158,16 +158,16 @@ const formatPhone = (phone: string) => {
 <template>
   <div class="max-w-6xl mx-auto px-4 sm:px-6">
     <PageHeader title="Seus Clientes" subtitle="Gerencie seus contatos e acelere seus orçamentos.">
-      <BaseButton @click="openModal()" class="w-full sm:w-auto shadow-2xl shadow-blue-100">
+      <BaseButton data-tour="clientes-novo-btn" @click="openModal()" class="w-full sm:w-auto shadow-2xl shadow-blue-100">
         Cadastrar Novo Cliente
       </BaseButton>
     </PageHeader>
 
     <!-- Filtros -->
-    <div class="mb-10 relative max-w-xl">
-      <input 
+    <div data-tour="clientes-busca" class="mb-10 relative max-w-xl">
+      <input
         v-model="searchQuery"
-        type="text" 
+        type="text"
         placeholder="Buscar por nome, e-mail ou documento..." 
         class="w-full pl-14 pr-6 py-5 bg-white border-2 border-gray-100 rounded-[2rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-300 shadow-sm"
       >

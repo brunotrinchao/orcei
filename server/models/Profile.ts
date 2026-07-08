@@ -113,6 +113,7 @@ Para dirimir quaisquer controvérsias oriundas desta proposta, fica eleito o for
   purgeScheduledAt: { type: Date, default: null },
   role: { type: String, enum: Object.values(UserRole), default: UserRole.USER },
   lastLoginAt: { type: Date, default: null },
+  onboardingCompletedTours: { type: [String], default: [] },
   googleIntegration: {
     email: String,
     accessToken: String,

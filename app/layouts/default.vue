@@ -80,6 +80,9 @@ onMounted(() => {
 
         <div class="flex items-center gap-4">
           <template v-if="loggedIn">
+            <!-- Onboarding Help Button -->
+            <OnboardingHelpButton />
+
             <!-- Credits & Plan Display -->
             <div class="flex items-center gap-3 bg-gray-50/50 px-3 py-1.5 rounded-2xl border border-gray-100 mr-1">
               <div class="flex flex-col items-end">
@@ -208,6 +211,8 @@ onMounted(() => {
         </div>
       </div>
     </footer>
+
+    <OnboardingController v-if="loggedIn" />
 
     <nav
       v-if="loggedIn"

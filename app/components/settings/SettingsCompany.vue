@@ -21,7 +21,7 @@ const localCompany = computed({
 </script>
 
 <template>
-  <section id="empresa" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
+  <section id="empresa" data-tour="config-empresa" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
     <div class="flex items-center gap-3 mb-8">
       <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
         <Briefcase class="w-5 h-5 text-purple-600" />

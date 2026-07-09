@@ -3,7 +3,7 @@ import type { ProfileDTO } from '../../../types'
 
 const route = useRoute()
 const { loggedIn } = useUserSession()
-const { autoStartForRoute, markWelcomeSeen } = useOnboarding()
+const { autoStartForRoute, markWelcomeSeen, startTour, hasTourForRoute } = useOnboarding()
 const { data: profile } = useNuxtData<ProfileDTO>('profile')
 
 const showWelcome = ref(false)
@@ -23,8 +23,10 @@ async function tryAutoStart() {
 async function handleAccept() {
   showWelcome.value = false
   await markWelcomeSeen(true)
+  const tourId = hasTourForRoute(route.path)
+  if (!tourId) return
   await nextTick()
-  setTimeout(() => autoStartForRoute(route.path), 400)
+  setTimeout(() => startTour(tourId, { force: true }), 400)
 }
 
 async function handleDecline() {

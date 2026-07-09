@@ -1,6 +1,7 @@
 import { Profile } from '../models/Profile'
 import type { UserDTO } from '../../types/user'
 import { QueueService } from './QueueService'
+import { getInitialCredits } from '../utils/credits'
 
 export const ProfileService = {
   async createForUser(user: UserDTO) {
@@ -23,7 +24,7 @@ export const ProfileService = {
 
     // Verificar se existe perfil deletado com o mesmo e-mail (outra conta social etc)
     const existingEmail = await Profile.findOne({ email: user.email, isDeleted: true })
-    const initialCredits = existingEmail ? 0 : 1
+    const initialCredits = existingEmail ? 0 : await getInitialCredits()
 
     const stripe = useStripe()
     let stripeCustomerId: string | undefined

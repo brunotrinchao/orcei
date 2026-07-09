@@ -23,6 +23,15 @@ export async function getActionCost(action: CreditAction): Promise<number> {
   return costs[action] ?? DEFAULT_COSTS[action]
 }
 
+const DEFAULT_INITIAL_CREDITS = 1
+
+/** Créditos concedidos a um novo usuário no cadastro (configurável pelo admin). */
+export async function getInitialCredits(): Promise<number> {
+  const settings = await PlatformSettings.findOne({}).lean()
+  const value = (settings as any)?.initialCredits
+  return Number.isFinite(value) ? value : DEFAULT_INITIAL_CREDITS
+}
+
 export function requireCreditBalance(profile: { creditsBalance: number }, cost: number, isAdmin: boolean, errorMessage: string) {
   if (isAdmin || cost === 0) return
   if (profile.creditsBalance < cost) {
@@ -66,4 +75,10 @@ export function sanitizeCreditCosts(input: any): Record<CreditAction, number> {
     if (Number.isFinite(num) && num >= 0) result[key] = Math.floor(num)
   }
   return result
+}
+
+export function sanitizeInitialCredits(input: any): number {
+  const num = Number(input)
+  if (Number.isFinite(num) && num >= 0) return Math.floor(num)
+  return DEFAULT_INITIAL_CREDITS
 }

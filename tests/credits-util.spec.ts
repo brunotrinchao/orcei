@@ -14,11 +14,11 @@ vi.mock('../server/models/Profile', () => ({
 
 import { PlatformSettings } from '../server/models/PlatformSettings'
 import { Profile } from '../server/models/Profile'
-import { getActionCost, getCreditCosts, requireCreditBalance, chargeCredit, sanitizeCreditCosts } from '../server/utils/credits'
+import { getActionCost, getCreditCosts, requireCreditBalance, chargeCredit, sanitizeCreditCosts, getInitialCredits, sanitizeInitialCredits } from '../server/utils/credits'
 
-function mockSettings(creditCosts: any) {
+function mockSettings(creditCosts: any, extra: any = {}) {
   vi.mocked(PlatformSettings.findOne).mockReturnValue({
-    lean: vi.fn().mockResolvedValue(creditCosts ? { creditCosts } : null)
+    lean: vi.fn().mockResolvedValue(creditCosts || Object.keys(extra).length ? { creditCosts, ...extra } : null)
   } as any)
 }
 
@@ -126,6 +126,45 @@ describe('credits util', () => {
     it('trunca valores decimais', () => {
       const result = sanitizeCreditCosts({ catalogSuggest: 2.9 })
       expect(result.catalogSuggest).toBe(2)
+    })
+  })
+
+  describe('getInitialCredits', () => {
+    it('retorna default (1) quando não há settings salvos', async () => {
+      mockSettings(null)
+      expect(await getInitialCredits()).toBe(1)
+    })
+
+    it('retorna valor customizado salvo', async () => {
+      mockSettings(null, { initialCredits: 3 })
+      expect(await getInitialCredits()).toBe(3)
+    })
+
+    it('aceita 0 (sem créditos grátis no cadastro)', async () => {
+      mockSettings(null, { initialCredits: 0 })
+      expect(await getInitialCredits()).toBe(0)
+    })
+  })
+
+  describe('sanitizeInitialCredits', () => {
+    it('aplica default quando input vazio/undefined', () => {
+      expect(sanitizeInitialCredits(undefined)).toBe(1)
+    })
+
+    it('rejeita valor negativo, mantendo default', () => {
+      expect(sanitizeInitialCredits(-5)).toBe(1)
+    })
+
+    it('rejeita string não numérica, mantendo default', () => {
+      expect(sanitizeInitialCredits('abc')).toBe(1)
+    })
+
+    it('aceita 0', () => {
+      expect(sanitizeInitialCredits(0)).toBe(0)
+    })
+
+    it('trunca valor decimal', () => {
+      expect(sanitizeInitialCredits(2.9)).toBe(2)
     })
   })
 })

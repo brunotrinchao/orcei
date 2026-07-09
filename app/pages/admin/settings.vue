@@ -32,6 +32,9 @@ watch(settings, (val) => {
     } else {
       localSettings.value.creditCosts = { ...DEFAULT_CREDIT_COSTS, ...localSettings.value.creditCosts }
     }
+    if (localSettings.value.initialCredits === undefined || localSettings.value.initialCredits === null) {
+      localSettings.value.initialCredits = 1
+    }
   }
 }, { immediate: true })
 
@@ -310,6 +313,22 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
                 <BaseInput v-model.number="localSettings.creditCosts.proposalSend" type="number" label="Criar e Enviar Orçamento" />
                 <p class="text-[10px] text-gray-400 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
               </div>
+            </div>
+          </section>
+
+          <section class="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                <Sparkles class="w-5 h-5 text-emerald-600" />
+              </div>
+              <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Créditos Iniciais</h2>
+            </div>
+            <p class="text-xs text-gray-500 font-medium leading-relaxed">
+              Quantidade de créditos que um novo usuário recebe automaticamente ao se cadastrar na plataforma.
+            </p>
+            <div class="max-w-xs space-y-1.5">
+              <BaseInput v-model.number="localSettings.initialCredits" type="number" label="Créditos no Cadastro" />
+              <p class="text-[10px] text-gray-400 font-bold ml-1">Defina 0 para não conceder créditos gratuitos</p>
             </div>
           </section>
         </div>

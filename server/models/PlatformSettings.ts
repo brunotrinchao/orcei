@@ -25,7 +25,8 @@ const platformSettingsSchema = new Schema({
     generate: { type: Number, default: 1, min: 0 },
     analyzeReport: { type: Number, default: 1, min: 0 },
     proposalSend: { type: Number, default: 1, min: 0 }
-  }
+  },
+  initialCredits: { type: Number, default: 1, min: 0 }
 }, { timestamps: true })
 
 export const PlatformSettings = model('PlatformSettings', platformSettingsSchema)

@@ -38,27 +38,45 @@ useHead({
     {
       rel: 'preload',
       as: 'image',
-      href: '/images/landpage-banner.png',
+      href: ogImageUrl, // URL absoluta para funcionar em qualquer contexto
       fetchpriority: 'high'
+    },
+    {
+      rel: 'canonical',
+      href: siteUrl
     }
+  ],
+  meta: [
+    { name: 'robots', content: 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1' }
   ]
 })
 
 // SEO Avançado Dinâmico (OpenGraph & Twitter Cards com URLs Absolutas)
 useSeoMeta({
-  title: 'Orcei Fácil — Crie seu Primeiro Orçamento Grátis com IA em Segundos',
-  ogTitle: 'Orcei Fácil — Crie seu Primeiro Orçamento Grátis com IA em Segundos',
-  description: 'Escreva do seu jeito: nossa IA organiza as especificações e monta uma proposta de orçamento impecável e PDF profissional prontos para aprovação online. Primeiro orçamento 100% grátis!',
-  ogDescription: 'Escreva do seu jeito: nossa IA organiza as especificações e monta uma proposta de orçamento impecável e PDF profissional prontos para aprovação online. Primeiro orçamento 100% grátis!',
-  ogImage: ogImageUrl, // Correção Crítica: URL Absoluta
+  // Title otimizado: <60 chars, keyword principal no início, benefit claro
+  title: 'Orcei Fácil — Software de Orçamento com IA Grátis',
+  ogTitle: 'Orcei Fácil — Crie Propostas Comerciais com IA em 2 Minutos',
+  // Description: keyword-rich, CTA implícito, <155 chars
+  description: 'Software de orçamento com IA para freelancers e autônomos. Crie propostas comerciais profissionais em 2 minutos, envie por link e feche mais clientes. Grátis para começar.',
+  ogDescription: 'Software de orçamento com IA para freelancers e autônomos. Crie propostas comerciais profissionais em 2 minutos, envie por link e feche mais clientes. Primeiro orçamento 100% grátis.',
+  ogImage: ogImageUrl,
+  ogImageWidth: '1200',
+  ogImageHeight: '675',
+  ogImageAlt: 'Orcei Fácil — Software de orçamento com inteligência artificial para freelancers',
   ogUrl: siteUrl,
+  ogType: 'website',
+  ogSiteName: 'Orcei Fácil',
+  ogLocale: 'pt_BR',
   twitterCard: 'summary_large_image',
-  twitterTitle: 'Orcei Fácil — Crie seu Primeiro Orçamento Grátis com IA em Segundos',
-  twitterDescription: 'Escreva do seu jeito: nossa IA organiza as especificações e monta uma proposta de orçamento impecável e PDF profissional prontos para aprovação. Primeiro orçamento grátis!',
-  twitterImage: ogImageUrl, // Correção Crítica: URL Absoluta
+  twitterSite: '@orceifacil',
+  twitterTitle: 'Orcei Fácil — Software de Orçamento com IA Grátis',
+  twitterDescription: 'Crie propostas comerciais profissionais com IA em 2 minutos. Envie por link, acompanhe leitura e feche mais clientes. Primeiro orçamento grátis!',
+  twitterImage: ogImageUrl,
+  twitterImageAlt: 'Orcei Fácil — painel de orçamentos com inteligência artificial',
 })
 
-// Injeção de Dados Estruturados JSON-LD Schema Unificado (@graph) para Rich Snippets Avançados de FAQ e Ofertas de Produto/SaaS
+// Injeção de Dados Estruturados JSON-LD Schema Unificado (@graph)
+// Inclui: Organization + WebSite + WebApplication + Product + FAQPage
 useHead({
   script: [
     {
@@ -66,27 +84,69 @@ useHead({
       children: JSON.stringify({
         '@context': 'https://schema.org',
         '@graph': [
+          // 1. Organization — necessário para Knowledge Panel e rich snippets de marca
+          {
+            '@type': 'Organization',
+            '@id': `${siteUrl}/#organization`,
+            'name': 'Orcei Fácil',
+            'url': siteUrl,
+            'logo': {
+              '@type': 'ImageObject',
+              'url': `${siteUrl}/images/favicon/favicon-96x96.png`,
+              'width': 96,
+              'height': 96
+            },
+            'sameAs': [
+              'https://www.instagram.com/orceifacil',
+              'https://www.linkedin.com/company/orceifacil'
+            ],
+            'contactPoint': {
+              '@type': 'ContactPoint',
+              'contactType': 'customer support',
+              'availableLanguage': 'Portuguese'
+            }
+          },
+          // 2. WebSite — habilita SearchAction (sitelinks search box)
+          {
+            '@type': 'WebSite',
+            '@id': `${siteUrl}/#website`,
+            'url': siteUrl,
+            'name': 'Orcei Fácil',
+            'description': 'Software de orçamento com IA para freelancers e autônomos brasileiros',
+            'publisher': { '@id': `${siteUrl}/#organization` },
+            'inLanguage': 'pt-BR'
+          },
+          // 3. WebApplication
           {
             '@type': 'WebApplication',
             '@id': `${siteUrl}/#webapp`,
             'name': 'Orcei Fácil',
             'url': siteUrl,
-            'description': 'Plataforma inteligente de criação, envio e aprovação online de orçamentos para freelancers e pequenas empresas. Crie seu primeiro orçamento grátis hoje.',
+            'description': 'Software de orçamento com inteligência artificial para freelancers e pequenas empresas. Crie propostas comerciais profissionais em 2 minutos. Grátis para começar.',
             'applicationCategory': 'BusinessApplication',
             'operatingSystem': 'All',
+            'browserRequirements': 'Requires JavaScript',
+            'inLanguage': 'pt-BR',
+            'offers': { '@id': `${siteUrl}/#product` },
             'featureList': [
-              'Criação de orçamentos assistida por Inteligência Artificial',
-              'Acompanhamento e notificações de leitura em tempo real',
-              'Assinatura e aprovação digital online pelo cliente',
-              'Exportação em PDF profissional e catálogo de serviços'
+              'Criação de orçamentos com Inteligência Artificial',
+              'Envio de proposta comercial por link exclusivo',
+              'Notificação em tempo real quando cliente visualiza',
+              'Aprovação digital online pelo cliente',
+              'PDF profissional com logo e dados da empresa',
+              'Catálogo de serviços reutilizável',
+              'Gestão de clientes integrada',
+              'Dashboard com relatórios e métricas'
             ]
           },
+          // 4. SoftwareApplication / Product com preços
           {
             '@type': 'Product',
             '@id': `${siteUrl}/#product`,
-            'name': 'Orcei Fácil',
+            'name': 'Orcei Fácil — Software de Orçamento com IA',
             'image': ogImageUrl,
-            'description': 'Plataforma inteligente de criação, envio e aprovação online de orçamentos para freelancers e pequenas empresas.',
+            'description': 'Software de orçamento com IA para freelancers, autônomos e pequenas empresas. Crie propostas comerciais profissionais, envie por link e feche mais clientes.',
+            'brand': { '@id': `${siteUrl}/#organization` },
             'offers': {
               '@type': 'AggregateOffer',
               'priceCurrency': 'BRL',
@@ -97,37 +157,60 @@ useHead({
                 {
                   '@type': 'Offer',
                   'name': 'Plano Gratuito',
+                  'description': 'Crie seu primeiro orçamento 100% grátis, sem cartão de crédito',
                   'price': '0.00',
                   'priceCurrency': 'BRL',
-                  'url': siteUrl
+                  'url': siteUrl,
+                  'availability': 'https://schema.org/InStock'
                 },
                 {
                   '@type': 'Offer',
-                  'name': 'Plano Avulso (Créditos)',
+                  'name': 'Plano Avulso — Créditos de IA',
+                  'description': 'Pacote de créditos para usar a IA sem mensalidade',
                   'price': '15.00',
                   'priceCurrency': 'BRL',
-                  'url': siteUrl
+                  'url': `${siteUrl}/planos`,
+                  'availability': 'https://schema.org/InStock'
                 },
                 {
                   '@type': 'Offer',
                   'name': 'Plano Profissional Mensal',
+                  'description': 'Orçamentos ilimitados com IA, PDF e catálogo de serviços',
                   'price': '29.90',
                   'priceCurrency': 'BRL',
-                  'url': siteUrl
+                  'url': `${siteUrl}/planos`,
+                  'availability': 'https://schema.org/InStock'
                 }
               ]
             }
           },
+          // 5. FAQPage — rich snippets de FAQ no Google
           {
             '@type': 'FAQPage',
             '@id': `${siteUrl}/#faq`,
             'mainEntity': [
               {
                 '@type': 'Question',
+                'name': 'O que é o Orcei Fácil?',
+                'acceptedAnswer': {
+                  '@type': 'Answer',
+                  'text': 'Orcei Fácil é um software de orçamento online com inteligência artificial para freelancers, autônomos e pequenas empresas. Você cria propostas comerciais profissionais em minutos, envia por link para o cliente e acompanha a aprovação em tempo real.'
+                }
+              },
+              {
+                '@type': 'Question',
+                'name': 'Como criar um orçamento grátis com o Orcei Fácil?',
+                'acceptedAnswer': {
+                  '@type': 'Answer',
+                  'text': 'Basta se cadastrar gratuitamente, descrever o serviço do seu jeito e a IA monta a proposta comercial completa. Você exporta em PDF profissional ou envia um link de aprovação diretamente para o cliente. Nenhum cartão de crédito é necessário.'
+                }
+              },
+              {
+                '@type': 'Question',
                 'name': 'É difícil configurar o sistema ou usar a inteligência artificial?',
                 'acceptedAnswer': {
                   '@type': 'Answer',
-                  'text': 'De forma alguma. Nós removemos toda a complexidade técnica. Você não precisa saber o que é IA ou programar nada. Basta escrever os detalhes do serviço como se estivesse explicando para um colega no WhatsApp, e o sistema faz o trabalho difícil. Se preferir, você também pode cadastrar seus serviços manualmente, sem usar a IA.'
+                  'text': 'De forma alguma. Você não precisa saber o que é IA ou programar nada. Basta escrever os detalhes do serviço como se estivesse explicando para um colega no WhatsApp, e o sistema faz o trabalho difícil. Se preferir, você também pode cadastrar seus serviços manualmente, sem usar a IA.'
                 }
               },
               {
@@ -135,7 +218,7 @@ useHead({
                 'name': 'Preciso pagar alguma coisa para criar meu primeiro orçamento?',
                 'acceptedAnswer': {
                   '@type': 'Answer',
-                  'text': 'Absolutamente nada. Você pode experimentar a plataforma e criar seu primeiro orçamento de forma 100% gratuita, com acesso completo à nossa Inteligência Artificial para redigir seus serviços e gerar seu PDF profissional. Não pedimos cartão de crédito nem qualquer compromisso financeiro. Basta se cadastrar e criar.'
+                  'text': 'Absolutamente nada. Você cria seu primeiro orçamento de forma 100% gratuita, com acesso completo à nossa Inteligência Artificial para redigir seus serviços e gerar seu PDF profissional. Não pedimos cartão de crédito nem qualquer compromisso financeiro.'
                 }
               },
               {
@@ -143,15 +226,15 @@ useHead({
                 'name': 'Meus dados e os dados dos meus clientes estão seguros?',
                 'acceptedAnswer': {
                   '@type': 'Answer',
-                  'text': 'Totalmente seguros. Usamos criptografia de padrão bancário para proteger todas as suas propostas e dados de clientes. Nós nunca venderemos suas informações ou usaremos seus contatos para outros fins. O que é seu, continua exclusivamente seu.'
+                  'text': 'Totalmente seguros. Usamos criptografia de padrão bancário para proteger todas as suas propostas e dados de clientes. Nós nunca venderemos suas informações ou usaremos seus contatos para outros fins.'
                 }
               },
               {
                 '@type': 'Question',
-                'name': 'O orçamento gerado pela IA não vai parecer frio ou artificial para os meus clientes?',
+                'name': 'O Orcei Fácil funciona para qual tipo de freelancer ou negócio?',
                 'acceptedAnswer': {
                   '@type': 'Answer',
-                  'text': 'Pelo contrário. Nós calibramos nossa inteligência artificial para que ela soe humana, clara e objetiva. Ela organiza a estrutura técnica do seu serviço para dar clareza, mas mantém o tom de voz profissional e direto. O seu cliente recebe uma proposta limpa e fácil de entender, e não um texto robótico cheio de termos corporativos difíceis.'
+                  'text': 'Funciona para qualquer prestador de serviço: designers, desenvolvedores, fotógrafos, arquitetos, consultores, eletricistas, pintores, personal trainers, agências e muito mais. Se você cobra por um serviço, o Orcei Fácil foi feito para você.'
                 }
               }
             ]

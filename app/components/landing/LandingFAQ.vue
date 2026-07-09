@@ -10,18 +10,33 @@ interface FAQItem {
 
 const faqItems = ref<FAQItem[]>([
   {
+    question: 'O que é o Orcei Fácil?',
+    answer: 'Orcei Fácil é um software de orçamento online com inteligência artificial para freelancers, autônomos e pequenas empresas. Você cria propostas comerciais profissionais em minutos, envia por link para o cliente e acompanha a aprovação em tempo real — sem precisar de Word, Excel ou ferramentas complicadas.',
+    isOpen: true
+  },
+  {
+    question: 'Como criar um orçamento grátis com o Orcei Fácil?',
+    answer: 'Basta se cadastrar gratuitamente, descrever o serviço do seu jeito e a IA monta a proposta comercial completa. Você exporta em PDF profissional ou envia um link de aprovação diretamente para o cliente. Nenhum cartão de crédito é necessário para começar.',
+    isOpen: false
+  },
+  {
     question: 'É difícil configurar o sistema ou usar a inteligência artificial?',
-    answer: 'De forma alguma. Nós removemos toda a complexidade técnica. Você não precisa saber o que é IA ou programar nada. Basta escrever os detalhes do serviço como se estivesse explicando para um colega no WhatsApp, e o sistema faz o trabalho difícil. Se preferir, você também pode cadastrar seus serviços manualmente, sem usar a IA.',
+    answer: 'De forma alguma. Você não precisa saber o que é IA ou programar nada. Basta escrever os detalhes do serviço como se estivesse explicando para um colega no WhatsApp, e o sistema faz o trabalho difícil. Se preferir, você também pode cadastrar seus serviços manualmente, sem usar a IA.',
     isOpen: false
   },
   {
     question: 'Preciso pagar alguma coisa para criar meu primeiro orçamento?',
-    answer: 'Absolutamente nada. Você pode experimentar a plataforma e criar seu primeiro orçamento de forma 100% gratuita, com acesso completo à nossa Inteligência Artificial para redigir seus serviços e gerar seu PDF profissional. Não pedimos cartão de crédito nem qualquer compromisso financeiro. Basta se cadastrar e criar.',
+    answer: 'Absolutamente nada. Você cria seu primeiro orçamento de forma 100% gratuita, com acesso completo à nossa Inteligência Artificial para redigir seus serviços e gerar seu PDF profissional. Não pedimos cartão de crédito nem qualquer compromisso financeiro. Basta se cadastrar e criar.',
     isOpen: false
   },
   {
     question: 'Meus dados e os dados dos meus clientes estão seguros?',
     answer: 'Totalmente seguros. Usamos criptografia de padrão bancário para proteger todas as suas propostas e dados de clientes. Nós nunca venderemos suas informações ou usaremos seus contatos para outros fins. O que é seu, continua exclusivamente seu.',
+    isOpen: false
+  },
+  {
+    question: 'O Orcei Fácil funciona para qual tipo de freelancer ou negócio?',
+    answer: 'Funciona para qualquer prestador de serviço: designers, desenvolvedores, fotógrafos, arquitetos, consultores, eletricistas, pintores, personal trainers, agências e muito mais. Se você cobra por um serviço, o Orcei Fácil foi feito para você.',
     isOpen: false
   },
   {

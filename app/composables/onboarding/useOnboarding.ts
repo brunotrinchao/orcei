@@ -50,5 +50,12 @@ export function useOnboarding() {
     return ROUTE_TOUR_MAP[path]
   }
 
-  return { startTour, completeTour, autoStartForRoute, hasTourForRoute, isTourActive }
+  async function markWelcomeSeen(accepted: boolean) {
+    try {
+      await $fetch('/api/profile/onboarding-welcome', { method: 'POST', body: { accepted } })
+      await refreshNuxtData('profile')
+    } catch {}
+  }
+
+  return { startTour, completeTour, autoStartForRoute, hasTourForRoute, markWelcomeSeen, isTourActive }
 }

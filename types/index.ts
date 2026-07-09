@@ -57,6 +57,7 @@ export interface ProfileDTO {
   defaultContractTemplate: string
   defaultTermsAndConditions: string
   onboardingCompletedTours?: string[]
+  onboardingWelcomeSeen?: boolean
   googleIntegration?: {
     email?: string
     accessToken?: string

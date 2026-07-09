@@ -4,8 +4,8 @@ export const steps: TourStep[] = [
   {
     element: '[data-tour="orcamentos-novo-btn"]',
     popover: {
-      title: 'Novo Orcamento',
-      description: 'Crie um orcamento manualmente ou use a IA para gerar uma proposta comercial completa em segundos.',
+      title: 'Novo Orçamento',
+      description: 'Crie um orçamento manualmente ou use a IA para gerar uma proposta comercial completa em segundos.',
       side: 'bottom'
     }
   },
@@ -13,7 +13,7 @@ export const steps: TourStep[] = [
     element: '[data-tour="orcamentos-filtros"]',
     popover: {
       title: 'Filtros e Busca',
-      description: 'Filtre seus orcamentos por periodo, status ou busque por titulo e cliente. Use o filtro "Chat Pendente" para ver propostas com mensagens nao lidas.',
+      description: 'Filtre seus orçamentos por período, status ou busque por título e cliente. Use o filtro "Chat Pendente" para ver propostas com mensagens não lidas.',
       side: 'bottom'
     }
   }

@@ -4,16 +4,16 @@ export const steps: TourStep[] = [
   {
     element: '[data-tour="catalogo-novo-item-btn"]',
     popover: {
-      title: 'Novo Item do Catalogo',
-      description: 'Adicione produtos ou servicos ao seu catalogo. Itens cadastrados aqui podem ser reutilizados nos orcamentos.',
+      title: 'Novo Item do Catálogo',
+      description: 'Adicione produtos ou serviços ao seu catálogo. Itens cadastrados aqui podem ser reutilizados nos orçamentos.',
       side: 'bottom'
     }
   },
   {
     element: '[data-tour="catalogo-busca"]',
     popover: {
-      title: 'Busca no Catalogo',
-      description: 'Pesquise por nome, descricao ou SKU para encontrar rapidamente itens do seu catalogo.',
+      title: 'Busca no Catálogo',
+      description: 'Pesquise por nome, descrição ou SKU para encontrar rapidamente itens do seu catálogo.',
       side: 'bottom'
     }
   }

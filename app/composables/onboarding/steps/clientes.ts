@@ -5,7 +5,7 @@ export const steps: TourStep[] = [
     element: '[data-tour="clientes-novo-btn"]',
     popover: {
       title: 'Cadastrar Novo Cliente',
-      description: 'Clique aqui para adicionar um novo cliente. Os dados do cliente ficam salvos para uso rapido ao criar orcamentos.',
+      description: 'Clique aqui para adicionar um novo cliente. Os dados do cliente ficam salvos para uso rápido ao criar orçamentos.',
       side: 'bottom'
     }
   },

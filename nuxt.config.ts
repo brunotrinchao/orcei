@@ -1,6 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@vueuse/nuxt', '@nuxtjs/cloudinary', '@vercel/speed-insights', '@sentry/nuxt/module'],
+  modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@vueuse/nuxt', '@nuxtjs/cloudinary', '@vercel/speed-insights', '@sentry/nuxt/module', 'nuxt-simple-sitemap'],
+
+  // Usado pelo nuxt-simple-sitemap v4 para compor URLs absolutas
+  site: {
+    url: process.env.NUXT_PUBLIC_SITE_URL || 'https://orceifacil.com.br',
+    name: 'Orcei Fácil',
+  },
 
   css: ['driver.js/dist/driver.css'],
 
@@ -146,9 +152,35 @@ export default defineNuxtConfig({
     }
   },
 
+  sitemap: {
+    // Rotas protegidas/privadas — fora do sitemap
+    exclude: [
+      '/dashboard/**',
+      '/admin/**',
+      '/clientes/**',
+      '/catalogo/**',
+      '/orcamentos/**',
+      '/agenda/**',
+      '/relatorios/**',
+      '/configuracoes/**',
+      '/api/**',
+      '/auth/**',
+      '/p/**',       // propostas exigem token — não indexáveis
+      '/maintenance',
+    ],
+    // URLs estáticas públicas com prioridades explícitas
+    urls: [
+      { loc: '/', priority: 1.0, changefreq: 'weekly', lastmod: '2026-07-09' },
+      { loc: '/planos', priority: 0.8, changefreq: 'monthly', lastmod: '2026-07-09' },
+      { loc: '/privacy', priority: 0.3, changefreq: 'yearly' },
+      { loc: '/terms', priority: 0.3, changefreq: 'yearly' },
+    ],
+    i18n: false,
+    autoLastmod: true,
+  },
+
   nitro: {
     preset: 'vercel',
-    trailingSlash: false
   },
 
   compatibilityDate: '2024-04-03',

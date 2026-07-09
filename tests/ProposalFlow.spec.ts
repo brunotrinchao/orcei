@@ -26,9 +26,14 @@ vi.mock('../server/models/Counter', () => ({
     findOneAndUpdate: vi.fn()
   }
 }))
-vi.mock('../server/models/ProposalHistory', () => ({ 
+vi.mock('../server/models/ProposalHistory', () => ({
   ProposalHistory: {
     create: vi.fn()
+  }
+}))
+vi.mock('../server/models/PlatformSettings', () => ({
+  PlatformSettings: {
+    findOne: vi.fn().mockReturnValue({ lean: vi.fn().mockResolvedValue(null) })
   }
 }))
 

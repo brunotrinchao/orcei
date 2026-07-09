@@ -23,6 +23,14 @@ export default defineEventHandler(async () => {
       heroTitle: settings?.landingPage?.heroTitle || `Crie orçamentos profissionais em segundos com IA`,
       heroSubtitle: settings?.landingPage?.heroSubtitle || `A plataforma definitiva para freelancers e pequenas agências gerenciarem vendas e fecharem mais negócios.`,
       features: settings?.landingPage?.features || []
+    },
+    creditCosts: {
+      proposalSuggest: settings?.creditCosts?.proposalSuggest ?? 1,
+      catalogSuggest: settings?.creditCosts?.catalogSuggest ?? 1,
+      clientExtract: settings?.creditCosts?.clientExtract ?? 1,
+      generate: settings?.creditCosts?.generate ?? 1,
+      analyzeReport: settings?.creditCosts?.analyzeReport ?? 1,
+      proposalSend: settings?.creditCosts?.proposalSend ?? 1
     }
   }
 })

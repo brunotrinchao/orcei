@@ -16,6 +16,7 @@ const emit = defineEmits<{
 }>()
 
 const { notify } = useAlerts()
+const { creditLabel } = useCreditCosts()
 
 const showForm = computed({
   get: () => props.open,
@@ -342,7 +343,7 @@ async function saveItem() {
               >
                 <Loader2 v-if="isSuggesting" class="w-3.5 h-3.5 animate-spin" />
                 <Sparkles v-else class="w-3.5 h-3.5" />
-                Sugerir com IA (1 Crédito)
+                {{ creditLabel('catalogSuggest', 'Sugerir com IA') }}
               </button>
             </div>
             <textarea 

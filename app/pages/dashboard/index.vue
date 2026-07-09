@@ -12,6 +12,7 @@ ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale
 const period = ref('last_30_days')
 const { loggedIn, user } = useUserSession()
 const { notify } = useAlerts()
+const { creditLabel } = useCreditCosts()
 
 const fetchQuery = computed(() => {
   const now = new Date()
@@ -317,7 +318,7 @@ function formatRelativeTime(minutesAgo: number) {
                   <Loader2 class="w-4 h-4 animate-spin mr-2" /> Analisando Dados...
                 </template>
                 <template v-else>
-                  Gerar Relatório IA (1 Crédito)
+                  {{ creditLabel('analyzeReport', 'Gerar Relatório IA') }}
                 </template>
               </BaseButton>
               <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest text-center lg:text-right">

@@ -7,6 +7,12 @@ import type { ProfileDTO } from '../../../types'
 
 const { data: profile, refresh: refreshProfile, pending: pendingProfile } = useLazyFetch<ProfileDTO>('/api/profile', { key: 'profile' })
 const { notify } = useAlerts()
+const { getCost } = useCreditCosts()
+
+function costText(action: string): string {
+  const cost = getCost(action)
+  return cost === 0 ? 'Grátis' : `${cost} ${cost === 1 ? 'crédito' : 'créditos'}`
+}
 
 const isLoading = ref<string | null>(null)
 
@@ -125,10 +131,10 @@ onMounted(() => {
           <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Custo da Ação Comercial</p>
           <div class="space-y-2">
             <div class="flex items-center gap-2 text-xs font-bold text-slate-300">
-              <span class="w-2.5 h-2.5 bg-blue-500 rounded-full"></span> 1 Proposta comercial = 1 crédito
+              <span class="w-2.5 h-2.5 bg-blue-500 rounded-full"></span> 1 Proposta comercial = {{ costText('proposalSend') }}
             </div>
             <div class="flex items-center gap-2 text-xs font-bold text-slate-300">
-              <span class="w-2.5 h-2.5 bg-indigo-500 rounded-full"></span> 1 Relatório IA analítico = 1 crédito
+              <span class="w-2.5 h-2.5 bg-indigo-500 rounded-full"></span> 1 Relatório IA analítico = {{ costText('analyzeReport') }}
             </div>
           </div>
         </div>

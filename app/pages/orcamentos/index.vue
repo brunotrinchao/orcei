@@ -6,6 +6,8 @@ import { isToday, isYesterday, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import type { ProposalDTO } from '../../../../types'
 
+const { creditLabel } = useCreditCosts()
+
 const searchQuery = ref('')
 const filterStatus = ref('')
 const filterStartDate = ref('')
@@ -588,7 +590,7 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
             </BaseButton>
             <BaseButton type="button" :disabled="isSubmitting" @click="proposalFormRef.submit('created')" class="bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-200">
               <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin mr-2" />
-              Criar e Enviar (1 Crédito)
+              {{ creditLabel('proposalSend', 'Criar e Enviar') }}
             </BaseButton>
           </template>
         </template>

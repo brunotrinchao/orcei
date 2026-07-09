@@ -5,6 +5,7 @@ import { CatalogItem } from '../../models/CatalogItem'
 import { Report } from '../../models/Report'
 import { AIService } from '../../services/AIService'
 import { checkRateLimit } from '../../utils/rate-limit'
+import { getActionCost, requireCreditBalance, chargeCredit } from '../../utils/credits'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -44,12 +45,9 @@ export default defineEventHandler(async (event) => {
   }
 
   // Verificação de saldo de créditos para IA (Relatório Analítico)
-  if (profile.creditsBalance < 1 && (session.user as any).role !== 'admin') {
-    throw createError({
-      statusCode: 402,
-      statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para gerar relatórios com IA.'
-    })
-  }
+  const cost = await getActionCost('analyzeReport')
+  const isAdmin = (session.user as any).role === 'admin'
+  requireCreditBalance(profile, cost, isAdmin, 'Saldo de créditos insuficiente. Adquira créditos para gerar relatórios com IA.')
   const totalRevenue = acceptedProposals.reduce((acc, p) => acc + (p.totals?.final || 0), 0)
   const averageValue = acceptedProposals.length > 0 ? totalRevenue / acceptedProposals.length : 0
 
@@ -142,17 +140,11 @@ Tom: Consultor sênior, direto, baseado em dados, sem frases motivacionais vazia
       }
     })
 
-    // Dedução de 1 crédito SOMENTE após relatório gerado e salvo com sucesso (atômica)
-    if ((session.user as any).role !== 'admin') {
-      const updated = await Profile.findOneAndUpdate(
-        { _id: profile._id, creditsBalance: { $gte: 1 } },
-        { $inc: { creditsBalance: -1, creditsUsed: 1, 'aiUsage.reports': 1 } },
-        { new: true }
-      )
-      if (!updated) {
-        throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para gerar relatórios com IA.' })
-      }
-    }
+    // Dedução de crédito SOMENTE após relatório gerado e salvo com sucesso (atômica)
+    await chargeCredit(profile._id, cost, isAdmin, {
+      aiUsageField: 'aiUsage.reports',
+      errorMessage: 'Saldo de créditos insuficiente. Adquira créditos para gerar relatórios com IA.'
+    })
 
     return { text: analysis }
   } catch (e: any) {

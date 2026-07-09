@@ -17,6 +17,14 @@ const platformSettingsSchema = new Schema({
   systemStatus: {
     label: { type: String, default: 'Operacional' },
     color: { type: String, default: 'green' }
+  },
+  creditCosts: {
+    proposalSuggest: { type: Number, default: 1, min: 0 },
+    catalogSuggest: { type: Number, default: 1, min: 0 },
+    clientExtract: { type: Number, default: 1, min: 0 },
+    generate: { type: Number, default: 1, min: 0 },
+    analyzeReport: { type: Number, default: 1, min: 0 },
+    proposalSend: { type: Number, default: 1, min: 0 }
   }
 }, { timestamps: true })
 

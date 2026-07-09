@@ -37,6 +37,7 @@ const step = ref<'prompt' | 'loading' | 'results'>('prompt')
 const promptText = ref('')
 const results = ref<any>(null)
 const { notify } = useAlerts()
+const { creditLabel } = useCreditCosts()
 
 // Simula a chamada da IA e o processamento de itens híbridos (Catálogo vs Mercado)
 async function generate() {
@@ -216,7 +217,7 @@ function removeItem(idx: number) {
                 :disabled="!promptText"
                 class="px-6 py-3 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-violet-500/20 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center gap-2"
               >
-                Analisar com IA (1 Crédito)
+                {{ creditLabel('proposalSuggest', 'Analisar com IA') }}
                 <ArrowRight class="w-4 h-4" />
               </button>
             </div>

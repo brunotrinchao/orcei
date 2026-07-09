@@ -6,6 +6,7 @@ import { nanoid } from 'nanoid'
 import { QueueService } from './QueueService'
 
 import { ProposalStatus, PaymentMethod, SendMethod, SubscriptionStatus } from '../../types/enums'
+import { getActionCost, chargeCredit } from '../utils/credits'
 
 export const ProposalService = {
   async listByProfile(profileId: string) {
@@ -71,7 +72,8 @@ export const ProposalService = {
       expiresAt.setDate(expiresAt.getDate() + validityDays)
 
       // Verificação de saldo ANTES de persistir o orçamento
-      if (data.status === ProposalStatus.CREATED && !isAdmin && (!profile || profile.creditsBalance < 1)) {
+      const cost = await getActionCost('proposalSend')
+      if (data.status === ProposalStatus.CREATED && !isAdmin && cost > 0 && (!profile || profile.creditsBalance < cost)) {
         throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para continuar.' })
       }
 
@@ -104,7 +106,7 @@ export const ProposalService = {
       // Se criar já como 'created' e sendMethod for 'auto', consome crédito e agenda envio
       let emailQueued = false
       if (data.status === ProposalStatus.CREATED) {
-        await this.consumeCredit(data.profileId, session || undefined, isAdmin)
+        await this.consumeCredit(data.profileId, cost, session || undefined, isAdmin)
 
         if (data.sendMethod !== SendMethod.MANUAL) {
           if (profile && data.client?.email) {
@@ -149,9 +151,10 @@ export const ProposalService = {
 
     // Verificação de saldo ANTES de abrir a transação, se a transição for cobrar crédito
     const willCharge = oldProposal.status === ProposalStatus.DRAFT && data.status !== ProposalStatus.DRAFT
-    if (willCharge && !isAdmin) {
+    const cost = await getActionCost('proposalSend')
+    if (willCharge && !isAdmin && cost > 0) {
       const profileCheck = await Profile.findById(profileId)
-      if (!profileCheck || profileCheck.creditsBalance < 1) {
+      if (!profileCheck || profileCheck.creditsBalance < cost) {
         throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para continuar.' })
       }
     }
@@ -165,7 +168,7 @@ export const ProposalService = {
     try {
       // Consome crédito se mudar de draft para created/pending/etc
       if (willCharge) {
-        await this.consumeCredit(profileId, session || undefined, isAdmin)
+        await this.consumeCredit(profileId, cost, session || undefined, isAdmin)
 
         // Se mudou para 'created' e não for manual, agenda e-mail
         if (data.status === ProposalStatus.CREATED && data.sendMethod !== SendMethod.MANUAL) {
@@ -222,35 +225,25 @@ export const ProposalService = {
     return await Proposal.findOneAndDelete({ _id: id, profileId })
   },
 
-  async consumeCredit(profileId: string, session?: any, isAdmin = false) {
+  async consumeCredit(profileId: string, cost: number, session?: any, isAdmin = false) {
     if (isAdmin) return // admin não paga crédito, mesmo padrão dos endpoints de IA
+    if (cost === 0) return
 
     if (typeof Profile.findOneAndUpdate === 'function') {
-      const updatedProfile = await Profile.findOneAndUpdate(
-        {
-          _id: profileId,
-          creditsBalance: { $gte: 1 }
-        },
-        { $inc: { creditsBalance: -1, creditsUsed: 1 } },
-        { new: true, session }
-      )
-
-      if (!updatedProfile) {
-        throw createError({
-          statusCode: 402,
-          statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para continuar.'
-        })
-      }
+      await chargeCredit(profileId, cost, isAdmin, {
+        errorMessage: 'Saldo de créditos insuficiente. Adquira créditos para continuar.',
+        session
+      })
     } else {
       // Fallback para ambiente de testes unitários
       const profile = await Profile.findById(profileId)
-      if (!profile || profile.creditsBalance < 1) {
+      if (!profile || profile.creditsBalance < cost) {
         throw createError({
           statusCode: 402,
           statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para continuar.'
         })
       }
-      await Profile.findByIdAndUpdate(profileId, { $inc: { creditsBalance: -1, creditsUsed: 1 } })
+      await Profile.findByIdAndUpdate(profileId, { $inc: { creditsBalance: -cost, creditsUsed: cost } })
     }
   },
 

@@ -13,6 +13,8 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:selectedClientId', 'update:clientSearch'])
 
+const { creditLabel } = useCreditCosts()
+
 const clientOptions = computed(() => {
   return props.clients.map((c: any) => ({
     label: c.name,
@@ -138,7 +140,7 @@ async function extractClient() {
             >
               <Loader2 v-if="isExtracting" class="w-4 h-4 animate-spin mr-2" />
               <Sparkles v-else class="w-4 h-4 mr-2" />
-              Extrair e Cadastrar (1 Crédito)
+              {{ creditLabel('clientExtract', 'Extrair e Cadastrar') }}
             </BaseButton>
           </div>
         </div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Settings, ShieldAlert, FileText, Globe, Plus, Trash2, RefreshCcw, Save, ChevronUp, ChevronDown } from 'lucide-vue-next'
+import { Settings, ShieldAlert, FileText, Globe, Plus, Trash2, RefreshCcw, Save, ChevronUp, ChevronDown, Sparkles } from 'lucide-vue-next'
 
 
 const { notify } = useAlerts()
@@ -12,11 +12,25 @@ const { data: settings, refresh } = useFetch<any>('/api/admin/settings')
 
 const localSettings = ref<any>(null)
 
+const DEFAULT_CREDIT_COSTS = {
+  proposalSuggest: 1,
+  catalogSuggest: 1,
+  clientExtract: 1,
+  generate: 1,
+  analyzeReport: 1,
+  proposalSend: 1
+}
+
 watch(settings, (val) => {
   if (val) {
     localSettings.value = JSON.parse(JSON.stringify(val))
     if (!localSettings.value.landingPage) {
       localSettings.value.landingPage = { features: [], heroTitle: '', heroSubtitle: '' }
+    }
+    if (!localSettings.value.creditCosts) {
+      localSettings.value.creditCosts = { ...DEFAULT_CREDIT_COSTS }
+    } else {
+      localSettings.value.creditCosts = { ...DEFAULT_CREDIT_COSTS, ...localSettings.value.creditCosts }
     }
   }
 }, { immediate: true })
@@ -66,7 +80,7 @@ function moveFeature(idx: number, direction: 'up' | 'down') {
   }
 }
 
-const activeTab = ref<'system' | 'landing'>('system')
+const activeTab = ref<'system' | 'landing' | 'credits'>('system')
 </script>
 
 <template>
@@ -101,6 +115,14 @@ const activeTab = ref<'system' | 'landing'>('system')
         >
           <Globe class="w-4 h-4" />
           Landing Page
+        </button>
+        <button
+          @click="activeTab = 'credits'"
+          :class="activeTab === 'credits' ? 'bg-gray-900 text-white shadow-lg' : 'text-gray-500 hover:bg-gray-100'"
+          class="flex items-center gap-3 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal"
+        >
+          <Sparkles class="w-4 h-4" />
+          Créditos de IA
         </button>
       </aside>
 
@@ -245,6 +267,48 @@ const activeTab = ref<'system' | 'landing'>('system')
                   <BaseCheckbox v-model="f.enabled" :id="'f-enabled-'+idx" />
                   <label :for="'f-enabled-'+idx" class="text-[10px] font-black text-gray-400 uppercase tracking-widest cursor-pointer">Ativo na Landpage</label>
                 </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- CRÉDITOS DE IA -->
+        <div v-if="activeTab === 'credits'" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <section class="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center">
+                <Sparkles class="w-5 h-5 text-violet-600" />
+              </div>
+              <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Custo de Créditos por Ação</h2>
+            </div>
+            <p class="text-xs text-gray-500 font-medium leading-relaxed">
+              Defina quantos créditos cada ação consome. Use 0 para tornar a ação gratuita — nesse caso, o saldo não é debitado e o rótulo de custo é ocultado nas telas do app.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="space-y-1.5">
+                <BaseInput v-model.number="localSettings.creditCosts.proposalSuggest" type="number" label="Sugestão de Itens no Orçamento (IA)" />
+                <p class="text-[10px] text-gray-400 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
+              </div>
+              <div class="space-y-1.5">
+                <BaseInput v-model.number="localSettings.creditCosts.catalogSuggest" type="number" label="Sugestão de Item do Catálogo (IA)" />
+                <p class="text-[10px] text-gray-400 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
+              </div>
+              <div class="space-y-1.5">
+                <BaseInput v-model.number="localSettings.creditCosts.clientExtract" type="number" label="Extração de Dados de Lead (IA)" />
+                <p class="text-[10px] text-gray-400 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
+              </div>
+              <div class="space-y-1.5">
+                <BaseInput v-model.number="localSettings.creditCosts.generate" type="number" label="Geração de Texto Genérico (IA)" />
+                <p class="text-[10px] text-gray-400 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
+              </div>
+              <div class="space-y-1.5">
+                <BaseInput v-model.number="localSettings.creditCosts.analyzeReport" type="number" label="Relatório Estratégico (IA)" />
+                <p class="text-[10px] text-gray-400 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
+              </div>
+              <div class="space-y-1.5">
+                <BaseInput v-model.number="localSettings.creditCosts.proposalSend" type="number" label="Criar e Enviar Orçamento" />
+                <p class="text-[10px] text-gray-400 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
               </div>
             </div>
           </section>

@@ -3,6 +3,7 @@ import { checkRateLimit } from '../../utils/rate-limit'
 
 import { ProfileService } from '../../services/ProfileService'
 import { Profile } from '../../models/Profile'
+import { getActionCost, requireCreditBalance, chargeCredit } from '../../utils/credits'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -19,12 +20,9 @@ export default defineEventHandler(async (event) => {
   }
 
   // Verificação de saldo de créditos
-  if (profile.creditsBalance < 1 && (session.user as any).role !== 'admin') {
-    throw createError({
-      statusCode: 402,
-      statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para usar a IA.'
-    })
-  }
+  const cost = await getActionCost('generate')
+  const isAdmin = (session.user as any).role === 'admin'
+  requireCreditBalance(profile, cost, isAdmin, 'Saldo de créditos insuficiente. Adquira créditos para usar a IA.')
 
   const { prompt } = await readBody(event)
   if (!prompt) {
@@ -34,17 +32,11 @@ export default defineEventHandler(async (event) => {
   try {
     const text = await AIService.generateDescription(prompt)
 
-    // Dedução de 1 crédito SOMENTE após geração bem-sucedida (atômica — previne race condition)
-    if ((session.user as any).role !== 'admin') {
-      const updated = await Profile.findOneAndUpdate(
-        { _id: profile._id, creditsBalance: { $gte: 1 } },
-        { $inc: { creditsBalance: -1, creditsUsed: 1, 'aiUsage.proposals': 1 } },
-        { new: true }
-      )
-      if (!updated) {
-        throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para usar a IA.' })
-      }
-    }
+    // Dedução de crédito SOMENTE após geração bem-sucedida (atômica — previne race condition)
+    await chargeCredit(profile._id, cost, isAdmin, {
+      aiUsageField: 'aiUsage.proposals',
+      errorMessage: 'Saldo de créditos insuficiente. Adquira créditos para usar a IA.'
+    })
 
     return { text }
   } catch (e: any) {

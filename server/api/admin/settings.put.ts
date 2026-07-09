@@ -1,5 +1,6 @@
 import { PlatformSettings } from '../../models/PlatformSettings'
 import { AuditLog } from '../../models/AuditLog'
+import { sanitizeCreditCosts } from '../../utils/credits'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -11,11 +12,12 @@ export default defineEventHandler(async (event) => {
   
   const settings = await PlatformSettings.findOneAndUpdate(
     {},
-    { 
+    {
       maintenanceMode: body.maintenanceMode,
       footerText: body.footerText,
       landingPage: body.landingPage,
-      systemStatus: body.systemStatus
+      systemStatus: body.systemStatus,
+      creditCosts: sanitizeCreditCosts(body.creditCosts)
     },
     { upsert: true, returnDocument: 'after' }
   )

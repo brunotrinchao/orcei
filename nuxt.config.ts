@@ -130,7 +130,7 @@ export default defineNuxtConfig({
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
       pusherKey: process.env.PUSHER_KEY,
       pusherCluster: process.env.PUSHER_CLUSTER,
-      integrationGoogleDriveCalendarStatus: process.env.INTEGRATION_GOOGLE_DRIVE_CALENDAR_STATUS === 'true',
+      integrationGoogleDriveCalendarStatus: 'true',
       emailContactDefault: process.env.EMAIL_CONTACT_DEFAULT || 'contato@orceifacil.com.br',
     }
   },

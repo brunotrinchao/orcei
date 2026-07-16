@@ -347,52 +347,64 @@ const statusMap: any = {
     </header>
 
     <!-- ─── COVER HERO ─────────────────────────────────────────────── -->
-    <section class="bg-gray-900 text-white relative overflow-hidden">
+    <section class="bg-white text-gray-900 relative overflow-hidden">
       <!-- Decorative blobs -->
-      <div class="absolute top-0 left-0 w-[600px] h-[600px] bg-[#3147F6]/20 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl pointer-events-none"></div>
-      <div class="absolute bottom-0 right-0 w-[400px] h-[400px] bg-blue-800/20 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl pointer-events-none"></div>
+      <div class="absolute top-0 left-0 w-[600px] h-[600px] rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl pointer-events-none"></div>
+      <div class="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full translate-x-1/3 translate-y-1/3 blur-3xl pointer-events-none"></div>
 
       <div class="relative z-10 max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
-        <!-- Label -->
-        <p class="text-[10px] font-black uppercase tracking-[0.3em] text-blue-400 mb-6">Proposta Comercial</p>
 
         <!-- Title -->
-        <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight max-w-3xl mb-4">
+        <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight max-w-3xl mb-4 text-gray-500">
           {{ proposal.title }}
         </h1>
 
-        <!-- Client name -->
-        <p class="text-gray-300 font-bold text-lg mb-12">
-          Preparado para <span class="text-white">{{ proposal.client.name }}</span>
-        </p>
 
         <!-- Stats row -->
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
-          <!-- Valid until -->
-          <div class="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
+
+          <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 backdrop-blur-sm">
             <div class="flex items-center gap-2 mb-2">
-              <Clock class="w-4 h-4 text-blue-400" />
-              <span class="text-[10px] font-black text-gray-300 uppercase tracking-widest">Válido até</span>
+              <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Proposta Elaborada para</span>
             </div>
-            <p class="font-black text-white text-base leading-tight">{{ formatDate(proposal.expiresAt) }}</p>
+            <p class="font-black text-black text-base leading-tight mb-4">{{ proposal.client.name }}</p>
+            <div class="grid grid-cols-2 gap-2 text-[10px] text-slate-400 font-bold">
+              <div>
+                <p class="text-[9px] text-slate-400 font-bold uppercase">Data de Emissão</p>
+                <p class="text-slate-700 font-black mt-0.5">{{ formatDate(proposal.createdAt) }}</p>
+              </div>
+              <div>
+               <p class="text-[9px] text-slate-400 font-bold uppercase">Válido até</p>
+                <p class="text-slate-700 font-black mt-0.5">{{ formatDate(proposal.expiresAt) }}</p>
+              </div>  
+            </div>
           </div>
 
-          <!-- Code -->
-          <div class="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
+          <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 backdrop-blur-sm">
             <div class="flex items-center gap-2 mb-2">
-              <FileText class="w-4 h-4 text-blue-400" />
-              <span class="text-[10px] font-black text-gray-300 uppercase tracking-widest">Código</span>
+              <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Profissional Responsável</span>
             </div>
-            <p class="font-black text-white text-base leading-tight">{{ proposal.code }}</p>
+            <p class="font-black text-black text-base leading-tight mb-4">{{ proposal.profileId?.name }}</p>
+            <div class="space-y-1 text-[10px] text-slate-500">
+              <div class="flex items-center gap-1.5">
+              <p class="font-bold text-slate-400 text-[9px] uppercase w-12 block">E-MAIL:</p>
+                <p class="font-bold text-slate-800">{{ proposal.profileId?.email }}</p>
+              </div>  
+              <div class="flex items-center gap-1.5">
+                <p class="font-bold text-slate-400 text-[9px] uppercase w-12 block">TELEFONE:</p>
+                <p class="font-bold text-slate-800">
+                  <img v-if="proposal.profileId?.contact?.phones[0].isWhatsapp" :src="'/images/icons/whatsapp-svg.svg'" class="w-4 h-4 inline-block" alt="WhatsApp" loading="lazy"/>
+                  {{ proposal.profileId?.contact?.phones[0].number }}</p>
+              </div>  
+            </div>
           </div>
 
           <!-- Total -->
           <div class="col-span-2 sm:col-span-1 bg-[#3147F6] border border-blue-500/40 rounded-2xl p-5">
             <div class="flex items-center gap-2 mb-2">
-              <Banknote class="w-4 h-4 text-blue-100" />
               <span class="text-[10px] font-black text-blue-100 uppercase tracking-widest">Valor Total</span>
             </div>
-            <p class="font-black text-white text-2xl leading-tight">
+            <p class="font-black text-white text-6xl leading-tight">
               R$ {{ finalTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
             </p>
           </div>

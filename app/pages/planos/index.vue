@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { 
   Zap, CheckCircle2, Loader2, ArrowRight, Download, 
-  ShieldAlert, ShieldCheck, Award, MessageSquare, AlertCircle, ShoppingBag 
+  ShieldAlert, ShieldCheck, Award, MessageSquare, AlertCircle, ShoppingBag, Coins 
 } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../../types'
 
@@ -87,7 +87,7 @@ onMounted(() => {
       <div class="bg-slate-900 text-white px-8 py-5 rounded-[2rem] shadow-2xl flex items-center gap-6 border border-white/5 relative overflow-hidden shrink-0">
         <div class="absolute -top-10 -right-10 w-24 h-24 bg-blue-500/10 rounded-full blur-xl"></div>
         <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-blue-400">
-          <Zap class="w-6 h-6 animate-pulse" />
+          <Coins class="w-6 h-6 animate-pulse" />
         </div>
         <div>
           <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Saldo de Créditos</p>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SubscriptionPlan } from '../../types/enums'
 import { onClickOutside } from '@vueuse/core'
-import { Shield, ArrowLeft, Home, FileText, Plus, Users, Settings, LogOut, BookOpen, ReceiptText } from 'lucide-vue-next'
+import { Shield, ArrowLeft, Home, FileText, Plus, Users, Settings, LogOut, BookOpen, ReceiptText, Coins } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../types'
 const { loggedIn, user, session, clear, fetch: refreshSession } = useUserSession()
 const { data: profile, refresh: refreshLayoutProfile } = useFetch<ProfileDTO>('/api/profile', { key: 'profile' })
@@ -86,6 +86,7 @@ onMounted(() => {
             <!-- Credits & Plan Display -->
             <div class="flex items-center gap-3 bg-gray-50/50 px-3 py-1.5 rounded-2xl border border-gray-100 mr-1">
               <div class="flex flex-row justify-center items-center">
+                <Coins class="w-3.5 h-3.5 text-gray-400 mr-1 " />
                 <span class="pr-1 text-[8px] uppercase font-bold text-gray-400 tracking-widest">Créditos: </span>
                 <span class="text-xs font-semibold text-gray-700">{{ profile?.creditsBalance ?? 0 }}</span>
               </div>

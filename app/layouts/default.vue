@@ -242,8 +242,19 @@ onMounted(() => {
             <span class="text-[9px] font-bold tracking-wide transition-colors">Clientes</span>
           </NuxtLink>
         </li>
-<!-- 
+
         <li class="flex-1 flex justify-center h-full relative">
+          <NuxtLink
+            to="/catalogo"
+            class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 hover:text-gray-900"
+            active-class="text-blue-600"
+          >
+            <BookOpen class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
+            <span class="text-[9px] font-bold tracking-wide transition-colors">Catálogo</span>
+          </NuxtLink>
+        </li>
+
+        <!-- <li class="flex-1 flex justify-center h-full relative">
           <NuxtLink
             to="/orcamentos?new=true"
             class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200"
@@ -259,17 +270,6 @@ onMounted(() => {
 
         <li class="flex-1 flex justify-center h-full relative">
           <NuxtLink
-            to="/catalogo"
-            class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 hover:text-gray-900"
-            active-class="text-blue-600"
-          >
-            <BookOpen class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
-            <span class="text-[9px] font-bold tracking-wide transition-colors">Catálogo</span>
-          </NuxtLink>
-        </li>
-
-        <li class="flex-1 flex justify-center h-full relative">
-          <NuxtLink
             to="/orcamentos"
             class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 hover:text-gray-900"
             active-class="text-blue-600"
@@ -281,23 +281,23 @@ onMounted(() => {
 
         <li class="flex-1 flex justify-center h-full relative">
           <NuxtLink
-            to="/configuracoes"
-            class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 hover:text-gray-900"
-            active-class="text-blue-600"
-          >
-            <Settings class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
-            <span class="text-[9px] font-bold tracking-wide transition-colors">Ajustes</span>
-          </NuxtLink>
-        </li>
-
-        <li class="flex-1 flex justify-center h-full relative">
-          <NuxtLink
             to="/relatorios"
             class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 hover:text-gray-900"
             active-class="text-blue-600"
           >
             <ReceiptText class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
             <span class="text-[9px] font-bold tracking-wide transition-colors">Relatórios</span>
+          </NuxtLink>
+        </li>
+
+        <li class="flex-1 flex justify-center h-full relative">
+          <NuxtLink
+            to="/configuracoes"
+            class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 hover:text-gray-900"
+            active-class="text-blue-600"
+          >
+            <Settings class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
+            <span class="text-[9px] font-bold tracking-wide transition-colors">Ajustes</span>
           </NuxtLink>
         </li>
       </ul>

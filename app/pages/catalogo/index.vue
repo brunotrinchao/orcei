@@ -217,7 +217,7 @@ function getIcon(name: string) {
           <td class="px-10 py-8">
             <div class="flex items-center gap-6">
               <div class="w-16 h-16 rounded-2xl border-2 border-gray-100 bg-white overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
-                <img v-if="item.imageUrl" :src="item.imageUrl" class="w-full h-full object-cover">
+                <img v-if="item.imageUrl" :src="item.imageUrl" class="w-full h-full object-cover" loading="lazy">
                 <div v-else class="text-gray-400">
                   <component :is="getIcon(item.icon || 'Package')" class="w-8 h-8" />
                 </div>

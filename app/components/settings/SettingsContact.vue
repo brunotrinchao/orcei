@@ -58,7 +58,7 @@ function removePhone(index: number) {
             <div class="flex items-center gap-2">
               <BaseCheckbox v-model="phone.isWhatsapp" :id="'wa-'+idx" />
               <label :for="'wa-'+idx" class="text-[10px] font-black text-gray-600 uppercase tracking-widest cursor-pointer flex items-center gap-1.5 hover:text-gray-900 transition-colors">
-                <img :src="'/images/icons/whatsapp-svg.svg'" class="w-3 h-3" alt="WhatsApp" /> WhatsApp
+                <img :src="'/images/icons/whatsapp-svg.svg'" class="w-3 h-3" alt="WhatsApp" loading="lazy"/> WhatsApp
               </label>
             </div>
             <button

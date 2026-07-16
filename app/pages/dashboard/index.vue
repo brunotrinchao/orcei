@@ -433,7 +433,7 @@ function formatRelativeTime(minutesAgo: number) {
                   target="_blank"
                   class="flex-1 flex items-center justify-center gap-1.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
                 >
-                  <img :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5" alt="WhatsApp" /> Chamar WhatsApp
+                  <img :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5" alt="WhatsApp" loading="lazy"/> Chamar WhatsApp
                 </a>
                 <NuxtLink
                   :to="`/p/${alert.slug}`"

@@ -127,7 +127,7 @@ function confirmImpersonate(targetUser: any) {
           <td class="px-8 py-6">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
-                <img v-if="user.avatar" :src="user.avatar" class="w-full h-full object-cover">
+                <img v-if="user.avatar" :src="user.avatar" class="w-full h-full object-cover" loading="lazy">
                 <User v-else class="w-5 h-5 text-gray-400" />
               </div>
               <div class="flex flex-col">
@@ -188,7 +188,7 @@ function confirmImpersonate(targetUser: any) {
       <div v-if="selectedUser" class="p-6 space-y-6">
         <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-3xl border border-gray-100">
           <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center border-2 border-white shadow-sm overflow-hidden">
-            <img v-if="selectedUser.avatar" :src="selectedUser.avatar" class="w-full h-full object-cover">
+            <img v-if="selectedUser.avatar" :src="selectedUser.avatar" class="w-full h-full object-cover" loading="lazy">
             <User v-else class="w-6 h-6 text-gray-300" />
           </div>
           <div>

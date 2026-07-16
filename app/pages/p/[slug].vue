@@ -311,6 +311,7 @@ const statusMap: any = {
           :src="proposal.profileId?.brandConfig?.logoUrl || useRuntimeConfig().public.appDocumentLogo || 'https://res.cloudinary.com/dpeaqezkb/image/upload/v1778873300/orcafacil/logo-default.png'"
           :alt="proposal.profileId?.name || systemInfo?.landingPage?.appName || 'Orcei'"
           class="h-7 w-auto object-contain"
+          loading="lazy"
         />
         <!-- Code + Status -->
         <div class="flex items-center gap-3">
@@ -530,6 +531,7 @@ const statusMap: any = {
             :src="useRuntimeConfig().public.appDocumentLogo || 'https://res.cloudinary.com/dpeaqezkb/image/upload/v1778873300/orcafacil/logo-default.png'"
             :alt="systemInfo?.landingPage?.appName || 'Orcei'"
             class="h-5 w-auto object-contain opacity-30"
+            loading="lazy"
           />
           <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">Powered by {{ systemInfo?.landingPage?.appName || 'Orcei' }}</p>
         </a>

@@ -111,7 +111,7 @@ async function cropLogo() {
       <div class="md:col-span-2 flex flex-col md:flex-row items-center gap-10 p-8 bg-gray-50/50 rounded-3xl border border-gray-200">
         <div class="relative group">
           <div class="w-32 h-32 bg-white rounded-3xl border-4 border-white shadow-xl flex items-center justify-center overflow-hidden transition-all group-hover:scale-105 duration-300 ring-1 ring-gray-100">
-            <img v-if="localLogoUrl" :src="localLogoUrl" class="w-full h-full object-contain" alt="Logo da Marca">
+            <img v-if="localLogoUrl" :src="localLogoUrl" class="w-full h-full object-contain" alt="Logo da Marca" loading="lazy">
             <div v-else class="text-gray-300 flex flex-col items-center gap-2">
               <PhotoIcon class="w-10 h-10 opacity-30" />
               <span class="text-[8px] font-black uppercase tracking-widest">120×120px</span>

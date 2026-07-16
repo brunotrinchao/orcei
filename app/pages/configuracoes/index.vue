@@ -302,7 +302,7 @@ onMounted(() => {
             <div class="space-y-6">
               <div class="p-6 bg-gray-50/50 rounded-3xl border border-gray-100 flex flex-col sm:flex-row items-center gap-6">
                 <div class="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center shrink-0 border border-gray-100">
-                  <img src="https://www.gstatic.com/images/branding/product/2x/calendar_2020q4_48dp.png" class="w-8 h-8 object-contain">
+                  <img src="https://www.gstatic.com/images/branding/product/2x/calendar_2020q4_48dp.png" class="w-8 h-8 object-contain" loading="lazy">
                 </div>
                 <div class="flex-1 text-center sm:text-left">
                   <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Google Calendar & Drive</h3>

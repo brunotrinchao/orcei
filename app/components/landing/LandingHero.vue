@@ -79,6 +79,7 @@ defineProps<{
             height="675"
             decoding="async"
             fetchpriority="high"
+            loading="lazy"
             class="w-full h-auto rounded-2xl block border border-slate-800"
           />
 

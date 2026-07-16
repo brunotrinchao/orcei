@@ -106,7 +106,7 @@ onUnmounted(() => {
         </div>
 
         <div class="text-[11px] text-slate-500 font-semibold flex items-center gap-1.5">
-          <img :src="'/images/icons/whatsapp-svg.svg'" class="w-4 h-4" alt="WhatsApp" /> Conversa informal de WhatsApp (Sem força de fechamento)
+          <img :src="'/images/icons/whatsapp-svg.svg'" class="w-4 h-4" alt="WhatsApp" loading="lazy"/> Conversa informal de WhatsApp (Sem força de fechamento)
         </div>
       </div>
 

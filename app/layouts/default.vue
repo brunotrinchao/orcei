@@ -106,7 +106,7 @@ onMounted(() => {
             <!-- User Avatar -->
             <div class="relative">
               <button @click.stop="toggleMenu" class="w-10 h-10 rounded-2xl bg-gray-100 flex items-center justify-center overflow-hidden hover:ring-4 ring-gray-100 transition-all border-2 border-white shadow-sm relative z-[60]">
-                <img v-if="(user as any)?.avatar || profile?.avatar" :src="(user as any)?.avatar || profile?.avatar" class="w-full h-full object-cover">
+                <img v-if="(user as any)?.avatar || profile?.avatar" :src="(user as any)?.avatar || profile?.avatar" class="w-full h-full object-cover" loading="lazy">
                 <span v-else class="text-sm font-black text-gray-900">{{ (user as any)?.name?.charAt(0).toUpperCase() || profile?.name?.charAt(0).toUpperCase() }}</span>
               </button>
 
@@ -114,7 +114,7 @@ onMounted(() => {
               <div v-if="isMenuOpen" class="absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 overflow-hidden ring-1 ring-black/5 z-[70]">
                 <div class="px-4 py-2 border-b border-gray-50 flex items-center gap-3">
                   <div class="w-6 h-6 rounded-lg overflow-hidden bg-gray-100 shrink-0">
-                    <img v-if="(user as any)?.avatar || profile?.avatar" :src="(user as any)?.avatar || profile?.avatar" class="w-full h-full object-cover">
+                    <img v-if="(user as any)?.avatar || profile?.avatar" :src="(user as any)?.avatar || profile?.avatar" class="w-full h-full object-cover" loading="lazy">
                   </div>
                   <p class="text-xs font-bold text-gray-900 truncate">{{ (user as any)?.name || profile?.name }}</p>
                 </div>

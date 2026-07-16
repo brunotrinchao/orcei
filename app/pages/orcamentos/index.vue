@@ -448,7 +448,7 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
                 title="Enviar via WhatsApp"
                 aria-label="Enviar via WhatsApp"
               >
-                <img :src="'/images/icons/whatsapp-svg.svg'" class="w-5 h-5" alt="WhatsApp" />
+                <img :src="'/images/icons/whatsapp-svg.svg'" class="w-5 h-5" alt="WhatsApp" loading="lazy"/>
               </button>
               <DropdownMenuRoot>
                 <DropdownMenuTrigger as-child>
@@ -645,7 +645,7 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
                 target="_blank"
                 class="flex items-center gap-2 px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-green-100"
               >
-                <img :src="'/images/icons/whatsapp-svg.svg'" class="w-4 h-4" alt="WhatsApp" /> WhatsApp
+                <img :src="'/images/icons/whatsapp-svg.svg'" class="w-4 h-4" alt="WhatsApp" loading="lazy"/> WhatsApp
               </a>
             </div>
           </div>
@@ -720,7 +720,7 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
 
         <div class="p-4 bg-blue-50 rounded-2xl border border-blue-100 flex items-center gap-4 text-left">
           <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center shrink-0">
-            <img :src="'/images/icons/whatsapp-svg.svg'" class="w-6 h-6" alt="WhatsApp" />
+            <img :src="'/images/icons/whatsapp-svg.svg'" class="w-6 h-6" alt="WhatsApp" loading="lazy"/>
           </div>
           <div>
             <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Dica Pro</p>
@@ -733,7 +733,7 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
             class="w-full bg-green-600 hover:bg-green-700 text-white shadow-xl shadow-green-100"
             @click="sendWhatsapp(lastCreatedProposal)"
           >
-            <img :src="'/images/icons/whatsapp-svg.svg'" class="w-5 h-5 mr-2" alt="WhatsApp" />
+            <img :src="'/images/icons/whatsapp-svg.svg'" class="w-5 h-5 mr-2" alt="WhatsApp" loading="lazy"/>
             Enviar via WhatsApp
           </BaseButton>
           <BaseButton 

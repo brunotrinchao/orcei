@@ -30,7 +30,7 @@ const landing = computed(() => systemInfo.value?.landingPage || {
 // Puxar configurações de domínio público para compor URLs absolutas
 const config = useRuntimeConfig()
 const siteUrl = config.public.siteUrl || 'https://orceifacil.com.br'
-const ogImageUrl = `${siteUrl}/images/landpage-banner.png`
+const ogImageUrl = `${siteUrl}/images/landpage-banner.jpg`
 
 // Otimização Crítica do LCP (Preload da Imagem principal do Banner no Head)
 useHead({

@@ -73,7 +73,7 @@ defineProps<{
         <!-- Container do Mockup com Rotação 3D -->
         <div class="product-mockup relative mx-auto rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-xl shadow-[0_0_50px_-12px_rgba(37,99,235,0.25)] transition-all duration-700 ease-out hover:rotate-x-[3deg] hover:rotate-y-[0deg] hover:scale-[1.01]">
           <img
-            src="/images/landpage-banner.png"
+            src="/images/landpage-banner.jpg"
             :alt="`${appName || 'Orcei Fácil'} — painel de orçamentos inteligência artificial`"
             width="1200"
             height="675"

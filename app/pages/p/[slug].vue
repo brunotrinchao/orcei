@@ -352,7 +352,7 @@ const statusMap: any = {
       <div class="absolute top-0 left-0 w-[600px] h-[600px] rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl pointer-events-none"></div>
       <div class="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full translate-x-1/3 translate-y-1/3 blur-3xl pointer-events-none"></div>
 
-      <div class="relative z-10 max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
+      <div class="relative z-10 max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-12">
 
         <!-- Title -->
         <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight max-w-3xl mb-4 text-gray-500">
@@ -405,7 +405,7 @@ const statusMap: any = {
             <div class="flex items-center gap-2 mb-2">
               <span class="text-[10px] font-black text-blue-100 uppercase tracking-widest">Valor Total</span>
             </div>
-            <p class="font-black text-white text-6xl leading-tight">
+            <p class="font-black text-white text-4xl leading-tight">
               R$ {{ finalTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
             </p>
              <p class="mt-2 text-xs font-black text-[#6B84FF] uppercase tracking-widest">

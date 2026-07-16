@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SubscriptionPlan } from '../../types/enums'
 import { onClickOutside } from '@vueuse/core'
-import { Shield, ArrowLeft, Home, FileText, Plus, Users, Settings, LogOut } from 'lucide-vue-next'
+import { Shield, ArrowLeft, Home, FileText, Plus, Users, Settings, LogOut, BookOpen, ReceiptText } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../types'
 const { loggedIn, user, session, clear, fetch: refreshSession } = useUserSession()
 const { data: profile, refresh: refreshLayoutProfile } = useFetch<ProfileDTO>('/api/profile', { key: 'profile' })
@@ -85,8 +85,8 @@ onMounted(() => {
 
             <!-- Credits & Plan Display -->
             <div class="flex items-center gap-3 bg-gray-50/50 px-3 py-1.5 rounded-2xl border border-gray-100 mr-1">
-              <div class="flex flex-col items-end">
-                <span class="text-[8px] uppercase font-bold text-gray-400 tracking-widest">Créditos</span>
+              <div class="flex flex-row justify-center items-center">
+                <span class="pr-1 text-[8px] uppercase font-bold text-gray-400 tracking-widest">Créditos: </span>
                 <span class="text-xs font-semibold text-gray-700">{{ profile?.creditsBalance ?? 0 }}</span>
               </div>
 
@@ -231,17 +231,18 @@ onMounted(() => {
           </NuxtLink>
         </li>
 
+
         <li class="flex-1 flex justify-center h-full relative">
           <NuxtLink
-            to="/orcamentos"
+            to="/clientes"
             class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 hover:text-gray-900"
             active-class="text-blue-600"
           >
-            <FileText class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
-            <span class="text-[9px] font-bold tracking-wide transition-colors">Propostas</span>
+            <Users class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
+            <span class="text-[9px] font-bold tracking-wide transition-colors">Clientes</span>
           </NuxtLink>
         </li>
-
+<!-- 
         <li class="flex-1 flex justify-center h-full relative">
           <NuxtLink
             to="/orcamentos?new=true"
@@ -254,16 +255,27 @@ onMounted(() => {
               <span class="text-[9px] font-bold tracking-wide mt-1 text-gray-500">Novo</span>
             </div>
           </NuxtLink>
+        </li> -->
+
+        <li class="flex-1 flex justify-center h-full relative">
+          <NuxtLink
+            to="/catalogo"
+            class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 hover:text-gray-900"
+            active-class="text-blue-600"
+          >
+            <BookOpen class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
+            <span class="text-[9px] font-bold tracking-wide transition-colors">Catálogo</span>
+          </NuxtLink>
         </li>
 
         <li class="flex-1 flex justify-center h-full relative">
           <NuxtLink
-            to="/clientes"
+            to="/orcamentos"
             class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 hover:text-gray-900"
             active-class="text-blue-600"
           >
-            <Users class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
-            <span class="text-[9px] font-bold tracking-wide transition-colors">Clientes</span>
+            <FileText class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
+            <span class="text-[9px] font-bold tracking-wide transition-colors">Orçamentos</span>
           </NuxtLink>
         </li>
 
@@ -275,6 +287,17 @@ onMounted(() => {
           >
             <Settings class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
             <span class="text-[9px] font-bold tracking-wide transition-colors">Ajustes</span>
+          </NuxtLink>
+        </li>
+
+        <li class="flex-1 flex justify-center h-full relative">
+          <NuxtLink
+            to="/relatorios"
+            class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 hover:text-gray-900"
+            active-class="text-blue-600"
+          >
+            <ReceiptText class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
+            <span class="text-[9px] font-bold tracking-wide transition-colors">Relatórios</span>
           </NuxtLink>
         </li>
       </ul>

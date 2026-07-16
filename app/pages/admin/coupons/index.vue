@@ -139,6 +139,7 @@ const formatDate = (ts: number | null) => ts ? new Date(ts).toLocaleDateString('
       </template>
     </PageHeader>
 
+    <div class="hidden md:block">
     <BaseDataList
       :items="coupons"
       :pending="pending"
@@ -191,6 +192,31 @@ const formatDate = (ts: number | null) => ts ? new Date(ts).toLocaleDateString('
         </tr>
       </template>
     </BaseDataList>
+    </div>
+
+    <!-- Listagem em Cards (mobile) -->
+    <div class="md:hidden space-y-4">
+      <template v-if="pending && coupons.length === 0">
+        <BaseSkeleton v-for="i in 3" :key="i" height="9rem" borderRadius="1rem" />
+      </template>
+      <template v-else-if="coupons.length === 0">
+        <div class="py-16 text-center">
+          <p class="font-black text-gray-900">Nenhum cupom encontrado</p>
+        </div>
+      </template>
+      <template v-else>
+        <CouponCard
+          v-for="coupon in coupons"
+          :key="coupon.id"
+          :coupon="coupon"
+          :audience-labels="audienceLabels"
+          :format-date="formatDate"
+          @edit="openEditModal(coupon)"
+          @deactivate="confirmDeactivate(coupon)"
+          @reactivate="reactivate(coupon)"
+        />
+      </template>
+    </div>
 
     <!-- Modal Criar -->
     <BaseDialog v-model:open="isCreateOpen" title="Novo Cupom" size="md">

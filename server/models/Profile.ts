@@ -30,7 +30,9 @@ const profileSchema = new Schema({
     }],
     social: {
       instagram: String,
-      youtube: String
+      youtube: String,
+      facebook: String,
+      twitter: String
     }
   },
   creditsBalance: { type: Number, default: 5 },

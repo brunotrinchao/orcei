@@ -5,7 +5,7 @@ const route = useRoute()
 
 const menuItems = [
   { label: 'Início', path: '/dashboard', icon: Home },
-  { label: 'Propostas', path: '/orcamentos', icon: FileText, exact: true },
+  { label: 'Orçamento', path: '/orcamentos', icon: FileText, exact: true },
   { label: 'Novo', path: '/orcamentos?new=true', icon: Plus, isPrimary: true },
   { label: 'Clientes', path: '/clientes', icon: Users },
   { label: 'Ajustes', path: '/configuracoes', icon: Settings },

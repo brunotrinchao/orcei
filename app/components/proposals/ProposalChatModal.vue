@@ -73,9 +73,9 @@ const formatMessageTime = (date: any) => {
     title="Dúvidas e Alterações"
     size="lg"
   >
-    <div v-if="proposal" class="p-0 flex flex-col h-[65vh] bg-[#E5DDD5] rounded-b-2xl overflow-hidden">
+    <div v-if="proposal" class="p-0 flex flex-col md:h-[65vh] h-[80vh] bg-[#E5DDD5] rounded-b-2xl overflow-hidden">
       <!-- Header -->
-      <div class="p-6 border-b border-gray-100 shrink-0 bg-white shadow-sm z-10 flex items-center justify-between">
+      <div class="p-4 border-b border-gray-100 shrink-0 bg-white shadow-sm z-10 flex items-center justify-between">
         <div>
           <h3 class="text-xl font-black text-gray-900 tracking-tight leading-tight">{{ proposal.title }}</h3>
           <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">{{ proposal.client.name }}</p>

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Phone, Plus, MessageSquare, Trash2, Instagram, Youtube } from 'lucide-vue-next'
+import { Phone, Plus, MessageSquare, Trash2, Instagram, Youtube, Facebook, Twitter } from 'lucide-vue-next'
 
 const props = defineProps<{
   contact: {
     phones: { number: string; isWhatsapp: boolean }[]
-    social: { instagram: string; youtube: string }
+    social: { instagram: string; youtube: string; facebook: string; twitter: string }
   }
 }>()
 
@@ -96,6 +96,30 @@ function removePhone(index: number) {
             v-model="localContact.social.youtube"
             type="text"
             placeholder="Canal"
+            class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-800 focus-visible:ring-2 focus-visible:ring-blue-600"
+          >
+        </div>
+        <div class="space-y-3">
+          <label for="social-facebook" class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1 flex items-center gap-2">
+            <Facebook class="w-3.5 h-3.5 text-blue-600" /> Facebook
+          </label>
+          <input
+            id="social-facebook"
+            v-model="localContact.social.facebook"
+            type="text"
+            placeholder="@suapagina"
+            class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-800 focus-visible:ring-2 focus-visible:ring-blue-600"
+          >
+        </div>
+        <div class="space-y-3">
+          <label for="social-twitter" class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1 flex items-center gap-2">
+            <Twitter class="w-3.5 h-3.5 text-gray-800" /> Twitter (X)
+          </label>
+          <input
+            id="social-twitter"
+            v-model="localContact.social.twitter"
+            type="text"
+            placeholder="@seuusuario"
             class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-800 focus-visible:ring-2 focus-visible:ring-blue-600"
           >
         </div>

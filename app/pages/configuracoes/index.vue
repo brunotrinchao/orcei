@@ -24,7 +24,13 @@ watch(profile, (val) => {
     clone.company = { taxId: '', legalName: '', tradeName: '' }
   }
   if (!clone.contact) {
-    clone.contact = { phones: [{ number: '', isWhatsapp: true }], social: { instagram: '', youtube: '' } }
+    clone.contact = { phones: [{ number: '', isWhatsapp: true }], social: { instagram: '', youtube: '', facebook: '', twitter: '' } }
+  }
+  if (!clone.contact.social) {
+    clone.contact.social = { instagram: '', youtube: '', facebook: '', twitter: '' }
+  } else {
+    clone.contact.social.facebook ??= ''
+    clone.contact.social.twitter ??= ''
   }
   localProfile.value = clone
 }, { immediate: true })
@@ -270,28 +276,36 @@ onMounted(() => {
         <div class="flex-1 space-y-10 min-w-0">
 
           <!-- Identidade Visual -->
+          <div :class="activeSection === 'visual' ? 'block' : 'hidden lg:block'">
           <SettingsVisual
             v-model:logoUrl="localProfile.brandConfig.logoUrl"
             v-model:primaryColor="localProfile.brandConfig.primaryColor"
           />
+          </div>
 
           <!-- Dados da Empresa -->
+          <div :class="activeSection === 'empresa' ? 'block' : 'hidden lg:block'">
           <SettingsCompany
             v-model:company="localProfile.company"
           />
+          </div>
 
           <!-- Endereço -->
+          <div :class="activeSection === 'endereco' ? 'block' : 'hidden lg:block'">
           <SettingsAddress
             v-model:address="localProfile.address"
           />
+          </div>
 
           <!-- Contato -->
+          <div :class="activeSection === 'contato' ? 'block' : 'hidden lg:block'">
           <SettingsContact
             v-model:contact="localProfile.contact"
           />
+          </div>
 
           <!-- Integrações -->
-          <section id="integracoes" data-tour="config-integracoes" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
+          <section id="integracoes" data-tour="config-integracoes" :class="activeSection === 'integracoes' ? 'block' : 'hidden lg:block'" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
             <div class="flex items-center gap-3 mb-8">
               <div class="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center">
                 <Globe class="w-5 h-5 text-sky-600" />
@@ -325,7 +339,7 @@ onMounted(() => {
           </section>
 
           <!-- Regras de Negócio -->
-          <section id="negocio" data-tour="config-regras-negocio" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
+          <section id="negocio" data-tour="config-regras-negocio" :class="activeSection === 'negocio' ? 'block' : 'hidden lg:block'" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
             <div class="flex items-center gap-3 mb-8">
               <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
                 <Briefcase class="w-5 h-5 text-emerald-600" />
@@ -358,13 +372,15 @@ onMounted(() => {
           </section>
 
           <!-- Modelos Legais -->
+          <div :class="activeSection === 'modelos' ? 'block' : 'hidden lg:block'">
           <SettingsTemplates
             v-model:contractTemplate="localProfile.defaultContractTemplate"
             v-model:termsAndConditions="localProfile.defaultTermsAndConditions"
           />
+          </div>
 
           <!-- Privacidade e Dados -->
-          <section id="privacidade" data-tour="config-privacidade" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
+          <section id="privacidade" data-tour="config-privacidade" :class="activeSection === 'privacidade' ? 'block' : 'hidden lg:block'" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
             <div class="flex items-center gap-3 mb-8">
               <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
                 <Shield class="w-5 h-5 text-red-600" />

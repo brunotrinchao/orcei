@@ -108,7 +108,7 @@ onUnmounted(() => {
           </div>
 
           <!-- Conteúdo rolável -->
-          <div class="flex-1 overflow-y-auto px-8 py-6">
+          <div class="flex-1 overflow-y-auto md:px-8 px-2 md:py-6 py-2">
             <slot />
           </div>
 

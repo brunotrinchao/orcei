@@ -88,7 +88,8 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
       </div>
     </div>
 
-    <!-- Listagem Unificada -->
+    <!-- Listagem Unificada (desktop) -->
+    <div class="hidden md:block">
     <BaseDataList data-tour="relatorios-lista"
       :items="filteredReports"
       :pending="pending"
@@ -151,6 +152,31 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
         </div>
       </template>
     </BaseDataList>
+    </div>
+
+    <!-- Listagem em Cards (mobile) -->
+    <div class="md:hidden space-y-4" data-tour="relatorios-lista">
+      <template v-if="pending && filteredReports.length === 0">
+        <BaseSkeleton v-for="i in 3" :key="i" height="8rem" borderRadius="1rem" />
+      </template>
+      <template v-else-if="filteredReports.length === 0">
+        <div class="py-16 text-center">
+          <p class="font-black text-gray-900">Nenhum relatório encontrado</p>
+          <p class="text-sm text-gray-500 mt-1">Você ainda não gerou relatórios IA ou os filtros não retornaram resultados.</p>
+        </div>
+      </template>
+      <template v-else>
+        <ReportCard
+          v-for="report in filteredReports"
+          :key="report._id"
+          :report="report"
+          :format-date="formatDate"
+          @view="openView(report)"
+          @download="downloadPdf(report._id)"
+          @delete="confirmDeleteReport(report)"
+        />
+      </template>
+    </div>
 
     <!-- Modal de Visualização -->
     <BaseDialog

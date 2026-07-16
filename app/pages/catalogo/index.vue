@@ -195,7 +195,8 @@ function getIcon(name: string) {
       @saved="handleItemSaved" 
     />
 
-    <!-- Listagem Unificada -->
+    <!-- Listagem Unificada (desktop) -->
+    <div class="hidden md:block">
     <BaseDataList
       :items="items"
       :pending="pending"
@@ -287,6 +288,33 @@ function getIcon(name: string) {
         </tr>
       </template>
     </BaseDataList>
+    </div>
+
+    <!-- Listagem em Cards (mobile) -->
+    <div class="md:hidden space-y-4">
+      <template v-if="pending && items.length === 0">
+        <BaseSkeleton v-for="i in 3" :key="i" height="9rem" borderRadius="1rem" />
+      </template>
+      <template v-else-if="items.length === 0">
+        <div class="py-16 text-center">
+          <p class="font-black text-gray-900">Catálogo Vazio</p>
+          <p class="text-sm text-gray-500 mt-1">Sua lista de produtos e serviços aparecerá aqui. Comece cadastrando o primeiro.</p>
+        </div>
+      </template>
+      <template v-else>
+        <CatalogItemCard
+          v-for="item in items"
+          :key="item._id"
+          :item="item"
+          :get-icon="getIcon"
+          @edit="openModal(item)"
+          @delete="deleteItem(item._id)"
+        />
+        <div v-if="totalItems > itemsPerPage" class="flex justify-center pt-2">
+          <BasePagination :total="totalItems" :items-per-page="itemsPerPage" v-model="currentPage" />
+        </div>
+      </template>
+    </div>
   </div>
 </template>
 

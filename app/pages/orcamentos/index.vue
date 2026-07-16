@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useIntersectionObserver } from '@vueuse/core'
 import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles, Send, CheckCheck, X, ArrowLeft, ArrowRight, Trash2, MoreVertical } from 'lucide-vue-next'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
 import { isToday, isYesterday, format } from 'date-fns'
@@ -45,6 +46,66 @@ const { data: proposalsData, refresh, pending } = useLazyFetch<any>('/api/propos
 const proposals = computed<any[]>(() => proposalsData.value?.items || [])
 const totalProposals = computed(() => proposalsData.value?.total || 0)
 
+// Infinite scroll (mobile) - estado isolado da paginação desktop
+const mobileProposals = ref<ProposalDTO[]>([])
+const mobilePage = ref(1)
+const mobileTotal = ref(0)
+const isMobileFetching = ref(false)
+const mobileInitialLoading = ref(true)
+const mobileHasMore = computed(() => mobileProposals.value.length < mobileTotal.value)
+const sentinelRef = ref<HTMLElement | null>(null)
+
+function isMobileViewport() {
+  return typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
+}
+
+async function fetchMobilePage(page: number, replace = false) {
+  if (isMobileFetching.value) return
+  isMobileFetching.value = true
+  try {
+    const res: any = await $fetch('/api/proposals', {
+      query: {
+        page,
+        limit: itemsPerPage,
+        search: searchQuery.value,
+        status: filterStatus.value,
+        startDate: filterStartDate.value,
+        endDate: filterEndDate.value,
+        pendingChat: filterPendingChat.value
+      }
+    })
+    mobileProposals.value = replace ? res.items : [...mobileProposals.value, ...res.items]
+    mobileTotal.value = res.total
+    mobilePage.value = page
+  } finally {
+    isMobileFetching.value = false
+    mobileInitialLoading.value = false
+  }
+}
+
+function resetMobileList() {
+  mobileProposals.value = []
+  mobileTotal.value = 0
+  mobilePage.value = 1
+  mobileInitialLoading.value = true
+  if (isMobileViewport()) fetchMobilePage(1, true)
+}
+
+function refreshBoth() {
+  refresh()
+  resetMobileList()
+}
+
+watch([searchQuery, filterStatus, filterStartDate, filterEndDate, filterPendingChat], () => {
+  resetMobileList()
+})
+
+useIntersectionObserver(sentinelRef, ([entry]) => {
+  if (entry?.isIntersecting && mobileHasMore.value && !isMobileFetching.value) {
+    fetchMobilePage(mobilePage.value + 1)
+  }
+}, { threshold: 0.1 })
+
 const { copy } = useClipboard()
 
 const isModalOpen = ref(false)
@@ -67,7 +128,7 @@ async function setupGlobalNotifications() {
       notificationChannel = pusher.subscribe(`private-profile-${profile._id}`)
       notificationChannel.bind('proposal-notification', (data: any) => {
         // Se receber uma notificação de nova mensagem, atualiza a lista para refletir no badge
-        refresh()
+        refreshBoth()
       })
     }
   } catch (e) {
@@ -78,6 +139,7 @@ async function setupGlobalNotifications() {
 onMounted(() => {
   siteOrigin.value = window.location.origin
   setupGlobalNotifications()
+  resetMobileList()
 })
 
 // Observa mudanças na query para abrir o modal de nova proposta, mesmo que o usuário já esteja na página
@@ -232,8 +294,8 @@ async function handleProposalSubmit(formData: Partial<ProposalDTO>) {
     })
     
     isModalOpen.value = false
-    refresh()
-    
+    refreshBoth()
+
     if (isNew && res.status === 'created' && res.client?.phone) {
       lastCreatedProposal.value = res
       isSuccessModalOpen.value = true
@@ -306,7 +368,7 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
       try {
         await $fetch(`/api/proposals/${proposal._id}`, { method: 'DELETE' })
         notify('Sucesso', 'Orçamento excluído com sucesso.')
-        refresh()
+        refreshBoth()
       } catch (e: any) {
         notify('Erro', e.data?.statusMessage || 'Erro ao excluir orçamento')
       }
@@ -388,7 +450,8 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
       </div>
     </div>
 
-    <!-- Listagem Unificada -->
+    <!-- Listagem Unificada (desktop) -->
+    <div class="hidden md:block">
     <BaseDataList
       :items="proposals"
       :pending="pending"
@@ -530,6 +593,40 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
         </tr>
       </template>
     </BaseDataList>
+    </div>
+
+    <!-- Listagem em Cards (mobile) -->
+    <div class="md:hidden space-y-4">
+      <template v-if="mobileInitialLoading">
+        <BaseSkeleton v-for="i in 3" :key="i" height="10rem" borderRadius="1rem" />
+      </template>
+      <template v-else-if="mobileProposals.length === 0">
+        <div class="py-16 text-center">
+          <p class="font-black text-gray-900">Sem Orçamentos</p>
+          <p class="text-sm text-gray-500 mt-1">Clique no botão acima para criar seu primeiro orçamento.</p>
+        </div>
+      </template>
+      <template v-else>
+        <ProposalCard
+          v-for="proposal in mobileProposals"
+          :key="proposal._id"
+          :proposal="proposal"
+          :status-variant="getStatusVariant(proposal.status)"
+          :status-label="statusMap[proposal.status]?.label"
+          :is-resending="isResending === proposal._id"
+          @open-chat="openChat(proposal)"
+          @send-whatsapp="sendWhatsapp(proposal)"
+          @open-history="openHistory(proposal)"
+          @open-preview="openPreview(proposal)"
+          @resend-email="resendEmail(proposal._id)"
+          @edit="openModal(proposal)"
+          @delete="confirmDeleteProposal(proposal)"
+        />
+        <div ref="sentinelRef" class="h-1"></div>
+        <div v-if="isMobileFetching" class="py-4 text-center text-sm text-gray-400 font-bold">Carregando...</div>
+        <div v-else-if="!mobileHasMore" class="py-4 text-center text-sm text-gray-400 font-bold">Fim da lista</div>
+      </template>
+    </div>
 
     <!-- Modal de Orçamento -->
     <BaseDialog
@@ -604,7 +701,7 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
       size="xl"
       @close="selectedProposal = null"
     >
-      <div v-if="selectedProposal" class="space-y-0">
+      <div v-if="selectedProposal" class="">
         <div class="bg-green-500 rounded-2xl p-6 flex items-center gap-4 mb-6">
           <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
             <CheckCircle2 class="w-8 h-8 text-white" />
@@ -790,7 +887,7 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
         <div class="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center shrink-0 rounded-t-3xl">
           <div class="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">
             <LinkIcon class="w-3 h-3" /> Link do Cliente:
-            <span class="text-blue-600 lowercase font-bold select-all">{{ siteOrigin }}/p/{{ selectedProposal.slug }}{{ selectedProposal.token ? `?t=${selectedProposal.token}` : '' }}</span>
+            <span class="text-blue-600 lowercase font-bold select-all"><a :href="siteOrigin + '/p/' + selectedProposal.slug + (selectedProposal.token ? `?t=${selectedProposal.token}` : '')">{{ siteOrigin }}/p/{{ selectedProposal.slug }}{{ selectedProposal.token ? `?t=${selectedProposal.token}` : '' }}</a></span>
           </div>
         </div>
         <div class="flex-1 bg-white overflow-hidden rounded-b-3xl">
@@ -805,7 +902,7 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
     <ProposalChatModal
       v-model:open="isChatOpen"
       :proposal="selectedProposal"
-      @refresh="refresh"
+      @refresh="refreshBoth"
     />
     <!-- Modal de Paywall Express -->
     <PaywallExpressModal 

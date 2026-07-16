@@ -40,6 +40,8 @@ export interface ProfileDTO {
     social: {
       instagram?: string
       youtube?: string
+      facebook?: string
+      twitter?: string
     }
   }
   creditsBalance: number

@@ -302,7 +302,8 @@ const formatPhone = (phone: string) => {
       </template>
     </BaseDialog>
 
-    <!-- Listagem Unificada -->
+    <!-- Listagem Unificada (desktop) -->
+    <div class="hidden md:block">
     <BaseDataList
       :items="clients"
       :pending="pending"
@@ -385,5 +386,32 @@ const formatPhone = (phone: string) => {
         </tr>
       </template>
     </BaseDataList>
+    </div>
+
+    <!-- Listagem em Cards (mobile) -->
+    <div class="md:hidden space-y-4">
+      <template v-if="pending && clients.length === 0">
+        <BaseSkeleton v-for="i in 3" :key="i" height="9rem" borderRadius="1rem" />
+      </template>
+      <template v-else-if="clients.length === 0">
+        <div class="py-16 text-center">
+          <p class="font-black text-gray-900">Sem Clientes</p>
+          <p class="text-sm text-gray-500 mt-1">Sua lista de clientes aparecerá aqui. Comece cadastrando o primeiro.</p>
+        </div>
+      </template>
+      <template v-else>
+        <ClientCard
+          v-for="client in clients"
+          :key="client._id"
+          :client="client"
+          :format-phone="formatPhone"
+          @edit="openModal(client)"
+          @delete="deleteClient(client._id)"
+        />
+        <div v-if="totalClients > itemsPerPage" class="flex justify-center pt-2">
+          <BasePagination :total="totalClients" :items-per-page="itemsPerPage" v-model="currentPage" />
+        </div>
+      </template>
+    </div>
   </div>
 </template>

@@ -105,7 +105,8 @@ function confirmImpersonate(targetUser: any) {
       </div>
     </div>
 
-    <!-- Listagem Unificada -->
+    <!-- Listagem Unificada (desktop) -->
+    <div class="hidden md:block">
     <BaseDataList
       :items="users"
       :pending="pending"
@@ -182,6 +183,33 @@ function confirmImpersonate(targetUser: any) {
         </tr>
       </template>
     </BaseDataList>
+    </div>
+
+    <!-- Listagem em Cards (mobile) -->
+    <div class="md:hidden space-y-4">
+      <template v-if="pending && users.length === 0">
+        <BaseSkeleton v-for="i in 3" :key="i" height="9rem" borderRadius="1rem" />
+      </template>
+      <template v-else-if="users.length === 0">
+        <div class="py-16 text-center">
+          <p class="font-black text-gray-900">Nenhum usuário encontrado</p>
+        </div>
+      </template>
+      <template v-else>
+        <UserCard
+          v-for="user in users"
+          :key="user._id"
+          :user="user"
+          :is-impersonating="isImpersonating"
+          :format-date="formatDate"
+          @adjust-credits="openCreditModal(user)"
+          @impersonate="confirmImpersonate(user)"
+        />
+        <div v-if="totalUsers > itemsPerPage" class="flex justify-center pt-2">
+          <BasePagination :total="totalUsers" :items-per-page="itemsPerPage" v-model="currentPage" />
+        </div>
+      </template>
+    </div>
 
     <!-- Modal de Créditos -->
     <BaseDialog v-model:open="isCreditModalOpen" title="Ajustar Créditos" size="md">

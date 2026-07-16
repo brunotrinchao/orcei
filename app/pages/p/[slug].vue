@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Phone, MessageCircle, CheckCircle2, Download, ExternalLink, MapPin, X, Loader2, AlertCircle, PencilLine, ThumbsDown, Eye, FileText, CreditCard, Banknote, Clock, Shield, Mail, Send, Check, CheckCheck } from 'lucide-vue-next'
+import { Phone, MessageCircle, CheckCircle2, Download, ExternalLink, MapPin, X, Loader2, AlertCircle, PencilLine, ThumbsDown, Eye, FileText, CreditCard, Banknote, Clock, Shield, Mail, Send, Check, CheckCheck, Instagram, Youtube, Facebook, Twitter } from 'lucide-vue-next'
 import { isToday, isYesterday, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import type { ProposalDTO } from '../../../types'
@@ -210,6 +210,27 @@ const profileWhatsapp = computed(() => {
 })
 
 const { data: systemInfo } = useFetch<any>('/api/system/status')
+
+// Links das redes sociais do profissional (contact.social), exibidos no rodapé
+const social = computed(() => (proposal.value?.profileId as any)?.contact?.social || {})
+
+const socialLinks = computed(() => {
+  const s = social.value
+  const links: { key: string; url: string; icon: any; hoverClass: string }[] = []
+  if (s.instagram) {
+    links.push({ key: 'instagram', url: `https://instagram.com/${s.instagram.replace('@', '')}`, icon: Instagram, hoverClass: 'hover:text-pink-400' })
+  }
+  if (s.facebook) {
+    links.push({ key: 'facebook', url: `https://facebook.com/${s.facebook.replace('@', '')}`, icon: Facebook, hoverClass: 'hover:text-blue-400' })
+  }
+  if (s.twitter) {
+    links.push({ key: 'twitter', url: `https://x.com/${s.twitter.replace('@', '')}`, icon: Twitter, hoverClass: 'hover:text-gray-300' })
+  }
+  if (s.youtube) {
+    links.push({ key: 'youtube', url: `https://youtube.com/${s.youtube.replace('@', '')}`, icon: Youtube, hoverClass: 'hover:text-red-400' })
+  }
+  return links
+})
 
 const statusMap: any = {
   draft:      { label: 'Rascunho',   variant: 'default' },
@@ -509,11 +530,26 @@ const statusMap: any = {
               </div>
             </a>
           </div>
+
+          
         </div>
       </section>
 
       <!-- ── TERMS LINK + FOOTER ─────────────────────────────────── -->
       <footer class="pt-4 pb-2 text-center space-y-6">
+        <!-- Redes sociais -->
+          <div v-if="socialLinks.length" class="mt-6 flex items-center justify-center gap-4">
+            <a
+              v-for="link in socialLinks"
+              :key="link.key"
+              :href="link.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              :class="['w-9 h-9 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-gray-400 transition-all outline-none focus-visible:ring-2 focus-visible:ring-white', link.hoverClass]"
+            >
+              <component :is="link.icon" class="w-4 h-4" />
+            </a>
+          </div>
         <button
           @click="isTermsOpen = true"
           class="text-gray-600 hover:text-gray-800 text-[10px] font-black uppercase tracking-[0.2em] underline decoration-dotted underline-offset-8 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6]"
@@ -587,7 +623,7 @@ const statusMap: any = {
     </BaseDialog>
 
     <!-- Chat Dialog -->
-    <BaseDialog v-model:open="isChatModalOpen" title="Dúvidas e Alterações" size="md">
+    <BaseDialog v-model:open="isChatModalOpen" title="Dúvidas e Alterações" size="lg">
       <div class="p-0 flex flex-col h-[500px] bg-[#E5DDD5] overflow-hidden rounded-b-2xl">
         <!-- Messages list -->
         <div 

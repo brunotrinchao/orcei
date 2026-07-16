@@ -188,11 +188,33 @@ export function generateProposalHtml(proposal: any, profile: any, appName: strin
         ${termsHtml}
       </div>
 
+      ${buildSocialLinksHtml(profile?.contact?.social)}
+
       <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; font-size: 9px; color: #ccc; font-family: sans-serif; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 900;">
         Powered by Orcei Fácil · orceifacil.com.br
       </div>
     </body>
     </html>
+  `
+}
+
+function buildSocialLinksHtml(social: any) {
+  if (!social) return ''
+  const links: { label: string; url: string }[] = []
+  if (social.instagram) links.push({ label: `Instagram: ${social.instagram}`, url: `https://instagram.com/${String(social.instagram).replace('@', '')}` })
+  if (social.facebook) links.push({ label: `Facebook: ${social.facebook}`, url: `https://facebook.com/${String(social.facebook).replace('@', '')}` })
+  if (social.twitter) links.push({ label: `X (Twitter): ${social.twitter}`, url: `https://x.com/${String(social.twitter).replace('@', '')}` })
+  if (social.youtube) links.push({ label: `YouTube: ${social.youtube}`, url: `https://youtube.com/${String(social.youtube).replace('@', '')}` })
+
+  if (!links.length) return ''
+
+  return `
+    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
+      <div style="font-size: 10px; color: #999; letter-spacing: 0.1em; text-transform: uppercase; font-weight: bold; margin-bottom: 8px;">Redes Sociais</div>
+      <div style="font-size: 11px; color: #3B82F6;">
+        ${links.map(l => `<a href="${l.url}" style="color: #3B82F6; text-decoration: none; margin: 0 8px;">${l.label}</a>`).join(' · ')}
+      </div>
+    </div>
   `
 }
 

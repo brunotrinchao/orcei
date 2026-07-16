@@ -30,7 +30,8 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
       <NuxtLink to="/admin" class="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">Voltar ao Painel</NuxtLink>
     </PageHeader>
 
-    <!-- Listagem Unificada -->
+    <!-- Listagem Unificada (desktop) -->
+    <div class="hidden md:block">
     <BaseDataList
       :items="logs"
       :pending="pending"
@@ -69,5 +70,29 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
         </tr>
       </template>
     </BaseDataList>
+    </div>
+
+    <!-- Listagem em Cards (mobile) -->
+    <div class="md:hidden space-y-4">
+      <template v-if="pending && logs.length === 0">
+        <BaseSkeleton v-for="i in 3" :key="i" height="7rem" borderRadius="1rem" />
+      </template>
+      <template v-else-if="logs.length === 0">
+        <div class="py-16 text-center">
+          <p class="font-black text-gray-900">Nenhum log encontrado</p>
+        </div>
+      </template>
+      <template v-else>
+        <AuditLogCard
+          v-for="(log, index) in logs"
+          :key="log._id || index"
+          :log="log"
+          :format-date="formatDate"
+        />
+        <div v-if="totalLogs > itemsPerPage" class="flex justify-center pt-2">
+          <BasePagination :total="totalLogs" :items-per-page="itemsPerPage" v-model="currentPage" />
+        </div>
+      </template>
+    </div>
   </div>
 </template>

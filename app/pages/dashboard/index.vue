@@ -147,7 +147,7 @@ function formatRelativeTime(minutesAgo: number) {
         <p class="text-gray-500 font-medium">Acompanhe suas conversões, produtividade IA e receitas acumuladas.</p>
       </div>
 
-      <div data-tour="dashboard-period-filter" class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide bg-gray-100/80 p-1.5 rounded-3xl border border-gray-200/50">
+      <div data-tour="dashboard-period-filter" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide bg-gray-100/80 p-1.5 rounded-3xl border border-gray-200/50 md:w-auto w-full">
         <button 
           v-for="p in [
             { label: '7D', value: 'last_7_days' },
@@ -159,7 +159,7 @@ function formatRelativeTime(minutesAgo: number) {
           :key="p.value"
           @click="period = p.value"
           :class="period === p.value ? 'bg-white text-blue-600 shadow-sm font-black' : 'text-gray-500 hover:text-gray-900 font-bold'"
-          class="px-5 py-2 rounded-2xl text-[10px] uppercase tracking-widest transition-all whitespace-nowrap"
+          class="md:px-5 px-3 py-2 rounded-2xl text-[10px] uppercase tracking-widest transition-all whitespace-nowrap"
         >
           {{ p.label }}
         </button>
@@ -177,16 +177,16 @@ function formatRelativeTime(minutesAgo: number) {
       <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         
         <!-- Receita Confirmada -->
-        <div class="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-col justify-between">
-          <div class="flex justify-between items-start mb-3 md:mb-4">
-            <div class="w-8 h-8 md:w-12 md:h-12 bg-green-50 text-green-600 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-colors">
-              <DollarSign class="w-4 h-4 md:w-6 md:h-6" />
+        <div class="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
+          <div class="flex flex-col md:flex-row justify-between w-auto md:w-full items-center md:items-start mb-0 md:mb-4">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-green-50 text-green-600 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-colors">
+              <DollarSign class="w-5 h-5 md:w-6 md:h-6" />
             </div>
             <span class="hidden md:inline-block text-[9px] font-black text-green-500 uppercase tracking-widest bg-green-50 px-2.5 py-1 rounded-lg">Faturado</span>
           </div>
-          <div>
-            <p class="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 truncate">Faturamento</p>
-            <h3 class="text-lg md:text-3xl font-black text-gray-900 tracking-tight truncate">
+          <div class="flex-1 min-w-0">
+            <p class="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0 md:mb-1 truncate">Faturamento</p>
+            <h3 class="text-base md:text-3xl font-black text-gray-900 tracking-tight truncate">
               R$ {{ (stats.totalRevenue ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) }}
             </h3>
             <p class="hidden md:block text-[10px] text-gray-400 mt-1 font-semibold truncate">{{ stats.acceptedCount }} orçamentos convertidos</p>
@@ -194,16 +194,16 @@ function formatRelativeTime(minutesAgo: number) {
         </div>
 
         <!-- Conversão Geral -->
-        <div class="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-col justify-between">
-          <div class="flex justify-between items-start mb-3 md:mb-4">
-            <div class="w-8 h-8 md:w-12 md:h-12 bg-blue-50 text-blue-600 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
-              <TrendingUp class="w-4 h-4 md:w-6 md:h-6" />
+        <div class="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
+          <div class="flex flex-col md:flex-row justify-between w-auto md:w-full items-center md:items-start mb-0 md:mb-4">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-50 text-blue-600 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
+              <TrendingUp class="w-5 h-5 md:w-6 md:h-6" />
             </div>
             <span class="hidden md:inline-block text-[9px] font-black text-blue-500 uppercase tracking-widest bg-blue-50 px-2.5 py-1 rounded-lg">Sucesso</span>
           </div>
-          <div>
-            <p class="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 truncate">Conversão</p>
-            <h3 class="text-xl md:text-3xl font-black text-gray-900 tracking-tight">
+          <div class="flex-1 min-w-0">
+            <p class="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0 md:mb-1 truncate">Conversão</p>
+            <h3 class="text-base md:text-3xl font-black text-gray-900 tracking-tight truncate">
               {{ Math.round(stats.approvalRate ?? 0) }}%
             </h3>
             <p class="hidden md:block text-[10px] text-gray-400 mt-1 font-semibold truncate">{{ stats.proposalsCount }} orçamentos totais</p>
@@ -211,16 +211,16 @@ function formatRelativeTime(minutesAgo: number) {
         </div>
 
         <!-- TMA (Tempo Médio de Atendimento/Fechamento) -->
-        <div class="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-col justify-between">
-          <div class="flex justify-between items-start mb-3 md:mb-4">
-            <div class="w-8 h-8 md:w-12 md:h-12 bg-purple-50 text-purple-600 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
-              <Clock class="w-4 h-4 md:w-6 md:h-6" />
+        <div class="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
+          <div class="flex flex-col md:flex-row justify-between w-auto md:w-full items-center md:items-start mb-0 md:mb-4">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-purple-50 text-purple-600 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
+              <Clock class="w-5 h-5 md:w-6 md:h-6" />
             </div>
             <span class="hidden md:inline-block text-[9px] font-black text-purple-500 uppercase tracking-widest bg-purple-50 px-2.5 py-1 rounded-lg">Agilidade</span>
           </div>
-          <div>
-            <p class="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 truncate">TMA</p>
-            <h3 class="text-xl md:text-3xl font-black text-gray-900 tracking-tight">
+          <div class="flex-1 min-w-0">
+            <p class="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0 md:mb-1 truncate">TMA</p>
+            <h3 class="text-base md:text-3xl font-black text-gray-900 tracking-tight truncate">
               {{ stats.tmaHours > 24 ? `${Math.round(stats.tmaHours / 24)}d` : `${Math.round(stats.tmaHours || 0)}h` }}
             </h3>
             <p class="hidden md:block text-[10px] text-gray-400 mt-1 font-semibold truncate">tempo médio p/ aceite</p>
@@ -228,16 +228,16 @@ function formatRelativeTime(minutesAgo: number) {
         </div>
 
         <!-- SLA Comercial (Fechados em < 48h) -->
-        <div class="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-col justify-between">
-          <div class="flex justify-between items-start mb-3 md:mb-4">
-            <div class="w-8 h-8 md:w-12 md:h-12 bg-orange-50 text-orange-600 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-colors">
-              <ShieldCheck class="w-4 h-4 md:w-6 md:h-6" />
+        <div class="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
+          <div class="flex flex-col md:flex-row justify-between w-auto md:w-full items-center md:items-start mb-0 md:mb-4">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-orange-50 text-orange-600 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-colors">
+              <ShieldCheck class="w-5 h-5 md:w-6 md:h-6" />
             </div>
             <span class="hidden md:inline-block text-[9px] font-black text-orange-500 uppercase tracking-widest bg-orange-50 px-2.5 py-1 rounded-lg">Meta</span>
           </div>
-          <div>
-            <p class="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 truncate">SLA 48h</p>
-            <h3 class="text-xl md:text-3xl font-black text-gray-900 tracking-tight">
+          <div class="flex-1 min-w-0">
+            <p class="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0 md:mb-1 truncate">SLA 48h</p>
+            <h3 class="text-base md:text-3xl font-black text-gray-900 tracking-tight truncate">
               {{ Math.round(stats.slaRate ?? 0) }}%
             </h3>
             <p class="hidden md:block text-[10px] text-gray-400 mt-1 font-semibold truncate">fechados na meta</p>
@@ -342,19 +342,25 @@ function formatRelativeTime(minutesAgo: number) {
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <!-- Funil Comercial Horizontal -->
-        <div class="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm flex flex-col justify-between">
+        <div class="lg:col-span-2 bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm flex flex-col justify-between">
           <div>
             <div class="flex justify-between items-center mb-6">
-              <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Funil Comercial e Conversão</h3>
-              <span class="text-[9px] font-black text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-0.5 rounded-md">Passos de Vendas</span>
+              <h3 class="text-md md:text-sm font-black text-gray-900 uppercase tracking-widest">Funil Comercial e Conversão</h3>
+              <span class="hidden md:block text-[9px] font-black text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-0.5 rounded-md">Passos de Vendas</span>
             </div>
             
             <div class="space-y-4">
               <!-- Rascunho -->
-              <div class="flex items-center gap-4">
-                <span class="w-20 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Rascunhos</span>
-                <div class="flex-1 h-10 bg-slate-50 rounded-xl relative overflow-hidden">
-                  <div class="h-full bg-slate-200/70" :style="{ width: stats.proposalsCount > 0 ? (stats.draftCount / stats.proposalsCount * 100) + '%' : '0%' }"></div>
+              <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest text-left md:text-right w-full md:w-20">
+                  Rascunhos
+                </span>
+                
+                <div class="w-full md:flex-1 h-10 bg-slate-50 rounded-xl relative overflow-hidden">
+                  <div 
+                    class="h-full bg-slate-200/70" 
+                    :style="{ width: stats.proposalsCount > 0 ? (stats.draftCount / stats.proposalsCount * 100) + '%' : '0%' }"
+                  ></div>
                   <span class="absolute inset-y-0 left-4 flex items-center text-xs font-bold text-gray-700">
                     {{ stats.draftCount }} rascunhos em elaboração
                   </span>
@@ -362,9 +368,9 @@ function formatRelativeTime(minutesAgo: number) {
               </div>
 
               <!-- Criado/Pendente (Enviado) -->
-              <div class="flex items-center gap-4">
-                <span class="w-20 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Enviados</span>
-                <div class="flex-1 h-10 bg-blue-50/50 rounded-xl relative overflow-hidden">
+              <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+                <span class="w-full md:w-20 text-[10px] font-black text-gray-400 uppercase tracking-widest text-left md:text-right">Enviados</span>
+                <div class="w-full md:flex-1 h-10 bg-blue-50/50 rounded-xl relative overflow-hidden">
                   <div class="h-full bg-blue-100" :style="{ width: stats.proposalsCount > 0 ? (stats.pendingCount / stats.proposalsCount * 100) + '%' : '0%' }"></div>
                   <span class="absolute inset-y-0 left-4 flex items-center text-xs font-bold text-blue-800">
                     {{ stats.pendingCount }} orçamentos aguardando resposta
@@ -373,9 +379,9 @@ function formatRelativeTime(minutesAgo: number) {
               </div>
 
               <!-- Aceitos (Finalizados) -->
-              <div class="flex items-center gap-4">
-                <span class="w-20 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Aceitos</span>
-                <div class="flex-1 h-10 bg-emerald-50 rounded-xl relative overflow-hidden">
+              <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+                <span class="w-full md:w-20 text-[10px] font-black text-gray-400 uppercase tracking-widest text-left md:text-right">Aceitos</span>
+                <div class="w-full md:flex-1 h-10 bg-emerald-50 rounded-xl relative overflow-hidden">
                   <div class="h-full bg-emerald-100" :style="{ width: stats.proposalsCount > 0 ? (stats.acceptedCount / stats.proposalsCount * 100) + '%' : '0%' }"></div>
                   <span class="absolute inset-y-0 left-4 flex items-center text-xs font-bold text-emerald-800">
                     {{ stats.acceptedCount }} orçamentos fechados ({{ Math.round(stats.approvalRate) }}% conversão)
@@ -402,7 +408,7 @@ function formatRelativeTime(minutesAgo: number) {
         </div>
 
         <!-- Alertas de Follow-ups Inteligentes -->
-        <div class="lg:col-span-1 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-6">
+        <div class="lg:col-span-1 bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm space-y-6">
           <div class="flex justify-between items-center">
             <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Ações e Follow-ups</h3>
             <AlertCircle class="w-5 h-5 text-indigo-500" />
@@ -433,7 +439,7 @@ function formatRelativeTime(minutesAgo: number) {
                   target="_blank"
                   class="flex-1 flex items-center justify-center gap-1.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
                 >
-                  <img :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5" alt="WhatsApp" loading="lazy"/> Chamar WhatsApp
+                  <img :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5" alt="WhatsApp" loading="lazy"/> WhatsApp
                 </a>
                 <NuxtLink
                   :to="`/p/${alert.slug}`"
@@ -445,7 +451,7 @@ function formatRelativeTime(minutesAgo: number) {
               </div>
             </div>
             
-            <div v-if="!stats.followUpAlerts?.length" class="text-center py-10 space-y-3">
+            <div v-if="!stats.followUpAlerts?.length" class="text-center py-8 space-y-3">
               <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto">
                 <CheckCircle2 class="w-6 h-6" />
               </div>
@@ -460,7 +466,7 @@ function formatRelativeTime(minutesAgo: number) {
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <!-- Gráfico de Evolução de Faturamento -->
-        <div data-tour="dashboard-revenue-chart" class="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
+        <div data-tour="dashboard-revenue-chart" class="lg:col-span-2 bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
           <div class="flex justify-between items-center">
             <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Evolução do Faturamento</h3>
             <BarChart3 class="w-5 h-5 text-gray-400" />
@@ -471,7 +477,7 @@ function formatRelativeTime(minutesAgo: number) {
         </div>
 
         <!-- Distribuição de Status -->
-        <div class="lg:col-span-1 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
+        <div class="lg:col-span-1 bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
           <div class="flex justify-between items-center">
             <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Status dos Orçamentos</h3>
             <Activity class="w-5 h-5 text-gray-400" />
@@ -487,7 +493,7 @@ function formatRelativeTime(minutesAgo: number) {
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <!-- Tracking de Aberturas em Tempo Real -->
-        <div class="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm flex flex-col justify-between">
+        <div class="lg:col-span-2 bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm flex flex-col justify-between">
           <div>
             <div class="flex justify-between items-center mb-6">
               <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Visualizações Recentes (Tracking)</h3>
@@ -531,7 +537,7 @@ function formatRelativeTime(minutesAgo: number) {
         </div>
 
         <!-- Ranking de Clientes (Faturamento) -->
-        <div class="lg:col-span-1 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-6">
+        <div class="lg:col-span-1 bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm space-y-6">
           <div class="flex justify-between items-center">
             <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Top Clientes</h3>
             <NuxtLink to="/clientes" class="text-[9px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-800">Ver Todos</NuxtLink>

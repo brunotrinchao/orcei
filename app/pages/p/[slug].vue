@@ -399,6 +399,7 @@ const statusMap: any = {
             </div>
           </div>
 
+          
           <!-- Total -->
           <div class="col-span-2 sm:col-span-1 bg-[#3147F6] border border-blue-500/40 rounded-2xl p-5">
             <div class="flex items-center gap-2 mb-2">
@@ -407,6 +408,11 @@ const statusMap: any = {
             <p class="font-black text-white text-6xl leading-tight">
               R$ {{ finalTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
             </p>
+             <p class="mt-2 text-xs font-black text-[#6B84FF] uppercase tracking-widest">
+                {{ selectedMethod === 'cash'
+                ? (proposal.paymentConfig.cashDiscount > 0 ? `À Vista — ${proposal.paymentConfig.cashDiscount}% OFF` : 'À Vista')
+                : (proposal.paymentConfig.installments > 1 ? `Cartão — ${proposal.paymentConfig.installments}x sem juros` : 'À Vista no Cartão') }}
+              </p>
           </div>
         </div>
       </div>

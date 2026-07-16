@@ -50,7 +50,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50/50 pb-32 md:pb-0 font-sans text-gray-900 antialiased">
+  <div class="min-h-screen bg-gray-50/50 pb-16 md:pb-0 font-sans text-gray-900 antialiased">
     <!-- Desktop/Mobile Header -->
     <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100">
       <nav class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -150,12 +150,12 @@ onMounted(() => {
     </div>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-250px)]">
+    <main class="max-w-7xl mx-auto px-4 py-6 min-h-[calc(100vh-250px)]">
       <slot />
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-gray-100 pt-16 pb-32 md:pb-16 px-6">
+    <footer class="bg-white border-t border-gray-100 pt-8 md:pb-4 pb-8 md:pb-16 px-6">
       <div class="max-w-7xl mx-auto">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div class="md:col-span-2 space-y-6">

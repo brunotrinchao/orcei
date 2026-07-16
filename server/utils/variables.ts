@@ -2,6 +2,7 @@ interface ProposalData {
   client: { name: string }
   totals: { final: number }
   expiresAt?: Date
+  executionDate?: Date,
   paymentConfig?: {
     method: 'cash' | 'credit_card'
     installments: number
@@ -34,6 +35,10 @@ export function processVariables(text: string, proposal: ProposalData, profile: 
 
   const paymentMethod = proposal.paymentConfig?.method === 'cash' ? 'À Vista' : 'Cartão de Crédito'
   let paymentDetails = ''
+
+  const dateExecution = proposal.executionDate 
+    ? new Date(proposal.executionDate).toLocaleDateString('pt-BR')
+    : new Date().toLocaleDateString('pt-BR')
   
   if (proposal.paymentConfig?.method === 'cash') {
     paymentDetails = proposal.paymentConfig.cashDiscount > 0 
@@ -65,7 +70,8 @@ export function processVariables(text: string, proposal: ProposalData, profile: 
     'bairro': profile.address?.neighborhood || '',
     'cidade': profile.address?.city || '',
     'estado': profile.address?.state || '',
-    'telefone': (profile as any).contact?.phones?.[0]?.number || ''
+    'telefone': (profile as any).contact?.phones?.[0]?.number || '',
+    'data_inicio': dateExecution
   }
 
   let processed = text

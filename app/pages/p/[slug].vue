@@ -190,15 +190,17 @@ async function handleAction() {
   }
 }
 
-const formatDate = (date: any) => {
+const formatDate = (date: any, format: any) => {
   if (!date) return 'Sem validade'
+
+  const newFormat = format || {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }
   const d = new Date(date)
   if (isNaN(d.getTime())) return 'Sem validade'
-  return d.toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric'
-  })
+  return d.toLocaleDateString('pt-BR', newFormat)
 }
 
 // Retorna o número de WhatsApp do perfil (campo phones[])
@@ -368,7 +370,7 @@ const statusMap: any = {
               <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Proposta Elaborada para</span>
             </div>
             <p class="font-black text-black text-base leading-tight mb-4">{{ proposal.client.name }}</p>
-            <div class="grid grid-cols-2 gap-2 text-[10px] text-slate-400 font-bold">
+            <div class="grid grid-cols-3 gap-3 text-[10px] text-slate-400 font-bold">
               <div>
                 <p class="text-[9px] text-slate-400 font-bold uppercase">Data de Emissão</p>
                 <p class="text-slate-700 font-black mt-0.5">{{ formatDate(proposal.createdAt) }}</p>
@@ -376,6 +378,10 @@ const statusMap: any = {
               <div>
                <p class="text-[9px] text-slate-400 font-bold uppercase">Válido até</p>
                 <p class="text-slate-700 font-black mt-0.5">{{ formatDate(proposal.expiresAt) }}</p>
+              </div>  
+              <div>
+               <p class="text-[9px] text-slate-400 font-bold uppercase">Data de Início</p>
+                <p class="text-slate-700 font-black mt-0.5">{{ formatDate(proposal.executionDate) }}</p>
               </div>  
             </div>
           </div>

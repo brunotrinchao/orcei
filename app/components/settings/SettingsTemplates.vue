@@ -22,7 +22,8 @@ const availableVariables = [
   { tag: '{{numero}}', desc: 'Número do endereço' },
   { tag: '{{bairro}}', desc: 'Bairro do prestador' },
   { tag: '{{cidade}}', desc: 'Cidade do prestador' },
-  { tag: '{{estado}}', desc: 'Estado do prestador' }
+  { tag: '{{estado}}', desc: 'Estado do prestador' },
+  { tag: '{{data_inicio}}', desc: 'Data de início do serviço' },
 ]
 
 const copiedTag = ref('')

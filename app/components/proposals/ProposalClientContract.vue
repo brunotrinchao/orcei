@@ -27,3 +27,9 @@ const safeContractText = computed(() => useSanitizeHtml(props.contractText))
     </details>
   </section>
 </template>
+
+<style scoped>
+.prose-contract {
+  @apply prose prose-sm max-w-none prose-headings:font-black prose-headings:uppercase prose-headings:text-xs prose-headings:tracking-[0.25em] prose-headings:text-gray-600 prose-p:text-gray-600 prose-p:text-xs  
+}
+</style>

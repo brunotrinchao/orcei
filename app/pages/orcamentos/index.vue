@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
-import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles, Send, CheckCheck, X, ArrowLeft, ArrowRight, Trash2, MoreVertical } from 'lucide-vue-next'
+import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles, Send, CheckCheck, X, ArrowLeft, ArrowRight, Trash2, MoreVertical, Check, Copy, Variable } from 'lucide-vue-next'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
 import { isToday, isYesterday, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -115,6 +115,12 @@ const isHistoryOpen = ref(false)
 const isChatOpen = ref(false)
 const isPaywallOpen = ref(false)
 const paywallReason = ref('')
+
+const isContractModalOpen = ref(false)
+const contractProposal = ref<ProposalDTO | null>(null)
+const localContractText = ref('')
+const isSavingContract = ref(false)
+const copiedContractTag = ref('')
 
 
 // Pusher Integration
@@ -375,6 +381,57 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
     }
   })
 }
+
+const contractVariables = [
+  { tag: '{{nome_cliente}}', desc: 'Nome do cliente' },
+  { tag: '{{valor_total}}', desc: 'Valor final do orçamento' },
+  { tag: '{{dias_validade}}', desc: 'Dias restantes de validade' },
+  { tag: '{{forma_pagamento}}', desc: 'Método (À Vista / Cartão)' },
+  { tag: '{{detalhes_pagamento}}', desc: 'Ex: Parcelado em 3x...' },
+  { tag: '{{nome_empresa}}', desc: 'Nome do perfil' },
+  { tag: '{{nome_fantasia}}', desc: 'Nome fantasia da empresa' },
+  { tag: '{{razao_social}}', desc: 'Razão social da empresa' },
+  { tag: '{{cnpj}}', desc: 'CNPJ do prestador' },
+  { tag: '{{telefone}}', desc: 'Telefone do prestador' },
+  { tag: '{{endereco_prestador}}', desc: 'Endereço completo' },
+  { tag: '{{cep}}', desc: 'CEP do prestador' },
+  { tag: '{{rua}}', desc: 'Rua do prestador' },
+  { tag: '{{numero}}', desc: 'Número do endereço' },
+  { tag: '{{bairro}}', desc: 'Bairro do prestador' },
+  { tag: '{{cidade}}', desc: 'Cidade do prestador' },
+  { tag: '{{estado}}', desc: 'Estado do prestador' },
+  { tag: '{{data_inicio}}', desc: 'Data de início do serviço' },
+]
+
+function openContractModal(proposal: ProposalDTO) {
+  contractProposal.value = proposal
+  localContractText.value = proposal.contractText || ''
+  isContractModalOpen.value = true
+}
+
+function copyContractTag(tag: string) {
+  copy(tag)
+  copiedContractTag.value = tag
+  setTimeout(() => copiedContractTag.value = '', 2000)
+}
+
+async function saveContract() {
+  if (!contractProposal.value) return
+  isSavingContract.value = true
+  try {
+    await $fetch(`/api/proposals/${contractProposal.value._id}/contract`, {
+      method: 'PATCH',
+      body: { contractText: localContractText.value }
+    })
+    isContractModalOpen.value = false
+    refreshBoth()
+    notify('Sucesso', 'Contrato atualizado com sucesso!')
+  } catch (e: any) {
+    notify('Erro', e.data?.statusMessage || 'Erro ao salvar contrato')
+  } finally {
+    isSavingContract.value = false
+  }
+}
 </script>
 
 <template>
@@ -560,6 +617,14 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
                     >
                       <Pencil class="w-4 h-4" />
                       Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      v-if="proposal.status === 'pending'"
+                      @click="openContractModal(proposal)"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+                    >
+                      <FileText class="w-4 h-4" />
+                      Editar Contrato
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       v-if="proposal.status !== 'accepted'"
@@ -898,6 +963,49 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
         </div>
       </div>
     </BaseDialog>
+    <!-- Modal Editar Contrato -->
+    <BaseDialog v-model:open="isContractModalOpen" title="Editar Contrato" size="xl">
+      <div class="p-6 space-y-6">
+        <!-- Variáveis -->
+        <div class="p-5 bg-slate-50/50 rounded-3xl border border-slate-100">
+          <div class="flex items-center gap-2 mb-3">
+            <Variable class="w-4 h-4 text-slate-500" />
+            <h3 class="text-xs font-black text-slate-700 uppercase tracking-widest">Variáveis Dinâmicas</h3>
+          </div>
+          <p class="text-xs text-slate-500 font-medium mb-4">
+            Clique em uma variável para copiá-la. Ela será substituída automaticamente no contrato gerado.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="v in contractVariables"
+              :key="v.tag"
+              type="button"
+              @click="copyContractTag(v.tag)"
+              :title="v.desc"
+              class="group flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:border-violet-300 hover:bg-violet-50 rounded-lg transition-all"
+            >
+              <span class="text-[10px] font-mono font-bold text-slate-600 group-hover:text-violet-700">{{ v.tag }}</span>
+              <Check v-if="copiedContractTag === v.tag" class="w-3 h-3 text-emerald-500" />
+              <Copy v-else class="w-3 h-3 text-slate-300 group-hover:text-violet-400" />
+            </button>
+          </div>
+        </div>
+
+        <!-- Editor -->
+        <div class="space-y-2">
+          <label class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Contrato</label>
+          <RichTextEditor v-model="localContractText" class="min-h-[350px] border-2 border-gray-50 rounded-3xl overflow-hidden" />
+        </div>
+      </div>
+      <template #footer>
+        <BaseButton variant="secondary" @click="isContractModalOpen = false">Cancelar</BaseButton>
+        <BaseButton @click="saveContract" :disabled="isSavingContract">
+          <Loader2 v-if="isSavingContract" class="w-4 h-4 animate-spin mr-2" />
+          {{ isSavingContract ? 'Salvando...' : 'Salvar Contrato' }}
+        </BaseButton>
+      </template>
+    </BaseDialog>
+
     <!-- Modal de Chat/Interação -->
     <ProposalChatModal
       v-model:open="isChatOpen"

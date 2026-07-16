@@ -189,10 +189,12 @@ export const ProposalService = {
         }
       }
 
-      const totals = this.calculateTotals(data.items, data.totals?.additional || 0, data.totals?.discount || 0, data.paymentConfig)
+      const totals = data.items
+        ? this.calculateTotals(data.items, data.totals?.additional || 0, data.totals?.discount || 0, data.paymentConfig)
+        : undefined
       const updated = await Proposal.findOneAndUpdate(
         { _id: id, profileId },
-        { ...data, totals },
+        { ...data, ...(totals !== undefined ? { totals } : {}) },
         { returnDocument: 'after', session: session || undefined }
       )
 
@@ -214,6 +216,17 @@ export const ProposalService = {
         session.endSession()
       }
     }
+  },
+
+  async updateContractText(id: string, profileId: string, contractText: string) {
+    const proposal = await Proposal.findOne({ _id: id, profileId })
+    if (!proposal) return null
+    if (proposal.status !== ProposalStatus.PENDING) return null
+    return await Proposal.findOneAndUpdate(
+      { _id: id, profileId },
+      { $set: { contractText } },
+      { returnDocument: 'after' }
+    )
   },
 
   async delete(id: string, profileId: string) {

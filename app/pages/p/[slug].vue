@@ -337,7 +337,7 @@ const statusMap: any = {
         <!-- Code + Status -->
         <div class="flex items-center gap-3">
           <span class="hidden sm:block text-[10px] font-black text-gray-600 uppercase tracking-[0.2em]">
-            #{{ proposal.code }}
+            {{ proposal.code }}
           </span>
           <BaseBadge :variant="statusMap[proposal.status]?.variant || 'info'">
             {{ statusMap[proposal.status]?.label || proposal.status }}
@@ -383,7 +383,7 @@ const statusMap: any = {
               <FileText class="w-4 h-4 text-blue-400" />
               <span class="text-[10px] font-black text-gray-300 uppercase tracking-widest">Código</span>
             </div>
-            <p class="font-black text-white text-base leading-tight">#{{ proposal.code }}</p>
+            <p class="font-black text-white text-base leading-tight">{{ proposal.code }}</p>
           </div>
 
           <!-- Total -->
@@ -410,6 +410,7 @@ const statusMap: any = {
         v-model:selected-upsells="selectedUpsells"
         :totals="computedTotals"
         :final-total="finalTotal"
+        :is-accepted="proposal.status === 'accepted'"
       />
 
       <!-- ── PAYMENT OPTIONS ─────────────────────────────────────── -->

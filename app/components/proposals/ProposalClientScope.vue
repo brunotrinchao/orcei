@@ -12,11 +12,13 @@ const props = defineProps<{
     final: number
   }
   finalTotal: number
+  isAccepted?: boolean
 }>()
 
 const selectedUpsells = defineModel<string[]>('selectedUpsells', { default: () => [] })
 
 function toggleUpsell(itemId: string) {
+  if (props.isAccepted) return
   const index = selectedUpsells.value.indexOf(itemId)
   if (index === -1) {
     selectedUpsells.value.push(itemId)
@@ -85,7 +87,15 @@ function toggleUpsell(itemId: string) {
           v-for="item in upsellItems"
           :key="item._id"
           @click="toggleUpsell(item._id!)"
-          class="px-8 py-6 flex items-start gap-4 sm:gap-6 cursor-pointer select-none transition-all duration-300 hover:bg-blue-50/30 relative active:scale-[0.995]"
+          class="px-8 py-6 flex items-start gap-4 sm:gap-6 select-none transition-all duration-300 relative"
+          :class="[
+            isAccepted
+              ? 'cursor-default'
+              : 'cursor-pointer hover:bg-blue-50/30 active:scale-[0.995]',
+            isAccepted && !selectedUpsells.includes(item._id!)
+              ? 'opacity-40 grayscale'
+              : ''
+          ]"
         >
           <!-- Switch checkbox -->
           <div class="shrink-0 pt-1">

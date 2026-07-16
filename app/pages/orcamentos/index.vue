@@ -887,7 +887,7 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
         <div class="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center shrink-0 rounded-t-3xl">
           <div class="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">
             <LinkIcon class="w-3 h-3" /> Link do Cliente:
-            <span class="text-blue-600 lowercase font-bold select-all"><a :href="siteOrigin + '/p/' + selectedProposal.slug + (selectedProposal.token ? `?t=${selectedProposal.token}` : '')">{{ siteOrigin }}/p/{{ selectedProposal.slug }}{{ selectedProposal.token ? `?t=${selectedProposal.token}` : '' }}</a></span>
+            <span class="text-blue-600 lowercase font-bold select-all"><a :href="siteOrigin + '/p/' + selectedProposal.slug + (selectedProposal.token ? `?t=${selectedProposal.token}` : '')" target="_blank">{{ siteOrigin }}/p/{{ selectedProposal.slug }}{{ selectedProposal.token ? `?t=${selectedProposal.token}` : '' }}</a></span>
           </div>
         </div>
         <div class="flex-1 bg-white overflow-hidden rounded-b-3xl">

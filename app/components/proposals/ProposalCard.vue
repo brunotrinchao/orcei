@@ -53,12 +53,12 @@ const validityBarColor = computed(() =>
   <div class="rounded-2xl border border-gray-200 bg-white shadow-sm p-4">
     <!-- topo: ref + badge -->
     <div class="flex items-center justify-between mb-2">
-      <span class="text-xs font-bold text-gray-400">REF: #{{ proposal.code }}</span>
+      <span class="text-xs font-bold text-gray-400">REF: {{ proposal.code }}</span>
       <BaseBadge :variant="statusVariant">{{ statusLabel }}</BaseBadge>
     </div>
 
     <!-- título: código + título do orçamento -->
-    <h3 class="text-xl font-black text-gray-900 tracking-tight">#{{ proposal.code }}</h3>
+    <h3 class="text-xl font-black text-gray-900 tracking-tight">{{ proposal.code }}</h3>
     <p class="text-sm text-gray-600 font-semibold mt-0.5">{{ proposal.title || 'Sem título' }}</p>
     <p class="text-sm text-gray-500 mt-0.5">{{ proposal.client.name }}</p>
 

@@ -4,6 +4,7 @@ import { Profile } from '../../models/Profile'
 import { Client } from '../../models/Client'
 import { Proposal } from '../../models/Proposal'
 import { CatalogItem } from '../../models/CatalogItem'
+import { Report } from '../../models/Report'
 import { AuditService } from '../../services/AuditService'
 import { ProposalService } from '../../services/ProposalService'
 import { GoogleService } from '../../services/GoogleService'
@@ -138,16 +139,18 @@ async function handleGenerateBackupCsv(payload: any) {
 
   console.log(`[Job] Gerando backup CSV para: ${profile.email}`)
 
-  const [clients, proposals, catalog] = await Promise.all([
+  const [clients, proposals, catalog, reports] = await Promise.all([
     Client.find({ profileId }).lean(),
     Proposal.find({ profileId }).lean(),
-    CatalogItem.find({ profileId }).lean()
+    CatalogItem.find({ profileId }).lean(),
+    Report.find({ profileId }).lean()
   ])
 
   const zip = new JSZip()
   zip.file('clientes.csv', jsonToCsv(clients))
   zip.file('orcamentos.csv', jsonToCsv(proposals))
   zip.file('catalogo.csv', jsonToCsv(catalog))
+  zip.file('relatorios.csv', jsonToCsv(reports))
 
   const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' })
 

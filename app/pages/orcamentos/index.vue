@@ -145,7 +145,8 @@ async function setupGlobalNotifications() {
 }
 
 onMounted(() => {
-  siteOrigin.value = window.location.origin
+  const config = useRuntimeConfig()
+  siteOrigin.value = config.public.publicProposalUrl || window.location.origin
   setupGlobalNotifications()
   resetMobileList()
 })
@@ -185,7 +186,8 @@ const { notify, confirm } = useAlerts()
 const siteOrigin = ref('')
 
 onMounted(() => {
-  siteOrigin.value = window.location.origin
+  const config = useRuntimeConfig()
+  siteOrigin.value = config.public.publicProposalUrl || window.location.origin
 })
 
 async function openHistory(proposal: ProposalDTO) {
@@ -206,11 +208,12 @@ function sendWhatsapp(proposal: ProposalDTO) {
   if (!proposal.client.phone) return
   
   const tokenPart = proposal.token ? `?t=${proposal.token}` : ''
+  const baseOrigin = siteOrigin.value || window.location.origin
   const message = encodeURIComponent(
     `Olá, ${proposal.client.name}! \n\n` +
     `Preparei o orçamento *${proposal.title}* para você.\n\n` +
     `Confira os detalhes e aprove através deste link:\n` +
-    `${window.location.origin}/p/${proposal.slug}${tokenPart}\n\n` +
+    `${baseOrigin}/p/${proposal.slug}${tokenPart}\n\n` +
     `Qualquer dúvida, estou à disposição!\n\n` +
     `*${currentProfile.value?.name || ''}*`
   )
@@ -235,7 +238,8 @@ async function resendEmail(proposalId: string) {
 
 async function shareProposal(proposal: ProposalDTO) {
   const tokenPart = proposal.token ? `?t=${proposal.token}` : ''
-  const url = `${window.location.origin}/p/${proposal.slug}${tokenPart}`
+  const baseOrigin = siteOrigin.value || window.location.origin
+  const url = `${baseOrigin}/p/${proposal.slug}${tokenPart}`
   
   if (navigator.share) {
     try {

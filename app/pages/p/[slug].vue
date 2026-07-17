@@ -17,6 +17,22 @@ useHead({
 const { notify, confirm: confirmAlert } = useAlerts()
 const { hasConsent } = useCookieConsent()
 const route = useRoute()
+const config = useRuntimeConfig()
+
+// Redirecionamento SSR para forçar o subdomínio de orçamentos (orcamento.orceifacil.com.br)
+if (import.meta.server) {
+  const headers = useRequestHeaders()
+  const host = headers.host
+  const targetProposalUrl = config.public.publicProposalUrl
+  
+  if (targetProposalUrl && host && !host.includes('localhost') && !host.includes('127.0.0.1')) {
+    const targetDomain = targetProposalUrl.replace(/^https?:\/\//i, '').split('/')[0]
+    if (host !== targetDomain) {
+      await navigateTo(`${targetProposalUrl}${route.fullPath}`, { external: true, redirectCode: 301 })
+    }
+  }
+}
+
 const { t: token, preview } = route.query
 const isPreview = computed(() => preview === 'true')
 const { data: proposal, refresh, error, pending } = useLazyFetch<ProposalDTO>(`/api/proposals/public/${route.params.slug}`, {

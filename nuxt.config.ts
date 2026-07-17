@@ -112,6 +112,7 @@ export default defineNuxtConfig({
     pusherSecret: process.env.PUSHER_SECRET,
     pusherCluster: process.env.PUSHER_CLUSTER,
     public: {
+      publicProposalUrl: process.env.PUBLIC_PROPOSAL_URL || '',
       stripeStarterPriceId: process.env.STRIPE_STARTER_PRICE_ID,
       stripePremiumPriceId: process.env.STRIPE_PREMIUM_PRICE_ID,
       stripePriceMonthly: process.env.STRIPE_PRICE_MONTHLY,

@@ -110,7 +110,8 @@ export const ProposalService = {
 
         if (data.sendMethod !== SendMethod.MANUAL) {
           if (profile && data.client?.email) {
-            const proposalUrl = `${process.env.PUBLIC_URL || 'https://orceifacil.com.br'}/p/${slug}?t=${token}`
+            const domain = process.env.PUBLIC_PROPOSAL_URL || process.env.PUBLIC_URL || 'https://orceifacil.com.br'
+            const proposalUrl = `${domain}/p/${slug}?t=${token}`
             await QueueService.publish('SEND_EMAIL_PROPOSAL', {
               clientEmail: data.client.email,
               clientName: data.client.name,
@@ -176,7 +177,8 @@ export const ProposalService = {
             ? await Profile.findById(profileId).session(session) 
             : await Profile.findById(profileId)
           if (profile && data.client?.email) {
-            const proposalUrl = `${process.env.PUBLIC_URL || 'https://orceifacil.com.br'}/p/${oldProposal.slug}?t=${oldProposal.token}`
+            const domain = process.env.PUBLIC_PROPOSAL_URL || process.env.PUBLIC_URL || 'https://orceifacil.com.br'
+            const proposalUrl = `${domain}/p/${oldProposal.slug}?t=${oldProposal.token}`
             await QueueService.publish('SEND_EMAIL_PROPOSAL', {
               clientEmail: data.client.email,
               clientName: data.client.name,

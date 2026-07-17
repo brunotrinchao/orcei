@@ -110,7 +110,6 @@ const { copy } = useClipboard()
 
 const isModalOpen = ref(false)
 const isAIWizardOpen = ref(false)
-const isPreviewOpen = ref(false)
 const isHistoryOpen = ref(false)
 const isChatOpen = ref(false)
 const isPaywallOpen = ref(false)
@@ -282,7 +281,9 @@ function openPreview(proposal: ProposalDTO) {
   if (proposal.status === 'accepted') {
     isAcceptedModalOpen.value = true
   } else {
-    isPreviewOpen.value = true
+    const tokenPart = proposal.token ? `&t=${proposal.token}` : ''
+    const url = `${siteOrigin.value}/p/${proposal.slug}?preview=true${tokenPart}`
+    window.open(url, '_blank')
   }
 }
 
@@ -950,28 +951,7 @@ async function saveContract() {
       </template>
     </BaseDialog>
 
-    <!-- Modal de Preview -->
-    <BaseDialog
-      v-model:open="isPreviewOpen" 
-      title="Preview do Orçamento" 
-      size="xl"
-      @close="selectedProposal = null"
-    >
-      <div v-if="selectedProposal" class="flex flex-col h-[75vh]">
-        <div class="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center shrink-0 rounded-t-3xl">
-          <div class="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">
-            <LinkIcon class="w-3 h-3" /> Link do Cliente:
-            <span class="text-blue-600 lowercase font-bold select-all"><a :href="siteOrigin + '/p/' + selectedProposal.slug + (selectedProposal.token ? `?t=${selectedProposal.token}` : '')" target="_blank">{{ siteOrigin }}/p/{{ selectedProposal.slug }}{{ selectedProposal.token ? `?t=${selectedProposal.token}` : '' }}</a></span>
-          </div>
-        </div>
-        <div class="flex-1 bg-white overflow-hidden rounded-b-3xl">
-          <iframe
-            :src="`${siteOrigin}/p/${selectedProposal.slug}?preview=true${selectedProposal.token ? `&t=${selectedProposal.token}` : ''}`"
-            class="w-full h-full border-none"
-          ></iframe>
-        </div>
-      </div>
-    </BaseDialog>
+
     <!-- Modal Editar Contrato -->
     <BaseDialog v-model:open="isContractModalOpen" title="Editar Contrato" size="xl">
       <div class="p-6 space-y-6">

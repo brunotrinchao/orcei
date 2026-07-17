@@ -48,15 +48,20 @@ export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
   const profile = (proposal as any).profileId
   
+  const tokenStr = String(token || '')
+  const propTokenStr = String(proposal.token || '')
+  const hasValidToken = propTokenStr && tokenStr && propTokenStr.length === tokenStr.length && timingSafeEqual(Buffer.from(propTokenStr), Buffer.from(tokenStr))
+
   if (isPreviewRequest) {
-    // Se for preview, PRECISA estar logado e ser o dono (comparando userId do Google)
+    // Se for preview, PRECISA estar logado e ser o dono OU ter o token correto na URL
     const isOwner = session?.user && (session.user as any).id === profile?.userId
-    if (!isOwner) {
-      throw createError({ statusCode: 403, statusMessage: 'Acesso Negado: Preview permitido apenas ao proprietário' })
+    
+    if (!isOwner && !hasValidToken) {
+      throw createError({ statusCode: 403, statusMessage: 'Acesso Negado: Preview permitido apenas ao proprietário ou via token de acesso' })
     }
   } else {
     // Se não for preview, valida o token público obrigatoriamente
-    if (!proposal.token || !token || !timingSafeEqual(Buffer.from(String(proposal.token)), Buffer.from(String(token)))) {
+    if (!proposal.token || !token || !hasValidToken) {
       throw createError({ statusCode: 403, statusMessage: 'Acesso Negado: Token Inválido ou Expirado' })
     }
   }

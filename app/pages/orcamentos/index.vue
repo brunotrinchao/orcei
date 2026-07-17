@@ -125,10 +125,12 @@ const copiedContractTag = ref('')
 
 // Pusher Integration
 let notificationChannel: any = null
+const currentProfile = ref<any>(null)
 
 async function setupGlobalNotifications() {
   try {
     const profile = await $fetch<any>('/api/profile')
+    currentProfile.value = profile
     const { pusher } = usePusher()
     if (pusher && profile) {
       notificationChannel = pusher.subscribe(`private-profile-${profile._id}`)
@@ -205,11 +207,12 @@ function sendWhatsapp(proposal: ProposalDTO) {
   
   const tokenPart = proposal.token ? `?t=${proposal.token}` : ''
   const message = encodeURIComponent(
-    `Olá ${proposal.client.name}! \u{1F44B}\n\n` +
+    `Olá, ${proposal.client.name}! \n\n` +
     `Preparei o orçamento *${proposal.title}* para você.\n\n` +
     `Confira os detalhes e aprove através deste link:\n` +
     `${window.location.origin}/p/${proposal.slug}${tokenPart}\n\n` +
-    `Qualquer dúvida, estou à disposição!`
+    `Qualquer dúvida, estou à disposição!\n\n` +
+    `*${currentProfile.value?.name || ''}*`
   )
   
   const phone = proposal.client.phone.replace(/\D/g, '')

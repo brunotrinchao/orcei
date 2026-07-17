@@ -14,7 +14,7 @@ const icons = [
   'ShoppingBag', 'Smartphone', 'Laptop', 'Camera', 'Music', 'Image', 'Video',
   'PenTool', 'Compass', 'Globe', 'Heart', 'Star', 'User', 'Settings', 'Hammer',
   'Wrench', 'Truck', 'CreditCard', 'Banknote', 'Coins', 'ChartBar', 'PieChart',
-  'Target', 'Award', 'Trophy', 'Coffee', 'Utensils', 'Umbrella', 'Plane'
+  'Target', 'Award', 'Trophy', 'Coffee', 'Utensils', 'Umbrella', 'Plane', 'MessageSquare'
 ]
 
 const searchQuery = ref('')

@@ -13,6 +13,8 @@ const period = ref('last_30_days')
 const { loggedIn, user } = useUserSession()
 const { notify } = useAlerts()
 const { creditLabel } = useCreditCosts()
+const config = useRuntimeConfig()
+const publicProposalUrl = config.public.publicProposalUrl || ''
 
 const fetchQuery = computed(() => {
   const now = new Date()
@@ -441,13 +443,13 @@ function formatRelativeTime(minutesAgo: number) {
                 >
                   <img :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5" alt="WhatsApp" loading="lazy"/> WhatsApp
                 </a>
-                <NuxtLink
-                  :to="`/p/${alert.slug}`"
+                <a
+                  :href="`${publicProposalUrl || window.location.origin}/p/${alert.slug}`"
                   target="_blank"
                   class="flex-1 flex items-center justify-center gap-1.5 py-2 border border-gray-200 hover:bg-gray-50 text-gray-600 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
                 >
                   Ver Proposta
-                </NuxtLink>
+                </a>
               </div>
             </div>
             

@@ -146,7 +146,8 @@ async function setupGlobalNotifications() {
 
 onMounted(() => {
   const config = useRuntimeConfig()
-  siteOrigin.value = config.public.publicProposalUrl || window.location.origin
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  siteOrigin.value = isLocal ? window.location.origin : (config.public.publicProposalUrl || window.location.origin)
   setupGlobalNotifications()
   resetMobileList()
 })
@@ -187,7 +188,8 @@ const siteOrigin = ref('')
 
 onMounted(() => {
   const config = useRuntimeConfig()
-  siteOrigin.value = config.public.publicProposalUrl || window.location.origin
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  siteOrigin.value = isLocal ? window.location.origin : (config.public.publicProposalUrl || window.location.origin)
 })
 
 async function openHistory(proposal: ProposalDTO) {
@@ -854,13 +856,13 @@ async function saveContract() {
       </div>
 
       <template #footer>
-        <NuxtLink
-          :to="selectedProposal ? `/p/${selectedProposal.slug}${selectedProposal.token ? `?t=${selectedProposal.token}` : ''}` : '#'"
+        <a
+          :href="selectedProposal ? `${siteOrigin}/p/${selectedProposal.slug}${selectedProposal.token ? `?t=${selectedProposal.token}` : ''}` : '#'"
           target="_blank"
           class="mr-auto flex items-center gap-2 text-xs font-black text-gray-400 hover:text-blue-600 uppercase tracking-widest transition-colors"
         >
           <ExternalLink class="w-4 h-4" /> Ver link público
-        </NuxtLink>
+        </a>
         <BaseButton variant="secondary" size="sm" @click="isAcceptedModalOpen = false">Fechar</BaseButton>
       </template>
     </BaseDialog>
@@ -964,7 +966,7 @@ async function saveContract() {
         </div>
         <div class="flex-1 bg-white overflow-hidden rounded-b-3xl">
           <iframe
-            :src="`/p/${selectedProposal.slug}?preview=true${selectedProposal.token ? `&t=${selectedProposal.token}` : ''}`"
+            :src="`${siteOrigin}/p/${selectedProposal.slug}?preview=true${selectedProposal.token ? `&t=${selectedProposal.token}` : ''}`"
             class="w-full h-full border-none"
           ></iframe>
         </div>

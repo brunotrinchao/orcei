@@ -58,8 +58,7 @@ const validityBarColor = computed(() =>
     </div>
 
     <!-- título: código + título do orçamento -->
-    <h3 class="text-xl font-black text-gray-900 tracking-tight">{{ proposal.code }}</h3>
-    <p class="text-sm text-gray-600 font-semibold mt-0.5">{{ proposal.title || 'Sem título' }}</p>
+    <h3 class="text-xl font-black text-gray-900 tracking-tight">{{ proposal.title || 'Sem título' }}</h3>
     <p class="text-sm text-gray-500 mt-0.5">{{ proposal.client.name }}</p>
 
     <!-- data / total -->

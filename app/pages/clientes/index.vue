@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Search, Plus, Pencil, Trash2, RefreshCcw, MapPin, Mail, Phone, ExternalLink } from 'lucide-vue-next'
+import { Search, Plus, Pencil, Trash2, RefreshCcw, MapPin, Mail, Phone, ExternalLink, MoreVertical } from 'lucide-vue-next'
+import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
 import type { ClientDTO } from '../../../../types'
 
 const { notify, confirm: confirmAlert } = useAlerts()
@@ -317,7 +318,7 @@ const formatPhone = (phone: string) => {
         <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Cliente</th>
         <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Contato</th>
         <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Localização</th>
-        <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] text-right">Ações</th>
+        <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] text-right"></th>
       </template>
 
       <template #item="{ item: client }">
@@ -340,17 +341,44 @@ const formatPhone = (phone: string) => {
           <td class="px-10 py-8">
             <div class="flex flex-col">
               <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">{{ client.address?.city || '-' }} - {{ client.address?.state || '-' }}</span>
-              <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest line-clamp-1 max-w-[180px] mt-1">{{ client.address?.street }}, {{ client.address?.number }}</span>
+              <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest line-clamp-1 max-w-[400px] mt-1">{{ client.address?.street }}, {{ client.address?.number }}</span>
             </div>
           </td>
           <td class="px-10 py-8 text-right">
             <div class="flex justify-end gap-3 items-center">
-              <button @click="openModal(client)" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all" title="Editar">
-                <Pencil class="w-5 h-5" />
-              </button>
-              <button @click="deleteClient(client._id)" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all" title="Excluir">
-                <Trash2 class="w-5 h-5" />
-              </button>
+              <DropdownMenuRoot>
+                <DropdownMenuTrigger as-child>
+                  <button
+                    class="p-2.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-2xl transition-all"
+                    title="Mais ações"
+                    aria-label="Mais ações do orçamento"
+                  >
+                    <MoreVertical class="w-5 h-5" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuContent
+                    align="end"
+                    :side-offset="6"
+                    class="min-w-[220px] bg-white rounded-2xl shadow-xl border border-gray-100 p-2 z-50"
+                  >
+                  <DropdownMenuItem
+                      @click="openModal(client)"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+                    >
+                      <Pencil class="w-4 h-4" />
+                      Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      @click="deleteClient(client._id)"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-red-600 cursor-pointer outline-none transition-all"
+                    >
+                      <Trash2 class="w-4 h-4" />
+                      Excluir
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenuPortal>
+              </DropdownMenuRoot>
             </div>
           </td>
         </tr>

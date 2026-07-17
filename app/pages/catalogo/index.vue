@@ -3,7 +3,8 @@ import { ref, computed } from 'vue'
 import { Cropper } from 'vue-advanced-cropper'
 import 'vue-advanced-cropper/dist/style.css'
 import * as LucideIcons from 'lucide-vue-next'
-import { Plus, Search, Image, Pencil, Trash2, Sparkles, RefreshCcw, Package, ShoppingBag, HelpCircle } from 'lucide-vue-next'
+import { Plus, Search, Image, Pencil, Trash2, Sparkles, RefreshCcw, Package, ShoppingBag, HelpCircle, MoreVertical } from 'lucide-vue-next'
+import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
 import type { CatalogItemDTO } from '../../../../types'
 
 const { notify, confirm: confirmAlert } = useAlerts()
@@ -210,7 +211,7 @@ function getIcon(name: string) {
         <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Item do Catálogo</th>
         <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] text-center">Tipo</th>
         <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] text-right">Preço</th>
-        <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] text-right">Ações</th>
+        <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] text-right"></th>
       </template>
 
       <template #item="{ item }">
@@ -245,12 +246,39 @@ function getIcon(name: string) {
           </td>
           <td class="px-10 py-8 text-right">
             <div class="flex justify-end gap-3 items-center">
-              <button @click="openModal(item)" class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all">
-                <Pencil class="w-6 h-6" />
-              </button>
-              <button @click="deleteItem(item._id)" class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all">
-                <Trash2 class="w-6 h-6" />
-              </button>
+              <DropdownMenuRoot>
+                <DropdownMenuTrigger as-child>
+                  <button
+                    class="p-2.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-2xl transition-all"
+                    title="Mais ações"
+                    aria-label="Mais ações do orçamento"
+                  >
+                    <MoreVertical class="w-5 h-5" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuContent
+                    align="end"
+                    :side-offset="6"
+                    class="min-w-[220px] bg-white rounded-2xl shadow-xl border border-gray-100 p-2 z-50"
+                  >
+                  <DropdownMenuItem
+                      @click="openModal(item)"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+                    >
+                      <Pencil class="w-4 h-4" />
+                      Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      @click="deleteItem(item._id)"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-red-600 cursor-pointer outline-none transition-all"
+                    >
+                      <Trash2 class="w-4 h-4" />
+                      Excluir
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenuPortal>
+              </DropdownMenuRoot>
             </div>
           </td>
         </tr>

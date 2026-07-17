@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { FileText, Download, Eye, Search, Calendar, RefreshCcw, Trash2, AlertTriangle } from 'lucide-vue-next'
+import { FileText, Download, Eye, Search, Calendar, RefreshCcw, Trash2, AlertTriangle, MoreVertical } from 'lucide-vue-next'
 
+import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
 const searchQuery = ref('')
 const startDate = ref('')
 const endDate = ref('')
@@ -96,11 +97,15 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
       empty-title="Nenhum relatório encontrado"
       empty-subtitle="Você ainda não gerou relatórios IA ou os filtros não retornaram resultados."
     >
+    <template #header>
+        <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Relatórios</th>
+      </template>
+
       <template #item="{ item: report }">
         <div class="p-8 hover:bg-gray-50/50 transition-all group flex flex-col md:flex-row md:items-center justify-between gap-6 border-b last:border-0 border-gray-100">
           <div class="flex items-center gap-6">
             <div class="space-y-1">
-              <h4 class="text-lg font-black text-gray-900 leading-tight">Análise Estratégica IA</h4>
+              <h4 class="text-lg font-black text-gray-900 leading-tight cursor-pointer hover:text-blue-600 transition-all" @click="openView(report)">Análise Estratégica IA</h4>
               <div class="flex items-center gap-3">
                 <span class="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                   <Calendar class="w-3 h-3" />
@@ -108,29 +113,56 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
                 </span>
                 <span class="w-1 h-1 bg-gray-200 rounded-full"></span>
                 <span class="text-xs font-bold text-blue-600 uppercase tracking-widest">
-                  {{ report.context?.totalProposals || 0 }} Orçamentos analisados
+                  <BaseBadge variant="info">
+                    {{ report.context?.totalProposals || 0 }} Orçamentos analisados
+                  </BaseBadge>
                 </span>
               </div>
             </div>
           </div>
 
           <div class="flex items-center gap-3">
-            <BaseButton variant="outline" size="sm" @click="openView(report)">
-              <Eye class="w-4 h-4 mr-2" />
-              Visualizar
-            </BaseButton>
-            <BaseButton size="sm" @click="downloadPdf(report._id)">
-              <Download class="w-4 h-4 mr-2" />
-              Download PDF
-            </BaseButton>
             <button
-              @click="confirmDeleteReport(report)"
-              class="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all"
-              title="Excluir"
-              aria-label="Excluir relatório"
+              @click="openView(report)"
+              class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all"
+              title="Visualizar"
+              aria-label="Visualizar relatório"
             >
-              <Trash2 class="w-5 h-5" />
+              <Eye class="w-5 h-5" />
             </button>
+            <DropdownMenuRoot>
+                <DropdownMenuTrigger as-child>
+                  <button
+                    class="p-2.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-2xl transition-all"
+                    title="Mais ações"
+                    aria-label="Mais ações do orçamento"
+                  >
+                    <MoreVertical class="w-5 h-5" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuContent
+                    align="end"
+                    :side-offset="6"
+                    class="min-w-[220px] bg-white rounded-2xl shadow-xl border border-gray-100 p-2 z-50"
+                  >
+                  <DropdownMenuItem
+                      @click="downloadPdf(report._id)"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+                    >
+                      <Download class="w-4 h-4" />
+                      Download PDF
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      @click="confirmDeleteReport(report)"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+                    >
+                      <Trash2 class="w-4 h-4" />
+                      Excluir
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenuPortal>
+              </DropdownMenuRoot>
           </div>
         </div>
       </template>

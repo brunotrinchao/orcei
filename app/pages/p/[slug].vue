@@ -546,6 +546,7 @@ const statusMap: any = {
           <div class="mt-10 pt-8 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <a
               :href="`mailto:${proposal.profileId.email}`"
+              @click="isPreview ? $event.preventDefault() : null"
               class="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10 transition-all group outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <div class="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
@@ -558,6 +559,7 @@ const statusMap: any = {
             </a>
             <a
               v-if="profileWhatsapp"
+              @click="isPreview ? $event.preventDefault() : null"
               :href="`https://wa.me/${profileWhatsapp.replace(/\D/g, '')}`"
               target="_blank"
               class="flex items-center gap-3 p-4 bg-white/5 hover:bg-green-500/10 rounded-2xl border border-white/10 hover:border-green-500/30 transition-all group outline-none focus-visible:ring-2 focus-visible:ring-green-500"

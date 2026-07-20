@@ -16,11 +16,8 @@ withDefaults(defineProps<Props>(), {
 
 <template>
   <div
-    class="animate-pulse shrink-0"
-    :class="[
-      !customClass.includes('bg-') ? 'bg-gray-200' : '',
-      customClass
-    ]"
+    class="skeleton-shimmer shrink-0"
+    :class="customClass"
     :style="{
       width: width !== 'auto' ? width : undefined,
       height: height !== 'auto' ? height : undefined,
@@ -28,3 +25,21 @@ withDefaults(defineProps<Props>(), {
     }"
   ></div>
 </template>
+
+<style scoped>
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #e5e7eb 25%,
+    #f3f4f6 50%,
+    #e5e7eb 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+</style>

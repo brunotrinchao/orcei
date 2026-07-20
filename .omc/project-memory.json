@@ -289,6 +289,12 @@
       "type": "file"
     },
     {
+      "path": "app/pages/dashboard/index.vue",
+      "accessCount": 6,
+      "lastAccessed": 1784575354299,
+      "type": "file"
+    },
+    {
       "path": "app/components/proposal/ProposalStepScope.vue",
       "accessCount": 3,
       "lastAccessed": 1784555468692,
@@ -346,6 +352,12 @@
       "path": "app/components/catalog/CatalogItemCard.vue",
       "accessCount": 2,
       "lastAccessed": 1784555440637,
+      "type": "file"
+    },
+    {
+      "path": "app/components/ui/BaseSkeleton.vue",
+      "accessCount": 2,
+      "lastAccessed": 1784575158609,
       "type": "file"
     },
     {

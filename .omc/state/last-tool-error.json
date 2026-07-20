@@ -1,7 +1,0 @@
-{
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"/home/brunotrinchao/.claude/squeez/bin/squeez wrap 'grep -rn \\\"BaseTable\\\\|@page-change\\\" /home/brunotrinchao/Documentos/Bruno/Orcei/app --include=\\\"*.vue\\\" | grep -v \\\"node_modules\\\"'\",\"d...",
-  "error": "Exit code 1\n# squeez [grep] 0→0 tokens (-0%) 50ms [adaptive: Full]\n[squeez: HIGH CACHE RATIO — cache_read 88K vs I/O 0K (~298×) — context is very large; consider /compact or trimming CLAUDE.md]",
-  "timestamp": "2026-07-20T13:58:39.907Z",
-  "retry_count": 1
-}

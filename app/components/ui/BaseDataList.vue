@@ -24,7 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
   currentPage: 1
 })
 
-defineEmits(['page-change'])
+defineEmits(['update:currentPage'])
 </script>
 
 <template>
@@ -81,7 +81,7 @@ defineEmits(['page-change'])
           :total="total" 
           :items-per-page="itemsPerPage" 
           :model-value="currentPage"
-          @update:model-value="$emit('page-change', $event)"
+          @update:model-value="$emit('update:currentPage', $event)"
         />
       </div>
     </div>
@@ -125,7 +125,7 @@ defineEmits(['page-change'])
           :total="total" 
           :items-per-page="itemsPerPage" 
           :model-value="currentPage"
-          @update:model-value="$emit('page-change', $event)"
+          @update:model-value="$emit('update:currentPage', $event)"
         />
       </div>
     </div>

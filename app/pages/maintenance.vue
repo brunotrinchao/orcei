@@ -3,7 +3,7 @@ import { ShieldAlert, Mail } from 'lucide-vue-next'
 definePageMeta({
   layout: 'blank'
 })
-const { data: systemInfo } = useFetch<any>('/api/system/status')
+const { data: systemInfo } = useFetch<any>('/api/system/status', { key: 'system-status' })
 </script>
 
 <template>

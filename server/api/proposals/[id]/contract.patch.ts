@@ -3,14 +3,17 @@ import { ProfileService } from '../../../services/ProfileService'
 import { ProposalStatus } from '../../../models/Proposal'
 
 export default defineEventHandler(async (event) => {
-  const session = await getUserSession(event)
+  const sessionPromise = getUserSession(event)
+  const bodyPromise = readBody(event)
+
+  const session = await sessionPromise
   if (!session?.user) throw createError({ statusCode: 401 })
 
   const profile = await ProfileService.getByUserId((session.user as any).id)
   if (!profile) throw createError({ statusCode: 404 })
 
   const id = getRouterParam(event, 'id')
-  const { contractText } = await readBody(event)
+  const { contractText } = await bodyPromise
 
   if (typeof contractText !== 'string') {
     throw createError({ statusCode: 400, statusMessage: 'contractText é obrigatório' })

@@ -6,7 +6,7 @@ definePageMeta({
 })
 
 const { loggedIn } = useUserSession()
-const { data: systemInfo } = useFetch<any>('/api/system/status')
+const { data: systemInfo } = useFetch<any>('/api/system/status', { key: 'system-status' })
 const { notify } = useAlerts()
 
 const acceptedTerms = ref(false)

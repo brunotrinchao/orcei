@@ -7,6 +7,8 @@ const { initTracking } = useCookieConsent()
 const { isLoading, startLoading, stopLoading } = usePageLoader()
 const router = useRouter()
 
+const mounted = ref(false)
+
 // Global navigation hooks
 router.beforeEach(() => {
   startLoading()
@@ -16,7 +18,10 @@ router.afterEach(() => {
   stopLoading()
 })
 
-onMounted(() => initTracking())
+onMounted(() => {
+  mounted.value = true
+  initTracking()
+})
 
 function handleConfirm() {
   if (options.value.onConfirm) options.value.onConfirm()
@@ -31,7 +36,9 @@ function handleCancel() {
 
 <template>
   <NuxtLayout>
-    <NuxtPage />
+    <Suspense>
+      <NuxtPage />
+    </Suspense>
   </NuxtLayout>
 
   <!-- Global Loading Blocker -->
@@ -51,8 +58,8 @@ function handleCancel() {
     </div>
   </Transition>
 
-  <CookieConsent />
-  <SpeedInsights />
+  <CookieConsent v-if="mounted" />
+  <SpeedInsights v-if="mounted" />
 
   <BaseAlertDialog
     v-model:open="isOpen"

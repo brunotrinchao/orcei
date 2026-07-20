@@ -36,7 +36,7 @@ function stopDrag() {
 
 onMounted(() => {
   window.addEventListener('mouseup', stopDrag)
-  window.addEventListener('touchend', stopDrag)
+  window.addEventListener('touchend', stopDrag, { passive: true })
 })
 
 onUnmounted(() => {
@@ -64,11 +64,11 @@ onUnmounted(() => {
     <!-- Container do Painel Interativo -->
     <div 
       ref="containerRef"
-      class="relative h-[520px] md:h-[480px] w-full rounded-3xl border border-slate-800 bg-slate-950 overflow-hidden cursor-ew-resize shadow-2xl"
+      class="relative min-h-[400px] h-[52vw] max-h-[600px] md:h-[480px] md:max-h-[540px] w-full rounded-3xl border border-slate-800 bg-slate-950 overflow-hidden cursor-ew-resize shadow-2xl"
       @mousemove="handleMouseMove"
-      @touchmove="handleTouchMove"
+      @touchmove.passive="handleTouchMove"
       @mousedown="startDrag"
-      @touchstart="startDrag"
+      @touchstart.passive="startDrag"
     >
       <!-- Lado Esquerdo: O "Antes" (Caos) -->
       <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-900 to-slate-950 px-6 py-8 flex flex-col justify-between">

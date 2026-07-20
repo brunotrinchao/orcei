@@ -1,3 +1,4 @@
+import { all } from 'better-all'
 import { CatalogItem } from '../../models/CatalogItem'
 import { AIService } from '../../services/AIService'
 import { CatalogMatchingService } from '../../services/CatalogMatchingService'
@@ -20,36 +21,48 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Prompt é obrigatório' })
   }
 
-  const profile = await ProfileService.getByUserId((session.user as any).id)
-  if (!profile) {
-    throw createError({ statusCode: 404, statusMessage: 'Perfil não encontrado' })
-  }
-
-  // Verificação de saldo de créditos
-  const cost = await getActionCost('proposalSuggest')
   const isAdmin = (session.user as any).role === 'admin'
-  requireCreditBalance(profile, cost, isAdmin, 'Saldo de créditos insuficiente. Adquira créditos para usar a IA.')
-
-  // Get full catalog to find relevant items via embeddings
-  const fullCatalog = await CatalogItem.find({ profileId: profile._id }).lean()
-
-  // Filter catalog using semantic matching
-  const relevantCatalogItems = await CatalogMatchingService.findRelevantItems(
-    prompt,
-    fullCatalog
-  )
-
-  const catalogContext = relevantCatalogItems.map(item => ({
-    id: item._id.toString(),
-    name: item.name,
-    description: item.description,
-    price: item.price,
-    unit: item.unit
-  }))
 
   try {
-    const responseText = await AIService.suggestProposalItems(prompt, catalogContext)
-    if (!responseText) throw new Error('IA retornou resposta vazia')
+    const { profile, cost, responseText } = await all({
+      async profile() {
+        return await ProfileService.getByUserId((session.user as any).id)
+      },
+      async cost() {
+        return isAdmin ? 0 : await getActionCost('proposalSuggest')
+      },
+      async creditCheck() {
+        const p = await this.$.profile
+        const c = await this.$.cost
+        if (!p) {
+          throw createError({ statusCode: 404, statusMessage: 'Perfil não encontrado' })
+        }
+        requireCreditBalance(p, c, isAdmin, 'Saldo de créditos insuficiente. Adquira créditos para usar a IA.')
+        return true
+      },
+      async fullCatalog() {
+        await this.$.creditCheck
+        const p = await this.$.profile
+        return await CatalogItem.find({ profileId: p!._id }).lean()
+      },
+      async relevantCatalogItems() {
+        const catalog = await this.$.fullCatalog
+        return await CatalogMatchingService.findRelevantItems(prompt, catalog)
+      },
+      async responseText() {
+        const items = await this.$.relevantCatalogItems
+        const catalogContext = items.map(item => ({
+          id: item._id.toString(),
+          name: item.name,
+          description: item.description,
+          price: item.price,
+          unit: item.unit
+        }))
+        const res = await AIService.suggestProposalItems(prompt, catalogContext)
+        if (!res) throw new Error('IA retornou resposta vazia')
+        return res
+      }
+    })
 
     const aiResult = JSON.parse(responseText)
 

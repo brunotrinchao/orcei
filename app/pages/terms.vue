@@ -4,7 +4,7 @@ const { public: { appName } } = useRuntimeConfig()
 useHead({ title: `Termos de Uso — ${appName}` })
 
 const { public: { emailContactDefault } } = useRuntimeConfig()
-const { data: systemInfo } = useFetch<any>('/api/system/status')
+const { data: systemInfo } = useFetch<any>('/api/system/status', { key: 'system-status' })
 const dynamicAppName = computed(() => systemInfo.value?.landingPage?.appName || appName)
 </script>
 

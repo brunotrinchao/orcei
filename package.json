@@ -38,6 +38,7 @@
     "@vercel/speed-insights": "^2.0.0",
     "@vueuse/core": "^14.3.0",
     "@vueuse/nuxt": "^14.3.0",
+    "better-all": "^0.0.7",
     "chart.js": "^4.5.1",
     "cloudinary": "^2.10.0",
     "date-fns": "^4.2.1",

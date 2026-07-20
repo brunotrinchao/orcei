@@ -1,3 +1,4 @@
+import { all } from 'better-all'
 import { ProfileService } from '../../services/ProfileService'
 import { Profile } from '../../models/Profile'
 import { Proposal } from '../../models/Proposal'
@@ -14,40 +15,52 @@ export default defineEventHandler(async (event) => {
   // Rate Limit: 5 requests per 1 minute for AI
   await checkRateLimit(event, { max: 5, windowMs: 60 * 1000, keyPrefix: 'ai-analyze' })
 
-  const profile = await ProfileService.getByUserId((session.user as any).id)
-  if (!profile) throw createError({ statusCode: 404 })
-
+  const isAdmin = (session.user as any).role === 'admin'
   const { start, end } = getQuery(event)
-  const query: any = { profileId: profile._id }
 
-  if (start && end) {
-    query.createdAt = {
-      $gte: new Date(start as string),
-      $lte: new Date(end as string)
+  const { profile, cost, proposals, catalog } = await all({
+    async profile() {
+      return await ProfileService.getByUserId((session.user as any).id)
+    },
+    async cost() {
+      return isAdmin ? 0 : await getActionCost('analyzeReport')
+    },
+    async proposals() {
+      const p = await this.$.profile
+      if (!p) throw createError({ statusCode: 404 })
+      const query: any = { profileId: p._id }
+      if (start && end) {
+        query.createdAt = {
+          $gte: new Date(start as string),
+          $lte: new Date(end as string)
+        }
+      }
+      return await Proposal.find(query).sort({ createdAt: -1 })
+    },
+    async catalog() {
+      const p = await this.$.profile
+      if (!p) throw createError({ statusCode: 404 })
+      return await CatalogItem.find({ profileId: p._id })
+    },
+    async creditCheck() {
+      const p = await this.$.profile
+      const c = await this.$.cost
+      const props = await this.$.proposals
+
+      const acceptedProps = props.filter(pr => pr.status === 'accepted')
+      if (acceptedProps.length === 0) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'É necessário ter pelo menos 1 orçamento aprovado para gerar um relatório estratégico.'
+        })
+      }
+
+      requireCreditBalance(p, c, isAdmin, 'Saldo de créditos insuficiente. Adquira créditos para gerar relatórios com IA.')
+      return true
     }
-  }
-
-  // Coletar dados para análise (mesmo universo do dashboard, sem truncar por limit)
-  const [proposals, catalog] = await Promise.all([
-    Proposal.find(query).sort({ createdAt: -1 }),
-    CatalogItem.find({ profileId: profile._id })
-  ])
+  })
 
   const acceptedProposals = proposals.filter(p => p.status === 'accepted')
-
-  // Pré-requisito de negócio: precisa de pelo menos 1 orçamento aprovado. Verificado
-  // ANTES da checagem de créditos para o cliente entender o motivo real do bloqueio.
-  if (acceptedProposals.length === 0) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'É necessário ter pelo menos 1 orçamento aprovado para gerar um relatório estratégico.'
-    })
-  }
-
-  // Verificação de saldo de créditos para IA (Relatório Analítico)
-  const cost = await getActionCost('analyzeReport')
-  const isAdmin = (session.user as any).role === 'admin'
-  requireCreditBalance(profile, cost, isAdmin, 'Saldo de créditos insuficiente. Adquira créditos para gerar relatórios com IA.')
   const totalRevenue = acceptedProposals.reduce((acc, p) => acc + (p.totals?.final || 0), 0)
   const averageValue = acceptedProposals.length > 0 ? totalRevenue / acceptedProposals.length : 0
 

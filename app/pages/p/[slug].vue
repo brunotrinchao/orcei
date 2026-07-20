@@ -227,7 +227,7 @@ const profileWhatsapp = computed(() => {
   return (wa || phones[0])?.number || null
 })
 
-const { data: systemInfo } = useFetch<any>('/api/system/status')
+const { data: systemInfo } = useFetch<any>('/api/system/status', { key: 'system-status' })
 
 // Links das redes sociais do profissional (contact.social), exibidos no rodapé
 const social = computed(() => (proposal.value?.profileId as any)?.contact?.social || {})

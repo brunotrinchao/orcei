@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Cropper } from 'vue-advanced-cropper'
-import 'vue-advanced-cropper/dist/style.css'
 import { SwatchBook, Image as PhotoIcon, Pencil } from 'lucide-vue-next'
 
 const props = defineProps<{
@@ -16,9 +14,7 @@ const emit = defineEmits<{
 
 const { notify } = useAlerts()
 const isSaving = ref(false)
-const showCropper = ref(false)
-const rawImage = ref<string | null>(null)
-const cropperRef = ref<any>(null)
+const { Cropper, showCropper, rawImage, cropperRef, onFileChange, resetCropper } = useCropper()
 
 const localLogoUrl = computed({
   get: () => props.logoUrl,
@@ -29,18 +25,6 @@ const localPrimaryColor = computed({
   get: () => props.primaryColor,
   set: (val) => emit('update:primaryColor', val)
 })
-
-function onFileChange(event: Event) {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
-  if (!file) return
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    rawImage.value = e.target?.result as string
-    showCropper.value = true
-  }
-  reader.readAsDataURL(file)
-}
 
 async function cropLogo() {
   if (!cropperRef.value) return
@@ -64,8 +48,7 @@ async function cropLogo() {
       body: { image: finalCanvas.toDataURL('image/png'), folder: 'orcei/logos' }
     })
     localLogoUrl.value = data.url
-    showCropper.value = false
-    rawImage.value = null
+    resetCropper()
     notify('Sucesso', 'Logotipo atualizado!')
   } catch {
     notify('Erro', 'Não foi possível fazer upload da imagem.')
@@ -92,13 +75,13 @@ async function cropLogo() {
           ref="cropperRef"
           :src="rawImage"
           :stencil-props="{ aspectRatio: 1/1, movable: true, resizable: true }"
-          class="w-full h-[360px]"
+          class="w-full h-[280px] sm:h-[360px]"
         />
       </div>
       <div class="flex justify-end gap-3">
         <button
           type="button"
-          @click="showCropper = false"
+          @click="resetCropper()"
           class="px-6 py-3 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-900 transition-all outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
         >
           Cancelar

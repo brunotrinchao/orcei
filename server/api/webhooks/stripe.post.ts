@@ -4,6 +4,15 @@ import { QueueService } from '../../services/QueueService'
 
 export default defineEventHandler(async (event) => {
   setResponseStatus(event, 200)
+
+  const runNonBlocking = async (promise: Promise<any>) => {
+    if (typeof event?.waitUntil === 'function') {
+      event.waitUntil(promise)
+    } else {
+      await promise
+    }
+  }
+
   const body = await readRawBody(event)
   const signature = getHeader(event, 'stripe-signature')
   const config = useRuntimeConfig()
@@ -92,14 +101,14 @@ export default defineEventHandler(async (event) => {
           if (updated?.email) {
             const amount = session.amount_total ? (session.amount_total / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00'
             const billingCycle = (priceId === config.public.stripePriceAnnual) ? 'Anual' : 'Mensal'
-            await QueueService.publish('SEND_EMAIL_PLAN_ACTIVATION', {
+            await runNonBlocking(QueueService.publish('SEND_EMAIL_PLAN_ACTIVATION', {
               userEmail: updated.email,
               userName: updated.name,
               planName: plan,
               credits,
               planPrice: amount,
               billingCycle
-            })
+            }))
           }
         }
       } else if (type === 'credits' && session.mode === 'payment') {
@@ -155,13 +164,13 @@ export default defineEventHandler(async (event) => {
 
         if (updated?.email) {
           const amount = session.amount_total ? (session.amount_total / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00'
-          await QueueService.publish('SEND_EMAIL_BUY_CREDIT', {
+          await runNonBlocking(QueueService.publish('SEND_EMAIL_BUY_CREDIT', {
             userEmail: updated.email,
             userName: updated.name,
             creditsAdded: creditsToAdd,
             newBalance: updated.creditsBalance,
             amountPaid: amount
-          })
+          }))
         }
       }
     }
@@ -258,14 +267,14 @@ export default defineEventHandler(async (event) => {
           if (updated?.email) {
             const amount = session.amount_paid ? (session.amount_paid / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00'
             const billingCycle = (priceId === config.public.stripePriceAnnual) ? 'Anual' : 'Mensal'
-            await QueueService.publish('SEND_EMAIL_PLAN_ACTIVATION', {
+            await runNonBlocking(QueueService.publish('SEND_EMAIL_PLAN_ACTIVATION', {
               userEmail: updated.email,
               userName: updated.name,
               planName: plan,
               credits: novoCreditsBalance,
               planPrice: amount,
               billingCycle
-            })
+            }))
           }
         }
       }
@@ -298,13 +307,13 @@ export default defineEventHandler(async (event) => {
           ? new Date(oldProfile.subscriptionEndsAt).toLocaleDateString('pt-BR')
           : 'Imediato'
           
-        await QueueService.publish('SEND_EMAIL_PLAN_CANCELLATION', {
+        await runNonBlocking(QueueService.publish('SEND_EMAIL_PLAN_CANCELLATION', {
           userEmail: updated.email,
           userName: updated.name,
           planName: oldProfile?.subscriptionPlan || 'Premium',
           cancellationDate,
           effectiveEndDate
-        })
+        }))
       }
     }
 
@@ -323,15 +332,18 @@ export default defineEventHandler(async (event) => {
       })
 
       if (userEmail && checkoutUrl) {
-        try {
-          await QueueService.publish('SEND_EMAIL_CART_RECOVERY', {
+        await runNonBlocking(
+          QueueService.publish('SEND_EMAIL_CART_RECOVERY', {
             userEmail,
             checkoutUrl
           })
-          console.log(`[Recuperação de Carrinho] Email enfileirado para ${userEmail} (Produto: ${tier || 'créditos'})`)
-        } catch (emailErr: any) {
-          console.error('[Recuperação de Carrinho] Falha ao enfileirar email:', emailErr.message)
-        }
+            .then(() => {
+              console.log(`[Recuperação de Carrinho] Email enfileirado para ${userEmail} (Produto: ${tier || 'créditos'})`)
+            })
+            .catch((emailErr) => {
+              console.error('[Recuperação de Carrinho] Falha ao enfileirar email:', emailErr.message)
+            })
+        )
       }
     }
 

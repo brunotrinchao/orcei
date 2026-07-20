@@ -3,7 +3,10 @@ import { Proposal } from '../../../models/Proposal'
 import { ProfileService } from '../../../services/ProfileService'
 
 export default defineEventHandler(async (event) => {
-  const session = await getUserSession(event)
+  const sessionPromise = getUserSession(event)
+  const bodyPromise = readBody(event)
+
+  const session = await sessionPromise
   if (!session?.user) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
 
   const profile = await ProfileService.getByUserId((session.user as any).id)
@@ -11,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
   const id = getRouterParam(event, 'id')
   const profileId = profile._id
-  const body = await readBody(event)
+  const body = await bodyPromise
 
   if (!body.text) throw createError({ statusCode: 400, statusMessage: 'Missing Message Text' })
 

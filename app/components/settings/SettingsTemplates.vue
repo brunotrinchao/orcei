@@ -112,11 +112,11 @@ const localTermsAndConditions = computed({
 
     <div v-show="activeTab === 'contract'" class="space-y-4">
       <label class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Contrato Padrão</label>
-      <RichTextEditor v-model="localContractTemplate" class="min-h-[350px] border-2 border-gray-50 rounded-3xl overflow-hidden" />
+      <LazyRichTextEditor v-model="localContractTemplate" class="min-h-[350px] border-2 border-gray-50 rounded-3xl overflow-hidden" />
     </div>
     <div v-show="activeTab === 'terms'" class="space-y-4">
       <label class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Termos e Condições</label>
-      <RichTextEditor v-model="localTermsAndConditions" class="min-h-[350px] border-2 border-gray-50 rounded-3xl overflow-hidden" />
+      <LazyRichTextEditor v-model="localTermsAndConditions" class="min-h-[350px] border-2 border-gray-50 rounded-3xl overflow-hidden" />
     </div>
   </section>
 </template>

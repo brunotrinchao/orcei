@@ -445,7 +445,7 @@ async function saveContract() {
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+  <div class="space-y-10 relative">
     <PageHeader title="Seus Orçamentos" subtitle="Acompanhe e gerencie seus orçamentos comerciais.">
       <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
         <button 
@@ -990,7 +990,7 @@ async function saveContract() {
         <!-- Editor -->
         <div class="space-y-2">
           <label class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Contrato</label>
-          <RichTextEditor v-model="localContractText" class="min-h-[350px] border-2 border-gray-50 rounded-3xl overflow-hidden" />
+          <LazyRichTextEditor v-model="localContractText" class="min-h-[350px] border-2 border-gray-50 rounded-3xl overflow-hidden" />
         </div>
       </div>
       <template #footer>
@@ -1003,7 +1003,7 @@ async function saveContract() {
     </BaseDialog>
 
     <!-- Modal de Chat/Interação -->
-    <ProposalChatModal
+    <LazyProposalChatModal
       v-model:open="isChatOpen"
       :proposal="selectedProposal"
       @refresh="refreshBoth"

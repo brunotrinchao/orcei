@@ -4,7 +4,7 @@ import { QueueService } from './QueueService'
 import { getInitialCredits } from '../utils/credits'
 
 export const ProfileService = {
-  async createForUser(user: UserDTO) {
+  async createForUser(user: UserDTO, event?: any) {
     const existing = await Profile.findOne({ userId: user.id })
     
     if (existing) {
@@ -55,10 +55,15 @@ export const ProfileService = {
 
       // Enfileira o envio do e-mail de Boas-Vindas no QStash para processamento assíncrono
       if (profile.email) {
-        await QueueService.publish('SEND_EMAIL_WELCOME', {
+        const publishPromise = QueueService.publish('SEND_EMAIL_WELCOME', {
           userEmail: profile.email,
           userName: profile.name
         })
+        if (event) {
+          event.waitUntil(publishPromise)
+        } else {
+          publishPromise.catch(err => console.error('Failed to send welcome email:', err))
+        }
       }
 
       return profile

@@ -42,10 +42,19 @@ const { data: systemInfo } = useFetch<any>('/api/system/status', {
   key: 'system-status'
 })
 
+let pageshowHandler: ((e: PageTransitionEvent) => void) | null = null
+
 onMounted(() => {
-  window.addEventListener('pageshow', (e) => {
+  pageshowHandler = (e: PageTransitionEvent) => {
     if (e.persisted) refreshLayoutProfile()
-  })
+  }
+  window.addEventListener('pageshow', pageshowHandler)
+})
+
+onUnmounted(() => {
+  if (pageshowHandler) {
+    window.removeEventListener('pageshow', pageshowHandler)
+  }
 })
 </script>
 
@@ -57,11 +66,11 @@ onMounted(() => {
         <div class="flex items-center gap-12">
           <NuxtLink to="/"><AppLogo size="sm" /></NuxtLink>
           <div v-if="loggedIn" class="hidden md:flex gap-8 items-center">
-            <NuxtLink to="/dashboard" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Dashboard</NuxtLink>
-            <NuxtLink to="/clientes" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Clientes</NuxtLink>
-            <NuxtLink to="/catalogo" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Catálogo</NuxtLink>
-            <NuxtLink to="/orcamentos" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Orçamentos</NuxtLink>
-            <NuxtLink to="/relatorios" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Relatórios</NuxtLink>
+            <NuxtLink to="/dashboard" @mouseenter="preloadRouteComponents('/dashboard')" @focus="preloadRouteComponents('/dashboard')" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Dashboard</NuxtLink>
+            <NuxtLink to="/clientes" @mouseenter="preloadRouteComponents('/clientes')" @focus="preloadRouteComponents('/clientes')" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Clientes</NuxtLink>
+            <NuxtLink to="/catalogo" @mouseenter="preloadRouteComponents('/catalogo')" @focus="preloadRouteComponents('/catalogo')" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Catálogo</NuxtLink>
+            <NuxtLink to="/orcamentos" @mouseenter="preloadRouteComponents('/orcamentos')" @focus="preloadRouteComponents('/orcamentos')" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Orçamentos</NuxtLink>
+            <NuxtLink to="/relatorios" @mouseenter="preloadRouteComponents('/relatorios')" @focus="preloadRouteComponents('/relatorios')" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Relatórios</NuxtLink>
             
             <!-- Admin Quick Access -->
             <template v-if="user?.role === 'admin'">
@@ -151,12 +160,12 @@ onMounted(() => {
     </div>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 py-6 min-h-[calc(100vh-250px)]">
+    <main class="max-w-7xl mx-auto px-4 py-6 min-h-[calc(100dvh-250px)]">
       <slot />
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-gray-100 pt-8 md:pb-4 pb-8 md:pb-16 px-6">
+    <footer class="bg-white border-t border-gray-100 pt-8 pb-8 md:pb-16 px-6">
       <div class="max-w-7xl mx-auto">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div class="md:col-span-2 space-y-6">

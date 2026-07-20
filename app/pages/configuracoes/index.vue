@@ -229,7 +229,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto pb-40 md:pb-20">
+  <div class="space-y-10 relative">
     <PageHeader title="Configurações" subtitle="Personalize sua identidade corporativa e regras de negócio." />
 
     <div v-if="localProfile">

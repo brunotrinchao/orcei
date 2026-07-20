@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Cropper } from 'vue-advanced-cropper'
-import 'vue-advanced-cropper/dist/style.css'
 import * as LucideIcons from 'lucide-vue-next'
 import { Plus, Search, Image, Pencil, Trash2, Sparkles, RefreshCcw, Package, ShoppingBag, HelpCircle, MoreVertical } from 'lucide-vue-next'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
@@ -28,117 +26,8 @@ const totalItems = computed(() => catalogData.value?.total || 0)
 const showForm = ref(false)
 const selectedItem = ref<CatalogItemDTO | null>(null)
 
-const showCropper = ref(false)
-const rawImage = ref<string | null>(null)
-const cropperRef = ref<any>(null)
-
-function onFileChange(event: Event) {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
-  if (!file) return
-
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    rawImage.value = e.target?.result as string
-    showCropper.value = true
-  }
-  reader.readAsDataURL(file)
-}
-
-async function cropImage() {
-  if (!cropperRef.value) return
-
-  const { canvas } = cropperRef.value.getResult()
-  if (!canvas) return
-
-  const finalCanvas = document.createElement('canvas')
-  finalCanvas.width = 400
-  finalCanvas.height = 400
-  const ctx = finalCanvas.getContext('2d')
-  if (!ctx) return
-
-  ctx.fillStyle = 'white'
-  ctx.fillRect(0, 0, 400, 400)
-  ctx.drawImage(canvas, 0, 0, 400, 400)
-
-  const base64Image = finalCanvas.toDataURL('image/jpeg', 0.8)
-
-  isSubmitting.value = true
-  try {
-    const data = await ($fetch as any)('/api/upload/cloudinary', {
-      method: 'POST',
-      body: { image: base64Image, folder: 'catalog' }
-    }) as { url: string }
-
-    if (!data?.url) throw new Error('URL não retornada pelo Cloudinary')
-    form.value.imageUrl = data.url
-    showCropper.value = false
-    rawImage.value = null
-  } catch (e) {
-    console.error('[Catalog] Image upload failed:', e)
-    notify('Erro', 'Não foi possível fazer upload da imagem.')
-  } finally {
-    isSubmitting.value = false
-  }
-}
-
-const form = ref({
-  type: 'service' as 'product' | 'service',
-  name: '',
-  description: '',
-  price: 0 as any,
-  unit: 'UN',
-  sku: '',
-  imageUrl: '',
-  icon: 'Package'
-})
-
-const isSubmitting = ref(false)
-const isGenerating = ref(false)
-const showAIDialog = ref(false)
-const aiPromptText = ref('')
-
-const unitOptions = [
-  { label: 'Unidade (UN)', value: 'UN' },
-  { label: 'Hora (H)', value: 'H' },
-  { label: 'Dia (DIA)', value: 'DIA' },
-  { label: 'Mês (MES)', value: 'MES' },
-  { label: 'Kilograma (KG)', value: 'KG' },
-  { label: 'Centímetro (CM)', value: 'CM' },
-  { label: 'Mililitro (ML)', value: 'ML' }
-]
-
-const typeOptions = [
-  { label: 'Serviço', value: 'service' },
-  { label: 'Produto', value: 'product' }
-]
-
 function openModal(item: CatalogItemDTO | null = null) {
-  if (item) {
-    selectedItem.value = item
-    form.value = { 
-      type: item.type,
-      name: item.name, 
-      description: item.description || '', 
-      price: item.price, 
-      unit: item.unit || 'UN',
-      sku: item.sku || '',
-      imageUrl: item.imageUrl || '',
-      icon: item.icon || 'Package'
-    }
-  } else {
-    selectedItem.value = null
-    form.value = { 
-      type: 'service',
-      name: '', 
-      description: '', 
-      price: 0, 
-      unit: 'UN',
-      sku: '',
-      imageUrl: '',
-      icon: 'Package'
-    }
-  }
+  selectedItem.value = item
   showForm.value = true
 }
 
@@ -169,7 +58,7 @@ function getIcon(name: string) {
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+  <div class="space-y-10 relative">
     <PageHeader title="Seu Catálogo" subtitle="Unifique seus produtos e serviços em um só lugar.">
       <BaseButton data-tour="catalogo-novo-item-btn" @click="openModal()" class="w-full sm:w-auto shadow-2xl shadow-blue-100">
         Novo Item do Catálogo
@@ -346,6 +235,4 @@ function getIcon(name: string) {
   </div>
 </template>
 
-<style scoped>
-.cropper { height: 400px; background: #f3f4f6; }
-</style>
+

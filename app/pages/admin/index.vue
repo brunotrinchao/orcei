@@ -91,7 +91,7 @@ const chartOptions = {
   }
 }
 
-const { data: systemInfo } = useFetch<any>('/api/system/status')
+const { data: systemInfo } = useFetch<any>('/api/system/status', { key: 'system-status' })
 
 // Formatação de data/hora nos logs do console
 function formatLogTime(isoString: string) {

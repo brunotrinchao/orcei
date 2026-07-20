@@ -2,7 +2,7 @@
 const { loggedIn } = useUserSession()
 
 const { data: systemInfo } = useFetch<any>('/api/system/status', {
-  key: 'system-status-landing'
+  key: 'system-status'
 })
 </script>
 

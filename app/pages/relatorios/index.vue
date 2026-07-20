@@ -60,7 +60,7 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+  <div class="space-y-10 relative">
     <PageHeader title="Meus Relatórios IA" subtitle="Analises estratégicas geradas pela inteligência artificial.">
       <BaseButton data-tour="relatorios-gerar-btn" to="/dashboard" variant="secondary">
         Gerar Novo Relatório

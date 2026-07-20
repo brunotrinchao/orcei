@@ -3,11 +3,14 @@ import { CatalogService } from '../../services/CatalogService'
 import { validateCatalogItem, throwIfInvalid } from '../../utils/validate'
 
 export default defineEventHandler(async (event) => {
-  const session = await getUserSession(event)
+  const sessionPromise = getUserSession(event)
+  const bodyPromise = readBody(event)
+
+  const session = await sessionPromise
   if (!session?.user) throw createError({ statusCode: 401 })
 
   const id = getRouterParam(event, 'id')
-  const body = await readBody(event)
+  const body = await bodyPromise
 
   const profile = await ProfileService.getByUserId((session.user as any).id)
   if (!profile) throw createError({ statusCode: 404 })

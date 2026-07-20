@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, computed } from 'vue'
-import { Cropper } from 'vue-advanced-cropper'
-import 'vue-advanced-cropper/dist/style.css'
 import { Pencil, Trash2, RefreshCcw, Sparkles, Loader2 } from 'lucide-vue-next'
 import type { CatalogItemDTO } from '../../../../types'
 
@@ -17,28 +15,12 @@ const emit = defineEmits<{
 
 const { notify } = useAlerts()
 const { creditLabel } = useCreditCosts()
+const { Cropper, showCropper, rawImage, cropperRef, onFileChange, resetCropper } = useCropper()
 
 const showForm = computed({
   get: () => props.open,
   set: (val) => emit('update:open', val)
 })
-
-const showCropper = ref(false)
-const rawImage = ref<string | null>(null)
-const cropperRef = ref<any>(null)
-
-function onFileChange(event: Event) {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
-  if (!file) return
-
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    rawImage.value = e.target?.result as string
-    showCropper.value = true
-  }
-  reader.readAsDataURL(file)
-}
 
 async function cropImage() {
   if (!cropperRef.value) return
@@ -67,8 +49,7 @@ async function cropImage() {
 
     if (!data?.url) throw new Error('URL não retornada pelo Cloudinary')
     form.value.imageUrl = data.url
-    showCropper.value = false
-    rawImage.value = null
+    resetCropper()
   } catch (e) {
     console.error('[Catalog] Image upload failed:', e)
     notify('Erro', 'Não foi possível fazer upload da imagem.')
@@ -266,13 +247,13 @@ async function saveItem() {
 
                 <!-- Image Preview -->
                 <div v-if="form.imageUrl" class="relative group w-full h-[60px] bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 overflow-hidden flex items-center justify-center animate-in fade-in zoom-in-95 duration-200 shadow-sm">
-                  <img :src="form.imageUrl" class="w-full h-full object-cover">
+                  <img :src="form.imageUrl" class="w-full h-full object-cover" loading="lazy">
                   <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <label class="p-1.5 bg-white rounded-lg text-gray-900 cursor-pointer hover:scale-110 transition-transform">
+                    <label class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center bg-white rounded-lg text-gray-900 cursor-pointer hover:scale-110 transition-transform">
                       <Pencil class="w-4 h-4" />
                       <input type="file" accept="image/*" @change="onFileChange" class="hidden">
                     </label>
-                    <button type="button" @click="form.imageUrl = ''" class="p-1.5 bg-white rounded-lg text-red-600 hover:scale-110 transition-transform">
+                    <button type="button" @click="form.imageUrl = ''" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center bg-white rounded-lg text-red-600 hover:scale-110 transition-transform">
                       <Trash2 class="w-4 h-4" />
                     </button>
                   </div>

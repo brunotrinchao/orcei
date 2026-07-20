@@ -13,9 +13,31 @@ const DEFAULT_COSTS: Record<CreditAction, number> = {
   proposalSend: 1
 }
 
+let cachedCosts: Record<CreditAction, number> | null = null
+let cachedCostsExpiry = 0
+let cachedInitialCredits: number | null = null
+let cachedInitialCreditsExpiry = 0
+const CACHE_TTL = 30 * 1000 // 30 seconds
+
+export function clearSettingsCache() {
+  cachedCosts = null
+  cachedCostsExpiry = 0
+  cachedInitialCredits = null
+  cachedInitialCreditsExpiry = 0
+}
+
+const isTest = process.env.NODE_ENV === 'test' || !!process.env.VITEST
+
 export async function getCreditCosts(): Promise<Record<CreditAction, number>> {
+  const now = Date.now()
+  if (!isTest && cachedCosts && now < cachedCostsExpiry) {
+    return cachedCosts
+  }
+
   const settings = await PlatformSettings.findOne({}).lean()
-  return { ...DEFAULT_COSTS, ...((settings as any)?.creditCosts || {}) }
+  cachedCosts = { ...DEFAULT_COSTS, ...((settings as any)?.creditCosts || {}) }
+  cachedCostsExpiry = now + CACHE_TTL
+  return cachedCosts
 }
 
 export async function getActionCost(action: CreditAction): Promise<number> {
@@ -27,9 +49,16 @@ const DEFAULT_INITIAL_CREDITS = 1
 
 /** Créditos concedidos a um novo usuário no cadastro (configurável pelo admin). */
 export async function getInitialCredits(): Promise<number> {
+  const now = Date.now()
+  if (!isTest && cachedInitialCredits !== null && now < cachedInitialCreditsExpiry) {
+    return cachedInitialCredits
+  }
+
   const settings = await PlatformSettings.findOne({}).lean()
   const value = (settings as any)?.initialCredits
-  return Number.isFinite(value) ? value : DEFAULT_INITIAL_CREDITS
+  cachedInitialCredits = Number.isFinite(value) ? value : DEFAULT_INITIAL_CREDITS
+  cachedInitialCreditsExpiry = now + CACHE_TTL
+  return cachedInitialCredits
 }
 
 export function requireCreditBalance(profile: { creditsBalance: number }, cost: number, isAdmin: boolean, errorMessage: string) {

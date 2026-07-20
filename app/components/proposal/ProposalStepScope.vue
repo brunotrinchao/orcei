@@ -180,14 +180,14 @@ function isItemSelected(item: any) {
 
             <!-- Ações -->
             <div class="flex items-center gap-1 shrink-0 ml-2">
-              <button @click="toggleItemExpansion(idx)" type="button" class="p-2 text-gray-400 hover:bg-gray-100 rounded-lg transition-colors" title="Editar Descrição">
+              <button @click="toggleItemExpansion(idx)" type="button" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:bg-gray-100 rounded-lg transition-colors" title="Editar Descrição">
                 <ChevronUp v-if="expandedItemIdx === idx" class="w-5 h-5" />
                 <ChevronDown v-else class="w-5 h-5" />
               </button>
-              <button @click="moveToUpsell(idx)" type="button" class="hidden sm:block p-2 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Mover para Opcionais">
+              <button @click="moveToUpsell(idx)" type="button" class="hidden sm:flex p-2.5 min-h-[44px] min-w-[44px] items-center justify-center text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Mover para Opcionais">
                 <ArrowDown class="w-4 h-4" />
               </button>
-              <button @click="form.items.splice(idx, 1)" type="button" class="p-2 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Remover Item">
+              <button @click="form.items.splice(idx, 1)" type="button" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Remover Item">
                 <Trash2 class="w-4 h-4" />
               </button>
             </div>
@@ -264,14 +264,14 @@ function isItemSelected(item: any) {
             </div>
 
             <div class="flex items-center gap-1 shrink-0 ml-2">
-              <button @click="toggleItemExpansion(idx, true)" type="button" class="p-2 text-gray-400 hover:bg-white rounded-lg transition-colors" title="Editar Descrição">
+              <button @click="toggleItemExpansion(idx, true)" type="button" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:bg-white rounded-lg transition-colors" title="Editar Descrição">
                 <ChevronUp v-if="expandedUpsellIdx === idx" class="w-5 h-5" />
                 <ChevronDown v-else class="w-5 h-5" />
               </button>
-              <button @click="moveToItems(idx)" type="button" class="hidden sm:block p-2 text-green-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Tornar Obrigatório">
+              <button @click="moveToItems(idx)" type="button" class="hidden sm:flex p-2.5 min-h-[44px] min-w-[44px] items-center justify-center text-green-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Tornar Obrigatório">
                 <Plus class="w-4 h-4" />
               </button>
-              <button @click="form.upsellItems.splice(idx, 1)" type="button" class="p-2 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Remover Opcional">
+              <button @click="form.upsellItems.splice(idx, 1)" type="button" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Remover Opcional">
                 <Trash2 class="w-4 h-4" />
               </button>
             </div>

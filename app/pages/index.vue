@@ -19,7 +19,7 @@ watchEffect(() => {
   }
 })
 
-const { data: systemInfo } = useFetch<any>('/api/system/status')
+const { data: systemInfo } = useFetch<any>('/api/system/status', { key: 'system-status' })
 
 const landing = computed(() => systemInfo.value?.landingPage || {
   heroTitle: 'Gere seu primeiro orçamento profissional grátis em 2 minutos.',

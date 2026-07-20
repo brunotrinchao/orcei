@@ -1,6 +1,6 @@
 import { PlatformSettings } from '../../models/PlatformSettings'
 import { AuditLog } from '../../models/AuditLog'
-import { sanitizeCreditCosts, sanitizeInitialCredits } from '../../utils/credits'
+import { sanitizeCreditCosts, sanitizeInitialCredits, clearSettingsCache } from '../../utils/credits'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -22,6 +22,8 @@ export default defineEventHandler(async (event) => {
     },
     { upsert: true, returnDocument: 'after' }
   )
+
+  clearSettingsCache()
 
   // Log de Auditoria
   await AuditLog.create({

@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // 1. Registrar Auditoria Assíncrona
-  await AuditService.log({
+  const logPromise = AuditService.log({
     adminId: profile._id.toString(),
     adminName: profile.name,
     action: 'UPDATE_PROFILE',
@@ -47,6 +47,12 @@ export default defineEventHandler(async (event) => {
     targetType: 'Profile',
     ip: event.node.req.socket.remoteAddress
   })
+
+  if (typeof event?.waitUntil === 'function') {
+    event.waitUntil(logPromise)
+  } else {
+    await logPromise
+  }
 
   return profile
 })

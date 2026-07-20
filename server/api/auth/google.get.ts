@@ -17,7 +17,7 @@ export default defineOAuthGoogleEventHandler({
     }
 
     // Vincular/Criar perfil no MongoDB e atualizar lastLoginAt
-    const profile = await ProfileService.createForUser(userData)
+    const profile = await ProfileService.createForUser(userData, event)
     if (profile) {
       profile.lastLoginAt = new Date()
       // Fix for legacy profiles with empty subscriptionPlan

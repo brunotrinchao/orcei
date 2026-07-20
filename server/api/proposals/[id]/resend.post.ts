@@ -22,16 +22,22 @@ export default defineEventHandler(async (event) => {
   const domain = process.env.PUBLIC_PROPOSAL_URL || process.env.PUBLIC_URL || 'https://orceifacil.com.br'
   const proposalUrl = `${domain}/p/${proposal.slug}?t=${proposal.token}`
   
-  await QueueService.publish('SEND_EMAIL_PROPOSAL', {
-    clientEmail: proposal.client.email,
-    clientName: proposal.client.name || 'Cliente',
-    url: proposalUrl,
-    profileName: profile.name,
-    proposalId: proposal._id
-  })
+  const runPromise = Promise.all([
+    QueueService.publish('SEND_EMAIL_PROPOSAL', {
+      clientEmail: proposal.client.email,
+      clientName: proposal.client.name || 'Cliente',
+      url: proposalUrl,
+      profileName: profile.name,
+      proposalId: proposal._id
+    }),
+    ProposalService.logHistory(proposal._id, 'sent', 'email', { status: 'queued', action: 'resend' })
+  ])
 
-  // Log no histórico
-  await ProposalService.logHistory(proposal._id, 'sent', 'email', { status: 'queued', action: 'resend' })
+  if (typeof event?.waitUntil === 'function') {
+    event.waitUntil(runPromise)
+  } else {
+    await runPromise
+  }
 
   return { success: true, queued: true }
 })

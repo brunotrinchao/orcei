@@ -2,10 +2,16 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const { loggedIn, user } = useUserSession()
   
   // 1. Verificação de Modo Manutenção (Global)
-  // Ignorar check para rota de manutenção e assets
-  if (to.path !== '/maintenance' && !to.path.startsWith('/_')) {
+  // Ignorar check para rota de manutenção, assets e administradores (condições síncronas baratas)
+  if (to.path !== '/maintenance' && !to.path.startsWith('/_') && user.value?.role !== 'admin') {
     try {
       const systemStatus = useState<{ data: any; fetchedAt: number } | null>('system-status', () => null)
+
+      // Se a flag já estiver ativa no cache síncrono, redireciona de imediato
+      if (systemStatus.value?.data?.maintenanceMode) {
+        return navigateTo('/maintenance')
+      }
+
       const now = Date.now()
       const CACHE_TTL = 5 * 60 * 1000 // 5 minutos
 
@@ -14,7 +20,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
         systemStatus.value = { data, fetchedAt: now }
       }
 
-      if (systemStatus.value.data.maintenanceMode && user.value?.role !== 'admin') {
+      if (systemStatus.value.data.maintenanceMode) {
         return navigateTo('/maintenance')
       }
     } catch (e) {

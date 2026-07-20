@@ -54,27 +54,35 @@ export const ProposalService = {
     }
 
     try {
-      const counter = await Counter.findOneAndUpdate(
-        { profileId: data.profileId, year: currentYear },
-        { $inc: { lastSequence: 1 } },
-        { upsert: true, returnDocument: 'after', session: session || undefined }
-      )
+      const costPromise = (data.status === ProposalStatus.CREATED && !isAdmin)
+        ? getActionCost('proposalSend')
+        : Promise.resolve(0)
+
+      const [counter, profile, cost] = await Promise.all([
+        Counter.findOneAndUpdate(
+          { profileId: data.profileId, year: currentYear },
+          { $inc: { lastSequence: 1 } },
+          { upsert: true, returnDocument: 'after', session: session || undefined }
+        ),
+        session 
+          ? Profile.findById(data.profileId).session(session) 
+          : Profile.findById(data.profileId),
+        costPromise
+      ])
 
       if (!counter) throw new Error('Falha ao gerar número de sequência')
       const sequenceNumber = counter.lastSequence
       const code = `#ORC-${currentYear}-${String(sequenceNumber).padStart(3, '0')}`
 
-      const profile = session 
-        ? await Profile.findById(data.profileId).session(session) 
-        : await Profile.findById(data.profileId)
       const validityDays = profile?.defaultValidityDays || 7
       const expiresAt = new Date()
       expiresAt.setDate(expiresAt.getDate() + validityDays)
 
       // Verificação de saldo ANTES de persistir o orçamento
-      const cost = await getActionCost('proposalSend')
-      if (data.status === ProposalStatus.CREATED && !isAdmin && cost > 0 && (!profile || profile.creditsBalance < cost)) {
-        throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para continuar.' })
+      if (data.status === ProposalStatus.CREATED && !isAdmin && cost > 0) {
+        if (!profile || profile.creditsBalance < cost) {
+          throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para continuar.' })
+        }
       }
 
       let proposal: any
@@ -152,11 +160,17 @@ export const ProposalService = {
 
     // Verificação de saldo ANTES de abrir a transação, se a transição for cobrar crédito
     const willCharge = oldProposal.status === ProposalStatus.DRAFT && data.status !== ProposalStatus.DRAFT
-    const cost = await getActionCost('proposalSend')
-    if (willCharge && !isAdmin && cost > 0) {
-      const profileCheck = await Profile.findById(profileId)
-      if (!profileCheck || profileCheck.creditsBalance < cost) {
-        throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para continuar.' })
+    let cost = 0
+    if (willCharge && !isAdmin) {
+      const [costVal, profileCheck] = await Promise.all([
+        getActionCost('proposalSend'),
+        Profile.findById(profileId)
+      ])
+      cost = costVal
+      if (cost > 0) {
+        if (!profileCheck || profileCheck.creditsBalance < cost) {
+          throw createError({ statusCode: 402, statusMessage: 'Saldo de créditos insuficiente. Adquira créditos para continuar.' })
+        }
       }
     }
 

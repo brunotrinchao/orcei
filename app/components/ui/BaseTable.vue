@@ -11,7 +11,7 @@ const props = withDefaults(defineProps<Props>(), {
   currentPage: 1
 })
 
-defineEmits(['page-change'])
+defineEmits(['update:currentPage'])
 </script>
 
 <template>
@@ -37,8 +37,8 @@ defineEmits(['page-change'])
       <BasePagination 
         :total="total" 
         :items-per-page="itemsPerPage" 
-        :default-page="currentPage" 
-        @update:page="$emit('page-change', $event)" 
+        :model-value="currentPage"
+        @update:model-value="$emit('update:currentPage', $event)"
       />
     </div>
   </div>

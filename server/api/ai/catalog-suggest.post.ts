@@ -1,3 +1,4 @@
+import { all } from 'better-all'
 import { CatalogItem } from '../../models/CatalogItem'
 import { AIService } from '../../services/AIService'
 import { checkRateLimit } from '../../utils/rate-limit'
@@ -15,17 +16,30 @@ export default defineEventHandler(async (event) => {
   // Rate Limit: 5 requests per 1 minute for AI
   await checkRateLimit(event, { max: 5, windowMs: 60 * 1000, keyPrefix: 'ai-catalog' })
 
-  const profile = await ProfileService.getByUserId((session.user as any).id)
-  if (!profile) {
-    throw createError({ statusCode: 404, statusMessage: 'Perfil não encontrado' })
-  }
-
-  // Verificação de saldo de créditos
-  const cost = await getActionCost('catalogSuggest')
   const isAdmin = (session.user as any).role === 'admin'
-  requireCreditBalance(profile, cost, isAdmin, 'Saldo de créditos insuficiente. Adquira créditos para usar a IA.')
 
-  const { name, type, context } = await readBody(event)
+  const { profile, cost, body } = await all({
+    async profile() {
+      return await ProfileService.getByUserId((session.user as any).id)
+    },
+    async cost() {
+      return isAdmin ? 0 : await getActionCost('catalogSuggest')
+    },
+    async body() {
+      return await readBody(event)
+    },
+    async creditCheck() {
+      const p = await this.$.profile
+      const c = await this.$.cost
+      if (!p) {
+        throw createError({ statusCode: 404, statusMessage: 'Perfil não encontrado' })
+      }
+      requireCreditBalance(p, c, isAdmin, 'Saldo de créditos insuficiente. Adquira créditos para usar a IA.')
+      return true
+    }
+  })
+
+  const { name, type, context } = body as any
   if (!name) {
     throw createError({ statusCode: 400, statusMessage: 'Nome é obrigatório' })
   }

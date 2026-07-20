@@ -157,7 +157,7 @@ const formatPhone = (phone: string) => {
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+  <div class="space-y-10 relative">
     <PageHeader title="Seus Clientes" subtitle="Gerencie seus contatos e acelere seus orçamentos.">
       <BaseButton data-tour="clientes-novo-btn" @click="openModal()" class="w-full sm:w-auto shadow-2xl shadow-blue-100">
         Cadastrar Novo Cliente

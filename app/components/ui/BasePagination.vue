@@ -14,22 +14,22 @@ import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal 
 interface Props {
   total: number
   itemsPerPage?: number
-  defaultPage?: number
+  modelValue?: number
   siblingCount?: number
   showEdges?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   itemsPerPage: 10,
-  defaultPage: 1,
+  modelValue: 1,
   siblingCount: 1,
   showEdges: true
 })
 
-const emit = defineEmits(['update:page'])
+const emit = defineEmits(['update:modelValue'])
 
 const handlePageChange = (page: number) => {
-  emit('update:page', page)
+  emit('update:modelValue', page)
 }
 </script>
 
@@ -37,7 +37,7 @@ const handlePageChange = (page: number) => {
   <PaginationRoot
     :total="total"
     :items-per-page="itemsPerPage"
-    :default-page="defaultPage"
+    :page="modelValue"
     :sibling-count="siblingCount"
     :show-edges="showEdges"
     @update:page="handlePageChange"

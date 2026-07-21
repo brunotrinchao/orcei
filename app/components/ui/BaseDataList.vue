@@ -36,15 +36,15 @@ useIntersectionObserver(sentinelRef, ([entry]) => {
 <template>
   <div class="w-full">
     <!-- TABLE TYPE -->
-    <div v-if="type === 'table'" class="bg-white rounded-[2.5rem] border border-gray-200 shadow-sm overflow-hidden transition-all">
+    <div v-if="type === 'table'" class="bg-white dark:bg-gray-900 rounded-[2.5rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden transition-all">
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead v-if="$slots.header">
-            <tr class="bg-gray-50/50 border-b border-gray-200">
+            <tr class="bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-800">
               <slot name="header" />
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-100">
+          <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
             <!-- Initial Loading State -->
             <template v-if="pending && (!items || items.length === 0)">
               <slot name="skeleton">
@@ -93,13 +93,13 @@ useIntersectionObserver(sentinelRef, ([entry]) => {
       </div>
 
       <!-- Empty State -->
-      <div v-if="!pending && (!items || items.length === 0)" class="text-center py-24 bg-white">
+      <div v-if="!pending && (!items || items.length === 0)" class="text-center py-24 bg-white dark:bg-gray-900">
         <slot name="empty">
-          <div class="w-20 h-20 bg-gray-50 text-gray-300 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6">
+          <div class="w-20 h-20 bg-gray-50 dark:bg-gray-800 text-gray-300 dark:text-gray-600 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6">
             <FileSearch class="w-10 h-10" />
           </div>
-          <h3 class="text-xl font-black text-gray-900 uppercase tracking-tight">{{ emptyTitle }}</h3>
-          <p class="text-gray-400 font-bold mt-2 px-6 max-w-sm mx-auto">{{ emptySubtitle }}</p>
+          <h3 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">{{ emptyTitle }}</h3>
+          <p class="text-gray-400 dark:text-gray-500 font-bold mt-2 px-6 max-w-sm mx-auto">{{ emptySubtitle }}</p>
         </slot>
       </div>
     </div>
@@ -110,7 +110,7 @@ useIntersectionObserver(sentinelRef, ([entry]) => {
         <!-- Initial Loading State -->
         <template v-if="pending && (!items || items.length === 0)">
           <slot name="skeleton">
-            <div v-for="i in skeletonCount" :key="i" class="bg-white rounded-[2.5rem] border-2 border-gray-100 p-8 space-y-6 shadow-sm">
+            <div v-for="i in skeletonCount" :key="i" class="bg-white dark:bg-gray-900 rounded-[2.5rem] border-2 border-gray-100 dark:border-gray-800 p-8 space-y-6 shadow-sm">
               <BaseSkeleton width="100%" height="12rem" borderRadius="1.5rem" />
               <div class="space-y-3">
                 <BaseSkeleton width="70%" height="1.5rem" />
@@ -128,7 +128,7 @@ useIntersectionObserver(sentinelRef, ([entry]) => {
 
       <!-- Load More Skeleton (grid) -->
       <div v-if="loadingMore && items && items.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div v-for="i in 3" :key="`more-${i}`" class="bg-white rounded-[2.5rem] border-2 border-gray-100 p-8 space-y-6 shadow-sm">
+        <div v-for="i in 3" :key="`more-${i}`" class="bg-white dark:bg-gray-900 rounded-[2.5rem] border-2 border-gray-100 dark:border-gray-800 p-8 space-y-6 shadow-sm">
           <BaseSkeleton width="100%" height="12rem" borderRadius="1.5rem" />
           <div class="space-y-3">
             <BaseSkeleton width="70%" height="1.5rem" />
@@ -141,13 +141,13 @@ useIntersectionObserver(sentinelRef, ([entry]) => {
       <div ref="sentinelRef" v-if="hasMore" class="h-1" />
 
       <!-- Empty State -->
-      <div v-if="!pending && (!items || items.length === 0)" class="text-center py-32 bg-white rounded-[3rem] border-2 border-gray-100">
+      <div v-if="!pending && (!items || items.length === 0)" class="text-center py-32 bg-white dark:bg-gray-900 rounded-[3rem] border-2 border-gray-100 dark:border-gray-800">
         <slot name="empty">
-          <div class="w-24 h-24 bg-gray-50 text-gray-300 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8">
+          <div class="w-24 h-24 bg-gray-50 dark:bg-gray-800 text-gray-300 dark:text-gray-600 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8">
             <FileSearch class="w-12 h-12" />
           </div>
-          <h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight">{{ emptyTitle }}</h3>
-          <p class="text-gray-400 font-bold mt-2 px-6 max-w-sm mx-auto">{{ emptySubtitle }}</p>
+          <h3 class="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">{{ emptyTitle }}</h3>
+          <p class="text-gray-400 dark:text-gray-500 font-bold mt-2 px-6 max-w-sm mx-auto">{{ emptySubtitle }}</p>
         </slot>
       </div>
     </div>

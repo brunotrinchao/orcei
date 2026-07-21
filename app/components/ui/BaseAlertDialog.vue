@@ -52,18 +52,18 @@ const emit = defineEmits(['update:open', 'confirm', 'cancel'])
         leave-to-class="opacity-0 scale-95 translate-y-4"
       >
         <AlertDialogContent 
-          class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md bg-white rounded-[2.5rem] p-8 shadow-2xl z-[301] focus:outline-none border border-gray-100"
+          class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md bg-white dark:bg-gray-900 rounded-[2.5rem] p-8 shadow-2xl z-[301] focus:outline-none border border-gray-100 dark:border-gray-800"
         >
-          <AlertDialogTitle class="text-xl font-black text-gray-900 uppercase tracking-tight mb-2">
+          <AlertDialogTitle class="text-xl font-black text-gray-900 dark:text-gray-50 uppercase tracking-tight mb-2">
             {{ title }}
           </AlertDialogTitle>
           
-          <AlertDialogDescription v-if="description" class="text-sm text-gray-500 font-medium leading-relaxed mb-8" v-html="description" />
+          <AlertDialogDescription v-if="description" class="text-sm text-gray-500 dark:text-gray-400 font-medium leading-relaxed mb-8" v-html="description" />
 
           <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
             <AlertDialogCancel 
               @click="emit('cancel')"
-              class="px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest text-gray-500 hover:bg-gray-50 transition-all border border-transparent"
+              class="px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all border border-transparent dark:border-gray-700"
             >
               {{ cancelText }}
             </AlertDialogCancel>

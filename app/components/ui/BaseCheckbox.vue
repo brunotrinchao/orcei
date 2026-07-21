@@ -15,13 +15,13 @@ const emit = defineEmits(['update:modelValue'])
     <CheckboxRoot
       :checked="modelValue"
       @update:checked="emit('update:modelValue', $event)"
-      class="flex h-6 w-6 appearance-none items-center justify-center rounded-lg bg-gray-50 border-2 border-gray-100 outline-none focus:ring-4 focus:ring-blue-500/10 transition-all data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+      class="flex h-6 w-6 appearance-none items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 outline-none focus:ring-4 focus:ring-blue-500/10 transition-all data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
     >
       <CheckboxIndicator class="flex items-center justify-center text-white">
         <Check class="w-4 h-4" />
       </CheckboxIndicator>
     </CheckboxRoot>
-    <label v-if="label" class="text-sm font-bold text-gray-700 cursor-pointer select-none">
+    <label v-if="label" class="text-sm font-bold text-gray-700 dark:text-gray-300 cursor-pointer select-none">
       {{ label }}
     </label>
   </div>

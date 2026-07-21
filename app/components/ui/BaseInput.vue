@@ -77,7 +77,7 @@ const inputId = useId()
 
 <template>
   <div class="space-y-2">
-    <label v-if="label" :for="inputId" class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">
+    <label v-if="label" :for="inputId" class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">
       {{ label }} <span v-if="required" class="text-red-500">*</span>
     </label>
     <input
@@ -90,7 +90,7 @@ const inputId = useId()
       :placeholder="placeholder"
       :disabled="disabled"
       :readonly="readonly"
-      class="w-full px-5 py-4 bg-white border-2 border-gray-200 hover:border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400 disabled:opacity-50 disabled:bg-gray-50 disabled:cursor-not-allowed"
+      class="w-full px-5 py-4 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all outline-none font-bold text-gray-900 dark:text-gray-50 placeholder:text-gray-400 dark:placeholder:text-gray-500 disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:cursor-not-allowed"
       :class="{ 'border-red-300 focus:border-red-500 focus:ring-red-500/20': error }"
     >
     <span v-if="error" class="text-[10px] font-bold text-red-500 ml-1 uppercase">{{ error }}</span>

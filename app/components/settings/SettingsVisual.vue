@@ -15,6 +15,7 @@ const emit = defineEmits<{
 const { notify } = useAlerts()
 const isSaving = ref(false)
 const { Cropper, showCropper, rawImage, cropperRef, onFileChange, resetCropper } = useCropper()
+const { isDark, toggle } = useDarkMode()
 
 const localLogoUrl = computed({
   get: () => props.logoUrl,
@@ -59,12 +60,12 @@ async function cropLogo() {
 </script>
 
 <template>
-  <section id="visual" data-tour="config-visual" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
+  <section id="visual" data-tour="config-visual" class="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-gray-200 dark:border-gray-800 shadow-sm scroll-mt-8">
     <div class="flex items-center gap-3 mb-8">
       <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
         <SwatchBook class="w-5 h-5 text-blue-600" />
       </div>
-      <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Identidade Visual</h2>
+      <h2 class="text-xl font-black text-gray-900 dark:text-gray-50 uppercase tracking-tight">Identidade Visual</h2>
     </div>
 
     <!-- Cropper inline -->
@@ -91,7 +92,7 @@ async function cropLogo() {
     </div>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-10">
-      <div class="md:col-span-2 flex flex-col md:flex-row items-center gap-10 p-8 bg-gray-50/50 rounded-3xl border border-gray-200">
+      <div class="md:col-span-2 flex flex-col md:flex-row items-center gap-10 p-8 bg-gray-50/50 dark:bg-gray-800/50 rounded-3xl border border-gray-200 dark:border-gray-700">
         <div class="relative group">
           <div class="w-32 h-32 bg-white rounded-3xl border-4 border-white shadow-xl flex items-center justify-center overflow-hidden transition-all group-hover:scale-105 duration-300 ring-1 ring-gray-100">
             <img v-if="localLogoUrl" :src="localLogoUrl" class="w-full h-full object-contain" alt="Logo da Marca" loading="lazy">
@@ -106,19 +107,47 @@ async function cropLogo() {
           </label>
         </div>
         <div class="flex-1 text-center md:text-left">
-          <h3 class="text-lg font-black text-gray-900 mb-1 uppercase tracking-tight">Logotipo da Marca</h3>
-          <p class="text-sm text-gray-600 font-medium">Recomendado 120×120px. Aparece em todos os orçamentos.</p>
+          <h3 class="text-lg font-black text-gray-900 dark:text-gray-50 mb-1 uppercase tracking-tight">Logotipo da Marca</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Recomendado 120×120px. Aparece em todos os orçamentos.</p>
         </div>
       </div>
 
+      <!-- Dark Mode -->
+      <div class="md:col-span-2 flex items-center justify-between p-6 bg-gray-50/50 dark:bg-gray-800/50 rounded-3xl border border-gray-200 dark:border-gray-700">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+            <component :is="isDark ? 'span' : 'span'" class="text-base">{{ isDark ? '🌙' : '☀️' }}</component>
+          </div>
+          <div>
+            <h3 class="text-sm font-black text-gray-900 dark:text-gray-50 uppercase tracking-tight">Aparência</h3>
+            <p class="text-xs text-gray-400 dark:text-gray-500 font-medium">{{ isDark ? 'Modo escuro ativo' : 'Modo claro ativo' }}</p>
+          </div>
+        </div>
+        <button
+          @click="toggle()"
+          :class="[
+            'relative inline-flex h-7 w-14 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600',
+            isDark ? 'bg-blue-600' : 'bg-gray-200'
+          ]"
+          :aria-label="isDark ? 'Ativar modo claro' : 'Ativar modo escuro'"
+        >
+          <span
+            :class="[
+              'inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-200',
+              isDark ? 'translate-x-8' : 'translate-x-1'
+            ]"
+          />
+        </button>
+      </div>
+
       <div class="space-y-3">
-        <label class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Cor Primária</label>
+        <label class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Cor Primária</label>
         <div class="flex gap-3">
           <div class="relative flex-1">
             <input
               v-model="localPrimaryColor"
               type="text"
-              class="w-full pl-14 pr-4 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none uppercase font-black text-sm text-gray-900 focus-visible:ring-2 focus-visible:ring-blue-600"
+              class="w-full pl-14 pr-4 py-4 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none uppercase font-black text-sm text-gray-900 dark:text-gray-50 focus-visible:ring-2 focus-visible:ring-blue-600"
               aria-label="Código hexadecimal da cor primária"
             >
             <div class="absolute left-4 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg border border-gray-200 shadow-sm" :style="{ backgroundColor: localPrimaryColor }"></div>

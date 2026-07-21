@@ -79,7 +79,7 @@ onUnmounted(() => {
         <DialogContent
           :style="{ zIndex: 101 + (currentZIndex * 2) }"
           :class="[
-            'fixed left-[50%] top-[50%] flex flex-col w-[100vw] sm:w-full h-[100dvh] sm:h-auto translate-x-[-50%] translate-y-[-50%] bg-white shadow-2xl rounded-none sm:rounded-[2.5rem] sm:border-4 border-white max-h-[100dvh] sm:max-h-[90vh] overflow-hidden outline-none',
+            'fixed left-[50%] top-[50%] flex flex-col w-[100vw] sm:w-full h-[100dvh] sm:h-auto translate-x-[-50%] translate-y-[-50%] bg-white dark:bg-gray-900 shadow-2xl rounded-none sm:rounded-[2.5rem] sm:border-4 border-white dark:border-gray-800 max-h-[100dvh] sm:max-h-[90vh] overflow-hidden outline-none',
             size === 'sm' ? 'sm:max-w-sm' : '',
             size === 'md' ? 'sm:max-w-lg' : '',
             size === 'lg' ? 'sm:max-w-2xl' : '',
@@ -89,18 +89,18 @@ onUnmounted(() => {
           ]"
         >
           <!-- Header fixo -->
-          <div class="flex-shrink-0 flex items-start justify-between px-8 pt-8 pb-6 border-b border-gray-100">
+          <div class="flex-shrink-0 flex items-start justify-between px-8 pt-8 pb-6 border-b border-gray-100 dark:border-gray-800">
             <div class="space-y-1">
-              <DialogTitle v-if="title" class="text-xl font-black text-gray-900 uppercase tracking-widest">
+              <DialogTitle v-if="title" class="text-xl font-black text-gray-900 dark:text-gray-50 uppercase tracking-widest">
                 {{ title }}
               </DialogTitle>
               <!-- Always rendered: satisfies Radix aria requirement; visually hidden when no description -->
-              <DialogDescription :class="description ? 'text-sm font-bold text-gray-400' : 'sr-only'">
+              <DialogDescription :class="description ? 'text-sm font-bold text-gray-400 dark:text-gray-500' : 'sr-only'">
                 {{ description || title }}
               </DialogDescription>
             </div>
             <DialogClose
-              class="ml-4 flex-shrink-0 rounded-xl p-2 text-gray-400 opacity-70 transition-all hover:bg-gray-50 hover:text-gray-900 hover:opacity-100 outline-none focus:ring-4 focus:ring-gray-100"
+              class="ml-4 flex-shrink-0 rounded-xl p-2 text-gray-400 dark:text-gray-500 opacity-70 transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white hover:opacity-100 outline-none focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700"
             >
               <X class="h-5 w-5" />
               <span class="sr-only">Fechar</span>
@@ -113,7 +113,7 @@ onUnmounted(() => {
           </div>
 
           <!-- Footer fixo -->
-          <div v-if="$slots.footer" class="flex-shrink-0 px-8 py-6 border-t border-gray-100 bg-white flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+          <div v-if="$slots.footer" class="flex-shrink-0 px-8 py-6 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
             <slot name="footer" />
           </div>
         </DialogContent>

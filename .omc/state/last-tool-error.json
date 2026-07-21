@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"/home/brunotrinchao/.claude/squeez/bin/squeez wrap 'grep -n \\\"text-gray-600 uppercase tracking-widest ml-1\\\\|inline-flex items-center justify-between\\\\|min-w-\\\\[var\\\\(--radix\\\\|flex items-...",
+  "error": "Exit code 2\n# squeez [grep] 7→7 tokens (-0%) 50ms [adaptive: Full] [budget: ~6792 calls left] [agents: 3 calls, ~1050K est. tokens]\ngrep: ( ou \\( descasados",
+  "timestamp": "2026-07-21T20:46:36.066Z",
+  "retry_count": 1
+}

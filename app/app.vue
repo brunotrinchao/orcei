@@ -50,10 +50,10 @@ function handleCancel() {
     leave-from-class="opacity-100"
     leave-to-class="opacity-0"
   >
-    <div v-if="isLoading" class="fixed inset-0 z-[9999] bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center">
+    <div v-if="isLoading" class="fixed inset-0 z-[9999] bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm flex flex-col items-center justify-center">
       <div class="flex flex-col items-center gap-6">
         <AppLogo size="xl" :loading="true" :icon-only="true" />
-        <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] animate-pulse">Carregando...</p>
+        <p class="text-[10px] font-black text-gray-400 dark:text-gray-400 uppercase tracking-[0.4em] animate-pulse">Carregando...</p>
       </div>
     </div>
   </Transition>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useIntersectionObserver } from '@vueuse/core'
 import { Search, Plus, CreditCard, Mail, Trash2, Shield, User, Loader2, ArrowRight, LogIn } from 'lucide-vue-next'
 
 
@@ -9,20 +10,24 @@ if (process.client && user.value?.role !== 'admin') {
 }
 
 const searchQuery = ref('')
-const currentPage = ref(1)
 const itemsPerPage = 20
+const query = computed(() => ({ search: searchQuery.value }))
+const {
+  items: users,
+  total: totalUsers,
+  pending,
+  loadingMore,
+  hasMore,
+  loadMore,
+  reset: refresh,
+} = useInfiniteList('/api/admin/users', query, { itemsPerPage, itemsKey: 'users' })
 
-const { data: usersData, refresh, pending } = useFetch<any>('/api/admin/users', {
-  query: computed(() => ({
-    page: currentPage.value,
-    limit: itemsPerPage,
-    search: searchQuery.value
-  })),
-  watch: [currentPage, searchQuery]
-})
-
-const users = computed(() => usersData.value?.users || [])
-const totalUsers = computed(() => usersData.value?.total || 0)
+const mobileSentinelRef = ref<HTMLElement | null>(null)
+useIntersectionObserver(mobileSentinelRef, ([entry]) => {
+  if (entry?.isIntersecting && hasMore.value && !loadingMore.value) {
+    loadMore()
+  }
+}, { threshold: 0.1 })
 
 // Modal de Créditos
 const isCreditModalOpen = ref(false)
@@ -110,9 +115,9 @@ function confirmImpersonate(targetUser: any) {
     <BaseDataList
       :items="users"
       :pending="pending"
-      :total="totalUsers"
-      :items-per-page="itemsPerPage"
-      v-model:current-page="currentPage"
+      :has-more="hasMore"
+      :loading-more="loadingMore"
+      @load-more="loadMore"
       empty-title="Nenhum usuário encontrado"
     >
       <template #header>
@@ -205,9 +210,8 @@ function confirmImpersonate(targetUser: any) {
           @adjust-credits="openCreditModal(user)"
           @impersonate="confirmImpersonate(user)"
         />
-        <div v-if="totalUsers > itemsPerPage" class="flex justify-center pt-2">
-          <BasePagination :total="totalUsers" :items-per-page="itemsPerPage" v-model="currentPage" />
-        </div>
+        <div ref="mobileSentinelRef" v-if="hasMore" class="h-1" />
+        <div v-if="loadingMore" class="py-4 text-center text-sm text-gray-400 font-bold">Carregando...</div>
       </template>
     </div>
 

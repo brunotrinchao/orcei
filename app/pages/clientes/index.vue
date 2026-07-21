@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useIntersectionObserver } from '@vueuse/core'
 import { Search, Plus, Pencil, Trash2, RefreshCcw, MapPin, Mail, Phone, ExternalLink, MoreVertical } from 'lucide-vue-next'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
 import type { ClientDTO } from '../../../../types'
@@ -7,20 +8,24 @@ import type { ClientDTO } from '../../../../types'
 const { notify, confirm: confirmAlert } = useAlerts()
 
 const searchQuery = ref('')
-const currentPage = ref(1)
 const itemsPerPage = 10
+const query = computed(() => ({ search: searchQuery.value }))
+const {
+  items: clients,
+  total: totalClients,
+  pending,
+  loadingMore,
+  hasMore,
+  loadMore,
+  reset: refresh,
+} = useInfiniteList('/api/clients', query, { itemsPerPage })
 
-const { data: clientsData, refresh, pending } = useLazyFetch<any>('/api/clients', {
-  query: computed(() => ({
-    page: currentPage.value,
-    limit: itemsPerPage,
-    search: searchQuery.value
-  })),
-  watch: [currentPage, searchQuery]
-})
-
-const clients = computed(() => clientsData.value?.items || [])
-const totalClients = computed(() => clientsData.value?.total || 0)
+const mobileSentinelRef = ref<HTMLElement | null>(null)
+useIntersectionObserver(mobileSentinelRef, ([entry]) => {
+  if (entry?.isIntersecting && hasMore.value && !loadingMore.value) {
+    loadMore()
+  }
+}, { threshold: 0.1 })
 
 const showForm = ref(false)
 const selectedClient = ref<ClientDTO | null>(null)
@@ -308,9 +313,9 @@ const formatPhone = (phone: string) => {
     <BaseDataList
       :items="clients"
       :pending="pending"
-      :total="totalClients"
-      :items-per-page="itemsPerPage"
-      v-model:current-page="currentPage"
+      :has-more="hasMore"
+      :loading-more="loadingMore"
+      @load-more="loadMore"
       empty-title="Sem Clientes"
       empty-subtitle="Sua lista de clientes aparecerá aqui. Comece cadastrando o primeiro."
     >
@@ -436,9 +441,8 @@ const formatPhone = (phone: string) => {
           @edit="openModal(client)"
           @delete="deleteClient(client._id)"
         />
-        <div v-if="totalClients > itemsPerPage" class="flex justify-center pt-2">
-          <BasePagination :total="totalClients" :items-per-page="itemsPerPage" v-model="currentPage" />
-        </div>
+        <div ref="mobileSentinelRef" v-if="hasMore" class="h-1" />
+        <div v-if="loadingMore" class="py-4 text-center text-sm text-gray-400 font-bold">Carregando...</div>
       </template>
     </div>
   </div>

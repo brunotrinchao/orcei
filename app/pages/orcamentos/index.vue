@@ -14,7 +14,6 @@ const filterStatus = ref('')
 const filterStartDate = ref('')
 const filterEndDate = ref('')
 const filterPendingChat = ref(false)
-const currentPage = ref(1)
 const itemsPerPage = 10
 
 const hasFilters = computed(() => {
@@ -27,82 +26,30 @@ function clearFilters() {
   filterStartDate.value = ''
   filterEndDate.value = ''
   filterPendingChat.value = false
-  currentPage.value = 1
 }
 
-const { data: proposalsData, refresh, pending } = useLazyFetch<any>('/api/proposals', {
-  query: computed(() => ({
-    page: currentPage.value,
-    limit: itemsPerPage,
-    search: searchQuery.value,
-    status: filterStatus.value,
-    startDate: filterStartDate.value,
-    endDate: filterEndDate.value,
-    pendingChat: filterPendingChat.value
-  })),
-  watch: [currentPage, searchQuery, filterStatus, filterStartDate, filterEndDate, filterPendingChat]
-})
+const query = computed(() => ({
+  search: searchQuery.value,
+  status: filterStatus.value,
+  startDate: filterStartDate.value,
+  endDate: filterEndDate.value,
+  pendingChat: filterPendingChat.value,
+}))
 
-const proposals = computed<any[]>(() => proposalsData.value?.items || [])
-const totalProposals = computed(() => proposalsData.value?.total || 0)
+const {
+  items: proposals,
+  total: totalProposals,
+  pending,
+  loadingMore,
+  hasMore,
+  loadMore,
+  reset: refresh,
+} = useInfiniteList<ProposalDTO>('/api/proposals', query, { itemsPerPage })
 
-// Infinite scroll (mobile) - estado isolado da paginação desktop
-const mobileProposals = ref<ProposalDTO[]>([])
-const mobilePage = ref(1)
-const mobileTotal = ref(0)
-const isMobileFetching = ref(false)
-const mobileInitialLoading = ref(true)
-const mobileHasMore = computed(() => mobileProposals.value.length < mobileTotal.value)
-const sentinelRef = ref<HTMLElement | null>(null)
-
-function isMobileViewport() {
-  return typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
-}
-
-async function fetchMobilePage(page: number, replace = false) {
-  if (isMobileFetching.value) return
-  isMobileFetching.value = true
-  try {
-    const res: any = await $fetch('/api/proposals', {
-      query: {
-        page,
-        limit: itemsPerPage,
-        search: searchQuery.value,
-        status: filterStatus.value,
-        startDate: filterStartDate.value,
-        endDate: filterEndDate.value,
-        pendingChat: filterPendingChat.value
-      }
-    })
-    mobileProposals.value = replace ? res.items : [...mobileProposals.value, ...res.items]
-    mobileTotal.value = res.total
-    mobilePage.value = page
-  } finally {
-    isMobileFetching.value = false
-    mobileInitialLoading.value = false
-  }
-}
-
-function resetMobileList() {
-  mobileProposals.value = []
-  mobileTotal.value = 0
-  mobilePage.value = 1
-  mobileInitialLoading.value = true
-  if (isMobileViewport()) fetchMobilePage(1, true)
-}
-
-function refreshBoth() {
-  refresh()
-  resetMobileList()
-}
-
-watch([searchQuery, filterStatus, filterStartDate, filterEndDate, filterPendingChat], () => {
-  resetMobileList()
-})
-
-useIntersectionObserver(sentinelRef, ([entry]) => {
-  if (entry?.isIntersecting && mobileHasMore.value && !isMobileFetching.value) {
-    fetchMobilePage(mobilePage.value + 1)
+const mobileSentinelRef = ref<HTMLElement | null>(null)
+useIntersectionObserver(mobileSentinelRef, ([entry]) => {
+  if (entry?.isIntersecting && hasMore.value && !loadingMore.value) {
+    loadMore()
   }
 }, { threshold: 0.1 })
 
@@ -135,7 +82,7 @@ async function setupGlobalNotifications() {
       notificationChannel = pusher.subscribe(`private-profile-${profile._id}`)
       notificationChannel.bind('proposal-notification', (data: any) => {
         // Se receber uma notificação de nova mensagem, atualiza a lista para refletir no badge
-        refreshBoth()
+        refresh()
       })
     }
   } catch (e) {
@@ -148,7 +95,6 @@ onMounted(() => {
   const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   siteOrigin.value = isLocal ? window.location.origin : (config.public.publicProposalUrl || window.location.origin)
   setupGlobalNotifications()
-  resetMobileList()
 })
 
 // Observa mudanças na query para abrir o modal de nova proposta, mesmo que o usuário já esteja na página
@@ -310,7 +256,7 @@ async function handleProposalSubmit(formData: Partial<ProposalDTO>) {
     })
     
     isModalOpen.value = false
-    refreshBoth()
+    refresh()
 
     if (isNew && res.status === 'created' && res.client?.phone) {
       lastCreatedProposal.value = res
@@ -384,7 +330,7 @@ function confirmDeleteProposal(proposal: ProposalDTO) {
       try {
         await $fetch(`/api/proposals/${proposal._id}`, { method: 'DELETE' })
         notify('Sucesso', 'Orçamento excluído com sucesso.')
-        refreshBoth()
+        refresh()
       } catch (e: any) {
         notify('Erro', e.data?.statusMessage || 'Erro ao excluir orçamento')
       }
@@ -434,7 +380,7 @@ async function saveContract() {
       body: { contractText: localContractText.value }
     })
     isContractModalOpen.value = false
-    refreshBoth()
+    refresh()
     notify('Sucesso', 'Contrato atualizado com sucesso!')
   } catch (e: any) {
     notify('Erro', e.data?.statusMessage || 'Erro ao salvar contrato')
@@ -522,9 +468,9 @@ async function saveContract() {
     <BaseDataList
       :items="proposals"
       :pending="pending"
-      :total="totalProposals"
-      :items-per-page="itemsPerPage"
-      v-model:current-page="currentPage"
+      :has-more="hasMore"
+      :loading-more="loadingMore"
+      @load-more="loadMore"
       empty-title="Sem Orçamentos"
       empty-subtitle="Clique no botão acima para criar seu primeiro orçamento."
     >
@@ -679,10 +625,10 @@ async function saveContract() {
 
     <!-- Listagem em Cards (mobile) -->
     <div class="md:hidden space-y-4">
-      <template v-if="mobileInitialLoading">
+      <template v-if="pending && proposals.length === 0">
         <BaseSkeleton v-for="i in 3" :key="i" height="10rem" borderRadius="1rem" />
       </template>
-      <template v-else-if="mobileProposals.length === 0">
+      <template v-else-if="proposals.length === 0">
         <div class="py-16 text-center">
           <p class="font-black text-gray-900">Sem Orçamentos</p>
           <p class="text-sm text-gray-500 mt-1">Clique no botão acima para criar seu primeiro orçamento.</p>
@@ -690,7 +636,7 @@ async function saveContract() {
       </template>
       <template v-else>
         <ProposalCard
-          v-for="proposal in mobileProposals"
+          v-for="proposal in proposals"
           :key="proposal._id"
           :proposal="proposal"
           :status-variant="getStatusVariant(proposal.status)"
@@ -704,9 +650,8 @@ async function saveContract() {
           @edit="openModal(proposal)"
           @delete="confirmDeleteProposal(proposal)"
         />
-        <div ref="sentinelRef" class="h-1"></div>
-        <div v-if="isMobileFetching" class="py-4 text-center text-sm text-gray-400 font-bold">Carregando...</div>
-        <div v-else-if="!mobileHasMore" class="py-4 text-center text-sm text-gray-400 font-bold">Fim da lista</div>
+        <div ref="mobileSentinelRef" v-if="hasMore" class="h-1" />
+        <div v-if="loadingMore" class="py-4 text-center text-sm text-gray-400 font-bold">Carregando...</div>
       </template>
     </div>
 
@@ -1006,7 +951,7 @@ async function saveContract() {
     <LazyProposalChatModal
       v-model:open="isChatOpen"
       :proposal="selectedProposal"
-      @refresh="refreshBoth"
+      @refresh="refresh"
     />
     <!-- Modal de Paywall Express -->
     <PaywallExpressModal 

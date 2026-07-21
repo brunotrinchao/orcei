@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useIntersectionObserver } from '@vueuse/core'
 import { History, User, Activity, Clock } from 'lucide-vue-next'
 
 
@@ -7,19 +8,23 @@ if (process.client && user.value?.role !== 'admin') {
   navigateTo('/dashboard')
 }
 
-const currentPage = ref(1)
 const itemsPerPage = 50
+const query = computed(() => ({}))
+const {
+  items: logs,
+  total: totalLogs,
+  pending,
+  loadingMore,
+  hasMore,
+  loadMore,
+} = useInfiniteList('/api/admin/audit-logs', query, { itemsPerPage, itemsKey: 'logs' })
 
-const { data: logsData, pending } = useFetch<any>('/api/admin/audit-logs', {
-  query: computed(() => ({
-    page: currentPage.value,
-    limit: itemsPerPage
-  })),
-  watch: [currentPage]
-})
-
-const logs = computed(() => logsData.value?.logs || [])
-const totalLogs = computed(() => logsData.value?.total || 0)
+const mobileSentinelRef = ref<HTMLElement | null>(null)
+useIntersectionObserver(mobileSentinelRef, ([entry]) => {
+  if (entry?.isIntersecting && hasMore.value && !loadingMore.value) {
+    loadMore()
+  }
+}, { threshold: 0.1 })
 
 const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
 </script>
@@ -35,9 +40,9 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
     <BaseDataList
       :items="logs"
       :pending="pending"
-      :total="totalLogs"
-      :items-per-page="itemsPerPage"
-      v-model:current-page="currentPage"
+      :has-more="hasMore"
+      :loading-more="loadingMore"
+      @load-more="loadMore"
       empty-title="Nenhum log encontrado"
     >
       <template #header>
@@ -89,9 +94,8 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
           :log="log"
           :format-date="formatDate"
         />
-        <div v-if="totalLogs > itemsPerPage" class="flex justify-center pt-2">
-          <BasePagination :total="totalLogs" :items-per-page="itemsPerPage" v-model="currentPage" />
-        </div>
+        <div ref="mobileSentinelRef" v-if="hasMore" class="h-1" />
+        <div v-if="loadingMore" class="py-4 text-center text-sm text-gray-400 font-bold">Carregando...</div>
       </template>
     </div>
   </div>

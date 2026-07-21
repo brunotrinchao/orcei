@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useIntersectionObserver } from '@vueuse/core'
 import * as LucideIcons from 'lucide-vue-next'
 import { Plus, Search, Image, Pencil, Trash2, Sparkles, RefreshCcw, Package, ShoppingBag, HelpCircle, MoreVertical } from 'lucide-vue-next'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
@@ -8,20 +9,24 @@ import type { CatalogItemDTO } from '../../../../types'
 const { notify, confirm: confirmAlert } = useAlerts()
 
 const searchQuery = ref('')
-const currentPage = ref(1)
 const itemsPerPage = 10
+const query = computed(() => ({ search: searchQuery.value }))
+const {
+  items,
+  total: totalItems,
+  pending,
+  loadingMore,
+  hasMore,
+  loadMore,
+  reset: refresh,
+} = useInfiniteList('/api/catalog', query, { itemsPerPage })
 
-const { data: catalogData, refresh, pending } = useLazyFetch<any>('/api/catalog', {
-  query: computed(() => ({
-    page: currentPage.value,
-    limit: itemsPerPage,
-    search: searchQuery.value
-  })),
-  watch: [currentPage, searchQuery]
-})
-
-const items = computed(() => catalogData.value?.items || [])
-const totalItems = computed(() => catalogData.value?.total || 0)
+const mobileSentinelRef = ref<HTMLElement | null>(null)
+useIntersectionObserver(mobileSentinelRef, ([entry]) => {
+  if (entry?.isIntersecting && hasMore.value && !loadingMore.value) {
+    loadMore()
+  }
+}, { threshold: 0.1 })
 
 const showForm = ref(false)
 const selectedItem = ref<CatalogItemDTO | null>(null)
@@ -90,9 +95,9 @@ function getIcon(name: string) {
     <BaseDataList
       :items="items"
       :pending="pending"
-      :total="totalItems"
-      :items-per-page="itemsPerPage"
-      v-model:current-page="currentPage"
+      :has-more="hasMore"
+      :loading-more="loadingMore"
+      @load-more="loadMore"
       empty-title="Catálogo Vazio"
       empty-subtitle="Sua lista de produtos e serviços aparecerá aqui. Comece cadastrando o primeiro."
     >
@@ -227,9 +232,8 @@ function getIcon(name: string) {
           @edit="openModal(item)"
           @delete="deleteItem(item._id)"
         />
-        <div v-if="totalItems > itemsPerPage" class="flex justify-center pt-2">
-          <BasePagination :total="totalItems" :items-per-page="itemsPerPage" v-model="currentPage" />
-        </div>
+        <div ref="mobileSentinelRef" v-if="hasMore" class="h-1" />
+        <div v-if="loadingMore" class="py-4 text-center text-sm text-gray-400 font-bold">Carregando...</div>
       </template>
     </div>
   </div>

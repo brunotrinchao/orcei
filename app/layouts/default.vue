@@ -64,7 +64,7 @@ onUnmounted(() => {
     <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100">
       <nav class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <div class="flex items-center gap-12">
-          <NuxtLink to="/"><AppLogo size="sm" /></NuxtLink>
+          <NuxtLink :to="loggedIn ? '/dashboard' : '/'"><AppLogo size="sm" /></NuxtLink>
           <div v-if="loggedIn" class="hidden md:flex gap-8 items-center">
             <NuxtLink to="/dashboard" @mouseenter="preloadRouteComponents('/dashboard')" @focus="preloadRouteComponents('/dashboard')" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Dashboard</NuxtLink>
             <NuxtLink to="/clientes" @mouseenter="preloadRouteComponents('/clientes')" @focus="preloadRouteComponents('/clientes')" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" active-class="text-gray-900">Clientes</NuxtLink>

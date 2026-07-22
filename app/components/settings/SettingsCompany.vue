@@ -21,12 +21,12 @@ const localCompany = computed({
 </script>
 
 <template>
-  <section id="empresa" data-tour="config-empresa" class="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-gray-200 dark:border-gray-700 shadow-sm scroll-mt-8">
+  <section id="empresa" data-tour="config-empresa" class="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-gray-200 dark:border-gray-800 shadow-sm scroll-mt-8">
     <div class="flex items-center gap-3 mb-8">
-      <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
-        <Briefcase class="w-5 h-5 text-purple-600" />
+      <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/50 flex items-center justify-center">
+        <Briefcase class="w-5 h-5 text-purple-600 dark:text-purple-400" />
       </div>
-      <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Dados da Empresa</h2>
+      <h2 class="text-xl font-black text-gray-900 dark:text-gray-50 uppercase tracking-tight">Dados da Empresa</h2>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <BaseInput v-model="localCompany.tradeName" label="Nome Fantasia" required />

@@ -12,12 +12,24 @@ export interface GoogleEventData {
 }
 
 export const GoogleService = {
-  getAuthClient(profile: any) {
+  getAuthClient(profile: any, event?: any) {
     const config = useRuntimeConfig()
+    let redirectUri = `${config.public.siteUrl}/api/integrations/google/callback`
+
+    if (event) {
+      try {
+        const protocol = getRequestProtocol(event, { xForwardedProto: true }) || 'https'
+        const host = getRequestHost(event, { xForwardedHost: true })
+        if (host) {
+          redirectUri = `${protocol}://${host}/api/integrations/google/callback`
+        }
+      } catch (e) {}
+    }
+
     const oauth2Client = new google.auth.OAuth2(
       config.googleClientId,
       config.googleClientSecret,
-      `${config.public.siteUrl}/api/integrations/google/callback`
+      redirectUri
     )
 
     if (profile.googleIntegration?.refreshToken) {

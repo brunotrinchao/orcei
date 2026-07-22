@@ -30,34 +30,34 @@ function removePhone(index: number) {
 </script>
 
 <template>
-  <section id="contato" data-tour="config-contato" class="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm scroll-mt-8">
+  <section id="contato" data-tour="config-contato" class="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-gray-200 dark:border-gray-800 shadow-sm scroll-mt-8">
     <div class="flex items-center gap-3 mb-8">
-      <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-        <Phone class="w-5 h-5 text-blue-600" />
+      <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center">
+        <Phone class="w-5 h-5 text-blue-600 dark:text-blue-400" />
       </div>
-      <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Contato e Redes Sociais</h2>
+      <h2 class="text-xl font-black text-gray-900 dark:text-gray-50 uppercase tracking-tight">Contato e Redes Sociais</h2>
     </div>
 
     <div class="space-y-8">
       <div class="space-y-4">
         <div class="flex justify-between items-center px-1">
-          <label class="text-xs font-black text-gray-600 uppercase tracking-widest">Telefones</label>
+          <label class="text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest">Telefones</label>
           <button
             type="button"
             @click="addPhone"
-            class="text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-1 hover:text-blue-700 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+            class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest flex items-center gap-1 hover:text-blue-700 dark:hover:text-blue-300 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
           >
             <Plus class="w-3 h-3" /> Adicionar
           </button>
         </div>
-        <div v-for="(phone, idx) in localContact.phones" :key="idx" class="flex flex-col sm:flex-row gap-4 p-6 bg-gray-50/50 rounded-3xl border border-gray-100">
+        <div v-for="(phone, idx) in localContact.phones" :key="idx" class="flex flex-col sm:flex-row gap-4 p-6 bg-gray-50/50 dark:bg-gray-950/50 rounded-3xl border border-gray-100 dark:border-gray-800">
           <div class="flex-1">
             <BaseInput v-model="phone.number" label="Número" placeholder="(00) 00000-0000" mask="phone" />
           </div>
           <div class="flex items-center gap-4 shrink-0">
             <div class="flex items-center gap-2">
               <BaseCheckbox v-model="phone.isWhatsapp" :id="'wa-'+idx" />
-              <label :for="'wa-'+idx" class="text-[10px] font-black text-gray-600 uppercase tracking-widest cursor-pointer flex items-center gap-1.5 hover:text-gray-900 transition-colors">
+              <label :for="'wa-'+idx" class="text-[10px] font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest cursor-pointer flex items-center gap-1.5 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
                 <img :src="'/images/icons/whatsapp-svg.svg'" class="w-3 h-3" alt="WhatsApp" loading="lazy"/> WhatsApp
               </label>
             </div>
@@ -74,9 +74,9 @@ function removePhone(index: number) {
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100" v-if="localContact.social">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100 dark:border-gray-800" v-if="localContact.social">
         <div class="space-y-3">
-          <label for="social-instagram" class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1 flex items-center gap-2">
+          <label for="social-instagram" class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
             <Instagram class="w-3.5 h-3.5 text-pink-500" /> Instagram
           </label>
           <input
@@ -84,11 +84,11 @@ function removePhone(index: number) {
             v-model="localContact.social.instagram"
             type="text"
             placeholder="@seuusuario"
-            class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-800 focus-visible:ring-2 focus-visible:ring-blue-600"
+            class="w-full px-5 py-4 bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-800 dark:text-gray-100 focus-visible:ring-2 focus-visible:ring-blue-600"
           >
         </div>
         <div class="space-y-3">
-          <label for="social-youtube" class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1 flex items-center gap-2">
+          <label for="social-youtube" class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
             <Youtube class="w-3.5 h-3.5 text-red-500" /> YouTube
           </label>
           <input
@@ -96,31 +96,31 @@ function removePhone(index: number) {
             v-model="localContact.social.youtube"
             type="text"
             placeholder="Canal"
-            class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-800 focus-visible:ring-2 focus-visible:ring-blue-600"
+            class="w-full px-5 py-4 bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-800 dark:text-gray-100 focus-visible:ring-2 focus-visible:ring-blue-600"
           >
         </div>
         <div class="space-y-3">
-          <label for="social-facebook" class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <Facebook class="w-3.5 h-3.5 text-blue-600" /> Facebook
+          <label for="social-facebook" class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
+            <Facebook class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" /> Facebook
           </label>
           <input
             id="social-facebook"
             v-model="localContact.social.facebook"
             type="text"
             placeholder="@suapagina"
-            class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-800 focus-visible:ring-2 focus-visible:ring-blue-600"
+            class="w-full px-5 py-4 bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-800 dark:text-gray-100 focus-visible:ring-2 focus-visible:ring-blue-600"
           >
         </div>
         <div class="space-y-3">
-          <label for="social-twitter" class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <Twitter class="w-3.5 h-3.5 text-gray-800" /> Twitter (X)
+          <label for="social-twitter" class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
+            <Twitter class="w-3.5 h-3.5 text-gray-800 dark:text-gray-200" /> Twitter (X)
           </label>
           <input
             id="social-twitter"
             v-model="localContact.social.twitter"
             type="text"
             placeholder="@seuusuario"
-            class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-800 focus-visible:ring-2 focus-visible:ring-blue-600"
+            class="w-full px-5 py-4 bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-800 dark:text-gray-100 focus-visible:ring-2 focus-visible:ring-blue-600"
           >
         </div>
       </div>

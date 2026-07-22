@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
     domain: getCookieDomain(config.public.siteUrl)
   })
 
-  const oauth2Client = GoogleService.getAuthClient({})
+  const oauth2Client = GoogleService.getAuthClient({}, event)
   const url = oauth2Client.generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',

@@ -30,7 +30,7 @@ const editor = useEditor({
   },
   editorProps: {
     attributes: {
-      class: 'prose prose-sm sm:prose-base max-w-none focus:outline-none min-h-[150px] p-4',
+      class: 'prose prose-sm sm:prose-base dark:prose-invert max-w-none focus:outline-none min-h-[150px] p-4 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-950',
     },
   },
 })
@@ -48,13 +48,13 @@ onUnmounted(() => {
 
 <template>
   <div class="space-y-2">
-    <label v-if="label" class="block text-sm font-bold text-gray-700">{{ label }}</label>
-    <div class="border rounded-xl overflow-hidden bg-white focus-within:ring-2 focus-within:ring-blue-500 transition shadow-sm">
+    <label v-if="label" class="block text-sm font-bold text-gray-700 dark:text-gray-300">{{ label }}</label>
+    <div class="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-blue-500 transition shadow-sm">
       <!-- Toolbar -->
-      <div v-if="editor" class="flex flex-wrap gap-1 p-2 border-b bg-gray-50">
+      <div v-if="editor" class="flex flex-wrap gap-1 p-2 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
         <button 
           @click.prevent="editor.chain().focus().toggleBold().run()"
-          :class="{ 'bg-blue-100 text-blue-600': editor.isActive('bold'), 'hover:bg-gray-200': !editor.isActive('bold') }"
+          :class="{ 'bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 font-bold': editor.isActive('bold'), 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800': !editor.isActive('bold') }"
           class="p-2 rounded transition" title="Negrito"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -63,7 +63,7 @@ onUnmounted(() => {
         </button>
         <button 
           @click.prevent="editor.chain().focus().toggleItalic().run()"
-          :class="{ 'bg-blue-100 text-blue-600': editor.isActive('italic'), 'hover:bg-gray-200': !editor.isActive('italic') }"
+          :class="{ 'bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 font-bold': editor.isActive('italic'), 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800': !editor.isActive('italic') }"
           class="p-2 rounded transition" title="Itálico"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 italic" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -72,24 +72,24 @@ onUnmounted(() => {
         </button>
         <button 
           @click.prevent="editor.chain().focus().toggleUnderline().run()"
-          :class="{ 'bg-blue-100 text-blue-600': editor.isActive('underline'), 'hover:bg-gray-200': !editor.isActive('underline') }"
+          :class="{ 'bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 font-bold': editor.isActive('underline'), 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800': !editor.isActive('underline') }"
           class="p-2 rounded transition" title="Sublinhado"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 4v7a4 4 0 01-8 0V4M6 20h12" />
           </svg>
         </button>
-        <div class="w-px h-6 bg-gray-200 mx-1"></div>
+        <div class="w-px h-6 bg-gray-200 dark:bg-gray-800 mx-1"></div>
         <button 
           @click.prevent="editor.chain().focus().toggleHeading({ level: 2 }).run()"
-          :class="{ 'bg-blue-100 text-blue-600': editor.isActive('heading', { level: 2 }), 'hover:bg-gray-200': !editor.isActive('heading', { level: 2 }) }"
+          :class="{ 'bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 font-bold': editor.isActive('heading', { level: 2 }), 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800': !editor.isActive('heading', { level: 2 }) }"
           class="p-2 rounded transition text-xs font-bold"
         >
           H2
         </button>
         <button 
           @click.prevent="editor.chain().focus().toggleBulletList().run()"
-          :class="{ 'bg-blue-100 text-blue-600': editor.isActive('bulletList'), 'hover:bg-gray-200': !editor.isActive('bulletList') }"
+          :class="{ 'bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 font-bold': editor.isActive('bulletList'), 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800': !editor.isActive('bulletList') }"
           class="p-2 rounded transition"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -109,5 +109,8 @@ onUnmounted(() => {
   color: #adb5bd;
   pointer-events: none;
   height: 0;
+}
+.dark .tiptap p.is-editor-empty:first-child::before {
+  color: #64748b;
 }
 </style>

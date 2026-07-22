@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const oauth2Client = GoogleService.getAuthClient({})
+    const oauth2Client = GoogleService.getAuthClient({}, event)
     const { tokens } = await oauth2Client.getToken(code as string)
 
     oauth2Client.setCredentials(tokens)

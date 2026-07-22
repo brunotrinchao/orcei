@@ -54,7 +54,7 @@ useHead({
 // SEO Avançado Dinâmico (OpenGraph & Twitter Cards com URLs Absolutas)
 useSeoMeta({
   // Title otimizado: <60 chars, keyword principal no início, benefit claro
-  title: 'Orcei Fácil — Software de Orçamento com IA Grátis',
+  title: 'Orcei Fácil — Software de Orçamento com IA',
   ogTitle: 'Orcei Fácil — Crie Propostas Comerciais com IA em 2 Minutos',
   // Description: keyword-rich, CTA implícito, <155 chars
   description: 'Software de orçamento com IA para freelancers e autônomos. Crie propostas comerciais profissionais em 2 minutos, envie por link e feche mais clientes. Grátis para começar.',
@@ -69,7 +69,7 @@ useSeoMeta({
   ogLocale: 'pt_BR',
   twitterCard: 'summary_large_image',
   twitterSite: '@orceifacil',
-  twitterTitle: 'Orcei Fácil — Software de Orçamento com IA Grátis',
+  twitterTitle: 'Orcei Fácil — Software de Orçamento com IA',
   twitterDescription: 'Crie propostas comerciais profissionais com IA em 2 minutos. Envie por link, acompanhe leitura e feche mais clientes. Primeiro orçamento grátis!',
   twitterImage: ogImageUrl,
   twitterImageAlt: 'Orcei Fácil — painel de orçamentos com inteligência artificial',

@@ -266,22 +266,22 @@ defineExpose({
       >
         <StepperSeparator
           v-if="step.step !== steps.length"
-          class="absolute left-[calc(50%+20px)] right-[calc(-50%+10px)] top-5 block h-[2px] shrink-0 rounded-full bg-gray-100 data-[state=completed]:bg-blue-600 transition-colors"
+          class="absolute left-[calc(50%+20px)] right-[calc(-50%+10px)] top-5 block h-[2px] shrink-0 rounded-full bg-gray-100 dark:bg-gray-800 data-[state=completed]:bg-blue-600 dark:data-[state=completed]:bg-blue-500 transition-colors"
         />
 
         <StepperTrigger as="button" class="flex flex-col items-center text-center gap-2 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
           <StepperIndicator
             :class="[
               'flex h-10 w-10 items-center justify-center rounded-full text-sm font-black border-2 transition-all',
-              currentStep === step.step ? 'border-blue-600 bg-blue-600 text-white shadow-lg shadow-blue-200' :
-              currentStep > step.step ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-200 text-gray-400 bg-white'
+              currentStep === step.step ? 'border-blue-600 bg-blue-600 text-white shadow-lg shadow-blue-500/20' :
+              currentStep > step.step ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-900'
             ]"
           >
             <Check v-if="currentStep > step.step" class="w-5 h-5" />
             <span v-else>{{ step.step }}</span>
           </StepperIndicator>
           <div class="space-y-0.5">
-            <StepperTitle :class="['text-xs font-black uppercase tracking-widest', currentStep >= step.step ? 'text-gray-900' : 'text-gray-400']">
+            <StepperTitle :class="['text-xs font-black uppercase tracking-widest', currentStep >= step.step ? 'text-gray-900 dark:text-gray-50' : 'text-gray-400 dark:text-gray-500']">
               {{ step.title }}
             </StepperTitle>
           </div>

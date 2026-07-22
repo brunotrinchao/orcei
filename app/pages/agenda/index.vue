@@ -231,15 +231,12 @@ const proposalOptions = computed(() => {
           </div>
         </div>
 
-        <div class="space-y-2">
-          <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Observações</label>
-          <textarea 
-            v-model="form.description" 
-            rows="3" 
-            class="w-full px-5 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-300"
-            placeholder="Detalhes adicionais..."
-          ></textarea>
-        </div>
+        <BaseTextarea 
+          v-model="form.description" 
+          label="Observações"
+          :rows="3" 
+          placeholder="Detalhes adicionais..."
+        />
 
       </form>
 

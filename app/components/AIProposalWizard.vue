@@ -183,7 +183,7 @@ function removeItem(idx: number) {
         </div>
 
         <!-- Conteúdo do Slide-over -->
-        <div class="flex-1 overflow-y-auto px-6 py-6 space-y-6 z-10 scrollbar-thin">
+        <div class="flex-1 overflow-y-auto px-6 py-6 space-y-6 z-10 custom-scrollbar">
           
           <!-- STEP 1: PROMPT -->
           <div v-if="step === 'prompt'" class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">

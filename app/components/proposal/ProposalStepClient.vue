@@ -104,7 +104,7 @@ async function extractClient() {
       
       <div class="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-800">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <label class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Dados do Cliente</label>
+          <label class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Dados do Cliente</label>
           <button 
             type="button"
             @click="isAIExtractOpen = !isAIExtractOpen"
@@ -124,12 +124,11 @@ async function extractClient() {
             </p>
           </div>
           
-          <textarea
+          <BaseTextarea
             v-model="rawLeadText"
-            rows="4"
+            :rows="4"
             placeholder="Ex: Oi, sou o Bruno Trinchão. Preciso de uma proposta comercial. Meu e-mail é bruno@trinchao.dev e WhatsApp 11988887777..."
-            class="w-full px-5 py-4 bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/30 outline-none font-bold text-slate-800 dark:text-slate-200 placeholder:text-slate-300 dark:placeholder:text-slate-700 resize-none text-xs shadow-inner"
-          ></textarea>
+          />
           
           <div class="flex justify-end">
             <BaseButton 
@@ -156,12 +155,12 @@ async function extractClient() {
           @update:model-value="onClientSelect"
         />
         
-        <div class="p-6 bg-gray-50 rounded-3xl border border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-4 relative z-0">
+        <div class="p-6 bg-gray-50 dark:bg-gray-900/60 rounded-3xl border border-gray-100 dark:border-gray-800 grid grid-cols-1 md:grid-cols-2 gap-4 relative z-0">
           <div class="md:col-span-2">
-            <BaseInput v-model="form.client.name" label="Nome do Cliente" readonly disabled class="bg-gray-100/50" required />
+            <BaseInput v-model="form.client.name" label="Nome do Cliente" readonly disabled required />
           </div>
-          <BaseInput v-model="form.client.email" label="E-mail" readonly disabled class="bg-gray-100/50" required />
-          <BaseInput v-model="form.client.phone" label="WhatsApp" readonly disabled class="bg-gray-100/50" />
+          <BaseInput v-model="form.client.email" label="E-mail" readonly disabled required />
+          <BaseInput v-model="form.client.phone" label="WhatsApp" readonly disabled />
         </div>
       </div>
     </div>

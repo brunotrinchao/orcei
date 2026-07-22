@@ -232,17 +232,17 @@ const formatPhone = (phone: string) => {
             />
             <div class="flex items-center gap-3 ml-2">
               <BaseCheckbox v-model="form.isWhatsapp" id="isWhatsapp" />
-              <label for="isWhatsapp" class="text-[10px] font-black text-gray-400 uppercase tracking-widest cursor-pointer hover:text-gray-600 transition-colors">
+              <label for="isWhatsapp" class="text-[10px] font-black text-gray-400 dark:text-gray-400 uppercase tracking-widest cursor-pointer hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
                 Este número possui WhatsApp
               </label>
             </div>
           </div>
         </div>
 
-        <div class="bg-gray-50/50 p-8 rounded-[2.5rem] border-2 border-gray-100 space-y-6">
+        <div class="bg-gray-50/50 dark:bg-gray-900/60 p-8 rounded-[2.5rem] border-2 border-gray-100 dark:border-gray-800 space-y-6">
           <div class="flex items-center justify-between px-1">
-            <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Endereço de Cobrança</h3>
-            <div v-if="isSearchingZip" class="flex items-center gap-2 text-[10px] font-black text-blue-600 animate-pulse uppercase tracking-widest">
+            <h3 class="text-[10px] font-black text-gray-400 dark:text-gray-400 uppercase tracking-[0.2em]">Endereço de Cobrança</h3>
+            <div v-if="isSearchingZip" class="flex items-center gap-2 text-[10px] font-black text-blue-600 dark:text-blue-400 animate-pulse uppercase tracking-widest">
               <RefreshCcw class="w-3 h-3 animate-spin" />
               Buscando...
             </div>
@@ -299,15 +299,12 @@ const formatPhone = (phone: string) => {
           </div>
         </div>
 
-        <div class="space-y-3">
-          <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-2">Notas Internas (opcional)</label>
-          <textarea 
-            v-model="form.notes" 
-            rows="3" 
-            class="w-full px-6 py-5 bg-white border-2 border-gray-100 rounded-[1.5rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-300 shadow-inner"
-            placeholder="Alguma observação sobre este cliente..."
-          ></textarea>
-        </div>
+        <BaseTextarea 
+          v-model="form.notes" 
+          label="Notas Internas (opcional)"
+          :rows="3" 
+          placeholder="Alguma observação sobre este cliente..."
+        />
 
       </form>
 

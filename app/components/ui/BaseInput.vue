@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import type { Component } from 'vue'
 import { IMaskDirective } from 'vue-imask'
+import { RefreshCcw } from 'lucide-vue-next'
 
 // Expose directive for template: vImask → v-imask
 const vImask = IMaskDirective
@@ -14,9 +17,13 @@ const props = defineProps<{
   required?: boolean
   disabled?: boolean
   readonly?: boolean
+  suffix?: string
+  prefix?: string
+  icon?: Component
+  loading?: boolean
 }>()
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'blur', 'focus'])
 
 // Guard: undefined/null → '' so native input never receives invalid value
 const safeValue = computed(() => props.modelValue ?? '')
@@ -72,6 +79,7 @@ const maskOptions = computed(() => {
 
   return props.mask
 })
+
 const inputId = useId()
 </script>
 
@@ -80,19 +88,41 @@ const inputId = useId()
     <label v-if="label" :for="inputId" class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">
       {{ label }} <span v-if="required" class="text-red-500">*</span>
     </label>
-    <input
-      :id="inputId"
-      :value="safeValue"
-      v-imask="maskOptions"
-      @input="onInput"
-      @accept="onAccept"
-      :type="type || 'text'"
-      :placeholder="placeholder"
-      :disabled="disabled"
-      :readonly="readonly"
-      class="w-full px-5 py-4 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all outline-none font-bold text-gray-900 dark:text-gray-50 placeholder:text-gray-400 dark:placeholder:text-gray-500 disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:cursor-not-allowed"
-      :class="{ 'border-red-300 dark:border-red-500/50 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500/20': error }"
-    >
+    <div class="relative flex items-center">
+      <!-- Ícone ou Prefixo na esquerda -->
+      <div v-if="icon || prefix || $slots.icon" class="absolute left-4 z-10 flex items-center gap-1.5 text-gray-400 dark:text-gray-500 pointer-events-none">
+        <slot name="icon">
+          <component :is="icon" v-if="icon" class="w-4 h-4" />
+        </slot>
+        <span v-if="prefix" class="text-xs font-black uppercase">{{ prefix }}</span>
+      </div>
+
+      <input
+        :id="inputId"
+        :value="safeValue"
+        v-imask="maskOptions"
+        @input="onInput"
+        @accept="onAccept"
+        @blur="emit('blur', $event)"
+        @focus="emit('focus', $event)"
+        :type="type || 'text'"
+        :placeholder="placeholder"
+        :disabled="disabled"
+        :readonly="readonly"
+        :class="[
+          'w-full py-4 bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:focus:border-blue-500 transition-all outline-none font-bold text-gray-900 dark:text-gray-50 placeholder:text-gray-400 dark:placeholder:text-gray-500 disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:cursor-not-allowed',
+          icon || prefix || $slots.icon ? 'pl-12' : 'pl-5',
+          suffix || loading ? 'pr-16' : 'pr-5',
+          error ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500/20' : ''
+        ]"
+      >
+
+      <!-- Símbolo de carregamento ou Sufixo na direita -->
+      <div v-if="loading || suffix" class="absolute right-5 flex items-center gap-2 pointer-events-none">
+        <RefreshCcw v-if="loading" class="w-4 h-4 animate-spin text-blue-600 dark:text-blue-400" />
+        <span v-if="suffix" class="text-xs font-black text-gray-400 dark:text-gray-500 uppercase">{{ suffix }}</span>
+      </div>
+    </div>
     <span v-if="error" class="text-[10px] font-bold text-red-500 ml-1 uppercase">{{ error }}</span>
   </div>
 </template>

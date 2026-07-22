@@ -140,7 +140,7 @@ const formatMessageTime = (date: any) => {
             <input
               v-model="newMessage"
               placeholder="Digite uma mensagem..."
-              class="w-full px-6 py-3.5 bg-white dark:bg-gray-800 border-none focus:ring-0 outline-none font-medium text-sm shadow-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+              class="w-full px-6 py-3.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-emerald-500/20 rounded-2xl outline-none font-medium text-sm shadow-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
             />
           </div>
           <button

@@ -137,7 +137,7 @@ function isItemSelected(item: any) {
         <span>Itens Obrigatórios ({{ form.items.length }})</span>
       </h3>
       
-      <div v-if="form.items.length === 0" class="p-8 border-2 border-dashed border-gray-200 rounded-3xl text-center text-gray-400 font-medium">
+      <div v-if="form.items.length === 0" class="p-8 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-3xl text-center text-gray-400 dark:text-gray-500 font-medium">
         Adicione itens buscando no catálogo acima ou clicando em "Novo".
       </div>
 
@@ -145,73 +145,73 @@ function isItemSelected(item: any) {
         <div 
           v-for="(item, idx) in form.items" 
           :key="'item_'+idx" 
-          class="bg-white rounded-2xl border-2 border-gray-100 hover:border-gray-200 shadow-sm overflow-hidden transition-all group"
+          class="bg-white dark:bg-gray-900 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 shadow-sm overflow-hidden transition-all group"
         >
           <!-- Cabecalho Compacto (Sempre visível) -->
           <div class="p-4 flex items-center gap-4">
             <div class="flex-1 flex items-center gap-3 min-w-0">
-              <GripVertical class="w-5 h-5 text-gray-300 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block shrink-0" />
+              <GripVertical class="w-5 h-5 text-gray-300 dark:text-gray-600 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block shrink-0" />
               <template v-if="!item.catalogItemId">
                 <input 
                   v-model="item.name" 
-                  class="flex-1 text-sm sm:text-base font-black text-gray-900 bg-transparent border-b border-transparent focus:border-blue-500 focus:ring-0 p-1 outline-none transition-all truncate" 
+                  class="flex-1 text-sm sm:text-base font-black text-gray-900 dark:text-gray-50 bg-transparent border-b border-transparent focus:border-blue-500 focus:ring-0 p-1 outline-none transition-all truncate" 
                   placeholder="Nome do Serviço" 
                 >
               </template>
               <template v-else>
-                <span class="flex-1 text-sm sm:text-base font-black text-gray-900 p-1 truncate">{{ item.name }}</span>
+                <span class="flex-1 text-sm sm:text-base font-black text-gray-900 dark:text-gray-50 p-1 truncate">{{ item.name }}</span>
               </template>
             </div>
             
             <div class="flex items-center gap-3 sm:gap-6 shrink-0">
               <div class="flex items-center gap-2">
-                <span class="text-[10px] font-black text-gray-400 uppercase hidden sm:block">Qtd</span>
-                <input v-model.number="item.quantity" type="number" class="w-14 sm:w-16 bg-gray-50 px-2 py-1.5 rounded-lg font-bold text-sm border border-transparent focus:border-blue-500 outline-none text-center">
+                <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase hidden sm:block">Qtd</span>
+                <input v-model.number="item.quantity" type="number" class="w-14 sm:w-16 bg-gray-50 dark:bg-gray-950 px-2 py-1.5 rounded-lg font-bold text-sm border border-transparent focus:border-blue-500 text-gray-900 dark:text-gray-50 outline-none text-center">
               </div>
               <div class="flex items-center gap-2">
-                <span class="text-[10px] font-black text-gray-400 uppercase hidden sm:block">R$</span>
-                <input v-model.number="item.price" type="number" class="w-20 sm:w-24 bg-gray-50 px-2 py-1.5 rounded-lg font-bold text-sm border border-transparent focus:border-blue-500 outline-none text-right">
+                <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase hidden sm:block">R$</span>
+                <input v-model.number="item.price" type="number" class="w-20 sm:w-24 bg-gray-50 dark:bg-gray-950 px-2 py-1.5 rounded-lg font-bold text-sm border border-transparent focus:border-blue-500 text-gray-900 dark:text-gray-50 outline-none text-right">
               </div>
               
               <div class="hidden md:block text-right min-w-[80px]">
-                <span class="text-sm font-black text-gray-900">R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+                <span class="text-sm font-black text-gray-900 dark:text-gray-50">R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
               </div>
             </div>
 
             <!-- Ações -->
             <div class="flex items-center gap-1 shrink-0 ml-2">
-              <button @click="toggleItemExpansion(idx)" type="button" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:bg-gray-100 rounded-lg transition-colors" title="Editar Descrição">
+              <button @click="toggleItemExpansion(idx)" type="button" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors" title="Editar Descrição">
                 <ChevronUp v-if="expandedItemIdx === idx" class="w-5 h-5" />
                 <ChevronDown v-else class="w-5 h-5" />
               </button>
-              <button @click="moveToUpsell(idx)" type="button" class="hidden sm:flex p-2.5 min-h-[44px] min-w-[44px] items-center justify-center text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Mover para Opcionais">
+              <button @click="moveToUpsell(idx)" type="button" class="hidden sm:flex p-2.5 min-h-[44px] min-w-[44px] items-center justify-center text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-lg transition-colors" title="Mover para Opcionais">
                 <ArrowDown class="w-4 h-4" />
               </button>
-              <button @click="form.items.splice(idx, 1)" type="button" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Remover Item">
+              <button @click="form.items.splice(idx, 1)" type="button" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-red-300 dark:text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors" title="Remover Item">
                 <Trash2 class="w-4 h-4" />
               </button>
             </div>
           </div>
 
           <!-- Área Expandida (Descrição) -->
-          <div v-show="expandedItemIdx === idx" class="px-4 pb-4 sm:pl-[4.5rem] bg-gray-50/50 border-t border-gray-100">
+          <div v-show="expandedItemIdx === idx" class="px-4 pb-4 sm:pl-[4.5rem] bg-gray-50/50 dark:bg-gray-950/50 border-t border-gray-100 dark:border-gray-800">
             <div class="pt-4 flex flex-col gap-3">
               <div class="relative">
                 <template v-if="!item.catalogItemId">
                   <textarea 
                     v-model="item.description" 
                     rows="3" 
-                    class="w-full text-sm font-medium text-gray-600 bg-transparent p-0 border-0 focus:ring-0 outline-none resize-none transition-all" 
+                    class="w-full text-sm font-medium text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-600 bg-transparent p-0 border-0 focus:ring-0 outline-none resize-none transition-all" 
                     placeholder="Descreva detalhadamente o que será entregue (visível para o cliente)..."
                   ></textarea>
                 </template>
                 <template v-else>
-                  <div class="w-full text-sm font-medium text-gray-600 whitespace-pre-wrap">{{ item.description || 'Nenhuma descrição fornecida para este item do catálogo.' }}</div>
+                  <div class="w-full text-sm font-medium text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{{ item.description || 'Nenhuma descrição fornecida para este item do catálogo.' }}</div>
                 </template>
               </div>
               <div class="flex sm:hidden justify-between items-center mt-2">
-                <span class="text-sm font-black text-gray-900">Total: R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-                <button @click="moveToUpsell(idx)" type="button" class="text-xs font-black text-blue-600 uppercase tracking-widest">
+                <span class="text-sm font-black text-gray-900 dark:text-gray-50">Total: R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+                <button @click="moveToUpsell(idx)" type="button" class="text-xs font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">
                   Tornar Opcional
                 </button>
               </div>
@@ -222,80 +222,80 @@ function isItemSelected(item: any) {
     </div>
 
     <!-- Escopo Opcional (Upsell) -->
-    <div v-if="form.upsellItems.length > 0" class="space-y-4 pt-6 border-t border-gray-100 relative z-0">
-      <h3 class="text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Itens Opcionais (Upsell)</h3>
-      <p class="text-[10px] font-bold text-gray-400 ml-1 mb-4 uppercase tracking-widest">O cliente pode aceitar ou recusar no momento da aprovação.</p>
+    <div v-if="form.upsellItems.length > 0" class="space-y-4 pt-6 border-t border-gray-100 dark:border-gray-800 relative z-0">
+      <h3 class="text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Itens Opcionais (Upsell)</h3>
+      <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 ml-1 mb-4 uppercase tracking-widest">O cliente pode aceitar ou recusar no momento da aprovação.</p>
       
       <div class="space-y-3">
         <div 
           v-for="(item, idx) in form.upsellItems" 
           :key="'upsell_'+idx" 
-          class="bg-blue-50/30 rounded-2xl border-2 border-dashed border-blue-200 hover:border-blue-300 shadow-sm overflow-hidden transition-all group"
+          class="bg-blue-50/30 dark:bg-blue-950/20 rounded-2xl border-2 border-dashed border-blue-200 dark:border-blue-900/50 hover:border-blue-300 dark:hover:border-blue-800 shadow-sm overflow-hidden transition-all group"
         >
           <!-- Cabecalho Compacto -->
           <div class="p-4 flex items-center gap-4">
             <div class="flex-1 flex items-center gap-3 min-w-0">
-              <GripVertical class="w-5 h-5 text-blue-200 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block shrink-0" />
+              <GripVertical class="w-5 h-5 text-blue-200 dark:text-blue-800 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block shrink-0" />
               <template v-if="!item.catalogItemId">
                 <input 
                   v-model="item.name" 
-                  class="flex-1 text-sm sm:text-base font-black text-gray-900 bg-transparent border-b border-transparent focus:border-blue-500 focus:ring-0 p-1 outline-none transition-all truncate" 
+                  class="flex-1 text-sm sm:text-base font-black text-gray-900 dark:text-gray-50 bg-transparent border-b border-transparent focus:border-blue-500 focus:ring-0 p-1 outline-none transition-all truncate" 
                   placeholder="Nome do Opcional" 
                 >
               </template>
               <template v-else>
-                <span class="flex-1 text-sm sm:text-base font-black text-gray-900 p-1 truncate">{{ item.name }}</span>
+                <span class="flex-1 text-sm sm:text-base font-black text-gray-900 dark:text-gray-50 p-1 truncate">{{ item.name }}</span>
               </template>
             </div>
             
             <div class="flex items-center gap-3 sm:gap-6 shrink-0">
               <div class="flex items-center gap-2">
-                <span class="text-[10px] font-black text-gray-400 uppercase hidden sm:block">Qtd</span>
-                <input v-model.number="item.quantity" type="number" class="w-14 sm:w-16 bg-white px-2 py-1.5 rounded-lg font-bold text-sm border border-blue-100 focus:border-blue-500 outline-none text-center">
+                <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase hidden sm:block">Qtd</span>
+                <input v-model.number="item.quantity" type="number" class="w-14 sm:w-16 bg-white dark:bg-gray-950 px-2 py-1.5 rounded-lg font-bold text-sm border border-blue-100 dark:border-blue-900/50 text-gray-900 dark:text-gray-50 focus:border-blue-500 outline-none text-center">
               </div>
               <div class="flex items-center gap-2">
-                <span class="text-[10px] font-black text-gray-400 uppercase hidden sm:block">R$</span>
-                <input v-model.number="item.price" type="number" class="w-20 sm:w-24 bg-white px-2 py-1.5 rounded-lg font-bold text-sm border border-blue-100 focus:border-blue-500 outline-none text-right">
+                <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase hidden sm:block">R$</span>
+                <input v-model.number="item.price" type="number" class="w-20 sm:w-24 bg-white dark:bg-gray-950 px-2 py-1.5 rounded-lg font-bold text-sm border border-blue-100 dark:border-blue-900/50 text-gray-900 dark:text-gray-50 focus:border-blue-500 outline-none text-right">
               </div>
               
               <div class="hidden md:block text-right min-w-[80px]">
-                <span class="text-sm font-black text-gray-900">+ R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+                <span class="text-sm font-black text-gray-900 dark:text-gray-50">+ R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
               </div>
             </div>
 
             <div class="flex items-center gap-1 shrink-0 ml-2">
-              <button @click="toggleItemExpansion(idx, true)" type="button" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:bg-white rounded-lg transition-colors" title="Editar Descrição">
+              <button @click="toggleItemExpansion(idx, true)" type="button" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 dark:text-gray-500 hover:bg-white dark:hover:bg-gray-800 rounded-lg transition-colors" title="Editar Descrição">
                 <ChevronUp v-if="expandedUpsellIdx === idx" class="w-5 h-5" />
                 <ChevronDown v-else class="w-5 h-5" />
               </button>
-              <button @click="moveToItems(idx)" type="button" class="hidden sm:flex p-2.5 min-h-[44px] min-w-[44px] items-center justify-center text-green-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Tornar Obrigatório">
+              <button @click="moveToItems(idx)" type="button" class="hidden sm:flex p-2.5 min-h-[44px] min-w-[44px] items-center justify-center text-green-500 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-950/40 rounded-lg transition-colors" title="Tornar Obrigatório">
                 <Plus class="w-4 h-4" />
               </button>
-              <button @click="form.upsellItems.splice(idx, 1)" type="button" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Remover Opcional">
+              <button @click="form.upsellItems.splice(idx, 1)" type="button" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-red-300 dark:text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors" title="Remover Opcional">
                 <Trash2 class="w-4 h-4" />
               </button>
             </div>
           </div>
 
           <!-- Área Expandida (Descrição) -->
-          <div v-show="expandedUpsellIdx === idx" class="px-4 pb-4 sm:pl-[4.5rem] bg-white/50 border-t border-blue-100">
+          <div v-show="expandedUpsellIdx === idx" class="px-4 pb-4 sm:pl-[4.5rem] bg-white/50 dark:bg-gray-950/40 border-t border-blue-100 dark:border-blue-900/40">
             <div class="pt-4 flex flex-col gap-3">
               <div class="relative">
                 <template v-if="!item.catalogItemId">
                   <textarea 
                     v-model="item.description" 
                     rows="3" 
-                    class="w-full text-sm font-medium text-gray-600 bg-transparent p-0 border-0 focus:ring-0 outline-none resize-none transition-all" 
+                    class="w-full text-sm font-medium text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-600 bg-transparent p-0 border-0 focus:ring-0 outline-none resize-none transition-all" 
                     placeholder="Por que o cliente deveria adquirir este pacote adicional?"
                   ></textarea>
                 </template>
                 <template v-else>
-                  <div class="w-full text-sm font-medium text-gray-600 whitespace-pre-wrap">{{ item.description || 'Nenhuma descrição fornecida para este opcional do catálogo.' }}</div>
+                  <div class="w-full text-sm font-medium text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{{ item.description || 'Nenhuma descrição fornecida para este opcional do catálogo.' }}</div>
                 </template>
               </div>
               <div class="flex sm:hidden justify-between items-center mt-2">
-                <span class="text-sm font-black text-gray-900">Total: R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-                <button @click="moveToItems(idx)" type="button" class="text-xs font-black text-green-600 uppercase tracking-widest">
+                <span class="text-sm font-black text-gray-900 dark:text-gray-50">Total: R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+                <button @click="moveToItems(idx)" type="button" class="text-xs font-black text-green-600 dark:text-green-400 uppercase tracking-widest">
                   Tornar Obrigatório
                 </button>
               </div>

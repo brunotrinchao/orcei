@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Component } from 'vue'
 import {
   SelectRoot,
   SelectTrigger,
@@ -26,6 +27,8 @@ const props = defineProps<{
   label?: string
   error?: string
   disabled?: boolean
+  required?: boolean
+  icon?: Component
 }>()
 
 const modelValue = defineModel<string>()
@@ -33,61 +36,73 @@ const id = useId()
 </script>
 
 <template>
-  <div :class="label ? 'space-y-2' : ''">
+  <div class="space-y-2">
     <label v-if="label" :id="`label-${id}`" class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">
-      {{ label }}
+      {{ label }} <span v-if="required" class="text-red-500">*</span>
     </label>
     
-    <SelectRoot v-model="modelValue" :disabled="disabled">
-      <SelectTrigger
-        :aria-labelledby="label ? `label-${id}` : undefined"
-        class="inline-flex items-center justify-between w-full h-[52px] px-5 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-100 group disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-        :class="{ 'border-red-300 dark:border-red-500/50 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500/20': error }"
-      >
-        <SelectValue :placeholder="placeholder || 'Selecione...'" />
-        <SelectIcon>
-          <ChevronDown class="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-white transition-colors" />
-        </SelectIcon>
-      </SelectTrigger>
+    <div class="relative flex items-center w-full">
+      <!-- Ícone na esquerda se fornecido -->
+      <div v-if="icon || $slots.icon" class="absolute left-4 z-10 flex items-center gap-1.5 text-gray-400 dark:text-gray-500 pointer-events-none">
+        <slot name="icon">
+          <component :is="icon" v-if="icon" class="w-4 h-4" />
+        </slot>
+      </div>
 
-      <SelectPortal>
-        <SelectContent
-          class="z-[9999] min-w-[var(--radix-select-trigger-width)] bg-white dark:bg-gray-900 rounded-2xl border-2 border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
-          position="popper"
-          :side-offset="8"
-          :avoid-collisions="true"
-          @pointer-down-outside="(e) => {
-            // Prevent closing the parent dialog when clicking outside the select but within the portal
-            if (e.detail.originalEvent.type === 'pointerdown') return;
-          }"
+      <SelectRoot v-model="modelValue" :disabled="disabled">
+        <SelectTrigger
+          :aria-labelledby="label ? `label-${id}` : undefined"
+          :class="[
+            'inline-flex items-center justify-between w-full h-[56px] bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-50 group disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:cursor-not-allowed shadow-sm',
+            icon || $slots.icon ? 'pl-12 pr-5' : 'px-5',
+            error ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500/20' : ''
+          ]"
         >
-          <SelectScrollUpButton class="flex items-center justify-center h-8 bg-white dark:bg-gray-900 text-gray-400 dark:text-gray-500 cursor-default">
-            <ChevronUp class="w-4 h-4" />
-          </SelectScrollUpButton>
+          <SelectValue :placeholder="placeholder || 'Selecione...'" />
+          <SelectIcon>
+            <ChevronDown class="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-white transition-colors" />
+          </SelectIcon>
+        </SelectTrigger>
 
-          <SelectViewport class="p-2">
-            <SelectItem
-              v-for="option in options"
-              :key="option.value"
-              :value="option.value || '__EMPTY__'"
-              class="relative flex items-center px-8 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 rounded-xl cursor-pointer outline-none focus:bg-gray-50 dark:focus:bg-gray-800 focus:text-gray-900 dark:focus:text-white data-[state=checked]:text-gray-900 dark:data-[state=checked]:text-white data-[state=checked]:bg-gray-50 dark:data-[state=checked]:bg-gray-800 transition-colors"
-            >
-              <SelectItemIndicator class="absolute left-2 inline-flex items-center justify-center">
-                <Check class="w-4 h-4 text-gray-900 dark:text-white" />
-              </SelectItemIndicator>
-              <SelectItemText>{{ option.label }}</SelectItemText>
-            </SelectItem>
-            <div v-if="!options || options.length === 0" class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">
-              Sem Opções
-            </div>
-          </SelectViewport>
+        <SelectPortal>
+          <SelectContent
+            class="z-[9999] min-w-[var(--radix-select-trigger-width)] bg-white dark:bg-gray-900 rounded-2xl border-2 border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+            position="popper"
+            :side-offset="8"
+            :avoid-collisions="true"
+            @pointer-down-outside="(e) => {
+              // Prevent closing the parent dialog when clicking outside the select but within the portal
+              if (e.detail.originalEvent.type === 'pointerdown') return;
+            }"
+          >
+            <SelectScrollUpButton class="flex items-center justify-center h-8 bg-white dark:bg-gray-900 text-gray-400 dark:text-gray-500 cursor-default">
+              <ChevronUp class="w-4 h-4" />
+            </SelectScrollUpButton>
 
-          <SelectScrollDownButton class="flex items-center justify-center h-8 bg-white dark:bg-gray-900 text-gray-400 dark:text-gray-500 cursor-default">
-            <ChevronDown class="w-4 h-4" />
-          </SelectScrollDownButton>
-        </SelectContent>
-      </SelectPortal>
-    </SelectRoot>
+            <SelectViewport class="p-2">
+              <SelectItem
+                v-for="option in options"
+                :key="option.value"
+                :value="option.value || '__EMPTY__'"
+                class="relative flex items-center px-8 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 rounded-xl cursor-pointer outline-none focus:bg-gray-50 dark:focus:bg-gray-800 focus:text-gray-900 dark:focus:text-white data-[state=checked]:text-gray-900 dark:data-[state=checked]:text-white data-[state=checked]:bg-gray-50 dark:data-[state=checked]:bg-gray-800 transition-colors"
+              >
+                <SelectItemIndicator class="absolute left-2 inline-flex items-center justify-center">
+                  <Check class="w-4 h-4 text-gray-900 dark:text-white" />
+                </SelectItemIndicator>
+                <SelectItemText>{{ option.label }}</SelectItemText>
+              </SelectItem>
+              <div v-if="!options || options.length === 0" class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">
+                Sem Opções
+              </div>
+            </SelectViewport>
+
+            <SelectScrollDownButton class="flex items-center justify-center h-8 bg-white dark:bg-gray-900 text-gray-400 dark:text-gray-500 cursor-default">
+              <ChevronDown class="w-4 h-4" />
+            </SelectScrollDownButton>
+          </SelectContent>
+        </SelectPortal>
+      </SelectRoot>
+    </div>
 
     <span v-if="error" class="text-[10px] font-bold text-red-500 ml-1 uppercase">
       {{ error }}

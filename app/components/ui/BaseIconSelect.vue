@@ -40,42 +40,42 @@ onClickOutside(dropdownRef, () => isOpen.value = false)
 
 <template>
   <div class="space-y-2 relative" ref="dropdownRef">
-    <label v-if="label" class="block text-xs font-black text-gray-400 uppercase tracking-widest ml-2">
+    <label v-if="label" class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">
       {{ label }}
     </label>
     
     <button 
       type="button"
       @click="isOpen = !isOpen"
-      class="w-full flex items-center justify-between px-6 py-4 bg-white border-2 border-gray-100 rounded-2xl hover:border-blue-200 transition-all text-left"
+      class="w-full h-[56px] flex items-center justify-between px-5 bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:focus:border-blue-500 transition-all text-left outline-none group shadow-sm"
     >
       <div class="flex items-center gap-3">
-        <div class="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center text-gray-600">
-          <component :is="getIcon(modelValue || 'Package')" class="w-5 h-5" />
+        <div class="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center text-gray-600 dark:text-gray-300">
+          <component :is="getIcon(modelValue || 'Package')" class="w-4 h-4" />
         </div>
-        <span class="font-bold text-gray-900">{{ modelValue || 'Selecione um ícone' }}</span>
+        <span class="font-bold text-sm text-gray-900 dark:text-gray-50">{{ modelValue || 'Selecione um ícone' }}</span>
       </div>
-      <ChevronDown :class="['w-5 h-5 text-gray-400 transition-transform', isOpen ? 'rotate-180' : '']" />
+      <ChevronDown :class="['w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-white transition-colors', isOpen ? 'rotate-180' : '']" />
     </button>
 
     <!-- Dropdown -->
     <div 
       v-if="isOpen" 
-      class="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-gray-100 rounded-[2rem] shadow-2xl z-[100] overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+      class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800 rounded-[2rem] shadow-2xl z-[100] overflow-hidden animate-in fade-in zoom-in-95 duration-200"
     >
-      <div class="p-4 border-b border-gray-50">
+      <div class="p-4 border-b border-gray-100 dark:border-gray-800">
         <div class="relative">
-          <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+          <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
           <input 
             v-model="searchQuery"
             type="text" 
             placeholder="Buscar ícone..." 
-            class="w-full pl-10 pr-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500/10 outline-none"
+            class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl text-sm font-bold text-gray-900 dark:text-gray-50 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-blue-500/10 outline-none"
           >
         </div>
       </div>
 
-      <div class="max-h-64 overflow-y-auto p-4 grid grid-cols-4 gap-2 scrollbar-thin scrollbar-thumb-gray-100">
+      <div class="max-h-64 overflow-y-auto p-4 grid grid-cols-4 gap-2 scrollbar-thin scrollbar-thumb-gray-100 dark:scrollbar-thumb-gray-800">
         <button 
           v-for="icon in filteredIcons" 
           :key="icon"
@@ -83,7 +83,9 @@ onClickOutside(dropdownRef, () => isOpen.value = false)
           @click="selectIcon(icon)"
           :class="[
             'p-3 rounded-xl flex flex-col items-center gap-2 transition-all group',
-            modelValue === icon ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50 text-gray-400 hover:text-gray-900'
+            modelValue === icon 
+              ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 font-bold' 
+              : 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
           ]"
         >
           <component :is="getIcon(icon)" class="w-6 h-6 group-hover:scale-110 transition-transform" />
@@ -91,7 +93,7 @@ onClickOutside(dropdownRef, () => isOpen.value = false)
         </button>
       </div>
 
-      <div v-if="filteredIcons.length === 0" class="p-8 text-center text-gray-400 text-xs font-bold uppercase tracking-widest">
+      <div v-if="filteredIcons.length === 0" class="p-8 text-center text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest">
         Nenhum ícone encontrado
       </div>
     </div>

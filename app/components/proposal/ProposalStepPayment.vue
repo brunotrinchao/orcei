@@ -16,7 +16,7 @@ const props = defineProps<{
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
       <div class="space-y-8">
-        <div class="bg-gray-50 dark:bg-gray-800 p-6 md:p-8 rounded-[3rem] space-y-6">
+        <div class="bg-gray-50 dark:bg-gray-900 p-6 md:p-8 rounded-[3rem] space-y-6 border border-gray-100 dark:border-gray-800">
           <h3 class="text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest">Execução & Pagamento</h3>
           
           <div class="space-y-3">
@@ -33,14 +33,14 @@ const props = defineProps<{
           </div>
 
           <div class="space-y-3">
-            <label class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Método de Envio</label>
-            <div role="radiogroup" aria-label="Método de Envio" class="flex flex-col sm:flex-row gap-2 p-1 bg-white rounded-2xl border border-gray-200">
+            <label class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Método de Envio</label>
+            <div role="radiogroup" aria-label="Método de Envio" class="flex flex-col sm:flex-row gap-2 p-1 bg-white dark:bg-gray-950 rounded-2xl border border-gray-200 dark:border-gray-800">
               <button 
                 type="button"
                 role="radio"
                 :aria-checked="form.sendMethod === SendMethod.AUTO"
                 @click="form.sendMethod = SendMethod.AUTO"
-                :class="form.sendMethod === SendMethod.AUTO ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 outline-none'"
+                :class="form.sendMethod === SendMethod.AUTO ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 outline-none'"
                 class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
               >
                 Auto (E-mail)
@@ -50,7 +50,7 @@ const props = defineProps<{
                 role="radio"
                 :aria-checked="form.sendMethod === SendMethod.MANUAL"
                 @click="form.sendMethod = SendMethod.MANUAL"
-                :class="form.sendMethod === SendMethod.MANUAL ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 outline-none'"
+                :class="form.sendMethod === SendMethod.MANUAL ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 outline-none'"
                 class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
               >
                 Manual (Link)
@@ -61,7 +61,7 @@ const props = defineProps<{
       </div>
 
       <div class="space-y-8">
-        <div class="bg-blue-600 text-white p-8 md:p-10 rounded-[3.5rem] shadow-2xl shadow-blue-200 relative overflow-hidden h-full flex flex-col justify-center">
+        <div class="bg-blue-600 text-white p-8 md:p-10 rounded-[3.5rem] shadow-2xl shadow-blue-200 dark:shadow-blue-950/50 relative overflow-hidden h-full flex flex-col justify-center">
           <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
           
           <div class="relative z-10 space-y-6">

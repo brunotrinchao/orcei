@@ -57,13 +57,7 @@ const localTermsAndConditions = computed({
 </script>
 
 <template>
-  <section id="modelos" class="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-gray-200 dark:border-gray-800 shadow-sm scroll-mt-8">
-    <div class="flex items-center gap-3 mb-6">
-      <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/50 flex items-center justify-center">
-        <FileText class="w-5 h-5 text-purple-600 dark:text-purple-400" />
-      </div>
-      <h2 class="text-xl font-black text-gray-900 dark:text-gray-50 uppercase tracking-tight">Modelos Legais</h2>
-    </div>
+  <BaseSectionCard id="modelos" title="Modelos Legais" :icon="FileText" icon-bg-class="bg-purple-50 dark:bg-purple-950/50" icon-color-class="text-purple-600 dark:text-purple-400">
 
     <div class="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-2xl mb-8 max-w-sm">
       <button
@@ -118,5 +112,5 @@ const localTermsAndConditions = computed({
       <label class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Termos e Condições</label>
       <LazyRichTextEditor v-model="localTermsAndConditions" class="min-h-[350px] border-2 border-gray-50 dark:border-gray-800 rounded-3xl overflow-hidden" />
     </div>
-  </section>
+  </BaseSectionCard>
 </template>

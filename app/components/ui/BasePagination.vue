@@ -44,13 +44,13 @@ const handlePageChange = (page: number) => {
   >
     <PaginationList v-slot="{ items }" class="flex items-center gap-2">
       <PaginationFirst
-        class="w-10 h-10 flex items-center justify-center rounded-xl border-2 border-gray-100 bg-white text-gray-500 hover:border-gray-200 hover:text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-10 h-10 flex items-center justify-center rounded-xl border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:border-gray-200 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <ChevronsLeft class="w-4 h-4" />
       </PaginationFirst>
       
       <PaginationPrev
-        class="w-10 h-10 flex items-center justify-center rounded-xl border-2 border-gray-100 bg-white text-gray-500 hover:border-gray-200 hover:text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-10 h-10 flex items-center justify-center rounded-xl border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:border-gray-200 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <ChevronLeft class="w-4 h-4" />
       </PaginationPrev>
@@ -60,7 +60,7 @@ const handlePageChange = (page: number) => {
           v-if="item.type === 'page'"
           :key="index"
           :value="item.value"
-          class="w-10 h-10 flex items-center justify-center rounded-xl border-2 border-gray-100 bg-white text-sm font-bold text-gray-500 hover:border-gray-200 hover:text-gray-900 transition-all data-[selected]:bg-gray-900 data-[selected]:border-gray-900 data-[selected]:text-white"
+          class="w-10 h-10 flex items-center justify-center rounded-xl border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 text-sm font-bold text-gray-500 dark:text-gray-400 hover:border-gray-200 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all data-[selected]:bg-gray-900 dark:data-[selected]:bg-gray-100 data-[selected]:border-gray-900 dark:data-[selected]:border-gray-100 data-[selected]:text-white dark:data-[selected]:text-gray-900"
         >
           {{ item.value }}
         </PaginationListItem>
@@ -68,20 +68,20 @@ const handlePageChange = (page: number) => {
           v-else
           :key="item.type"
           :index="index"
-          class="w-10 h-10 flex items-center justify-center text-gray-400"
+          class="w-10 h-10 flex items-center justify-center text-gray-400 dark:text-gray-500"
         >
           <MoreHorizontal class="w-4 h-4" />
         </PaginationEllipsis>
       </template>
 
       <PaginationNext
-        class="w-10 h-10 flex items-center justify-center rounded-xl border-2 border-gray-100 bg-white text-gray-500 hover:border-gray-200 hover:text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-10 h-10 flex items-center justify-center rounded-xl border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:border-gray-200 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <ChevronRight class="w-4 h-4" />
       </PaginationNext>
 
       <PaginationLast
-        class="w-10 h-10 flex items-center justify-center rounded-xl border-2 border-gray-100 bg-white text-gray-500 hover:border-gray-200 hover:text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-10 h-10 flex items-center justify-center rounded-xl border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:border-gray-200 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <ChevronsRight class="w-4 h-4" />
       </PaginationLast>

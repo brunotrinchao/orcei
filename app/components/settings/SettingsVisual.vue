@@ -60,13 +60,7 @@ async function cropLogo() {
 </script>
 
 <template>
-  <section id="visual" data-tour="config-visual" class="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-gray-200 dark:border-gray-800 shadow-sm scroll-mt-8">
-    <div class="flex items-center gap-3 mb-8">
-      <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center">
-        <SwatchBook class="w-5 h-5 text-blue-600 dark:text-blue-400" />
-      </div>
-      <h2 class="text-xl font-black text-gray-900 dark:text-gray-50 uppercase tracking-tight">Identidade Visual</h2>
-    </div>
+  <BaseSectionCard id="visual" data-tour="config-visual" title="Identidade Visual" :icon="SwatchBook" icon-bg-class="bg-blue-50 dark:bg-blue-950/50" icon-color-class="text-blue-600 dark:text-blue-400">
 
     <!-- Cropper inline -->
     <div v-if="showCropper" class="space-y-6">
@@ -92,7 +86,7 @@ async function cropLogo() {
     </div>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-10">
-      <div class="md:col-span-2 flex flex-col md:flex-row items-center gap-10 p-8 bg-gray-50/50 dark:bg-gray-800/50 rounded-3xl border border-gray-200 dark:border-gray-700">
+      <div class="md:col-span-2 flex flex-col md:flex-row items-center gap-10 p-6 bg-gray-50/50 dark:bg-gray-800/50 rounded-3xl border border-gray-200 dark:border-gray-700">
         <div class="relative group">
           <div class="w-32 h-32 bg-white dark:bg-gray-900 rounded-3xl border-4 border-white dark:border-gray-800 shadow-xl flex items-center justify-center overflow-hidden transition-all group-hover:scale-105 duration-300 ring-1 ring-gray-100 dark:ring-gray-800">
             <img v-if="localLogoUrl" :src="localLogoUrl" class="w-full h-full object-contain" alt="Logo da Marca" loading="lazy">
@@ -152,26 +146,10 @@ async function cropLogo() {
         </button>
       </div>
 
-      <div class="space-y-3">
-        <label class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Cor Primária</label>
-        <div class="flex gap-3">
-          <div class="relative flex-1">
-            <input
-              v-model="localPrimaryColor"
-              type="text"
-              class="w-full pl-14 pr-4 py-4 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none uppercase font-black text-sm text-gray-900 dark:text-gray-50 focus-visible:ring-2 focus-visible:ring-blue-600"
-              aria-label="Código hexadecimal da cor primária"
-            >
-            <div class="absolute left-4 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm" :style="{ backgroundColor: localPrimaryColor }"></div>
-          </div>
-          <input
-            v-model="localPrimaryColor"
-            type="color"
-            class="w-14 h-15 p-1 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-600 outline-none"
-            aria-label="Seletor de cor primária"
-          >
-        </div>
-      </div>
+      <BaseColorInput
+        v-model="localPrimaryColor"
+        label="Cor Primária"
+      />
     </div>
-  </section>
+  </BaseSectionCard>
 </template>

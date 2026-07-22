@@ -30,13 +30,7 @@ function removePhone(index: number) {
 </script>
 
 <template>
-  <section id="contato" data-tour="config-contato" class="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-gray-200 dark:border-gray-800 shadow-sm scroll-mt-8">
-    <div class="flex items-center gap-3 mb-8">
-      <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center">
-        <Phone class="w-5 h-5 text-blue-600 dark:text-blue-400" />
-      </div>
-      <h2 class="text-xl font-black text-gray-900 dark:text-gray-50 uppercase tracking-tight">Contato e Redes Sociais</h2>
-    </div>
+  <BaseSectionCard id="contato" data-tour="config-contato" title="Contato e Redes Sociais" :icon="Phone" icon-bg-class="bg-blue-50 dark:bg-blue-950/50" icon-color-class="text-blue-600 dark:text-blue-400">
 
     <div class="space-y-8">
       <div class="space-y-4">
@@ -75,55 +69,46 @@ function removePhone(index: number) {
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100 dark:border-gray-800" v-if="localContact.social">
-        <div class="space-y-3">
-          <label for="social-instagram" class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <Instagram class="w-3.5 h-3.5 text-pink-500" /> Instagram
-          </label>
-          <input
-            id="social-instagram"
-            v-model="localContact.social.instagram"
-            type="text"
-            placeholder="@seuusuario"
-            class="w-full px-5 py-4 bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-800 dark:text-gray-100 focus-visible:ring-2 focus-visible:ring-blue-600"
-          >
-        </div>
-        <div class="space-y-3">
-          <label for="social-youtube" class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <Youtube class="w-3.5 h-3.5 text-red-500" /> YouTube
-          </label>
-          <input
-            id="social-youtube"
-            v-model="localContact.social.youtube"
-            type="text"
-            placeholder="Canal"
-            class="w-full px-5 py-4 bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-800 dark:text-gray-100 focus-visible:ring-2 focus-visible:ring-blue-600"
-          >
-        </div>
-        <div class="space-y-3">
-          <label for="social-facebook" class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <Facebook class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" /> Facebook
-          </label>
-          <input
-            id="social-facebook"
-            v-model="localContact.social.facebook"
-            type="text"
-            placeholder="@suapagina"
-            class="w-full px-5 py-4 bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-800 dark:text-gray-100 focus-visible:ring-2 focus-visible:ring-blue-600"
-          >
-        </div>
-        <div class="space-y-3">
-          <label for="social-twitter" class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <Twitter class="w-3.5 h-3.5 text-gray-800 dark:text-gray-200" /> Twitter (X)
-          </label>
-          <input
-            id="social-twitter"
-            v-model="localContact.social.twitter"
-            type="text"
-            placeholder="@seuusuario"
-            class="w-full px-5 py-4 bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-800 dark:text-gray-100 focus-visible:ring-2 focus-visible:ring-blue-600"
-          >
-        </div>
+        <BaseInput
+          v-model="localContact.social.instagram"
+          label="Instagram"
+          placeholder="@seuusuario"
+        >
+          <template #icon>
+            <Instagram class="w-4 h-4 text-pink-500" />
+          </template>
+        </BaseInput>
+
+        <BaseInput
+          v-model="localContact.social.youtube"
+          label="YouTube"
+          placeholder="Canal"
+        >
+          <template #icon>
+            <Youtube class="w-4 h-4 text-red-500" />
+          </template>
+        </BaseInput>
+
+        <BaseInput
+          v-model="localContact.social.facebook"
+          label="Facebook"
+          placeholder="@suapagina"
+        >
+          <template #icon>
+            <Facebook class="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          </template>
+        </BaseInput>
+
+        <BaseInput
+          v-model="localContact.social.twitter"
+          label="Twitter (X)"
+          placeholder="@seuusuario"
+        >
+          <template #icon>
+            <Twitter class="w-4 h-4 text-gray-800 dark:text-gray-200" />
+          </template>
+        </BaseInput>
       </div>
     </div>
-  </section>
+  </BaseSectionCard>
 </template>

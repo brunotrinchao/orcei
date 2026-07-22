@@ -137,7 +137,7 @@ const isSubmitting = ref(false)
 const isResending = ref<string | null>(null)
 const proposalFormRef = ref<any>(null)
 
-const { notify, confirm } = useAlerts()
+const { notify, confirm: confirmAlert } = useAlerts()
 const siteOrigin = ref('')
 
 onMounted(() => {
@@ -180,16 +180,28 @@ function sendWhatsapp(proposal: ProposalDTO) {
   isSuccessModalOpen.value = false
 }
 
-async function resendEmail(proposalId: string) {
-  isResending.value = proposalId
-  try {
-    await $fetch(`/api/proposals/${proposalId}/resend`, { method: 'POST' })
-    notify('Sucesso', 'E-mail enviado com sucesso!')
-  } catch (e: any) {
-    notify('Erro', e.data?.statusMessage || 'Erro ao reenviar e-mail')
-  } finally {
-    isResending.value = null
-  }
+function resendEmail(proposal: any) {
+  const proposalId = typeof proposal === 'string' ? proposal : proposal._id
+  const targetProposal = typeof proposal === 'object' ? proposal : (proposals.value || []).find((p: any) => p._id === proposalId)
+  const clientName = targetProposal?.client?.name ? ` para ${targetProposal.client.name}` : ''
+
+  confirmAlert({
+    title: 'Reenviar E-mail',
+    description: `Tem certeza que deseja reenviar o e-mail de notificação deste orçamento${clientName}?`,
+    actionText: 'Sim, Reenviar',
+    cancelText: 'Cancelar',
+    onConfirm: async () => {
+      isResending.value = proposalId
+      try {
+        await $fetch(`/api/proposals/${proposalId}/resend`, { method: 'POST' })
+        notify('Sucesso', 'E-mail reenviado com sucesso!')
+      } catch (e: any) {
+        notify('Erro', e.data?.statusMessage || 'Erro ao reenviar e-mail')
+      } finally {
+        isResending.value = null
+      }
+    }
+  })
 }
 
 async function shareProposal(proposal: ProposalDTO) {
@@ -430,14 +442,14 @@ async function saveContract() {
             </div>
           </template>
 
-          <div class="w-full sm:w-56">
+          <div class="w-full md:w-56 shrink-0">
             <BaseDateRangePicker
               v-model:start="filterStartDate"
               v-model:end="filterEndDate"
             />
           </div>
 
-          <div class="w-full sm:w-48">
+          <div class="w-full md:w-48 shrink-0">
             <BaseSelect
               v-model="filterStatus"
               :options="[
@@ -451,7 +463,7 @@ async function saveContract() {
             />
           </div>
 
-          <div class="flex items-center gap-3 px-5 h-[52px] bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-2xl hover:border-gray-200 dark:hover:border-gray-700 transition-all group cursor-pointer shadow-sm">
+          <div class="flex items-center gap-3 px-5 h-[52px] bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-2xl hover:border-gray-200 dark:hover:border-gray-700 transition-all group cursor-pointer shadow-sm shrink-0">
             <BaseCheckbox v-model="filterPendingChat" id="pending-chat" />
             <label for="pending-chat" class="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest cursor-pointer group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors whitespace-nowrap">
               Chat Pendente
@@ -564,7 +576,7 @@ async function saveContract() {
                     <DropdownMenuItem
                       v-if="proposal.status !== 'draft' && proposal.status !== 'accepted'"
                       :disabled="isResending === proposal._id"
-                      @click="resendEmail(proposal._id)"
+                      @click="resendEmail(proposal)"
                       class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all disabled:opacity-50"
                     >
                       <RefreshCcw v-if="isResending === proposal._id" class="w-4 h-4 animate-spin" />
@@ -644,7 +656,7 @@ async function saveContract() {
           @send-whatsapp="sendWhatsapp(proposal)"
           @open-history="openHistory(proposal)"
           @open-preview="openPreview(proposal)"
-          @resend-email="resendEmail(proposal._id)"
+          @resend-email="resendEmail(proposal)"
           @edit="openModal(proposal)"
           @delete="confirmDeleteProposal(proposal)"
         />
@@ -742,22 +754,22 @@ async function saveContract() {
           </div>
         </div>
 
-        <div class="bg-gray-50 rounded-2xl p-6 mb-4">
-          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Cliente</p>
+        <div class="bg-gray-50 dark:bg-gray-900/60 rounded-2xl p-6 mb-4">
+          <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4">Cliente</p>
           <div class="flex items-center justify-between gap-4 flex-wrap">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 font-black text-lg">
+              <div class="w-10 h-10 bg-blue-100 dark:bg-blue-950/50 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400 font-black text-lg">
                 {{ selectedProposal.client.name.charAt(0) }}
               </div>
               <div>
-                <p class="font-black text-gray-900">{{ selectedProposal.client.name }}</p>
-                <p class="text-xs text-gray-500 font-medium">{{ selectedProposal.client.email }}</p>
+                <p class="font-black text-gray-900 dark:text-gray-100">{{ selectedProposal.client.name }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">{{ selectedProposal.client.email }}</p>
               </div>
             </div>
             <div class="flex gap-2">
               <a
                 :href="`mailto:${selectedProposal.client.email}`"
-                class="flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-gray-100 hover:border-blue-200 hover:text-blue-600 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-gray-600"
+                class="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 hover:border-blue-200 dark:hover:border-blue-900 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-gray-600 dark:text-gray-300"
               >
                 <Mail class="w-4 h-4" /> E-mail
               </a>
@@ -765,7 +777,7 @@ async function saveContract() {
                 v-if="selectedProposal.client.phone"
                 :href="whatsappLink(selectedProposal.client.phone)"
                 target="_blank"
-                class="flex items-center gap-2 px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-green-100"
+                class="flex items-center gap-2 px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-green-100 dark:shadow-none"
               >
                 <img :src="'/images/icons/whatsapp-svg.svg'" class="w-4 h-4" alt="WhatsApp" loading="lazy"/> WhatsApp
               </a>
@@ -773,35 +785,35 @@ async function saveContract() {
           </div>
         </div>
 
-        <div class="flex items-center gap-3 px-4 py-3 bg-blue-50 rounded-2xl mb-4">
-          <CreditCard v-if="selectedProposal.paymentConfig?.method === 'credit_card'" class="w-5 h-5 text-blue-600 shrink-0" />
-          <Banknote v-else class="w-5 h-5 text-blue-600 shrink-0" />
-          <p class="text-sm font-black text-blue-900">
+        <div class="flex items-center gap-3 px-4 py-3 bg-blue-50 dark:bg-blue-950/30 rounded-2xl mb-4">
+          <CreditCard v-if="selectedProposal.paymentConfig?.method === 'credit_card'" class="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
+          <Banknote v-else class="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
+          <p class="text-sm font-black text-blue-900 dark:text-blue-200">
             {{ selectedProposal.paymentConfig?.method === 'credit_card'
               ? `Cartão de Crédito — ${selectedProposal.paymentConfig.installments}x`
               : `À Vista (${selectedProposal.paymentConfig?.cashDiscount}% desconto)` }}
           </p>
         </div>
 
-        <div class="border border-gray-100 rounded-2xl overflow-hidden mb-4">
-          <div class="px-5 py-3 bg-gray-50 border-b border-gray-100">
-            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Itens do Orçamento</p>
+        <div class="border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden mb-4">
+          <div class="px-5 py-3 bg-gray-50 dark:bg-gray-900/60 border-b border-gray-100 dark:border-gray-800">
+            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Itens do Orçamento</p>
           </div>
-          <div class="divide-y divide-gray-50">
+          <div class="divide-y divide-gray-50 dark:divide-gray-800/60">
             <div v-for="item in selectedProposal.items" :key="item._id" class="flex justify-between items-start px-5 py-4 gap-4">
               <div class="flex-1 min-w-0">
-                <p class="font-black text-gray-900 text-sm">{{ item.name }}</p>
-                <p class="text-xs text-gray-400 font-medium mt-0.5 truncate">{{ item.description }}</p>
+                <p class="font-black text-gray-900 dark:text-gray-100 text-sm">{{ item.name }}</p>
+                <p class="text-xs text-gray-400 dark:text-gray-500 font-medium mt-0.5 truncate">{{ item.description }}</p>
               </div>
               <div class="text-right shrink-0">
-                <p class="font-black text-gray-900 text-sm">R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
-                <p class="text-[10px] text-gray-400 font-bold">{{ item.quantity }}x R$ {{ item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
+                <p class="font-black text-gray-900 dark:text-gray-100 text-sm">R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
+                <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold">{{ item.quantity }}x R$ {{ item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
               </div>
             </div>
           </div>
-          <div class="flex justify-between items-center px-5 py-4 border-t border-gray-100 bg-gray-50/50">
-            <span class="text-xs font-black text-gray-500 uppercase tracking-widest">Total Final</span>
-            <span class="font-black text-green-600 text-lg">R$ {{ selectedProposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+          <div class="flex justify-between items-center px-5 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/40">
+            <span class="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">Total Final</span>
+            <span class="font-black text-green-600 dark:text-green-400 text-lg">R$ {{ selectedProposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
           </div>
         </div>
       </div>
@@ -831,22 +843,22 @@ async function saveContract() {
       size="md"
     >
       <div v-if="lastCreatedProposal" class="p-6 text-center space-y-6">
-        <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto">
-          <CheckCircle2 class="w-10 h-10 text-green-600" />
+        <div class="w-20 h-20 bg-green-50 dark:bg-green-950/40 rounded-full flex items-center justify-center mx-auto">
+          <CheckCircle2 class="w-10 h-10 text-green-600 dark:text-green-400" />
         </div>
         
         <div class="space-y-2">
-          <h3 class="text-xl font-black text-gray-900 tracking-tight uppercase">Tudo Pronto!</h3>
-          <p class="text-sm text-gray-500 font-medium">O orçamento foi criado e o e-mail de notificação já foi enviado para o cliente.</p>
+          <h3 class="text-xl font-black text-gray-900 dark:text-gray-100 tracking-tight uppercase">Tudo Pronto!</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">O orçamento foi criado e o e-mail de notificação já foi enviado para o cliente.</p>
         </div>
 
-        <div class="p-4 bg-blue-50 rounded-2xl border border-blue-100 flex items-center gap-4 text-left">
-          <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center shrink-0">
+        <div class="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-2xl border border-blue-100 dark:border-blue-900/30 flex items-center gap-4 text-left">
+          <div class="w-10 h-10 bg-green-50 dark:bg-green-950/40 rounded-xl flex items-center justify-center shrink-0">
             <img :src="'/images/icons/whatsapp-svg.svg'" class="w-6 h-6" alt="WhatsApp" loading="lazy"/>
           </div>
           <div>
-            <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Dica Pro</p>
-            <p class="text-xs text-blue-800 font-bold">Enviar também pelo WhatsApp aumenta em 3x a velocidade de aprovação.</p>
+            <p class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">Dica Pro</p>
+            <p class="text-xs text-blue-800 dark:text-blue-300 font-bold">Enviar também pelo WhatsApp aumenta em 3x a velocidade de aprovação.</p>
           </div>
         </div>
 
@@ -878,8 +890,8 @@ async function saveContract() {
       <div v-if="selectedProposal" class="p-6">
         <div class="mb-8 flex items-center justify-between">
           <div>
-            <h3 class="text-xl font-black text-gray-900 tracking-tight">{{ selectedProposal.title }}</h3>
-            <p class="text-sm text-gray-500 font-medium">{{ selectedProposal.client.name }} • {{ selectedProposal.code }}</p>
+            <h3 class="text-xl font-black text-gray-900 dark:text-gray-100 tracking-tight">{{ selectedProposal.title }}</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">{{ selectedProposal.client.name }} • {{ selectedProposal.code }}</p>
           </div>
           <BaseBadge :variant="getStatusVariant(selectedProposal.status)">
             {{ statusMap[selectedProposal.status]?.label }}
@@ -906,12 +918,12 @@ async function saveContract() {
     <BaseDialog v-model:open="isContractModalOpen" title="Editar Contrato" size="xl">
       <div class="p-6 space-y-6">
         <!-- Variáveis -->
-        <div class="p-5 bg-slate-50/50 rounded-3xl border border-slate-100">
+        <div class="p-5 bg-slate-50/50 dark:bg-slate-900/50 rounded-3xl border border-slate-100 dark:border-slate-800">
           <div class="flex items-center gap-2 mb-3">
-            <Variable class="w-4 h-4 text-slate-500" />
-            <h3 class="text-xs font-black text-slate-700 uppercase tracking-widest">Variáveis Dinâmicas</h3>
+            <Variable class="w-4 h-4 text-slate-500 dark:text-slate-400" />
+            <h3 class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Variáveis Dinâmicas</h3>
           </div>
-          <p class="text-xs text-slate-500 font-medium mb-4">
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mb-4">
             Clique em uma variável para copiá-la. Ela será substituída automaticamente no contrato gerado.
           </p>
           <div class="flex flex-wrap gap-2">
@@ -921,19 +933,19 @@ async function saveContract() {
               type="button"
               @click="copyContractTag(v.tag)"
               :title="v.desc"
-              class="group flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:border-violet-300 hover:bg-violet-50 rounded-lg transition-all"
+              class="group flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-900 border border-slate-200 dark:border-slate-800 hover:border-violet-300 dark:hover:border-violet-700 hover:bg-violet-50 dark:hover:bg-violet-950/30 rounded-lg transition-all"
             >
-              <span class="text-[10px] font-mono font-bold text-slate-600 group-hover:text-violet-700">{{ v.tag }}</span>
+              <span class="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300 group-hover:text-violet-700 dark:group-hover:text-violet-400">{{ v.tag }}</span>
               <Check v-if="copiedContractTag === v.tag" class="w-3 h-3 text-emerald-500" />
-              <Copy v-else class="w-3 h-3 text-slate-300 group-hover:text-violet-400" />
+              <Copy v-else class="w-3 h-3 text-slate-300 dark:text-slate-600 group-hover:text-violet-400" />
             </button>
           </div>
         </div>
 
         <!-- Editor -->
         <div class="space-y-2">
-          <label class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Contrato</label>
-          <LazyRichTextEditor v-model="localContractText" class="min-h-[350px] border-2 border-gray-50 rounded-3xl overflow-hidden" />
+          <label class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Contrato</label>
+          <LazyRichTextEditor v-model="localContractText" class="min-h-[350px] border-2 border-gray-50 dark:border-gray-800 rounded-3xl overflow-hidden" />
         </div>
       </div>
       <template #footer>

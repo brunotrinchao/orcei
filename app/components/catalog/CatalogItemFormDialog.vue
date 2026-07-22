@@ -216,8 +216,8 @@ async function saveItem() {
         <!-- Section 1: Visual & Name -->
         <div class="space-y-6">
           <div class="space-y-2">
-            <h3 class="text-lg font-black text-gray-900 tracking-tight">Identidade e Classificação</h3>
-            <p class="text-sm text-gray-500 font-medium">Defina o visual e o nome comercial do seu item.</p>
+            <h3 class="text-lg font-black text-gray-900 dark:text-gray-100 tracking-tight">Identidade e Classificação</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Defina o visual e o nome comercial do seu item.</p>
           </div>
 
           <div class="space-y-8">
@@ -226,18 +226,18 @@ async function saveItem() {
               
               <div class="space-y-3">
                 <div class="flex items-center justify-between">
-                  <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Identidade Visual</label>
-                  <div class="flex bg-gray-100 p-1 rounded-xl w-[120px]">
+                  <label class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Identidade Visual</label>
+                  <div class="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl w-[120px]">
                     <button 
                       type="button"
                       @click="form.imageUrl = ''"
-                      :class="[!form.imageUrl ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400']"
+                      :class="[!form.imageUrl ? 'bg-white dark:bg-gray-900 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500']"
                       class="flex-1 px-2 py-1 rounded-lg text-[9px] font-black uppercase transition-all"
                     >Ícone</button>
                     <button 
                       type="button"
                       class="relative flex-1 px-2 py-1 rounded-lg text-[9px] font-black uppercase transition-all overflow-hidden"
-                      :class="[form.imageUrl ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400']"
+                      :class="[form.imageUrl ? 'bg-white dark:bg-gray-900 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500']"
                     >
                       Foto
                       <input type="file" accept="image/*" @change="onFileChange" class="absolute inset-0 opacity-0 cursor-pointer">
@@ -246,14 +246,14 @@ async function saveItem() {
                 </div>
 
                 <!-- Image Preview -->
-                <div v-if="form.imageUrl" class="relative group w-full h-[60px] bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 overflow-hidden flex items-center justify-center animate-in fade-in zoom-in-95 duration-200 shadow-sm">
+                <div v-if="form.imageUrl" class="relative group w-full h-[60px] bg-gray-50 dark:bg-gray-900 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-800 overflow-hidden flex items-center justify-center animate-in fade-in zoom-in-95 duration-200 shadow-sm">
                   <img :src="form.imageUrl" class="w-full h-full object-cover" loading="lazy">
                   <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <label class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center bg-white rounded-lg text-gray-900 cursor-pointer hover:scale-110 transition-transform">
+                    <label class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center bg-white dark:bg-gray-800 rounded-lg text-gray-900 dark:text-white cursor-pointer hover:scale-110 transition-transform">
                       <Pencil class="w-4 h-4" />
                       <input type="file" accept="image/*" @change="onFileChange" class="hidden">
                     </label>
-                    <button type="button" @click="form.imageUrl = ''" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center bg-white rounded-lg text-red-600 hover:scale-110 transition-transform">
+                    <button type="button" @click="form.imageUrl = ''" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center bg-white dark:bg-gray-800 rounded-lg text-red-600 dark:text-red-400 hover:scale-110 transition-transform">
                       <Trash2 class="w-4 h-4" />
                     </button>
                   </div>
@@ -293,10 +293,10 @@ async function saveItem() {
         </div>
 
         <!-- Section 2: Values & Description -->
-        <div class="space-y-6 pt-8 border-t border-gray-100">
+        <div class="space-y-6 pt-8 border-t border-gray-100 dark:border-gray-800">
           <div class="space-y-2">
-            <h3 class="text-lg font-black text-gray-900 tracking-tight">Valores e Detalhes</h3>
-            <p class="text-sm text-gray-500 font-medium">Como este item será cobrado e descrito no orçamento.</p>
+            <h3 class="text-lg font-black text-gray-900 dark:text-gray-100 tracking-tight">Valores e Detalhes</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Como este item será cobrado e descrito no orçamento.</p>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
@@ -315,12 +315,12 @@ async function saveItem() {
 
           <div class="space-y-3 pt-2">
             <div class="flex justify-between items-center px-1">
-              <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Descrição Comercial</label>
+              <label class="block text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">Descrição Comercial</label>
               <button
                 type="button"
                 @click="suggestWithAI"
                 :disabled="isSuggesting || !form.name.trim()"
-                class="flex items-center gap-1.5 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-700 disabled:opacity-40 disabled:pointer-events-none transition-all"
+                class="flex items-center gap-1.5 text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest hover:text-blue-700 dark:hover:text-blue-300 disabled:opacity-40 disabled:pointer-events-none transition-all"
               >
                 <Loader2 v-if="isSuggesting" class="w-3.5 h-3.5 animate-spin" />
                 <Sparkles v-else class="w-3.5 h-3.5" />
@@ -330,7 +330,7 @@ async function saveItem() {
             <textarea 
               v-model="form.description" 
               rows="4" 
-              class="w-full px-6 py-5 bg-white border-2 border-gray-100 rounded-[1.5rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 shadow-inner"
+              class="w-full px-6 py-5 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-[1.5rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 dark:text-gray-100 shadow-inner placeholder:text-gray-400 dark:placeholder:text-gray-600"
               placeholder="Descreva o que está incluído..."
             ></textarea>
           </div>

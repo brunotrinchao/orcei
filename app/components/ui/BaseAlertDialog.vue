@@ -21,7 +21,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   open: false,
-  cancelText: 'Cancelar',
+  cancelText: undefined,
   actionText: 'Confirmar',
   variant: 'primary'
 })
@@ -62,6 +62,7 @@ const emit = defineEmits(['update:open', 'confirm', 'cancel'])
 
           <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
             <AlertDialogCancel 
+              v-if="cancelText"
               @click="emit('cancel')"
               class="px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all border border-transparent dark:border-gray-700"
             >
@@ -73,8 +74,8 @@ const emit = defineEmits(['update:open', 'confirm', 'cancel'])
               :class="[
                 'px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg',
                 variant === 'destructive' 
-                  ? 'bg-red-500 text-white hover:bg-red-600 shadow-red-100' 
-                  : 'bg-gray-900 text-white hover:bg-black shadow-gray-100'
+                  ? 'bg-red-500 text-white hover:bg-red-600 shadow-red-100 dark:shadow-none' 
+                  : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-black dark:hover:bg-gray-100 shadow-gray-100 dark:shadow-none'
               ]"
             >
               {{ actionText }}

@@ -37,7 +37,10 @@ export const useAlerts = () => {
 
   // Helper para confirmações (substitui confirm())
   const confirm = (opt: AlertOptions) => {
-    showAlert(opt)
+    showAlert({
+      cancelText: 'Cancelar',
+      ...opt
+    })
   }
 
   return {

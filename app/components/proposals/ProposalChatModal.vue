@@ -73,28 +73,28 @@ const formatMessageTime = (date: any) => {
     title="Dúvidas e Alterações"
     size="lg"
   >
-    <div v-if="proposal" class="p-0 flex flex-col md:h-[65vh] h-[80vh] bg-[#E5DDD5] rounded-b-2xl overflow-hidden">
+    <div v-if="proposal" class="p-0 flex flex-col md:h-[65vh] h-[80vh] bg-[#E5DDD5] dark:bg-gray-950 rounded-b-2xl overflow-hidden">
       <!-- Header -->
-      <div class="p-4 border-b border-gray-100 shrink-0 bg-white shadow-sm z-10 flex items-center justify-between">
+      <div class="p-4 border-b border-gray-100 dark:border-gray-800 shrink-0 bg-white dark:bg-gray-900 shadow-sm z-10 flex items-center justify-between">
         <div>
-          <h3 class="text-xl font-black text-gray-900 tracking-tight leading-tight">{{ proposal.title }}</h3>
-          <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">{{ proposal.client.name }}</p>
+          <h3 class="text-xl font-black text-gray-900 dark:text-gray-50 tracking-tight leading-tight">{{ proposal.title }}</h3>
+          <p class="text-xs font-bold text-gray-400 dark:text-gray-400 uppercase tracking-widest mt-1">{{ proposal.client.name }}</p>
         </div>
       </div>
 
       <!-- Messages Area -->
-      <div ref="chatMessagesRef" class="flex-1 overflow-y-auto p-6 space-y-4 bg-[#dfe4ea] scrollbar-hide">
-        <div v-if="!groupedMessages?.length" class="text-center py-20 bg-white/60 backdrop-blur-sm rounded-3xl p-8 max-w-xs mx-auto mt-10">
-          <div class="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mx-auto mb-4 border border-gray-100 shadow-sm">
-            <MessageCircle class="w-6 h-6 text-gray-300" />
+      <div ref="chatMessagesRef" class="flex-1 overflow-y-auto p-6 space-y-4 bg-[#dfe4ea] dark:bg-gray-900/80 scrollbar-hide">
+        <div v-if="!groupedMessages?.length" class="text-center py-20 bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm rounded-3xl p-8 max-w-xs mx-auto mt-10">
+          <div class="w-16 h-16 bg-white dark:bg-gray-800 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-gray-100 dark:border-gray-700 shadow-sm">
+            <MessageCircle class="w-6 h-6 text-gray-300 dark:text-gray-500" />
           </div>
-          <p class="text-xs font-black text-gray-400 uppercase tracking-widest">Nenhuma interação iniciada</p>
+          <p class="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Nenhuma interação iniciada</p>
         </div>
 
         <div v-for="group in groupedMessages" :key="group.date" class="space-y-4">
           <!-- Date Separator -->
           <div class="flex justify-center my-6">
-            <span class="px-4 py-1.5 bg-white/80 backdrop-blur-md rounded-xl text-[9px] font-black text-gray-500 uppercase tracking-widest shadow-sm">
+            <span class="px-4 py-1.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-xl text-[9px] font-black text-gray-500 dark:text-gray-300 uppercase tracking-widest shadow-sm">
               {{ group.date }}
             </span>
           </div>
@@ -112,8 +112,8 @@ const formatMessageTime = (date: any) => {
               :class="[
                 'px-4 py-2.5 rounded-2xl text-sm font-medium leading-relaxed shadow-sm min-w-[80px]',
                 msg.sender === 'freelancer'
-                  ? 'bg-[#DCF8C6] text-gray-800 rounded-tr-none'
-                  : 'bg-white text-gray-800 rounded-tl-none'
+                  ? 'bg-[#DCF8C6] dark:bg-emerald-950 dark:text-emerald-100 text-gray-800 rounded-tr-none'
+                  : 'bg-white dark:bg-gray-800 dark:text-gray-100 text-gray-800 rounded-tl-none'
               ]"
             >
               {{ msg.text }}
@@ -134,13 +134,13 @@ const formatMessageTime = (date: any) => {
       </div>
 
       <!-- Input Area -->
-      <div class="p-4 bg-[#F0F2F5] border-t border-gray-200 shrink-0">
+      <div class="p-4 bg-[#F0F2F5] dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shrink-0">
         <form @submit.prevent="sendMessage" class="flex gap-3 items-center">
           <div class="flex-1 relative">
             <input
               v-model="newMessage"
               placeholder="Digite uma mensagem..."
-              class="w-full px-6 py-3.5 bg-white border-none rounded-full focus:ring-0 outline-none font-medium text-sm shadow-sm placeholder:text-gray-400"
+              class="w-full px-6 py-3.5 bg-white dark:bg-gray-800 border-none focus:ring-0 outline-none font-medium text-sm shadow-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
             />
           </div>
           <button

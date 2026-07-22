@@ -15,19 +15,17 @@ const isDrawerOpen = ref(false)
   <div class="w-full">
     <!-- Desktop Layout -->
     <div class="hidden md:flex items-center gap-3 w-full flex-wrap">
-      <div v-if="$slots.search" class="relative flex-1 min-w-[240px] max-w-lg">
+      <div v-if="$slots.search" class="relative flex-1 min-w-[260px] max-w-md">
         <slot name="search" />
       </div>
-      <div class="flex items-center gap-3 flex-wrap flex-1">
-        <slot />
-        <button 
-          v-if="activeFiltersCount && activeFiltersCount > 0" 
-          @click="$emit('clear')" 
-          class="h-[52px] px-4 flex items-center justify-center gap-2 text-xs font-black text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 hover:border-red-200 dark:hover:border-red-900/50 rounded-2xl uppercase tracking-widest transition-all shadow-sm active:scale-95 shrink-0"
-        >
-          <X class="w-4 h-4" /> Limpar Filtros
-        </button>
-      </div>
+      <slot />
+      <button 
+        v-if="activeFiltersCount && activeFiltersCount > 0" 
+        @click="$emit('clear')" 
+        class="h-[52px] px-4 flex items-center justify-center gap-2 text-xs font-black text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 hover:border-red-200 dark:hover:border-red-900/50 rounded-2xl uppercase tracking-widest transition-all shadow-sm active:scale-95 shrink-0"
+      >
+        <X class="w-4 h-4" /> Limpar Filtros
+      </button>
     </div>
 
     <!-- Mobile Layout -->

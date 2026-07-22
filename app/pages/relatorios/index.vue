@@ -91,7 +91,7 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
             </div>
           </template>
 
-          <div class="w-full sm:w-56">
+          <div class="w-full md:w-56 shrink-0">
             <BaseDateRangePicker 
               v-model:start="startDate"
               v-model:end="endDate"

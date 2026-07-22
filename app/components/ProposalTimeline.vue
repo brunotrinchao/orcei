@@ -74,24 +74,24 @@ const getActionIcon = (action: string) => {
 
 const getActionColor = (action: string) => {
   const colors: Record<string, string> = {
-    'created': 'text-gray-500 bg-gray-100',
-    'sent': 'text-blue-500 bg-blue-100',
-    'delivered': 'text-green-500 bg-green-100',
-    'opened': 'text-purple-500 bg-purple-100',
-    'clicked': 'text-orange-500 bg-orange-100',
-    'viewed': 'text-indigo-500 bg-indigo-100',
-    'accepted': 'text-emerald-500 bg-emerald-100',
-    'declined': 'text-red-500 bg-red-100',
-    'bounced': 'text-red-600 bg-red-100',
-    'complained': 'text-black bg-gray-200',
-    'scheduled': 'text-blue-400 bg-blue-50',
-    'received': 'text-green-400 bg-green-50',
-    'delayed': 'text-yellow-500 bg-yellow-50',
-    'failed': 'text-red-700 bg-red-100',
-    'suppressed': 'text-gray-700 bg-gray-200',
-    'google_sync': 'text-blue-600 bg-blue-50'
+    'created': 'text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800',
+    'sent': 'text-blue-500 dark:text-blue-400 bg-blue-100 dark:bg-blue-950/60',
+    'delivered': 'text-green-500 dark:text-green-400 bg-green-100 dark:bg-green-950/60',
+    'opened': 'text-purple-500 dark:text-purple-400 bg-purple-100 dark:bg-purple-950/60',
+    'clicked': 'text-orange-500 dark:text-orange-400 bg-orange-100 dark:bg-orange-950/60',
+    'viewed': 'text-indigo-500 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-950/60',
+    'accepted': 'text-emerald-500 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60',
+    'declined': 'text-red-500 dark:text-red-400 bg-red-100 dark:bg-red-950/60',
+    'bounced': 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-950/60',
+    'complained': 'text-black dark:text-gray-200 bg-gray-200 dark:bg-gray-700',
+    'scheduled': 'text-blue-400 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40',
+    'received': 'text-green-400 dark:text-green-300 bg-green-50 dark:bg-green-950/40',
+    'delayed': 'text-yellow-500 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950/40',
+    'failed': 'text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-950/60',
+    'suppressed': 'text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-800',
+    'google_sync': 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40'
   }
-  return colors[action] || 'text-gray-500 bg-gray-100'
+  return colors[action] || 'text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800'
 }
 
 const formatDate = (date: string) => {
@@ -104,18 +104,18 @@ const formatDate = (date: string) => {
     <ul role="list" class="-mb-8">
       <li v-for="(event, eventIdx) in history" :key="event._id">
         <div class="relative pb-8">
-          <span v-if="eventIdx !== history.length - 1" class="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true" />
+          <span v-if="eventIdx !== history.length - 1" class="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-800" aria-hidden="true" />
           <div class="relative flex space-x-3">
             <div>
-              <span :class="[getActionColor(event.action), 'flex h-8 w-8 items-center justify-center rounded-full ring-8 ring-white']">
+              <span :class="[getActionColor(event.action), 'flex h-8 w-8 items-center justify-center rounded-full ring-8 ring-white dark:ring-gray-900']">
                 <component :is="getActionIcon(event.action)" class="h-5 w-5" aria-hidden="true" />
               </span>
             </div>
             <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
               <div>
-                <p class="text-sm text-gray-500">
+                <p class="text-sm text-gray-500 dark:text-gray-400">
                   {{ getActionLabel(event.action) }}
-                  <span v-if="event.details?.paymentMethod" class="font-medium text-gray-900">
+                  <span v-if="event.details?.paymentMethod" class="font-medium text-gray-900 dark:text-gray-200">
                     via {{ event.details.paymentMethod === 'cash' ? 'À vista' : 'Cartão' }}
                   </span>
                   <span v-if="event.action === 'google_sync'" class="text-xs opacity-70">
@@ -123,7 +123,7 @@ const formatDate = (date: string) => {
                   </span>
                 </p>
               </div>
-              <div class="whitespace-nowrap text-right text-sm text-gray-500">
+              <div class="whitespace-nowrap text-right text-sm text-gray-500 dark:text-gray-400">
                 <time :datetime="event.timestamp">{{ formatDate(event.timestamp) }}</time>
               </div>
             </div>

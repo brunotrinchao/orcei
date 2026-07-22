@@ -5,6 +5,6 @@ export default defineVitestConfig({
   test: {
     environment: 'nuxt',
     globals: true,
-    exclude: [...configDefaults.exclude, 'tests/e2e/**/*', '**/.claude/worktrees/**/tests/e2e/**/*']
+    exclude: [...configDefaults.exclude, 'tests/e2e/**/*', '**/.claude/worktrees/**/tests/e2e/**/*', '.claude/**/*']
   }
 })

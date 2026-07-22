@@ -106,8 +106,8 @@ function isItemSelected(item: any) {
 <template>
   <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
     <div class="space-y-2">
-      <h3 class="text-lg font-black text-gray-900 tracking-tight">Serviços e Valores</h3>
-      <p class="text-sm text-gray-500 font-medium">Defina o escopo obrigatório e adicione pacotes opcionais (upsell).</p>
+      <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight">Serviços e Valores</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Defina o escopo obrigatório e adicione pacotes opcionais (upsell).</p>
     </div>
 
     <!-- Smart Catalog Search -->
@@ -133,7 +133,7 @@ function isItemSelected(item: any) {
 
     <!-- Escopo Principal -->
     <div class="space-y-4 relative z-0">
-      <h3 class="text-xs font-black text-gray-600 uppercase tracking-widest ml-1 flex justify-between">
+      <h3 class="text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1 flex justify-between">
         <span>Itens Obrigatórios ({{ form.items.length }})</span>
       </h3>
       

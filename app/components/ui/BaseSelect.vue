@@ -33,7 +33,7 @@ const id = useId()
 </script>
 
 <template>
-  <div class="space-y-2">
+  <div :class="label ? 'space-y-2' : ''">
     <label v-if="label" :id="`label-${id}`" class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">
       {{ label }}
     </label>
@@ -41,12 +41,12 @@ const id = useId()
     <SelectRoot v-model="modelValue" :disabled="disabled">
       <SelectTrigger
         :aria-labelledby="label ? `label-${id}` : undefined"
-        class="inline-flex items-center justify-between w-full px-5 py-4 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all outline-none font-bold text-gray-900 dark:text-gray-50 group disabled:opacity-50 disabled:cursor-not-allowed"
-        :class="{ 'border-red-300 focus:border-red-500 focus:ring-red-500/20': error }"
+        class="inline-flex items-center justify-between w-full h-[52px] px-5 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-100 group disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+        :class="{ 'border-red-300 dark:border-red-500/50 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500/20': error }"
       >
         <SelectValue :placeholder="placeholder || 'Selecione...'" />
         <SelectIcon>
-          <ChevronDown class="w-4 h-4 text-gray-400 group-hover:text-gray-900 transition-colors" />
+          <ChevronDown class="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-white transition-colors" />
         </SelectIcon>
       </SelectTrigger>
 
@@ -73,7 +73,7 @@ const id = useId()
               class="relative flex items-center px-8 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 rounded-xl cursor-pointer outline-none focus:bg-gray-50 dark:focus:bg-gray-800 focus:text-gray-900 dark:focus:text-white data-[state=checked]:text-gray-900 dark:data-[state=checked]:text-white data-[state=checked]:bg-gray-50 dark:data-[state=checked]:bg-gray-800 transition-colors"
             >
               <SelectItemIndicator class="absolute left-2 inline-flex items-center justify-center">
-                <Check class="w-4 h-4 text-gray-900" />
+                <Check class="w-4 h-4 text-gray-900 dark:text-white" />
               </SelectItemIndicator>
               <SelectItemText>{{ option.label }}</SelectItemText>
             </SelectItem>

@@ -148,7 +148,14 @@ async function deleteClient(id: string) {
   })
 }
 
-// Formatters
+const activeFiltersCount = computed(() => {
+  return searchQuery.value ? 1 : 0
+})
+
+function clearFilters() {
+  searchQuery.value = ''
+}
+
 const formatPhone = (phone: string) => {
   const r = phone.replace(/\D/g, '')
   if (r.length === 11) {
@@ -167,20 +174,23 @@ const formatPhone = (phone: string) => {
       <BaseButton data-tour="clientes-novo-btn" @click="openModal()" class="w-full sm:w-auto shadow-2xl shadow-blue-100">
         Cadastrar Novo Cliente
       </BaseButton>
-    </PageHeader>
 
-    <!-- Filtros -->
-    <div data-tour="clientes-busca" class="mb-10 relative max-w-xl">
-      <input
-        v-model="searchQuery"
-        type="text"
-        placeholder="Buscar por nome, e-mail ou documento..." 
-        class="w-full pl-14 pr-6 py-5 bg-white border-2 border-gray-100 rounded-[2rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-300 shadow-sm"
-      >
-      <div class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300">
-        <Search class="w-6 h-6" />
-      </div>
-    </div>
+      <template #filters>
+        <BaseFilters :active-filters-count="activeFiltersCount" @clear="clearFilters" data-tour="clientes-busca">
+          <template #search>
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Buscar por nome, e-mail ou documento..." 
+              class="w-full h-[52px] pl-12 pr-5 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-sm"
+            >
+            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
+              <Search class="w-5 h-5" />
+            </div>
+          </template>
+        </BaseFilters>
+      </template>
+    </PageHeader>
 
     <!-- Modal de Formulário -->
     <BaseDialog 
@@ -327,26 +337,26 @@ const formatPhone = (phone: string) => {
       </template>
 
       <template #item="{ item: client }">
-        <tr class="hover:bg-gray-50/30 transition-all group">
+        <tr class="hover:bg-gray-50/30 dark:hover:bg-gray-800/20 transition-all group">
           <td class="px-10 py-8">
             <div class="flex flex-col">
-              <span class="font-black text-lg text-gray-900 group-hover:text-blue-600 transition-colors">{{ client.name }}</span>
-              <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{{ client.taxId || 'Sem documento' }}</span>
+              <span class="font-black text-lg text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ client.name }}</span>
+              <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">{{ client.taxId || 'Sem documento' }}</span>
             </div>
           </td>
           <td class="px-10 py-8">
             <div class="flex flex-col">
-              <span class="text-sm font-bold text-gray-600">{{ client.email }}</span>
+              <span class="text-sm font-bold text-gray-600 dark:text-gray-300">{{ client.email }}</span>
               <div class="flex items-center gap-2 mt-1">
-                <span class="text-xs font-black text-gray-400">{{ formatPhone(client.phone) }}</span>
+                <span class="text-xs font-black text-gray-400 dark:text-gray-500">{{ formatPhone(client.phone) }}</span>
                 <img v-if="client.isWhatsapp" :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5" alt="WhatsApp" loading="lazy"/>
               </div>
             </div>
           </td>
           <td class="px-10 py-8">
             <div class="flex flex-col">
-              <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">{{ client.address?.city || '-' }} - {{ client.address?.state || '-' }}</span>
-              <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest line-clamp-1 max-w-[400px] mt-1">{{ client.address?.street }}, {{ client.address?.number }}</span>
+              <span class="text-[10px] font-black text-gray-900 dark:text-gray-100 uppercase tracking-widest">{{ client.address?.city || '-' }} - {{ client.address?.state || '-' }}</span>
+              <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest line-clamp-1 max-w-[400px] mt-1">{{ client.address?.street }}, {{ client.address?.number }}</span>
             </div>
           </td>
           <td class="px-10 py-8 text-right">
@@ -354,7 +364,7 @@ const formatPhone = (phone: string) => {
               <DropdownMenuRoot>
                 <DropdownMenuTrigger as-child>
                   <button
-                    class="p-2.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-2xl transition-all"
+                    class="p-2.5 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl transition-all"
                     title="Mais ações"
                     aria-label="Mais ações do orçamento"
                   >
@@ -365,18 +375,18 @@ const formatPhone = (phone: string) => {
                   <DropdownMenuContent
                     align="end"
                     :side-offset="6"
-                    class="min-w-[220px] bg-white rounded-2xl shadow-xl border border-gray-100 p-2 z-50"
+                    class="min-w-[220px] bg-white dark:bg-gray-950 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
                   >
                   <DropdownMenuItem
                       @click="openModal(client)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
                     >
                       <Pencil class="w-4 h-4" />
                       Editar
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       @click="deleteClient(client._id)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-red-600 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-red-600 dark:hover:text-red-400 cursor-pointer outline-none transition-all"
                     >
                       <Trash2 class="w-4 h-4" />
                       Excluir
@@ -428,7 +438,7 @@ const formatPhone = (phone: string) => {
       </template>
       <template v-else-if="clients.length === 0">
         <div class="py-16 text-center">
-          <p class="font-black text-gray-900">Sem Clientes</p>
+          <p class="font-black text-gray-900 dark:text-gray-100">Sem Clientes</p>
           <p class="text-sm text-gray-500 mt-1">Sua lista de clientes aparecerá aqui. Comece cadastrando o primeiro.</p>
         </div>
       </template>

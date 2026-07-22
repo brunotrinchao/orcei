@@ -8,22 +8,22 @@ defineProps<{
 </script>
 
 <template>
-  <div class="rounded-2xl border border-gray-200 bg-white shadow-sm p-4 text-xs">
+  <div class="rounded-2xl border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700 shadow-sm p-4 text-xs">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2 text-gray-500 font-bold">
         <Clock class="w-3 h-3" />
         {{ formatDate(log.createdAt) }}
       </div>
-      <span class="px-2 py-1 bg-gray-100 rounded text-[9px] font-black uppercase tracking-widest text-gray-600 border border-gray-200">
+      <span class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-[9px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
         {{ log.action }}
       </span>
     </div>
 
-    <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+    <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
       <User class="w-3.5 h-3.5 text-gray-400" />
-      <span class="font-black text-gray-900">{{ log.adminName }}</span>
+      <span class="font-black text-gray-900 dark:text-white">{{ log.adminName }}</span>
     </div>
 
-    <pre class="text-[9px] bg-gray-50 p-2 rounded-lg mt-2 overflow-hidden truncate">{{ JSON.stringify(log.details) }}</pre>
+    <pre class="text-[9px] bg-gray-50 dark:bg-gray-800 p-2 rounded-lg mt-2 overflow-hidden truncate">{{ JSON.stringify(log.details) }}</pre>
   </div>
 </template>

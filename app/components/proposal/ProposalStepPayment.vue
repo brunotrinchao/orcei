@@ -10,14 +10,14 @@ const props = defineProps<{
 <template>
   <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
     <div class="space-y-2">
-      <h3 class="text-lg font-black text-gray-900 tracking-tight">Condições e Finalização</h3>
-      <p class="text-sm text-gray-500 font-medium">Configure como o cliente pagará e receba o resumo financeiro.</p>
+      <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight">Condições e Finalização</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Configure como o cliente pagará e receba o resumo financeiro.</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
       <div class="space-y-8">
-        <div class="bg-gray-50 p-6 md:p-8 rounded-[3rem] space-y-6">
-          <h3 class="text-xs font-black text-gray-900 uppercase tracking-widest">Execução & Pagamento</h3>
+        <div class="bg-gray-50 dark:bg-gray-800 p-6 md:p-8 rounded-[3rem] space-y-6">
+          <h3 class="text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest">Execução & Pagamento</h3>
           
           <div class="space-y-3">
             <BaseDateTimePicker 

@@ -50,7 +50,7 @@ const validityBarColor = computed(() =>
 </script>
 
 <template>
-  <div class="rounded-2xl border border-gray-200 bg-white shadow-sm p-4">
+  <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-4">
     <!-- topo: ref + badge -->
     <div class="flex items-center justify-between mb-2">
       <span class="text-xs font-bold text-gray-400">REF: {{ proposal.code }}</span>
@@ -58,25 +58,25 @@ const validityBarColor = computed(() =>
     </div>
 
     <!-- título: código + título do orçamento -->
-    <h3 class="text-xl font-black text-gray-900 tracking-tight">{{ proposal.title || 'Sem título' }}</h3>
-    <p class="text-sm text-gray-500 mt-0.5">{{ proposal.client.name }}</p>
+    <h3 class="text-xl font-black text-gray-900 dark:text-gray-50 tracking-tight">{{ proposal.title || 'Sem título' }}</h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{{ proposal.client.name }}</p>
 
     <!-- data / total -->
     <div class="flex items-center justify-between mt-4">
       <span class="text-xs text-gray-500 font-medium">{{ formatDate(proposal.createdAt) }}</span>
       <div class="text-right">
         <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Total</span>
-        <span class="font-black text-gray-900">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+        <span class="font-black text-gray-900 dark:text-gray-50">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
       </div>
     </div>
 
     <!-- barra de validade -->
-    <div class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden mt-3">
+    <div class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden mt-3">
       <div class="h-full rounded-full transition-all" :class="validityBarColor" :style="{ width: validityPercent + '%' }"></div>
     </div>
 
     <!-- rodapé: ações -->
-    <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+    <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
       <div class="flex items-center gap-1">
         <button
           @click="$emit('open-chat')"
@@ -106,7 +106,7 @@ const validityBarColor = computed(() =>
       <DropdownMenuRoot>
         <DropdownMenuTrigger as-child>
           <button
-            class="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all"
+            class="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all"
             title="Mais ações"
             aria-label="Mais ações do orçamento"
           >
@@ -117,18 +117,18 @@ const validityBarColor = computed(() =>
           <DropdownMenuContent
             align="end"
             :side-offset="6"
-            class="min-w-[220px] bg-white rounded-2xl shadow-xl border border-gray-100 p-2 z-50"
+            class="min-w-[220px] bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
           >
             <DropdownMenuItem
               @click="$emit('open-history')"
-              class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+              class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
             >
               <History class="w-4 h-4" />
               Ver Histórico
             </DropdownMenuItem>
             <DropdownMenuItem
               @click="$emit('open-preview')"
-              class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+              class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
             >
               <Eye class="w-4 h-4" />
               Visualizar Orçamento
@@ -137,7 +137,7 @@ const validityBarColor = computed(() =>
               v-if="proposal.status !== 'draft' && proposal.status !== 'accepted'"
               :disabled="isResending"
               @click="$emit('resend-email')"
-              class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all disabled:opacity-50"
+              class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all disabled:opacity-50"
             >
               <RefreshCcw v-if="isResending" class="w-4 h-4 animate-spin" />
               <Mail v-else class="w-4 h-4" />
@@ -146,7 +146,7 @@ const validityBarColor = computed(() =>
             <DropdownMenuItem
               v-if="proposal.status !== 'accepted'"
               @click="$emit('edit')"
-              class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+              class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
             >
               <Pencil class="w-4 h-4" />
               Editar
@@ -154,7 +154,7 @@ const validityBarColor = computed(() =>
             <DropdownMenuItem
               v-if="proposal.status !== 'accepted'"
               @click="$emit('delete')"
-              class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-600 hover:bg-red-50 cursor-pointer outline-none transition-all"
+              class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer outline-none transition-all"
             >
               <Trash2 class="w-4 h-4" />
               Excluir

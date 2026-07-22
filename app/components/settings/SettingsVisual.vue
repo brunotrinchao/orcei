@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { SwatchBook, Image as PhotoIcon, Pencil } from 'lucide-vue-next'
+import { SwatchBook, Image as PhotoIcon, Pencil, Sun, Moon } from 'lucide-vue-next'
 
 const props = defineProps<{
   logoUrl: string
@@ -115,12 +115,19 @@ async function cropLogo() {
       <!-- Dark Mode -->
       <div class="md:col-span-2 flex items-center justify-between p-6 bg-gray-50/50 dark:bg-gray-800/50 rounded-3xl border border-gray-200 dark:border-gray-700">
         <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-            <component :is="isDark ? 'span' : 'span'" class="text-base">{{ isDark ? '🌙' : '☀️' }}</component>
+          <div class="w-8 h-8 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400">
+            <ClientOnly>
+              <Moon v-if="isDark" class="w-4 h-4 transition-transform duration-300 hover:rotate-12" />
+              <Sun v-else class="w-4 h-4 transition-transform duration-300 hover:rotate-12" />
+            </ClientOnly>
           </div>
           <div>
             <h3 class="text-sm font-black text-gray-900 dark:text-gray-50 uppercase tracking-tight">Aparência</h3>
-            <p class="text-xs text-gray-400 dark:text-gray-500 font-medium">{{ isDark ? 'Modo escuro ativo' : 'Modo claro ativo' }}</p>
+            <p class="text-xs text-gray-400 dark:text-gray-500 font-medium">
+              <ClientOnly>
+                {{ isDark ? 'Modo escuro ativo' : 'Modo claro ativo' }}
+              </ClientOnly>
+            </p>
           </div>
         </div>
         <button
@@ -133,10 +140,15 @@ async function cropLogo() {
         >
           <span
             :class="[
-              'inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-200',
+              'inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-200 flex items-center justify-center',
               isDark ? 'translate-x-8' : 'translate-x-1'
             ]"
-          />
+          >
+            <ClientOnly>
+              <Moon v-if="isDark" class="w-3 h-3 text-blue-600" />
+              <Sun v-else class="w-3 h-3 text-amber-500" />
+            </ClientOnly>
+          </span>
         </button>
       </div>
 

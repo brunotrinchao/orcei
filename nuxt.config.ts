@@ -25,6 +25,24 @@ export default defineNuxtConfig({
       htmlAttrs: {
         lang: 'pt-BR' // Otimização técnica de SEO e acessibilidade
       },
+      script: [
+        {
+          children: `
+            (function() {
+              try {
+                const theme = localStorage.getItem('orcei-dark-mode');
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (theme === 'dark' || (!theme && prefersDark)) {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+              } catch (e) {}
+            })();
+          `,
+          type: 'text/javascript'
+        }
+      ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/images/favicon/favicon.ico' },
         { rel: 'icon', type: 'image/png', sizes: '96x96', href: '/images/favicon/favicon-96x96.png' },

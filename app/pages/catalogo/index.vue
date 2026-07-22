@@ -60,6 +60,14 @@ async function deleteItem(id: string) {
 function getIcon(name: string) {
   return (LucideIcons as any)[name] || HelpCircle
 }
+
+const activeFiltersCount = computed(() => {
+  return searchQuery.value ? 1 : 0
+})
+
+function clearFilters() {
+  searchQuery.value = ''
+}
 </script>
 
 <template>
@@ -68,20 +76,23 @@ function getIcon(name: string) {
       <BaseButton data-tour="catalogo-novo-item-btn" @click="openModal()" class="w-full sm:w-auto shadow-2xl shadow-blue-100">
         Novo Item do Catálogo
       </BaseButton>
-    </PageHeader>
 
-    <!-- Filtros -->
-    <div data-tour="catalogo-busca" class="mb-10 relative max-w-xl">
-      <input
-        v-model="searchQuery"
-        type="text"
-        placeholder="Buscar por nome, descrição ou SKU..." 
-        class="w-full pl-14 pr-6 py-5 bg-white border-2 border-gray-100 rounded-[2rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-300 shadow-sm"
-      >
-      <div class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300">
-        <Search class="w-6 h-6" />
-      </div>
-    </div>
+      <template #filters>
+        <BaseFilters :active-filters-count="activeFiltersCount" @clear="clearFilters" data-tour="catalogo-busca">
+          <template #search>
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Buscar por nome, descrição ou SKU..." 
+              class="w-full h-[52px] pl-12 pr-5 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-sm"
+            >
+            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
+              <Search class="w-5 h-5" />
+            </div>
+          </template>
+        </BaseFilters>
+      </template>
+    </PageHeader>
 
     <!-- Modal de Formulário -->
     <CatalogItemFormDialog 
@@ -109,24 +120,24 @@ function getIcon(name: string) {
       </template>
 
       <template #item="{ item }">
-        <tr class="hover:bg-gray-50/30 transition-all group">
+        <tr class="hover:bg-gray-50/30 dark:hover:bg-gray-800/20 transition-all group">
           <td class="px-10 py-8">
             <div class="flex items-center gap-6">
-              <div class="w-16 h-16 rounded-2xl border-2 border-gray-100 bg-white overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
+              <div class="w-16 h-16 rounded-2xl border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
                 <img v-if="item.imageUrl" :src="item.imageUrl" class="w-full h-full object-cover" loading="lazy">
                 <div v-else class="text-gray-400">
                   <component :is="getIcon(item.icon || 'Package')" class="w-8 h-8" />
                 </div>
               </div>
               <div class="flex flex-col">
-                <span class="font-black text-lg text-gray-900 group-hover:text-blue-600 transition-colors">{{ item.name }}</span>
-                <span class="text-xs font-bold text-gray-400 line-clamp-1 max-w-xl mt-1">{{ item.description || 'Sem descrição comercial' }}</span>
+                <span class="font-black text-lg text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ item.name }}</span>
+                <span class="text-xs font-bold text-gray-400 dark:text-gray-500 line-clamp-1 max-w-xl mt-1">{{ item.description || 'Sem descrição comercial' }}</span>
               </div>
             </div>
           </td>
           <td class="px-10 py-8 text-center">
             <span 
-              :class="item.type === 'service' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-purple-50 text-purple-600 border-purple-100'" 
+              :class="item.type === 'service' ? 'bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-900/30' : 'bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-900/30'" 
               class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border"
             >
               {{ item.type === 'service' ? 'Serviço' : 'Produto' }}
@@ -134,8 +145,8 @@ function getIcon(name: string) {
           </td>
           <td class="px-10 py-8 text-right">
             <div class="flex flex-col items-end">
-              <span class="font-black text-lg text-gray-900">R$ {{ (item.price ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-              <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">por {{ item.unit }}</span>
+              <span class="font-black text-lg text-gray-900 dark:text-gray-100">R$ {{ (item.price ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+              <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">por {{ item.unit }}</span>
             </div>
           </td>
           <td class="px-10 py-8 text-right">
@@ -143,7 +154,7 @@ function getIcon(name: string) {
               <DropdownMenuRoot>
                 <DropdownMenuTrigger as-child>
                   <button
-                    class="p-2.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-2xl transition-all"
+                    class="p-2.5 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl transition-all"
                     title="Mais ações"
                     aria-label="Mais ações do orçamento"
                   >
@@ -154,18 +165,18 @@ function getIcon(name: string) {
                   <DropdownMenuContent
                     align="end"
                     :side-offset="6"
-                    class="min-w-[220px] bg-white rounded-2xl shadow-xl border border-gray-100 p-2 z-50"
+                    class="min-w-[220px] bg-white dark:bg-gray-950 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
                   >
                   <DropdownMenuItem
                       @click="openModal(item)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
                     >
                       <Pencil class="w-4 h-4" />
                       Editar
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       @click="deleteItem(item._id)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-red-600 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-red-600 dark:hover:text-red-400 cursor-pointer outline-none transition-all"
                     >
                       <Trash2 class="w-4 h-4" />
                       Excluir
@@ -219,7 +230,7 @@ function getIcon(name: string) {
       </template>
       <template v-else-if="items.length === 0">
         <div class="py-16 text-center">
-          <p class="font-black text-gray-900">Catálogo Vazio</p>
+          <p class="font-black text-gray-900 dark:text-gray-50">Catálogo Vazio</p>
           <p class="text-sm text-gray-500 mt-1">Sua lista de produtos e serviços aparecerá aqui. Comece cadastrando o primeiro.</p>
         </div>
       </template>

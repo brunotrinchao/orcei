@@ -90,8 +90,8 @@ const getScoreColor = (val: number) => {
 <template>
   <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
     <div class="space-y-2">
-      <h3 class="text-lg font-black text-gray-900 tracking-tight">Resumo do Orçamento</h3>
-      <p class="text-sm text-gray-500 font-medium">Revise todos os detalhes antes de salvar ou enviar para o cliente.</p>
+      <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight">Resumo do Orçamento</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Revise todos os detalhes antes de salvar ou enviar para o cliente.</p>
     </div>
 
     <!-- AI CONVERSION PREDICTOR SCORE (Premium AI Widget) -->
@@ -141,7 +141,7 @@ const getScoreColor = (val: number) => {
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       
       <!-- Cliente -->
-      <div class="bg-gray-50 p-6 rounded-[2rem] space-y-4">
+      <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-[2rem] space-y-4">
         <div class="flex items-center gap-3 text-blue-600">
           <User class="w-5 h-5" />
           <h4 class="text-[10px] font-black uppercase tracking-widest">Cliente</h4>

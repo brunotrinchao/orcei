@@ -17,10 +17,10 @@ function handleClick() {
   <button
     v-if="tourId"
     @click="handleClick"
-    class="w-10 h-10 rounded-2xl bg-gray-100 flex items-center justify-center hover:ring-4 ring-gray-100 transition-all border-2 border-white shadow-sm text-gray-500 hover:text-blue-600"
+    class="w-10 h-10 rounded-2xl bg-gray-50 dark:bg-gray-900/60 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 border border-slate-100 dark:border-slate-800/80 shadow-sm hover:ring-4 ring-gray-100 dark:ring-gray-800/50 transition-all"
     title="Ajuda - Tour guiado"
     aria-label="Iniciar tour guiado da página"
   >
-    <HelpCircle class="w-5 h-5" />
+    <HelpCircle class="w-4.5 h-4.5" />
   </button>
 </template>

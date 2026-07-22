@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SubscriptionPlan } from '../../types/enums'
 import { onClickOutside } from '@vueuse/core'
-import { Shield, ArrowLeft, Home, FileText, Plus, Users, Settings, LogOut, BookOpen, ReceiptText, Coins, Moon, Sun } from 'lucide-vue-next'
+import { Shield, ArrowLeft, Home, FileText, Plus, Users, Settings, LogOut, BookOpen, ReceiptText, Coins, Moon, Sun, HelpCircle } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../types'
 const { loggedIn, user, session, clear, fetch: refreshSession } = useUserSession()
 const { data: profile, refresh: refreshLayoutProfile } = useFetch<ProfileDTO>('/api/profile', { key: 'profile' })
@@ -17,6 +17,15 @@ async function stopImpersonating() {
 }
 
 const isMenuOpen = ref(false)
+const menuRef = ref<HTMLElement | null>(null)
+
+onClickOutside(menuRef, () => {
+  isMenuOpen.value = false
+})
+
+const route = useRoute()
+const { hasTourForRoute, startTour } = useOnboarding()
+const tourId = computed(() => hasTourForRoute(route.path))
 
 function toggleMenu() {
   isMenuOpen.value = !isMenuOpen.value
@@ -72,15 +81,6 @@ onUnmounted(() => {
             <NuxtLink to="/catalogo" @mouseenter="preloadRouteComponents('/catalogo')" @focus="preloadRouteComponents('/catalogo')" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" active-class="text-gray-900 dark:text-white">Catálogo</NuxtLink>
             <NuxtLink to="/orcamentos" @mouseenter="preloadRouteComponents('/orcamentos')" @focus="preloadRouteComponents('/orcamentos')" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" active-class="text-gray-900 dark:text-white">Orçamentos</NuxtLink>
             <NuxtLink to="/relatorios" @mouseenter="preloadRouteComponents('/relatorios')" @focus="preloadRouteComponents('/relatorios')" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" active-class="text-gray-900 dark:text-white">Relatórios</NuxtLink>
-            
-            <!-- Admin Quick Access -->
-            <template v-if="user?.role === 'admin'">
-              <div class="h-4 w-px bg-gray-200"></div>
-              <NuxtLink to="/admin" class="flex items-center gap-2 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-red-100 transition-all border border-red-100">
-                <Shield class="w-3.5 h-3.5" />
-                Painel Admin
-              </NuxtLink>
-            </template>
           </div>
           <div v-else class="hidden md:flex gap-8">
             <a href="#features" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Funcionalidades</a>
@@ -88,45 +88,76 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 md:gap-3">
           <template v-if="loggedIn">
-            <!-- Onboarding Help Button -->
-            <OnboardingHelpButton />
-
             <!-- Credits & Plan Display -->
-            <div class="flex items-center gap-3 bg-gray-50/50 dark:bg-gray-800/50 px-3 py-1.5 rounded-2xl border border-gray-100 dark:border-gray-700 mr-1">
-              <div class="flex flex-row justify-center items-center">
-                <Coins class="w-3.5 h-3.5 text-gray-400 mr-1 " />
-                <span class="pr-1 text-[8px] uppercase font-bold text-gray-400 tracking-widest">Créditos: </span>
-                <span class="text-xs font-semibold text-gray-700">{{ profile?.creditsBalance ?? 0 }}</span>
+            <div class="flex items-center gap-2 md:gap-3.5 bg-slate-50 dark:bg-slate-900/60 px-2.5 md:px-3.5 py-1.5 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-inner mr-0.5 md:mr-1">
+              <!-- Créditos -->
+              <div class="flex items-center gap-1.5 py-0.5">
+                <div class="w-6 h-6 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-500">
+                  <Coins class="w-3.5 h-3.5" />
+                </div>
+                <div class="flex flex-col">
+                  <span class="hidden md:inline-block text-[7px] uppercase font-black text-gray-400 dark:text-gray-500 tracking-wider leading-none">Créditos</span>
+                  <span class="text-xs font-black text-slate-800 dark:text-slate-100 leading-none md:leading-tight mt-0.5 md:mt-0.5">{{ profile?.creditsBalance ?? 0 }}</span>
+                </div>
               </div>
-
-              <div v-if="profile?.subscriptionPlan && profile.subscriptionPlan !== SubscriptionPlan.FREE" class="h-6 w-px bg-gray-200"></div>
-              <div v-if="profile?.subscriptionPlan && profile.subscriptionPlan !== SubscriptionPlan.FREE" class="flex flex-col items-start">
-                <span :class="[
-                  'text-[8px] uppercase font-bold tracking-widest',
-                  profile.cancelAtPeriodEnd ? 'text-amber-400' : 'text-blue-400'
-                ]">{{ profile.cancelAtPeriodEnd ? 'Cancela em breve' : 'Plano' }}</span>
-                <span :class="[
-                  'text-[10px] font-black uppercase',
-                  profile.cancelAtPeriodEnd ? 'text-amber-600' : 'text-blue-600'
-                ]">{{ profile.subscriptionPlan }}</span>
+              
+              <!-- Divisor (Oculto no mobile) -->
+              <div v-if="profile?.subscriptionPlan && profile.subscriptionPlan !== SubscriptionPlan.FREE" class="hidden md:block h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
+              
+              <!-- Plano (Oculto no mobile) -->
+              <div v-if="profile?.subscriptionPlan && profile.subscriptionPlan !== SubscriptionPlan.FREE" class="hidden md:flex items-center gap-1.5 py-0.5">
+                <div class="flex flex-col">
+                  <span class="text-[7px] uppercase font-black text-gray-400 dark:text-gray-500 tracking-wider leading-none">
+                    {{ profile.cancelAtPeriodEnd ? 'Cancela em' : 'Assinatura' }}
+                  </span>
+                  <span 
+                    :class="[
+                      'text-[9px] font-black uppercase px-1.5 py-0.5 rounded-md leading-none mt-0.5 tracking-wider',
+                      profile.cancelAtPeriodEnd 
+                        ? 'bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400' 
+                        : 'bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400'
+                    ]"
+                  >
+                    {{ profile.subscriptionPlan }}
+                  </span>
+                </div>
               </div>
             </div>
+
+            <!-- Admin Quick Access (Oculto no mobile) -->
+            <NuxtLink 
+              v-if="user?.role === 'admin'"
+              to="/admin" 
+              class="hidden md:flex w-10 h-10 rounded-2xl items-center justify-center bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-600 dark:text-red-400 shadow-sm hover:ring-4 ring-red-500/5 dark:ring-red-950/20 transition-all"
+              title="Painel de Administração"
+              aria-label="Acessar Painel de Administração"
+            >
+              <Shield class="w-4.5 h-4.5" />
+            </NuxtLink>
+
+            <!-- Onboarding Help Button (Oculto no mobile) -->
+            <OnboardingHelpButton class="hidden md:flex" />
 
             <!-- Dark Mode Toggle -->
             <button
               @click="toggle()"
-              class="w-9 h-9 rounded-2xl flex items-center justify-center bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+              class="hidden md:flex w-10 h-10 rounded-2xl items-center justify-center bg-gray-50 dark:bg-gray-900/60 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 border border-slate-100 dark:border-slate-800/80 shadow-sm hover:ring-4 ring-gray-100 dark:ring-gray-800/50 transition-all"
               :aria-label="isDark ? 'Ativar modo claro' : 'Ativar modo escuro'"
             >
-              <Sun v-if="isDark" class="w-4 h-4" />
-              <Moon v-else class="w-4 h-4" />
+              <ClientOnly>
+                <Sun v-if="isDark" class="w-4.5 h-4.5 text-amber-500" />
+                <Moon v-else class="w-4.5 h-4.5 text-slate-400" />
+              </ClientOnly>
             </button>
 
             <!-- User Avatar -->
-            <div class="relative">
-              <button @click.stop="toggleMenu" class="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden hover:ring-4 ring-gray-100 dark:ring-gray-700 transition-all border-2 border-white dark:border-gray-700 shadow-sm relative z-[60]">
+            <div ref="menuRef" class="relative">
+              <button 
+                @click="toggleMenu" 
+                class="w-10 h-10 rounded-2xl bg-gray-50 dark:bg-gray-900 flex items-center justify-center overflow-hidden hover:ring-4 ring-gray-100 dark:ring-gray-800/50 transition-all border border-slate-100 dark:border-slate-800/80 shadow-sm relative z-[60]"
+              >
                 <img v-if="(user as any)?.avatar || profile?.avatar" :src="(user as any)?.avatar || profile?.avatar" class="w-full h-full object-cover" loading="lazy">
                 <span v-else class="text-sm font-black text-gray-900 dark:text-gray-50">{{ (user as any)?.name?.charAt(0).toUpperCase() || profile?.name?.charAt(0).toUpperCase() }}</span>
               </button>
@@ -141,12 +172,40 @@ onUnmounted(() => {
                 </div>
                 <NuxtLink to="/configuracoes" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition">Configurações</NuxtLink>
                 <NuxtLink to="/planos" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition">Plano</NuxtLink>
-                <NuxtLink v-if="user?.role === 'admin'" to="/admin" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-red-600 font-bold hover:bg-red-50 transition border-t border-gray-50">Painel Admin</NuxtLink>
-                <button @click="logout" class="w-full text-left px-4 py-2 text-xs text-red-500 hover:bg-red-50 transition border-t border-gray-50 mt-1">Sair</button>
-              </div>
+                
+                <!-- Alternar Aparência (Apenas no Mobile) -->
+                <button 
+                  @click="toggle()" 
+                  class="md:hidden w-full text-left px-4 py-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition flex items-center justify-between border-t border-gray-50 dark:border-gray-800"
+                >
+                  <span>Alternar Tema</span>
+                  <span class="flex items-center gap-1.5 text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase font-mono">
+                    <ClientOnly>
+                      <template v-if="isDark">
+                        <Moon class="w-3.5 h-3.5 text-blue-500" />
+                        <span>Escuro</span>
+                      </template>
+                      <template v-else>
+                        <Sun class="w-3.5 h-3.5 text-amber-500" />
+                        <span>Claro</span>
+                      </template>
+                    </ClientOnly>
+                  </span>
+                </button>
 
-              <!-- Click Overlay to close -->
-              <div v-if="isMenuOpen" @click="isMenuOpen = false" class="fixed inset-0 z-[55]"></div>
+                <!-- Tour Guiado (Apenas no Mobile se houver tour configurado) -->
+                <button 
+                  v-if="tourId"
+                  @click="startTour(tourId, { force: true }); isMenuOpen = false" 
+                  class="md:hidden w-full text-left px-4 py-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition flex items-center justify-between border-t border-gray-50 dark:border-gray-800"
+                >
+                  <span>Tour Guiado (Ajuda)</span>
+                  <HelpCircle class="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                </button>
+
+                <NuxtLink v-if="user?.role === 'admin'" to="/admin" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-red-600 dark:text-red-400 font-bold hover:bg-red-50 dark:hover:bg-red-950/30 transition border-t border-gray-50 dark:border-gray-800">Painel Admin</NuxtLink>
+                <button @click="logout" class="w-full text-left px-4 py-2 text-xs text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition border-t border-gray-50 dark:border-gray-800 mt-1">Sair</button>
+              </div>
             </div>
           </template>
           <template v-else>
@@ -193,25 +252,25 @@ onUnmounted(() => {
           <div class="space-y-4">
             <h3 class="text-[10px] font-black text-gray-900 dark:text-gray-50 uppercase tracking-widest">Navegação</h3>
             <nav class="flex flex-col gap-3">
-              <NuxtLink to="/dashboard" class="text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">Dashboard</NuxtLink>
-              <NuxtLink to="/orcamentos" class="text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">Orçamentos</NuxtLink>
-              <NuxtLink to="/clientes" class="text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">Clientes</NuxtLink>
+              <NuxtLink to="/dashboard" class="text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Dashboard</NuxtLink>
+              <NuxtLink to="/orcamentos" class="text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Orçamentos</NuxtLink>
+              <NuxtLink to="/clientes" class="text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Clientes</NuxtLink>
             </nav>
           </div>
 
           <div class="space-y-4">
             <h3 class="text-[10px] font-black text-gray-900 dark:text-gray-50 uppercase tracking-widest">Suporte & Legal</h3>
             <nav class="flex flex-col gap-3">
-              <NuxtLink to="/terms" class="text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">Termos de Uso</NuxtLink>
-              <NuxtLink to="/privacy" class="text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">Privacidade</NuxtLink>
-              <button @click="resetConsent" class="text-left text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">Gerenciar Cookies</button>
-              <a href="mailto:contato@orceifacil.com.br" class="text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">contato@orceifacil.com.br</a>
+              <NuxtLink to="/terms" class="text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Termos de Uso</NuxtLink>
+              <NuxtLink to="/privacy" class="text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Privacidade</NuxtLink>
+              <button @click="resetConsent" class="text-left text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Gerenciar Cookies</button>
+              <a href="mailto:contato@orceifacil.com.br" class="text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">contato@orceifacil.com.br</a>
             </nav>
           </div>
         </div>
         
         <div class="pt-8 border-t border-gray-100 dark:border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p class="text-[10px] font-black text-gray-300 dark:text-gray-600 uppercase tracking-widest">
+          <p class="text-[10px] font-black text-gray-300 dark:text-gray-400 uppercase tracking-widest">
             {{ systemInfo?.footerText || `© ${new Date().getFullYear()} ${systemInfo?.landingPage?.appName || 'ORCEI'}. Todos os direitos reservados.` }}
           </p>
           <div class="flex items-center gap-6">
@@ -245,7 +304,7 @@ onUnmounted(() => {
           <NuxtLink
             to="/dashboard"
             class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white"
-            active-class="text-blue-600"
+            active-class="text-blue-600 dark:text-blue-400"
           >
             <Home class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
             <span class="text-[9px] font-bold tracking-wide transition-colors">Início</span>
@@ -257,7 +316,7 @@ onUnmounted(() => {
           <NuxtLink
             to="/clientes"
             class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white"
-            active-class="text-blue-600"
+            active-class="text-blue-600 dark:text-blue-400"
           >
             <Users class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
             <span class="text-[9px] font-bold tracking-wide transition-colors">Clientes</span>
@@ -268,7 +327,7 @@ onUnmounted(() => {
           <NuxtLink
             to="/catalogo"
             class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white"
-            active-class="text-blue-600"
+            active-class="text-blue-600 dark:text-blue-400"
           >
             <BookOpen class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
             <span class="text-[9px] font-bold tracking-wide transition-colors">Catálogo</span>
@@ -293,7 +352,7 @@ onUnmounted(() => {
           <NuxtLink
             to="/orcamentos"
             class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white"
-            active-class="text-blue-600"
+            active-class="text-blue-600 dark:text-blue-400"
           >
             <FileText class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
             <span class="text-[9px] font-bold tracking-wide transition-colors">Orçamentos</span>
@@ -304,7 +363,7 @@ onUnmounted(() => {
           <NuxtLink
             to="/relatorios"
             class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white"
-            active-class="text-blue-600"
+            active-class="text-blue-600 dark:text-blue-400"
           >
             <ReceiptText class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
             <span class="text-[9px] font-bold tracking-wide transition-colors">Relatórios</span>
@@ -315,7 +374,7 @@ onUnmounted(() => {
           <NuxtLink
             to="/configuracoes"
             class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white"
-            active-class="text-blue-600"
+            active-class="text-blue-600 dark:text-blue-400"
           >
             <Settings class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
             <span class="text-[9px] font-bold tracking-wide transition-colors">Ajustes</span>

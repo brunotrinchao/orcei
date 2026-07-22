@@ -20,6 +20,15 @@ const hasFilters = computed(() => {
   return !!(searchQuery.value || filterStatus.value || filterStartDate.value || filterEndDate.value || filterPendingChat.value)
 })
 
+const activeFiltersCount = computed(() => {
+  let count = 0
+  if (searchQuery.value) count++
+  if (filterStatus.value) count++
+  if (filterStartDate.value || filterEndDate.value) count++
+  if (filterPendingChat.value) count++
+  return count
+})
+
 function clearFilters() {
   searchQuery.value = ''
   filterStatus.value = ''
@@ -406,62 +415,51 @@ async function saveContract() {
           Novo Orçamento
         </BaseButton>
       </div>
+
+      <template #filters>
+        <BaseFilters :active-filters-count="activeFiltersCount" @clear="clearFilters" data-tour="orcamentos-filtros">
+          <template #search>
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Buscar por título, cliente ou código..."
+              class="w-full h-[52px] pl-12 pr-5 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-sm"
+            >
+            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
+              <Search class="w-5 h-5" />
+            </div>
+          </template>
+
+          <div class="w-full sm:w-56">
+            <BaseDateRangePicker
+              v-model:start="filterStartDate"
+              v-model:end="filterEndDate"
+            />
+          </div>
+
+          <div class="w-full sm:w-48">
+            <BaseSelect
+              v-model="filterStatus"
+              :options="[
+                { label: 'Todos os Status', value: '__EMPTY__' },
+                ...Object.entries(statusMap).map(([value, info]: any) => ({
+                  label: info.label,
+                  value
+                }))
+              ]"
+              placeholder="Todos os Status"
+            />
+          </div>
+
+          <div class="flex items-center gap-3 px-5 h-[52px] bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-2xl hover:border-gray-200 dark:hover:border-gray-700 transition-all group cursor-pointer shadow-sm">
+            <BaseCheckbox v-model="filterPendingChat" id="pending-chat" />
+            <label for="pending-chat" class="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest cursor-pointer group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors whitespace-nowrap">
+              Chat Pendente
+            </label>
+          </div>
+        </BaseFilters>
+      </template>
     </PageHeader>
-
-    <!-- Busca e Filtros -->
-    <div data-tour="orcamentos-filtros" class="mb-10 space-y-6">
-      <div class="relative max-w-xl">
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Buscar por título, cliente ou código..."
-          class="w-full pl-14 pr-6 py-5 bg-white border-2 border-gray-100 rounded-[2rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-300 shadow-sm"
-        >
-        <div class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300">
-          <Search class="w-6 h-6" />
-        </div>
-      </div>
-
-      <div class="flex flex-wrap items-end gap-4">
-        <div class="w-full sm:w-64">
-          <BaseDateRangePicker
-            label="Data de Criação"
-            v-model:start="filterStartDate"
-            v-model:end="filterEndDate"
-          />
-        </div>
-
-        <div class="w-full sm:w-48">
-          <BaseSelect
-            label="Status"
-            v-model="filterStatus"
-            :options="[
-              { label: 'Todos', value: '__EMPTY__' },
-              ...Object.entries(statusMap).map(([value, info]: any) => ({
-                label: info.label,
-                value
-              }))
-            ]"
-            placeholder="Todos os Status"
-          />
-        </div>
-
-        <div class="flex items-center gap-3 px-6 py-4 bg-white border-2 border-gray-100 rounded-2xl hover:border-blue-200 transition-all group h-[58px]">
-          <BaseCheckbox v-model="filterPendingChat" id="pending-chat" />
-          <label for="pending-chat" class="text-xs font-black text-gray-500 uppercase tracking-widest cursor-pointer group-hover:text-gray-900 transition-colors">
-            Chat Pendente
-          </label>
-        </div>
-
-        <button 
-          v-if="hasFilters" 
-          @click="clearFilters" 
-          class="flex items-center gap-2 px-4 py-2 text-xs font-black text-gray-400 hover:text-red-500 uppercase tracking-widest transition-all mb-4"
-        >
-          <X class="w-4 h-4" /> Limpar Filtros
-        </button>
-      </div>
-    </div>
 
     <!-- Listagem Unificada (desktop) -->
     <div class="hidden md:block">
@@ -484,11 +482,11 @@ async function saveContract() {
       </template>
 
       <template #item="{ item: proposal }">
-        <tr class="hover:bg-gray-50/30 transition-all group">
+        <tr class="hover:bg-gray-50/30 dark:hover:bg-gray-800/20 transition-all group">
           <td class="px-8 py-6">
             <div class="flex items-center gap-3">
               <div class="flex flex-col">
-                <span class="font-black text-gray-900 group-hover:text-blue-600 transition-colors text-lg tracking-tight">{{ proposal.title || 'Sem título' }}</span>
+                <span class="font-black text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors text-lg tracking-tight">{{ proposal.title || 'Sem título' }}</span>
               </div>
             </div>
           </td>
@@ -506,7 +504,7 @@ async function saveContract() {
             </BaseBadge>
           </td>
           <td class="px-8 py-6 text-right">
-            <span class="font-black text-gray-900 text-xl tracking-tight">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+            <span class="font-black text-gray-900 dark:text-gray-100 text-xl tracking-tight">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
           </td>
           <td class="px-8 py-6 text-right">
             <div class="flex justify-end items-center gap-1">
@@ -536,7 +534,7 @@ async function saveContract() {
               <DropdownMenuRoot>
                 <DropdownMenuTrigger as-child>
                   <button
-                    class="p-2.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-2xl transition-all"
+                    class="p-2.5 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl transition-all"
                     title="Mais ações"
                     aria-label="Mais ações do orçamento"
                   >
@@ -547,18 +545,18 @@ async function saveContract() {
                   <DropdownMenuContent
                     align="end"
                     :side-offset="6"
-                    class="min-w-[220px] bg-white rounded-2xl shadow-xl border border-gray-100 p-2 z-50"
+                    class="min-w-[220px] bg-white dark:bg-gray-950 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
                   >
                     <DropdownMenuItem
                       @click="openHistory(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
                     >
                       <History class="w-4 h-4" />
                       Ver Histórico
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       @click="openPreview(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
                     >
                       <Eye class="w-4 h-4" />
                       Visualizar Orçamento
@@ -567,7 +565,7 @@ async function saveContract() {
                       v-if="proposal.status !== 'draft' && proposal.status !== 'accepted'"
                       :disabled="isResending === proposal._id"
                       @click="resendEmail(proposal._id)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all disabled:opacity-50"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all disabled:opacity-50"
                     >
                       <RefreshCcw v-if="isResending === proposal._id" class="w-4 h-4 animate-spin" />
                       <Mail v-else class="w-4 h-4" />
@@ -576,7 +574,7 @@ async function saveContract() {
                     <DropdownMenuItem
                       v-if="proposal.status !== 'accepted'"
                       @click="openModal(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
                     >
                       <Pencil class="w-4 h-4" />
                       Editar
@@ -584,7 +582,7 @@ async function saveContract() {
                     <DropdownMenuItem
                       v-if="proposal.status === 'pending'"
                       @click="openContractModal(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
                     >
                       <FileText class="w-4 h-4" />
                       Editar Contrato
@@ -592,7 +590,7 @@ async function saveContract() {
                     <DropdownMenuItem
                       v-if="proposal.status !== 'accepted'"
                       @click="confirmDeleteProposal(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-600 hover:bg-red-50 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer outline-none transition-all"
                     >
                       <Trash2 class="w-4 h-4" />
                       Excluir
@@ -630,7 +628,7 @@ async function saveContract() {
       </template>
       <template v-else-if="proposals.length === 0">
         <div class="py-16 text-center">
-          <p class="font-black text-gray-900">Sem Orçamentos</p>
+          <p class="font-black text-gray-900 dark:text-gray-50">Sem Orçamentos</p>
           <p class="text-sm text-gray-500 mt-1">Clique no botão acima para criar seu primeiro orçamento.</p>
         </div>
       </template>

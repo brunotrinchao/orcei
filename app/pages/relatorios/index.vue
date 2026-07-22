@@ -6,6 +6,17 @@ const searchQuery = ref('')
 const startDate = ref('')
 const endDate = ref('')
 
+const activeFiltersCount = computed(() => {
+  let count = 0
+  if (startDate.value || endDate.value) count++
+  return count
+})
+
+function clearFilters() {
+  startDate.value = ''
+  endDate.value = ''
+}
+
 const { data: reports, refresh, pending } = useLazyFetch<any[]>('/api/reports', {
   query: computed(() => ({
     start: startDate.value,
@@ -65,29 +76,30 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
       <BaseButton data-tour="relatorios-gerar-btn" to="/dashboard" variant="secondary">
         Gerar Novo Relatório
       </BaseButton>
-    </PageHeader>
 
-    <!-- Filtros -->
-    <div class="flex flex-col md:flex-row gap-4 mb-10">
-      <div class="relative flex-[2]">
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Buscar no conteúdo do relatório..."
-          class="w-full pl-12 pr-6 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-300 shadow-sm"
-        >
-        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300">
-          <Search class="w-5 h-5" />
-        </div>
-      </div>
-      
-      <div class="flex-1 min-w-[280px]">
-        <BaseDateRangePicker 
-          v-model:start="startDate"
-          v-model:end="endDate"
-        />
-      </div>
-    </div>
+      <template #filters>
+        <BaseFilters :active-filters-count="activeFiltersCount" @clear="clearFilters">
+          <template #search>
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Buscar no conteúdo do relatório..."
+              class="w-full h-[52px] pl-12 pr-5 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-sm"
+            >
+            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
+              <Search class="w-5 h-5" />
+            </div>
+          </template>
+
+          <div class="w-full sm:w-56">
+            <BaseDateRangePicker 
+              v-model:start="startDate"
+              v-model:end="endDate"
+            />
+          </div>
+        </BaseFilters>
+      </template>
+    </PageHeader>
 
     <!-- Listagem Unificada (desktop) -->
     <div class="hidden md:block">
@@ -102,16 +114,16 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
       </template>
 
       <template #item="{ item: report }">
-        <div class="p-8 hover:bg-gray-50/50 transition-all group flex flex-col md:flex-row md:items-center justify-between gap-6 border-b last:border-0 border-gray-100">
+        <div class="p-8 hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition-all group flex flex-col md:flex-row md:items-center justify-between gap-6 border-b last:border-0 border-gray-100 dark:border-gray-800">
           <div class="flex items-center gap-6">
             <div class="space-y-1">
-              <h4 class="text-lg font-black text-gray-900 leading-tight cursor-pointer hover:text-blue-600 transition-all" @click="openView(report)">Análise Estratégica IA</h4>
+              <h4 class="text-lg font-black text-gray-900 dark:text-gray-50 leading-tight cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-all" @click="openView(report)">Análise Estratégica IA</h4>
               <div class="flex items-center gap-3">
                 <span class="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                   <Calendar class="w-3 h-3" />
                   {{ formatDate(report.createdAt) }}
                 </span>
-                <span class="w-1 h-1 bg-gray-200 rounded-full"></span>
+                <span class="w-1 h-1 bg-gray-200 dark:bg-gray-700 rounded-full"></span>
                 <span class="text-xs font-bold text-blue-600 uppercase tracking-widest">
                   <BaseBadge variant="info">
                     {{ report.context?.totalProposals || 0 }} Orçamentos analisados
@@ -124,7 +136,7 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
           <div class="flex items-center gap-3">
             <button
               @click="openView(report)"
-              class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all"
+              class="p-2.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-2xl transition-all"
               title="Visualizar"
               aria-label="Visualizar relatório"
             >
@@ -133,7 +145,7 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
             <DropdownMenuRoot>
                 <DropdownMenuTrigger as-child>
                   <button
-                    class="p-2.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-2xl transition-all"
+                    class="p-2.5 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl transition-all"
                     title="Mais ações"
                     aria-label="Mais ações do orçamento"
                   >
@@ -144,18 +156,18 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
                   <DropdownMenuContent
                     align="end"
                     :side-offset="6"
-                    class="min-w-[220px] bg-white rounded-2xl shadow-xl border border-gray-100 p-2 z-50"
+                    class="min-w-[220px] bg-white dark:bg-gray-950 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
                   >
                   <DropdownMenuItem
                       @click="downloadPdf(report._id)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
                     >
                       <Download class="w-4 h-4" />
                       Download PDF
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       @click="confirmDeleteReport(report)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-red-600 dark:hover:text-red-400 cursor-pointer outline-none transition-all"
                     >
                       <Trash2 class="w-4 h-4" />
                       Excluir
@@ -193,7 +205,7 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
       </template>
       <template v-else-if="filteredReports.length === 0">
         <div class="py-16 text-center">
-          <p class="font-black text-gray-900">Nenhum relatório encontrado</p>
+          <p class="font-black text-gray-900 dark:text-gray-50">Nenhum relatório encontrado</p>
           <p class="text-sm text-gray-500 mt-1">Você ainda não gerou relatórios IA ou os filtros não retornaram resultados.</p>
         </div>
       </template>
@@ -217,11 +229,11 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
       size="xl"
     >
       <div v-if="selectedReport">
-        <div class="flex items-center gap-3 px-5 py-3 mb-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-800">
+        <div class="flex items-center gap-3 px-5 py-3 mb-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/30 rounded-2xl text-amber-800 dark:text-amber-200">
           <AlertTriangle class="w-5 h-5 shrink-0" />
           <p class="text-xs font-bold">Relatório gerado por Inteligência Artificial. Os dados e recomendações podem conter equívocos — sempre valide antes de tomar decisões críticas.</p>
         </div>
-        <div class="prose prose-blue prose-headings:font-black prose-h2:text-blue-600 prose-h2:mt-10 prose-h2:mb-4 prose-h2:pb-2 prose-h2:border-b prose-h2:border-blue-100 prose-p:leading-relaxed prose-p:mb-4 prose-table:my-6 prose-li:my-1 max-w-none p-8 bg-gray-50 rounded-[2rem] border border-gray-100 min-h-[60vh]">
+        <div class="prose prose-blue dark:prose-invert prose-headings:font-black prose-h2:text-blue-600 dark:prose-h2:text-blue-400 prose-h2:mt-10 prose-h2:mb-4 prose-h2:pb-2 prose-h2:border-b prose-h2:border-blue-100 dark:prose-h2:border-gray-800 prose-p:leading-relaxed prose-p:mb-4 prose-table:my-6 prose-li:my-1 max-w-none p-8 bg-gray-50 dark:bg-gray-900/50 rounded-[2rem] border border-gray-100 dark:border-gray-800 min-h-[60vh]">
           <div v-html="$md.render(selectedReport.content)"></div>
         </div>
       </div>

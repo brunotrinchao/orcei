@@ -95,7 +95,7 @@ onUnmounted(() => {
                 {{ title }}
               </DialogTitle>
               <!-- Always rendered: satisfies Radix aria requirement; visually hidden when no description -->
-              <DialogDescription :class="description ? 'text-sm font-bold text-gray-400 dark:text-gray-500' : 'sr-only'">
+              <DialogDescription :class="description ? 'text-sm font-bold text-gray-400 dark:text-gray-400' : 'sr-only'">
                 {{ description || title }}
               </DialogDescription>
             </div>

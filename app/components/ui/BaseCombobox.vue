@@ -96,7 +96,7 @@ const selectOption = (option: Option) => {
 
 <template>
   <div class="space-y-2" ref="containerRef">
-    <label v-if="label" class="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-2">
+    <label v-if="label" class="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em] ml-2">
       {{ label }}
     </label>
     
@@ -108,8 +108,8 @@ const selectOption = (option: Option) => {
         @input="onInput"
         :placeholder="placeholder || 'Buscar...'"
         :disabled="disabled"
-        class="w-full px-5 py-4 pl-12 bg-white/50 backdrop-blur-xl border-2 border-gray-100 hover:border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-        :class="{ 'border-red-300 focus:border-red-500 focus:ring-red-500/20': error }"
+        class="w-full px-5 py-4 pl-12 bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 dark:text-gray-50 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+        :class="{ 'border-red-300 dark:border-red-500/50 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500/20': error }"
       />
       
       <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
@@ -127,10 +127,10 @@ const selectOption = (option: Option) => {
       >
         <div 
           v-if="isOpen && !disabled"
-          class="absolute z-50 w-full mt-2 bg-white/95 backdrop-blur-2xl rounded-2xl border-2 border-gray-100 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] overflow-hidden"
+          class="absolute z-50 w-full mt-2 bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl rounded-2xl border-2 border-gray-200 dark:border-gray-700 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-gray-900/20 overflow-hidden"
         >
           <div class="max-h-[300px] overflow-y-auto p-2 space-y-1">
-            <div v-if="internalSearch.length < 2" class="px-6 py-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">
+            <div v-if="internalSearch.length < 2" class="px-6 py-8 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] text-center">
               Digite pelo menos 2 caracteres...
             </div>
             
@@ -143,14 +143,14 @@ const selectOption = (option: Option) => {
                 class="w-full relative flex items-center px-4 py-3 text-sm font-bold rounded-xl outline-none transition-all duration-200 group text-left"
                 :class="[
                   modelValue === option.value 
-                    ? 'bg-blue-50 text-blue-700' 
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                 ]"
               >
                 <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mr-3 group-hover:scale-110 transition-transform"
-                     :class="modelValue === option.value ? 'bg-blue-100/50' : 'bg-gray-100/50'">
+                     :class="modelValue === option.value ? 'bg-blue-100/50 dark:bg-blue-900/50' : 'bg-gray-100/50 dark:bg-gray-700/50'">
                   <span class="font-black text-xs uppercase"
-                        :class="modelValue === option.value ? 'text-blue-600' : 'text-gray-500'">
+                        :class="modelValue === option.value ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'">
                     {{ option.label.charAt(0) }}
                   </span>
                 </div>
@@ -158,11 +158,11 @@ const selectOption = (option: Option) => {
                 
                 <Check 
                   v-if="modelValue === option.value" 
-                  class="w-4 h-4 text-blue-600 ml-3" 
+                  class="w-4 h-4 text-blue-600 dark:text-blue-400 ml-3" 
                 />
               </button>
               
-              <div v-if="!options || options.length === 0" class="px-6 py-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">
+              <div v-if="!options || options.length === 0" class="px-6 py-8 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] text-center">
                 {{ loading ? 'Buscando...' : (emptyMessage || 'Nenhum item encontrado') }}
               </div>
             </template>

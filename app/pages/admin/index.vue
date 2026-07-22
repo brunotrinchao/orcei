@@ -11,6 +11,7 @@ ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale
 
 const { data: stats, pending } = useFetch<any>('/api/admin/stats')
 const { user } = useUserSession()
+const { isDark } = useDarkMode()
 
 if (process.client && user.value?.role !== 'admin') {
   navigateTo('/dashboard')
@@ -22,32 +23,32 @@ const metrics = computed(() => [
     value: stats.value?.revenue?.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00',
     subValue: stats.value?.revenue?.failedInvoicesCount > 0 ? `${stats.value.revenue.failedInvoicesCount} faturas com falha (Stripe)` : 'Sem falhas de cobrança',
     icon: DollarSign,
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50'
+    color: 'text-emerald-600 dark:text-emerald-400',
+    bg: 'bg-emerald-50 dark:bg-emerald-950/30'
   },
   { 
     label: 'MRR Atual Recorrente', 
     value: (stats.value?.revenue?.mrr || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
     subValue: `ARR Estimado: ${((stats.value?.revenue?.mrr || 0) * 12).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`,
     icon: TrendingUp,
-    color: 'text-blue-600',
-    bg: 'bg-blue-50'
+    color: 'text-blue-600 dark:text-blue-400',
+    bg: 'bg-blue-50 dark:bg-blue-950/30'
   },
   { 
     label: 'Total de Usuários', 
     value: stats.value?.users?.total || 0,
     subValue: `+${stats.value?.users?.newMonth || 0} este mês | Churn: ${stats.value?.users?.churnRate ?? 0}%`,
     icon: Users,
-    color: 'text-purple-600',
-    bg: 'bg-purple-50'
+    color: 'text-purple-600 dark:text-purple-400',
+    bg: 'bg-purple-50 dark:bg-purple-950/30'
   },
   { 
     label: 'Conversão Comercial', 
     value: `${stats.value?.proposals?.conversionRate?.toFixed(1) || 0}%`,
     subValue: `${stats.value?.proposals?.accepted || 0} de ${stats.value?.proposals?.total || 0} propostas aprovadas`,
     icon: FileText,
-    color: 'text-orange-600',
-    bg: 'bg-orange-50'
+    color: 'text-orange-600 dark:text-orange-400',
+    bg: 'bg-orange-50 dark:bg-orange-950/30'
   }
 ])
 
@@ -80,16 +81,44 @@ const forecastChartData = computed(() => {
   }
 })
 
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: { 
-      position: 'bottom' as const, 
-      labels: { usePointStyle: true, font: { weight: 'bold' as const, size: 10 } } 
+const chartOptions = computed(() => {
+  const textColor = isDark.value ? '#9CA3AF' : '#4B5563'
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { 
+        position: 'bottom' as const, 
+        labels: { usePointStyle: true, font: { weight: 'bold' as const, size: 10 }, color: textColor } 
+      }
     }
   }
-}
+})
+
+const lineChartOptions = computed(() => {
+  const textColor = isDark.value ? '#9CA3AF' : '#4B5563'
+  const gridColor = isDark.value ? '#1e293b' : '#F1F5F9'
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        grid: { color: gridColor },
+        ticks: { color: textColor, font: { weight: 'bold', size: 9 } }
+      },
+      y: {
+        grid: { color: gridColor },
+        ticks: { color: textColor, font: { weight: 'bold', size: 9 } }
+      }
+    },
+    plugins: {
+      legend: { 
+        position: 'bottom' as const, 
+        labels: { usePointStyle: true, font: { weight: 'bold' as const, size: 10 }, color: textColor } 
+      }
+    }
+  }
+})
 
 const { data: systemInfo } = useFetch<any>('/api/system/status', { key: 'system-status' })
 
@@ -129,18 +158,18 @@ function formatLogTime(isoString: string) {
         <div 
           v-for="m in metrics" 
           :key="m.label" 
-          class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-4 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+          class="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-4 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
         >
           <div class="flex justify-between items-start">
             <div :class="[m.bg, m.color]" class="p-3 rounded-2xl">
               <component :is="m.icon" class="w-6 h-6" />
             </div>
-            <ArrowUpRight class="w-4 h-4 text-gray-300 group-hover:text-gray-900 transition-colors" />
+            <ArrowUpRight class="w-4 h-4 text-gray-300 group-hover:text-gray-900 dark:text-gray-600 dark:group-hover:text-white transition-colors" />
           </div>
           <div>
-            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ m.label }}</p>
-            <h3 class="text-2xl font-black text-gray-900 tracking-tight mt-1">{{ m.value }}</h3>
-            <p v-if="m.subValue" class="text-[10px] font-bold text-gray-400 mt-1 truncate">{{ m.subValue }}</p>
+            <p class="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ m.label }}</p>
+            <h3 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight mt-1">{{ m.value }}</h3>
+            <p v-if="m.subValue" class="text-[10px] font-bold text-gray-400 dark:text-gray-500 mt-1 truncate">{{ m.subValue }}</p>
           </div>
         </div>
       </section>
@@ -196,25 +225,25 @@ function formatLogTime(isoString: string) {
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <!-- Previsibilidade de Receita Stripe -->
-        <div class="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
+        <div class="lg:col-span-2 bg-white dark:bg-gray-900 p-10 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-              <BarChart3 class="w-5 h-5 text-blue-600" />
+            <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center">
+              <BarChart3 class="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Previsibilidade Financeira</h2>
+            <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Previsibilidade Financeira</h2>
           </div>
           <div class="h-80 relative">
-            <Line :data="forecastChartData" :options="chartOptions" />
+            <Line :data="forecastChartData" :options="lineChartOptions" />
           </div>
         </div>
 
         <!-- Distribuição de Faturamento por Origem -->
-        <div class="lg:col-span-1 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
+        <div class="lg:col-span-1 bg-white dark:bg-gray-900 p-10 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-              <PieChart class="w-5 h-5 text-emerald-600" />
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center">
+              <PieChart class="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Origem da Receita</h2>
+            <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Origem da Receita</h2>
           </div>
           <div class="h-80 relative flex items-center justify-center">
             <Doughnut :data="breakdownChartData" :options="chartOptions" />
@@ -227,34 +256,34 @@ function formatLogTime(isoString: string) {
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <!-- Ações Administrativas e Status do Sistema -->
-        <div class="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
+        <div class="lg:col-span-2 bg-white dark:bg-gray-900 p-10 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-              <Activity class="w-5 h-5 text-blue-600" />
+            <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center">
+              <Activity class="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Status do Sistema</h2>
+            <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Status do Sistema</h2>
           </div>
           
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <NuxtLink to="/admin/settings" class="p-6 bg-gray-50 rounded-3xl border border-gray-100 hover:border-blue-200 transition-all group flex flex-col justify-between">
+            <NuxtLink to="/admin/settings" class="p-6 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border border-gray-100 dark:border-gray-850 hover:border-blue-200 dark:hover:border-blue-900/50 transition-all group flex flex-col justify-between">
               <div>
                 <ShieldAlert class="w-6 h-6 text-red-500 mb-4" />
-                <h4 class="font-black text-gray-900 uppercase text-xs tracking-widest mb-1">Modo Manutenção</h4>
-                <p class="text-xs text-gray-500 font-medium leading-relaxed">Coloque a plataforma offline para usuários comuns.</p>
+                <h4 class="font-black text-gray-900 dark:text-white uppercase text-xs tracking-widest mb-1">Modo Manutenção</h4>
+                <p class="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed">Coloque a plataforma offline para usuários comuns.</p>
               </div>
             </NuxtLink>
-            <NuxtLink to="/admin/audit-logs" class="p-6 bg-gray-50 rounded-3xl border border-gray-100 hover:border-blue-200 transition-all group flex flex-col justify-between">
+            <NuxtLink to="/admin/audit-logs" class="p-6 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border border-gray-100 dark:border-gray-850 hover:border-blue-200 dark:hover:border-blue-900/50 transition-all group flex flex-col justify-between">
               <div>
                 <CreditCard class="w-6 h-6 text-emerald-500 mb-4" />
-                <h4 class="font-black text-gray-900 uppercase text-xs tracking-widest mb-1">Logs de Auditoria</h4>
-                <p class="text-xs text-gray-500 font-medium leading-relaxed">Histórico detalhado de ações administrativas.</p>
+                <h4 class="font-black text-gray-900 dark:text-white uppercase text-xs tracking-widest mb-1">Logs de Auditoria</h4>
+                <p class="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed">Histórico detalhado de ações administrativas.</p>
               </div>
             </NuxtLink>
-            <NuxtLink to="/admin/coupons" class="p-6 bg-gray-50 rounded-3xl border border-gray-100 hover:border-blue-200 transition-all group flex flex-col justify-between">
+            <NuxtLink to="/admin/coupons" class="p-6 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border border-gray-100 dark:border-gray-850 hover:border-blue-200 dark:hover:border-blue-900/50 transition-all group flex flex-col justify-between">
               <div>
                 <Ticket class="w-6 h-6 text-blue-500 mb-4" />
-                <h4 class="font-black text-gray-900 uppercase text-xs tracking-widest mb-1">Cupons Promocionais</h4>
-                <p class="text-xs text-gray-500 font-medium leading-relaxed">Crie e gerencie cupons de créditos via Stripe.</p>
+                <h4 class="font-black text-gray-900 dark:text-white uppercase text-xs tracking-widest mb-1">Cupons Promocionais</h4>
+                <p class="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed">Crie e gerencie cupons de créditos via Stripe.</p>
               </div>
             </NuxtLink>
           </div>

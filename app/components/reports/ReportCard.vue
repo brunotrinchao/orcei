@@ -14,26 +14,26 @@ defineEmits<{
 </script>
 
 <template>
-  <div class="rounded-2xl border border-gray-200 bg-white shadow-sm p-4">
-    <h4 class="text-lg font-black text-gray-900 leading-tight">Análise Estratégica IA</h4>
+  <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-4">
+    <h4 class="text-lg font-black text-gray-900 dark:text-gray-50 leading-tight">Análise Estratégica IA</h4>
     <div class="flex items-center gap-3 mt-2">
-      <span class="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+      <span class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest flex items-center gap-1.5">
         <Calendar class="w-3 h-3" />
         {{ formatDate(report.createdAt) }}
       </span>
     </div>
-    <span class="text-xs font-bold text-blue-600 uppercase tracking-widest block mt-1">
+    <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest block mt-1">
       {{ report.context?.totalProposals || 0 }} Orçamentos analisados
     </span>
 
-    <div class="flex items-center justify-end gap-1 mt-3 pt-3 border-t border-gray-100">
-      <button @click="$emit('view')" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all" title="Visualizar" aria-label="Visualizar relatório">
+    <div class="flex items-center justify-end gap-1 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
+      <button @click="$emit('view')" class="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-xl transition-all" title="Visualizar" aria-label="Visualizar relatório">
         <Eye class="w-5 h-5" />
       </button>
-      <button @click="$emit('download')" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all" title="Download PDF" aria-label="Download PDF">
+      <button @click="$emit('download')" class="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-xl transition-all" title="Download PDF" aria-label="Download PDF">
         <Download class="w-5 h-5" />
       </button>
-      <button @click="$emit('delete')" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all" title="Excluir" aria-label="Excluir relatório">
+      <button @click="$emit('delete')" class="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-all" title="Excluir" aria-label="Excluir relatório">
         <Trash2 class="w-5 h-5" />
       </button>
     </div>

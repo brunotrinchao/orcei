@@ -284,8 +284,14 @@
     },
     {
       "path": "app/pages/orcamentos/index.vue",
-      "accessCount": 18,
-      "lastAccessed": 1784650988441,
+      "accessCount": 27,
+      "lastAccessed": 1784728730128,
+      "type": "file"
+    },
+    {
+      "path": "app/pages/clientes/index.vue",
+      "accessCount": 15,
+      "lastAccessed": 1784728719223,
       "type": "file"
     },
     {
@@ -295,15 +301,27 @@
       "type": "file"
     },
     {
-      "path": "app/pages/clientes/index.vue",
-      "accessCount": 11,
-      "lastAccessed": 1784650720236,
-      "type": "file"
-    },
-    {
       "path": "app/pages/admin/audit-logs.vue",
       "accessCount": 10,
       "lastAccessed": 1784650922863,
+      "type": "file"
+    },
+    {
+      "path": "app/components/settings/SettingsVisual.vue",
+      "accessCount": 10,
+      "lastAccessed": 1784728628571,
+      "type": "file"
+    },
+    {
+      "path": "app/components/ui/BaseCombobox.vue",
+      "accessCount": 10,
+      "lastAccessed": 1784728687499,
+      "type": "file"
+    },
+    {
+      "path": "app/components/admin/CouponCard.vue",
+      "accessCount": 10,
+      "lastAccessed": 1784728711845,
       "type": "file"
     },
     {
@@ -313,9 +331,21 @@
       "type": "file"
     },
     {
-      "path": "app/components/settings/SettingsVisual.vue",
+      "path": "app/pages/catalogo/index.vue",
       "accessCount": 9,
-      "lastAccessed": 1784667008639,
+      "lastAccessed": 1784728700436,
+      "type": "file"
+    },
+    {
+      "path": "app/pages/dashboard/index.vue",
+      "accessCount": 9,
+      "lastAccessed": 1784728712713,
+      "type": "file"
+    },
+    {
+      "path": "app/components/admin/UserCard.vue",
+      "accessCount": 9,
+      "lastAccessed": 1784728728289,
       "type": "file"
     },
     {
@@ -325,9 +355,9 @@
       "type": "file"
     },
     {
-      "path": "app/pages/catalogo/index.vue",
-      "accessCount": 7,
-      "lastAccessed": 1784650870238,
+      "path": "app/components/ui/BaseDateRangePicker.vue",
+      "accessCount": 8,
+      "lastAccessed": 1784728725911,
       "type": "file"
     },
     {
@@ -343,6 +373,12 @@
       "type": "file"
     },
     {
+      "path": "app/components/proposal/ProposalStepClient.vue",
+      "accessCount": 6,
+      "lastAccessed": 1784728740176,
+      "type": "file"
+    },
+    {
       "path": "app/components/ui/BaseButton.vue",
       "accessCount": 5,
       "lastAccessed": 1784666792587,
@@ -355,9 +391,21 @@
       "type": "file"
     },
     {
+      "path": "app/components/admin/AuditLogCard.vue",
+      "accessCount": 5,
+      "lastAccessed": 1784728678535,
+      "type": "file"
+    },
+    {
       "path": "app/app.vue",
       "accessCount": 4,
       "lastAccessed": 1784666661002,
+      "type": "file"
+    },
+    {
+      "path": "app/components/AIProposalWizard.vue",
+      "accessCount": 4,
+      "lastAccessed": 1784728634619,
       "type": "file"
     },
     {
@@ -370,6 +418,42 @@
       "path": "app/components/ui/BaseSkeleton.vue",
       "accessCount": 3,
       "lastAccessed": 1784666906160,
+      "type": "file"
+    },
+    {
+      "path": "app/components/ui/BaseTable.vue",
+      "accessCount": 3,
+      "lastAccessed": 1784728619749,
+      "type": "file"
+    },
+    {
+      "path": "app/pages/configuracoes/index.vue",
+      "accessCount": 3,
+      "lastAccessed": 1784728629480,
+      "type": "file"
+    },
+    {
+      "path": "app/pages/admin/index.vue",
+      "accessCount": 3,
+      "lastAccessed": 1784728630411,
+      "type": "file"
+    },
+    {
+      "path": "app/components/catalog/CatalogItemFormDialog.vue",
+      "accessCount": 3,
+      "lastAccessed": 1784728632828,
+      "type": "file"
+    },
+    {
+      "path": "app/components/clients/ClientCard.vue",
+      "accessCount": 3,
+      "lastAccessed": 1784728685480,
+      "type": "file"
+    },
+    {
+      "path": "app/components/catalog/CatalogItemCard.vue",
+      "accessCount": 3,
+      "lastAccessed": 1784728686695,
       "type": "file"
     },
     {
@@ -409,9 +493,27 @@
       "type": "file"
     },
     {
-      "path": "app/components/ui/BaseTable.vue",
-      "accessCount": 1,
-      "lastAccessed": 1784644758955,
+      "path": "app/components/ui/BaseDateTimePicker.vue",
+      "accessCount": 2,
+      "lastAccessed": 1784728618890,
+      "type": "file"
+    },
+    {
+      "path": "app/components/ui/BaseLabel.vue",
+      "accessCount": 2,
+      "lastAccessed": 1784728619357,
+      "type": "file"
+    },
+    {
+      "path": "app/pages/relatorios/index.vue",
+      "accessCount": 2,
+      "lastAccessed": 1784728620504,
+      "type": "file"
+    },
+    {
+      "path": "app/pages/admin/settings.vue",
+      "accessCount": 2,
+      "lastAccessed": 1784728630677,
       "type": "file"
     },
     {
@@ -442,6 +544,36 @@
       "path": "app/composables/useDarkMode.ts",
       "accessCount": 1,
       "lastAccessed": 1784666654809,
+      "type": "file"
+    },
+    {
+      "path": "app/pages/admin/coupons/index.vue",
+      "accessCount": 1,
+      "lastAccessed": 1784728417479,
+      "type": "file"
+    },
+    {
+      "path": "app/pages/planos/index.vue",
+      "accessCount": 1,
+      "lastAccessed": 1784728417767,
+      "type": "file"
+    },
+    {
+      "path": "app/pages/auth/login.vue",
+      "accessCount": 1,
+      "lastAccessed": 1784728418115,
+      "type": "file"
+    },
+    {
+      "path": "app/pages/agenda/index.vue",
+      "accessCount": 1,
+      "lastAccessed": 1784728418688,
+      "type": "file"
+    },
+    {
+      "path": "app/pages/maintenance.vue",
+      "accessCount": 1,
+      "lastAccessed": 1784728418853,
       "type": "file"
     }
   ],

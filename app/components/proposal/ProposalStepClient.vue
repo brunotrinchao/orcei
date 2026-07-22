@@ -96,13 +96,13 @@ async function extractClient() {
 <template>
   <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
     <div class="space-y-2">
-      <h3 class="text-lg font-black text-gray-900 tracking-tight">Detalhes do Orçamento</h3>
-      <p class="text-sm text-gray-500 font-medium">Comece dando um nome ao seu projeto e identificando o cliente.</p>
+      <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight">Detalhes do Orçamento</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Comece dando um nome ao seu projeto e identificando o cliente.</p>
     </div>
 
     <div class="space-y-6">
       
-      <div class="space-y-4 pt-4 border-t border-gray-100">
+      <div class="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-800">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <label class="block text-xs font-black text-gray-600 uppercase tracking-widest ml-1">Dados do Cliente</label>
           <button 

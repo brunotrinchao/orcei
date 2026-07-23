@@ -236,16 +236,16 @@ const formatDate = (ts: number | null) => ts ? new Date(ts).toLocaleDateString('
     <!-- Modal Editar -->
     <BaseDialog v-model:open="isEditOpen" title="Editar Cupom" size="md">
       <div class="space-y-5">
-        <p class="text-xs font-bold text-gray-400 leading-relaxed">
+        <p class="text-xs font-bold text-gray-400 dark:text-gray-500 leading-relaxed">
           Código, expiração e limite de usos não podem ser alterados após a criação (restrição da Stripe) — desative este cupom e crie um novo se precisar mudar isso.
         </p>
         <BaseInput :model-value="selectedCoupon?.code" label="Código" disabled />
         <BaseInput v-model.number="editForm.credits" type="number" label="Créditos Concedidos" />
         <BaseSelect v-model="editForm.audience" :options="audienceOptions" label="Público-alvo" />
-        <label class="flex items-center gap-3 cursor-pointer select-none">
-          <input v-model="editForm.active" type="checkbox" class="w-5 h-5 rounded-md border-2 border-gray-300 text-blue-600 focus:ring-blue-500">
-          <span class="text-xs font-black text-gray-600 uppercase tracking-widest">Cupom ativo</span>
-        </label>
+        <div class="flex items-center gap-3 pt-2">
+          <BaseCheckbox v-model="editForm.active" id="edit-coupon-active" />
+          <label for="edit-coupon-active" class="text-xs font-black text-gray-600 dark:text-gray-300 uppercase tracking-widest cursor-pointer select-none">Cupom ativo</label>
+        </div>
       </div>
       <template #footer>
         <BaseButton variant="secondary" @click="isEditOpen = false">Cancelar</BaseButton>

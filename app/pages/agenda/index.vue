@@ -109,6 +109,12 @@ const calendarOptions = computed(() => ({
   plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
   initialView: 'dayGridMonth',
   locale: ptBrLocale,
+  buttonText: {
+    today: 'Hoje',
+    month: 'Mês',
+    week: 'Semana',
+    day: 'Dia'
+  },
   headerToolbar: {
     left: 'prev,next today',
     center: 'title',
@@ -310,7 +316,7 @@ const linkedProposal = computed(() => {
     </div>
 
     <!-- Container da Agenda (Dark Mode & Touch Ready) -->
-    <div data-tour="agenda-calendario" class="bg-white dark:bg-gray-900 p-4 sm:p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+    <div data-tour="agenda-calendario" class="bg-white dark:bg-gray-900 p-3 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
       <ClientOnly>
         <FullCalendar :options="calendarOptions" />
         <template #fallback>
@@ -401,11 +407,11 @@ const linkedProposal = computed(() => {
 <style>
 .fc {
   --fc-button-bg-color: #f9fafb;
-  --fc-button-border-color: #f3f4f6;
+  --fc-button-border-color: #e5e7eb;
   --fc-button-hover-bg-color: #f3f4f6;
-  --fc-button-hover-border-color: #e5e7eb;
-  --fc-button-active-bg-color: #e5e7eb;
-  --fc-button-active-border-color: #d1d5db;
+  --fc-button-hover-border-color: #d1d5db;
+  --fc-button-active-bg-color: #2563eb;
+  --fc-button-active-border-color: #2563eb;
   --fc-button-text-color: #374151;
   --fc-border-color: #f3f4f6;
   --fc-today-bg-color: #eff6ff;
@@ -416,9 +422,9 @@ const linkedProposal = computed(() => {
   --fc-button-border-color: #374151;
   --fc-button-hover-bg-color: #374151;
   --fc-button-hover-border-color: #4b5563;
-  --fc-button-active-bg-color: #374151;
-  --fc-button-active-border-color: #4b5563;
-  --fc-button-text-color: #f9fafb;
+  --fc-button-active-bg-color: #2563eb;
+  --fc-button-active-border-color: #2563eb;
+  --fc-button-text-color: #f3f4f6;
   --fc-border-color: #1f2937;
   --fc-today-bg-color: rgba(30, 58, 138, 0.25);
   --fc-page-bg-color: #111827;
@@ -426,8 +432,64 @@ const linkedProposal = computed(() => {
   --fc-list-event-hover-bg-color: #374151;
 }
 
+.fc .fc-toolbar {
+  @apply mb-6 gap-3;
+}
+
+.fc .fc-toolbar-chunk {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  gap: 0.375rem !important;
+}
+
+.fc .fc-button-group {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+}
+
 .fc .fc-toolbar-title {
-  @apply text-lg sm:text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight;
+  @apply text-base sm:text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight text-center whitespace-nowrap;
+}
+
+/* Layout Responsivo para Mobile */
+@media (max-width: 640px) {
+  .fc .fc-toolbar {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-areas: 
+      "title title"
+      "nav views" !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+  }
+
+  .fc .fc-toolbar-chunk:nth-child(2) {
+    grid-area: title;
+    justify-self: center;
+    width: 100%;
+  }
+
+  .fc .fc-toolbar-chunk:first-child {
+    grid-area: nav;
+    justify-self: start;
+  }
+
+  .fc .fc-toolbar-chunk:last-child {
+    grid-area: views;
+    justify-self: end;
+  }
+
+  .fc .fc-button {
+    padding: 0.5rem 0.625rem !important;
+    font-size: 0.65rem !important;
+    min-height: 40px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
 }
 
 .dark .fc .fc-col-header-cell-cushion,
@@ -448,12 +510,12 @@ const linkedProposal = computed(() => {
 }
 
 .fc .fc-button {
-  @apply rounded-xl font-black uppercase text-[10px] tracking-widest px-3 py-2 transition-all shadow-none touch-manipulation;
+  @apply rounded-xl font-black uppercase text-[10px] tracking-widest px-3.5 py-2.5 transition-all shadow-none touch-manipulation border;
 }
 
 .fc .fc-button-primary:not(:disabled).fc-button-active,
 .fc .fc-button-primary:not(:disabled):active {
-  @apply bg-blue-600 border-blue-600 text-white dark:bg-blue-600 dark:border-blue-600;
+  @apply bg-blue-600 border-blue-600 text-white dark:bg-blue-600 dark:border-blue-600 shadow-md shadow-blue-500/20;
 }
 
 .fc .fc-daygrid-day-number {

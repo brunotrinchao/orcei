@@ -135,14 +135,14 @@ function formatLogTime(isoString: string) {
     <!-- Cabeçalho Principal -->
     <PageHeader title="Painel de Administração" :subtitle="`Visão geral e telemetria global da plataforma ${systemInfo?.landingPage?.appName || 'Orcei Fácil'}.`" >
       <div class="flex gap-3">
-        <NuxtLink to="/admin/settings" class="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-black uppercase tracking-widest text-gray-600 hover:bg-gray-50 transition-all">
+        <BaseButton as="NuxtLink" to="/admin/settings" variant="secondary" size="sm">
           <Settings class="w-4 h-4 mr-2" />
           Configurações
-        </NuxtLink>
-        <NuxtLink to="/admin/users" class="inline-flex items-center px-4 py-2 bg-gray-900 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-800 transition-all shadow-lg shadow-gray-200">
+        </BaseButton>
+        <BaseButton as="NuxtLink" to="/admin/users" variant="primary" size="sm">
           <Users class="w-4 h-4 mr-2" />
           Gerenciar Usuários
-        </NuxtLink>
+        </BaseButton>
       </div>
     </PageHeader>
 

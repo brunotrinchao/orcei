@@ -105,26 +105,26 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
       <aside class="w-full lg:w-48 shrink-0 flex lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0 scrollbar-hide">
         <button 
           @click="activeTab = 'system'"
-          :class="activeTab === 'system' ? 'bg-gray-900 text-white shadow-lg' : 'text-gray-500 hover:bg-gray-100'"
-          class="flex items-center gap-3 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal"
+          :class="activeTab === 'system' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-lg' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'"
+          class="flex items-center gap-3 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
         >
-          <ShieldAlert class="w-4 h-4" />
+          <ShieldAlert class="w-4 h-4 shrink-0" />
           Sistema
         </button>
         <button 
           @click="activeTab = 'landing'"
-          :class="activeTab === 'landing' ? 'bg-gray-900 text-white shadow-lg' : 'text-gray-500 hover:bg-gray-100'"
-          class="flex items-center gap-3 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal"
+          :class="activeTab === 'landing' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-lg' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'"
+          class="flex items-center gap-3 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
         >
-          <Globe class="w-4 h-4" />
+          <Globe class="w-4 h-4 shrink-0" />
           Landing Page
         </button>
         <button
           @click="activeTab = 'credits'"
-          :class="activeTab === 'credits' ? 'bg-gray-900 text-white shadow-lg' : 'text-gray-500 hover:bg-gray-100'"
-          class="flex items-center gap-3 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal"
+          :class="activeTab === 'credits' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-lg' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'"
+          class="flex items-center gap-3 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
         >
-          <Sparkles class="w-4 h-4" />
+          <Sparkles class="w-4 h-4 shrink-0" />
           Créditos de IA
         </button>
       </aside>
@@ -133,24 +133,24 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
       <div class="flex-1 space-y-10 min-w-0">
         <!-- SYSTEM SETTINGS -->
         <div v-if="activeTab === 'system'" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <section class="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
-                <ShieldAlert class="w-5 h-5 text-red-600" />
+              <div class="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-950/40 flex items-center justify-center">
+                <ShieldAlert class="w-5 h-5 text-red-600 dark:text-red-400" />
               </div>
-              <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Estado do Sistema</h2>
+              <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Estado do Sistema</h2>
             </div>
 
-            <div class="p-8 bg-gray-50 rounded-[2.5rem] border border-gray-100 flex items-center justify-between gap-6">
+            <div class="p-8 bg-gray-50/50 dark:bg-gray-950/50 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 flex items-center justify-between gap-6">
               <div class="space-y-1">
-                <h3 class="font-black text-gray-900 uppercase text-xs tracking-widest">Modo Manutenção</h3>
-                <p class="text-xs text-gray-500 font-medium leading-relaxed">
+                <h3 class="font-black text-gray-900 dark:text-gray-100 uppercase text-xs tracking-widest">Modo Manutenção</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
                   Quando ativado, apenas administradores poderão acessar as rotas de dashboard. Usuários comuns verão uma página de manutenção.
                 </p>
               </div>
               <div 
                 @click="localSettings.maintenanceMode = !localSettings.maintenanceMode"
-                :class="localSettings.maintenanceMode ? 'bg-red-500' : 'bg-gray-200'"
+                :class="localSettings.maintenanceMode ? 'bg-red-500' : 'bg-gray-200 dark:bg-gray-800'"
                 class="w-16 h-8 rounded-full relative cursor-pointer transition-colors duration-300 shrink-0"
               >
                 <div 
@@ -170,53 +170,51 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
             </div>
           </section>
 
-          <section class="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                <FileText class="w-5 h-5 text-blue-600" />
+              <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center">
+                <FileText class="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </div>
-              <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Textos Globais</h2>
+              <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Textos Globais</h2>
             </div>
-            <div class="space-y-4">
-              <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Texto do Rodapé (Footer)</label>
-              <textarea 
+            <div>
+              <BaseTextarea 
                 v-model="localSettings.footerText"
-                rows="3"
-                class="w-full px-6 py-5 bg-gray-50 border-2 border-gray-100 rounded-[2rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-300 shadow-inner resize-none"
-              ></textarea>
+                label="Texto do Rodapé (Footer)"
+                :rows="3"
+                placeholder="Texto do rodapé institucional..."
+              />
             </div>
           </section>
         </div>
 
         <!-- LANDING PAGE SETTINGS -->
         <div v-if="activeTab === 'landing'" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <section class="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
-                <Globe class="w-5 h-5 text-purple-600" />
+              <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/40 flex items-center justify-center">
+                <Globe class="w-5 h-5 text-purple-600 dark:text-purple-400" />
               </div>
-              <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Hero Section (Início)</h2>
+              <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Hero Section (Início)</h2>
             </div>
             <div class="space-y-6">
               <BaseInput v-model="localSettings.landingPage.heroTitle" label="Título Principal" />
-              <div class="space-y-2">
-                <label class="block text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Subtítulo Hero</label>
-                <textarea 
-                  v-model="localSettings.landingPage.heroSubtitle"
-                  rows="3"
-                  class="w-full px-6 py-5 bg-gray-50 border-2 border-gray-100 rounded-[2rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 shadow-inner resize-none"
-                ></textarea>
-              </div>
+              <BaseTextarea 
+                v-model="localSettings.landingPage.heroSubtitle"
+                label="Subtítulo Hero"
+                :rows="3"
+                placeholder="Subtítulo chamativo da landing page..."
+              />
             </div>
           </section>
 
-          <section class="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                  <RefreshCcw class="w-5 h-5 text-emerald-600" />
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
+                  <RefreshCcw class="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 </div>
-                <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Funcionalidades</h2>
+                <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Funcionalidades</h2>
               </div>
               <BaseButton variant="secondary" size="sm" @click="addFeature">
                 <Plus class="w-4 h-4 mr-1" /> Add Recurso
@@ -224,14 +222,14 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
             </div>
 
             <div class="grid grid-cols-1 gap-6">
-              <div v-for="(f, idx) in localSettings.landingPage.features" :key="idx" class="p-6 bg-gray-50 rounded-3xl border border-gray-100 space-y-4 relative group/feature">
+              <div v-for="(f, idx) in localSettings.landingPage.features" :key="idx" class="p-6 bg-gray-50/50 dark:bg-gray-950/50 rounded-3xl border border-gray-100 dark:border-gray-800 space-y-4 relative group/feature">
                 <div class="flex justify-between items-start gap-4">
                   <!-- Reorder Controls -->
                   <div class="flex items-center gap-2 absolute -left-12 top-1/2 -translate-y-1/2 opacity-0 group-hover/feature:opacity-100 transition-all hidden lg:flex flex-col">
                     <button 
                       @click="moveFeature(idx, 'up')" 
                       :disabled="idx === 0"
-                      class="p-2 bg-white border border-gray-200 rounded-lg text-gray-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed shadow-sm transition-colors"
+                      class="p-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-gray-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed shadow-sm transition-colors"
                       title="Mover para cima"
                     >
                       <ChevronUp class="w-4 h-4" />
@@ -239,7 +237,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
                     <button 
                       @click="moveFeature(idx, 'down')" 
                       :disabled="idx === localSettings.landingPage.features.length - 1"
-                      class="p-2 bg-white border border-gray-200 rounded-lg text-gray-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed shadow-sm transition-colors"
+                      class="p-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-gray-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed shadow-sm transition-colors"
                       title="Mover para baixo"
                     >
                       <ChevronDown class="w-4 h-4" />
@@ -261,11 +259,11 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
                     </button>
                   </div>
                 </div>
-                <textarea 
+                <BaseTextarea 
                   v-model="f.description"
                   placeholder="Descrição do recurso..."
-                  class="w-full px-4 py-3 bg-white border-2 border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-500/10 outline-none text-xs font-medium text-gray-600 resize-none"
-                ></textarea>
+                  :rows="2"
+                />
                 <div class="flex items-center gap-3">
                   <BaseCheckbox v-model="f.enabled" :id="'f-enabled-'+idx" />
                   <label :for="'f-enabled-'+idx" class="text-[10px] font-black text-gray-400 uppercase tracking-widest cursor-pointer">Ativo na Landpage</label>
@@ -277,58 +275,58 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
 
         <!-- CRÉDITOS DE IA -->
         <div v-if="activeTab === 'credits'" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <section class="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center">
-                <Sparkles class="w-5 h-5 text-violet-600" />
+              <div class="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-950/40 flex items-center justify-center">
+                <Sparkles class="w-5 h-5 text-violet-600 dark:text-violet-400" />
               </div>
-              <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Custo de Créditos por Ação</h2>
+              <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Custo de Créditos por Ação</h2>
             </div>
-            <p class="text-xs text-gray-500 font-medium leading-relaxed">
+            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
               Defina quantos créditos cada ação consome. Use 0 para tornar a ação gratuita — nesse caso, o saldo não é debitado e o rótulo de custo é ocultado nas telas do app.
             </p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="space-y-1.5">
                 <BaseInput v-model.number="localSettings.creditCosts.proposalSuggest" type="number" label="Sugestão de Itens no Orçamento (IA)" />
-                <p class="text-[10px] text-gray-400 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
+                <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
               </div>
               <div class="space-y-1.5">
                 <BaseInput v-model.number="localSettings.creditCosts.catalogSuggest" type="number" label="Sugestão de Item do Catálogo (IA)" />
-                <p class="text-[10px] text-gray-400 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
+                <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
               </div>
               <div class="space-y-1.5">
                 <BaseInput v-model.number="localSettings.creditCosts.clientExtract" type="number" label="Extração de Dados de Lead (IA)" />
-                <p class="text-[10px] text-gray-400 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
+                <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
               </div>
               <div class="space-y-1.5">
                 <BaseInput v-model.number="localSettings.creditCosts.generate" type="number" label="Geração de Texto Genérico (IA)" />
-                <p class="text-[10px] text-gray-400 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
+                <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
               </div>
               <div class="space-y-1.5">
                 <BaseInput v-model.number="localSettings.creditCosts.analyzeReport" type="number" label="Relatório Estratégico (IA)" />
-                <p class="text-[10px] text-gray-400 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
+                <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
               </div>
               <div class="space-y-1.5">
                 <BaseInput v-model.number="localSettings.creditCosts.proposalSend" type="number" label="Criar e Enviar Orçamento" />
-                <p class="text-[10px] text-gray-400 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
+                <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold ml-1">Defina 0 para tornar a ação gratuita</p>
               </div>
             </div>
           </section>
 
-          <section class="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                <Sparkles class="w-5 h-5 text-emerald-600" />
+              <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
+                <Sparkles class="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">Créditos Iniciais</h2>
+              <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Créditos Iniciais</h2>
             </div>
-            <p class="text-xs text-gray-500 font-medium leading-relaxed">
+            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
               Quantidade de créditos que um novo usuário recebe automaticamente ao se cadastrar na plataforma.
             </p>
             <div class="max-w-xs space-y-1.5">
               <BaseInput v-model.number="localSettings.initialCredits" type="number" label="Créditos no Cadastro" />
-              <p class="text-[10px] text-gray-400 font-bold ml-1">Defina 0 para não conceder créditos gratuitos</p>
+              <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold ml-1">Defina 0 para não conceder créditos gratuitos</p>
             </div>
           </section>
         </div>

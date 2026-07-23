@@ -98,16 +98,12 @@ function confirmImpersonate(targetUser: any) {
     </PageHeader>
 
     <!-- Busca -->
-    <div class="relative max-w-lg">
-      <input
+    <div class="max-w-lg">
+      <BaseInput
         v-model="searchQuery"
-        type="text"
         placeholder="Buscar por nome ou e-mail..."
-        class="w-full h-[52px] pl-12 pr-5 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-sm"
-      >
-      <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
-        <Search class="w-5 h-5" />
-      </div>
+        :icon="Search"
+      />
     </div>
 
     <!-- Listagem Unificada (desktop) -->
@@ -129,16 +125,16 @@ function confirmImpersonate(targetUser: any) {
       </template>
 
       <template #item="{ item: user }">
-        <tr class="hover:bg-gray-50/30 transition-all group">
+        <tr class="hover:bg-gray-50/30 dark:hover:bg-gray-800/30 transition-all group">
           <td class="px-8 py-6">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
+              <div class="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden border-2 border-white dark:border-gray-800 shadow-sm">
                 <img v-if="user.avatar" :src="user.avatar" class="w-full h-full object-cover" loading="lazy">
                 <User v-else class="w-5 h-5 text-gray-400" />
               </div>
               <div class="flex flex-col">
-                <span class="font-black text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">{{ user.name }}</span>
-                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tight mt-1">{{ user.email }}</span>
+                <span class="font-black text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">{{ user.name }}</span>
+                <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tight mt-1">{{ user.email }}</span>
               </div>
             </div>
           </td>
@@ -147,21 +143,21 @@ function confirmImpersonate(targetUser: any) {
               {{ user.subscriptionPlan?.toUpperCase() || 'FREE' }}
             </BaseBadge>
           </td>
-          <td class="px-8 py-6 text-center font-black text-gray-900">
+          <td class="px-8 py-6 text-center font-black text-gray-900 dark:text-gray-100">
             {{ user.creditsBalance }}
           </td>
-          <td class="px-8 py-6 text-center text-xs font-bold text-gray-500">
+          <td class="px-8 py-6 text-center text-xs font-bold text-gray-500 dark:text-gray-400">
             {{ formatDate(user.createdAt) }}
           </td>
           <td class="px-8 py-6 text-right">
             <div class="flex justify-end gap-2">
-              <button @click="openCreditModal(user)" class="p-2.5 text-blue-500 hover:bg-blue-50 rounded-xl transition-all" title="Ajustar Créditos">
+              <button @click="openCreditModal(user)" class="p-2.5 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-xl transition-all" title="Ajustar Créditos">
                 <CreditCard class="w-5 h-5" />
               </button>
-              <button v-if="user.role !== 'admin'" :disabled="isImpersonating" @click="confirmImpersonate(user)" class="p-2.5 text-amber-500 hover:bg-amber-50 rounded-xl transition-all disabled:opacity-50" title="Personificar Usuário">
+              <button v-if="user.role !== 'admin'" :disabled="isImpersonating" @click="confirmImpersonate(user)" class="p-2.5 text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-xl transition-all disabled:opacity-50" title="Personificar Usuário">
                 <LogIn class="w-5 h-5" />
               </button>
-              <button v-if="user.role === 'admin'" class="p-2.5 text-red-500 bg-red-50 rounded-xl" title="Administrador">
+              <button v-if="user.role === 'admin'" class="p-2.5 text-red-500 bg-red-50 dark:bg-red-950/40 rounded-xl" title="Administrador">
                 <Shield class="w-5 h-5" />
               </button>
             </div>
@@ -197,7 +193,7 @@ function confirmImpersonate(targetUser: any) {
       </template>
       <template v-else-if="users.length === 0">
         <div class="py-16 text-center">
-          <p class="font-black text-gray-900">Nenhum usuário encontrado</p>
+          <p class="font-black text-gray-900 dark:text-gray-100">Nenhum usuário encontrado</p>
         </div>
       </template>
       <template v-else>
@@ -218,24 +214,24 @@ function confirmImpersonate(targetUser: any) {
     <!-- Modal de Créditos -->
     <BaseDialog v-model:open="isCreditModalOpen" title="Ajustar Créditos" size="md">
       <div v-if="selectedUser" class="p-6 space-y-6">
-        <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-3xl border border-gray-100">
-          <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center border-2 border-white shadow-sm overflow-hidden">
+        <div class="flex items-center gap-4 p-4 bg-gray-50/50 dark:bg-gray-950/50 rounded-3xl border border-gray-100 dark:border-gray-800">
+          <div class="w-12 h-12 rounded-xl bg-white dark:bg-gray-900 flex items-center justify-center border-2 border-white dark:border-gray-800 shadow-sm overflow-hidden">
             <img v-if="selectedUser.avatar" :src="selectedUser.avatar" class="w-full h-full object-cover" loading="lazy">
-            <User v-else class="w-6 h-6 text-gray-300" />
+            <User v-else class="w-6 h-6 text-gray-300 dark:text-gray-600" />
           </div>
           <div>
-            <p class="font-black text-gray-900 leading-none mb-1">{{ selectedUser.name }}</p>
-            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Saldo Atual: {{ selectedUser.creditsBalance }} créditos</p>
+            <p class="font-black text-gray-900 dark:text-gray-100 leading-none mb-1">{{ selectedUser.name }}</p>
+            <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Saldo Atual: {{ selectedUser.creditsBalance }} créditos</p>
           </div>
         </div>
 
         <div class="space-y-4">
-          <div class="flex gap-2 p-1 bg-gray-100 rounded-2xl">
+          <div class="flex gap-2 p-1 bg-gray-100 dark:bg-gray-800/60 rounded-2xl">
             <button 
               v-for="a in [{id: 'add', label: 'Adicionar'}, {id: 'remove', label: 'Remover'}, {id: 'set', label: 'Definir'}]" 
               :key="a.id"
               @click="creditAction = a.id as any"
-              :class="creditAction === a.id ? 'bg-white text-gray-900 shadow-md' : 'text-gray-500'"
+              :class="creditAction === a.id ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'"
               class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
             >
               {{ a.label }}

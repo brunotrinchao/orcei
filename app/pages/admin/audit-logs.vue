@@ -53,24 +53,24 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
       </template>
 
       <template #item="{ item: log }">
-        <tr class="hover:bg-gray-50/50 transition-all text-xs">
-          <td class="px-8 py-5 text-gray-500 font-bold flex items-center gap-2">
-            <Clock class="w-3 h-3" />
+        <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-all text-xs">
+          <td class="px-8 py-5 text-gray-500 dark:text-gray-400 font-bold flex items-center gap-2">
+            <Clock class="w-3 h-3 text-gray-400 dark:text-gray-500" />
             {{ formatDate(log.createdAt) }}
           </td>
           <td class="px-8 py-5">
             <div class="flex items-center gap-2">
-              <User class="w-3.5 h-3.5 text-gray-400" />
-              <span class="font-black text-gray-900">{{ log.adminName }}</span>
+              <User class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
+              <span class="font-black text-gray-900 dark:text-gray-100">{{ log.adminName }}</span>
             </div>
           </td>
           <td class="px-8 py-5">
-            <span class="px-2 py-1 bg-gray-100 rounded text-[9px] font-black uppercase tracking-widest text-gray-600 border border-gray-200">
+            <span class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-[9px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
               {{ log.action }}
             </span>
           </td>
-          <td class="px-8 py-5 text-gray-500 font-medium">
-            <pre class="text-[9px] bg-gray-50 p-2 rounded-lg max-w-xs overflow-hidden truncate">{{ JSON.stringify(log.details) }}</pre>
+          <td class="px-8 py-5 text-gray-500 dark:text-gray-400 font-medium">
+            <pre class="text-[9px] bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-300 p-2 rounded-lg max-w-xs overflow-hidden truncate border border-gray-100 dark:border-gray-800">{{ JSON.stringify(log.details) }}</pre>
           </td>
         </tr>
       </template>

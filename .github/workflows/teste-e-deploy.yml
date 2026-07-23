@@ -1,4 +1,4 @@
-name: Pipeline de Testes e Deploy Vercel
+name: Pipeline de Validação de Qualidade (CI)
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   run-tests:
-    name: Executar Testes
+    name: Executar Testes e Validações
     runs-on: ubuntu-latest
 
     steps:
@@ -37,38 +37,3 @@ jobs:
         env:
           NUXT_SESSION_PASSWORD: "dummy-password-for-testing-at-least-32-characters-long"
           SKIP_DB_CHECK: "true"
-
-  deploy-to-vercel:
-    name: Deploy na Vercel
-    needs: run-tests
-    runs-on: ubuntu-latest
-    # Corrigido para garantir que o deploy em produção rode apenas no PUSH da main, ignorando o PR
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Checkout do código
-        uses: actions/checkout@v4
-
-      - name: Instalar Vercel CLI
-        run: npm install --global vercel
-
-      # O segredo para não travar: 'vercel pull' baixa as configurações do seu projeto na Vercel
-      - name: Puxar informações do ambiente Vercel
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
-      # Cria o pacote de build localmente usando as configs oficiais do seu painel Vercel
-      - name: Construir artefatos do projeto (Build)
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
-      # Envia o build pronto, garantindo um deploy instantâneo e sem erros de máquina virtual
-      - name: Enviar Deploy para a Vercel
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

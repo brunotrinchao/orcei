@@ -4,7 +4,7 @@ import type { Component } from 'vue'
 interface Props {
   id?: string
   dataTour?: string
-  title: string
+  title?: string
   subtitle?: string
   icon?: Component
   iconBgClass?: string
@@ -14,6 +14,7 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   id: undefined,
   dataTour: undefined,
+  title: undefined,
   subtitle: undefined,
   icon: undefined,
   iconBgClass: 'bg-blue-50 dark:bg-blue-950/50',
@@ -25,10 +26,10 @@ withDefaults(defineProps<Props>(), {
   <section
     :id="id"
     :data-tour="dataTour"
-    class="bg-white dark:bg-gray-900 p-6 rounded-[2.5rem] border border-gray-200 dark:border-gray-800 shadow-sm scroll-mt-8 transition-colors"
+    class="bg-white dark:bg-gray-900 p-6 md:p-8 rounded-[2.5rem] border border-gray-200 dark:border-gray-800 shadow-sm scroll-mt-8 transition-colors"
   >
     <!-- Header da Seção -->
-    <div class="flex items-center justify-between gap-4 mb-8">
+    <div v-if="title || icon || $slots.icon || $slots['header-actions']" class="flex items-center justify-between gap-4 mb-6">
       <div class="flex items-center gap-3">
         <slot name="icon">
           <div
@@ -41,8 +42,8 @@ withDefaults(defineProps<Props>(), {
             <component :is="icon" :class="['w-5 h-5', iconColorClass]" />
           </div>
         </slot>
-        <div>
-          <h2 class="text-xl font-black text-gray-900 dark:text-gray-50 uppercase tracking-tight">
+        <div v-if="title || subtitle">
+          <h2 v-if="title" class="text-xl font-black text-gray-900 dark:text-gray-50 uppercase tracking-tight">
             {{ title }}
           </h2>
           <p v-if="subtitle" class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">

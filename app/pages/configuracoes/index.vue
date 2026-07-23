@@ -205,27 +205,9 @@ async function deleteAccount() {
 
 const activeSection = ref('visual')
 
-function scrollTo(id: string) {
-  const el = document.getElementById(id)
-  if (el) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    activeSection.value = id
-  }
+function selectSection(id: string) {
+  activeSection.value = id
 }
-
-onMounted(() => {
-  const observer = new IntersectionObserver(
-    (entries) => {
-      const visible = entries.filter(e => e.isIntersecting)
-      if (visible.length) activeSection.value = visible[0].target.id
-    },
-    { threshold: 0.3 }
-  )
-  sections.forEach(s => {
-    const el = document.getElementById(s.id)
-    if (el) observer.observe(el)
-  })
-})
 </script>
 
 <template>
@@ -239,8 +221,8 @@ onMounted(() => {
         <button
           v-for="s in sections"
           :key="s.id"
-          @click="scrollTo(s.id)"
-          :class="activeSection === s.id ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-400'"
+          @click="selectSection(s.id)"
+          :class="activeSection === s.id ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-md' : 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'"
           class="shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
         >
           <component :is="s.icon" class="w-3 h-3" />
@@ -256,7 +238,7 @@ onMounted(() => {
           <button
             v-for="s in sections"
             :key="s.id"
-            @click="scrollTo(s.id)"
+            @click="selectSection(s.id)"
             :class="activeSection === s.id
               ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-lg'
               : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/60 hover:text-gray-900 dark:hover:text-gray-100'"
@@ -272,166 +254,189 @@ onMounted(() => {
           </div>
         </aside>
 
-        <!-- Sections -->
-        <div class="flex-1 space-y-10 min-w-0">
+        <!-- Container da Seção Ativa com Transição Suave -->
+        <div class="flex-1 min-w-0">
+          <Transition
+            mode="out-in"
+            enter-active-class="transition-all duration-300 ease-out"
+            enter-from-class="opacity-0 translate-y-2"
+            enter-to-class="opacity-100 translate-y-0"
+            leave-active-class="transition-all duration-200 ease-in"
+            leave-from-class="opacity-100 translate-y-0"
+            leave-to-class="opacity-0 -translate-y-2"
+          >
+            <div :key="activeSection">
+              <!-- Identidade Visual -->
+              <SettingsVisual
+                v-if="activeSection === 'visual'"
+                v-model:logoUrl="localProfile.brandConfig.logoUrl"
+                v-model:primaryColor="localProfile.brandConfig.primaryColor"
+              />
 
-          <!-- Identidade Visual -->
-          <div :class="activeSection === 'visual' ? 'block' : 'hidden lg:block'">
-          <SettingsVisual
-            v-model:logoUrl="localProfile.brandConfig.logoUrl"
-            v-model:primaryColor="localProfile.brandConfig.primaryColor"
-          />
-          </div>
+              <!-- Dados da Empresa -->
+              <SettingsCompany
+                v-else-if="activeSection === 'empresa'"
+                v-model:company="localProfile.company"
+              />
 
-          <!-- Dados da Empresa -->
-          <div :class="activeSection === 'empresa' ? 'block' : 'hidden lg:block'">
-          <SettingsCompany
-            v-model:company="localProfile.company"
-          />
-          </div>
+              <!-- Endereço -->
+              <SettingsAddress
+                v-else-if="activeSection === 'endereco'"
+                v-model:address="localProfile.address"
+              />
 
-          <!-- Endereço -->
-          <div :class="activeSection === 'endereco' ? 'block' : 'hidden lg:block'">
-          <SettingsAddress
-            v-model:address="localProfile.address"
-          />
-          </div>
+              <!-- Contato -->
+              <SettingsContact
+                v-else-if="activeSection === 'contato'"
+                v-model:contact="localProfile.contact"
+              />
 
-          <!-- Contato -->
-          <div :class="activeSection === 'contato' ? 'block' : 'hidden lg:block'">
-          <SettingsContact
-            v-model:contact="localProfile.contact"
-          />
-          </div>
-
-          <!-- Integrações -->
-          <div :class="activeSection === 'integracoes' ? 'block' : 'hidden lg:block'">
-            <BaseSectionCard id="integracoes" data-tour="config-integracoes" title="Integrações" :icon="Globe" icon-bg-class="bg-sky-50 dark:bg-sky-950/50" icon-color-class="text-sky-600 dark:text-sky-400">
-              <div class="space-y-6">
-                <div class="p-6 bg-gray-50/50 dark:bg-gray-950/50 rounded-3xl border border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row items-center gap-6">
-                  <div class="w-12 h-12 bg-white dark:bg-gray-900 rounded-2xl shadow-sm flex items-center justify-center shrink-0 border border-gray-100 dark:border-gray-800">
-                    <img src="https://www.gstatic.com/images/branding/product/2x/calendar_2020q4_48dp.png" class="w-8 h-8 object-contain" loading="lazy">
-                  </div>
-                  <div class="flex-1 text-center sm:text-left">
-                    <h3 class="text-sm font-black text-gray-900 dark:text-gray-100 uppercase tracking-widest">Google Calendar & Drive</h3>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 font-bold mt-1 leading-relaxed">Sincronize sua agenda e arquive orçamentos automaticamente.</p>
-                  </div>
-                  <div class="shrink-0 w-full sm:w-auto">
-                    <span v-if="!integrationGoogleDriveCalendarStatus" class="inline-flex items-center justify-center px-6 py-3 bg-gray-100 dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 cursor-not-allowed">
-                      Em breve
-                    </span>
-                    <div v-else-if="localProfile.googleIntegration?.email" class="flex flex-col items-center sm:items-end gap-2">
-                      <span class="text-[10px] font-black text-green-600 dark:text-green-400 uppercase tracking-widest bg-green-50 dark:bg-green-950/40 px-3 py-1 rounded-full">Conectado: {{ localProfile.googleIntegration.email }}</span>
-                      <button @click="disconnectGoogle" class="text-[10px] font-black text-red-400 uppercase tracking-widest hover:text-red-600 transition-colors">Desconectar</button>
+              <!-- Integrações -->
+              <BaseSectionCard 
+                v-else-if="activeSection === 'integracoes'" 
+                id="integracoes" 
+                data-tour="config-integracoes" 
+                title="Integrações" 
+                :icon="Globe" 
+                icon-bg-class="bg-sky-50 dark:bg-sky-950/50" 
+                icon-color-class="text-sky-600 dark:text-sky-400"
+              >
+                <div class="space-y-6">
+                  <div class="p-6 bg-gray-50/50 dark:bg-gray-950/50 rounded-3xl border border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row items-center gap-6">
+                    <div class="w-12 h-12 bg-white dark:bg-gray-900 rounded-2xl shadow-sm flex items-center justify-center shrink-0 border border-gray-100 dark:border-gray-800">
+                      <img src="https://www.gstatic.com/images/branding/product/2x/calendar_2020q4_48dp.png" class="w-8 h-8 object-contain" loading="lazy">
                     </div>
-                    <a v-else href="/api/integrations/google/connect" class="inline-flex items-center justify-center px-6 py-3 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-700 dark:text-gray-200 hover:border-blue-500 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all shadow-sm">
-                      Conectar Google
-                    </a>
+                    <div class="flex-1 text-center sm:text-left">
+                      <h3 class="text-sm font-black text-gray-900 dark:text-gray-100 uppercase tracking-widest">Google Calendar & Drive</h3>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 font-bold mt-1 leading-relaxed">Sincronize sua agenda e arquive orçamentos automaticamente.</p>
+                    </div>
+                    <div class="shrink-0 w-full sm:w-auto">
+                      <span v-if="!integrationGoogleDriveCalendarStatus" class="inline-flex items-center justify-center px-6 py-3 bg-gray-100 dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 cursor-not-allowed">
+                        Em breve
+                      </span>
+                      <div v-else-if="localProfile.googleIntegration?.email" class="flex flex-col items-center sm:items-end gap-2">
+                        <span class="text-[10px] font-black text-green-600 dark:text-green-400 uppercase tracking-widest bg-green-50 dark:bg-green-950/40 px-3 py-1 rounded-full">Conectado: {{ localProfile.googleIntegration.email }}</span>
+                        <BaseButton variant="ghost" size="sm" @click="disconnectGoogle" class="text-[10px] text-red-400 hover:text-red-600">Desconectar</BaseButton>
+                      </div>
+                      <a v-else href="/api/integrations/google/connect" class="inline-flex items-center justify-center px-6 py-3 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-700 dark:text-gray-200 hover:border-blue-500 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all shadow-sm">
+                        Conectar Google
+                      </a>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </BaseSectionCard>
-          </div>
+              </BaseSectionCard>
 
-          <!-- Regras de Negócio -->
-          <div :class="activeSection === 'negocio' ? 'block' : 'hidden lg:block'">
-            <BaseSectionCard id="negocio" data-tour="config-regras-negocio" title="Regras de Negócio" :icon="Briefcase" icon-bg-class="bg-emerald-50 dark:bg-emerald-950/50" icon-color-class="text-emerald-600 dark:text-emerald-400">
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <BaseInput
-                  v-model.number="localProfile.defaultValidityDays"
-                  label="Validade Padrão"
-                  type="number"
-                  suffix="dias"
-                />
-                <BaseInput
-                  v-model.number="localProfile.defaultInstallments"
-                  label="Parcelamento (Cartão)"
-                  type="number"
-                  suffix="x"
-                />
-                <BaseInput
-                  v-model.number="localProfile.defaultCashDiscount"
-                  label="Desconto (À Vista)"
-                  type="number"
-                  suffix="%"
-                />
-              </div>
-            </BaseSectionCard>
-          </div>
-
-          <!-- Modelos Legais -->
-          <div :class="activeSection === 'modelos' ? 'block' : 'hidden lg:block'">
-          <SettingsTemplates
-            v-model:contractTemplate="localProfile.defaultContractTemplate"
-            v-model:termsAndConditions="localProfile.defaultTermsAndConditions"
-          />
-          </div>
-
-          <!-- Privacidade e Dados -->
-          <div :class="activeSection === 'privacidade' ? 'block' : 'hidden lg:block'">
-            <BaseSectionCard id="privacidade" data-tour="config-privacidade" title="Privacidade e Dados" :icon="Shield" icon-bg-class="bg-red-50 dark:bg-red-950/50" icon-color-class="text-red-600 dark:text-red-400">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="p-8 bg-gray-50/50 dark:bg-gray-950/50 rounded-3xl border border-gray-100 dark:border-gray-800 space-y-4">
-                  <h3 class="text-sm font-black text-gray-900 dark:text-gray-100 uppercase tracking-widest">Backup Completo</h3>
-                  <p class="text-sm text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
-                    Exporte todos os seus dados cadastrados (Clientes, Catálogo, Orçamentos e Agenda) em formato JSON. O arquivo será enviado para o seu e-mail.
-                  </p>
-                  <BaseButton 
-                    variant="secondary" 
-                    size="sm" 
-                    class="w-full sm:w-auto" 
-                    :disabled="isExporting" 
-                    :loading="isExporting"
-                    @click="exportData"
-                  >
-                    {{ isExporting ? 'Processando...' : 'Exportar Meus Dados' }}
-                  </BaseButton>
+              <!-- Regras de Negócio -->
+              <BaseSectionCard 
+                v-else-if="activeSection === 'negocio'" 
+                id="negocio" 
+                data-tour="config-regras-negocio" 
+                title="Regras de Negócio" 
+                :icon="Briefcase" 
+                icon-bg-class="bg-emerald-50 dark:bg-emerald-950/50" 
+                icon-color-class="text-emerald-600 dark:text-emerald-400"
+              >
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <BaseInput
+                    v-model.number="localProfile.defaultValidityDays"
+                    label="Validade Padrão"
+                    type="number"
+                    suffix="dias"
+                  />
+                  <BaseInput
+                    v-model.number="localProfile.defaultInstallments"
+                    label="Parcelamento (Cartão)"
+                    type="number"
+                    suffix="x"
+                  />
+                  <BaseInput
+                    v-model.number="localProfile.defaultCashDiscount"
+                    label="Desconto (À Vista)"
+                    type="number"
+                    suffix="%"
+                  />
                 </div>
+              </BaseSectionCard>
 
-                <div class="p-8 bg-orange-50/30 dark:bg-orange-950/20 rounded-3xl border border-orange-100 dark:border-orange-900/30 space-y-4">
-                  <h3 class="text-sm font-black text-orange-900 dark:text-orange-300 uppercase tracking-widest">Resetar Dados</h3>
-                  <p class="text-sm text-orange-700/70 dark:text-orange-400/80 font-medium leading-relaxed">
-                    Apaga Clientes, Catálogo, Orçamentos e Relatórios. Sua conta, plano e créditos permanecem intactos. Ação irreversível.
-                  </p>
-                  <BaseButton
-                    variant="outline"
-                    size="sm"
-                    class="w-full sm:w-auto text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-900/50 hover:bg-orange-50 dark:hover:bg-orange-950/40"
-                    :disabled="isResetting"
-                    :loading="isResetting"
-                    @click="resetData"
-                  >
-                    {{ isResetting ? 'Resetando...' : 'Resetar Dados' }}
-                  </BaseButton>
+              <!-- Modelos Legais -->
+              <SettingsTemplates
+                v-else-if="activeSection === 'modelos'"
+                v-model:contractTemplate="localProfile.defaultContractTemplate"
+                v-model:termsAndConditions="localProfile.defaultTermsAndConditions"
+              />
+
+              <!-- Privacidade e Dados -->
+              <BaseSectionCard 
+                v-else-if="activeSection === 'privacidade'" 
+                id="privacidade" 
+                data-tour="config-privacidade" 
+                title="Privacidade e Dados" 
+                :icon="Shield" 
+                icon-bg-class="bg-red-50 dark:bg-red-950/50" 
+                icon-color-class="text-red-600 dark:text-red-400"
+              >
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div class="p-8 bg-gray-50/50 dark:bg-gray-950/50 rounded-3xl border border-gray-100 dark:border-gray-800 space-y-4">
+                    <h3 class="text-sm font-black text-gray-900 dark:text-gray-100 uppercase tracking-widest">Backup Completo</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
+                      Exporte todos os seus dados cadastrados (Clientes, Catálogo, Orçamentos e Agenda) em formato JSON. O arquivo será enviado para o seu e-mail.
+                    </p>
+                    <BaseButton 
+                      variant="secondary" 
+                      size="sm" 
+                      class="w-full sm:w-auto" 
+                      :disabled="isExporting" 
+                      :loading="isExporting"
+                      @click="exportData"
+                    >
+                      {{ isExporting ? 'Processando...' : 'Exportar Meus Dados' }}
+                    </BaseButton>
+                  </div>
+
+                  <div class="p-8 bg-orange-50/30 dark:bg-orange-950/20 rounded-3xl border border-orange-100 dark:border-orange-900/30 space-y-4">
+                    <h3 class="text-sm font-black text-orange-900 dark:text-orange-300 uppercase tracking-widest">Resetar Dados</h3>
+                    <p class="text-sm text-orange-700/70 dark:text-orange-400/80 font-medium leading-relaxed">
+                      Apaga Clientes, Catálogo, Orçamentos e Relatórios. Sua conta, plano e créditos permanecem intactos. Ação irreversível.
+                    </p>
+                    <BaseButton
+                      variant="outline"
+                      size="sm"
+                      class="w-full sm:w-auto text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-900/50 hover:bg-orange-50 dark:hover:bg-orange-950/40"
+                      :disabled="isResetting"
+                      :loading="isResetting"
+                      @click="resetData"
+                    >
+                      {{ isResetting ? 'Resetando...' : 'Resetar Dados' }}
+                    </BaseButton>
+                  </div>
+
+                  <div class="p-8 bg-red-50/30 dark:bg-red-950/20 rounded-3xl border border-red-100 dark:border-red-900/30 space-y-4">
+                    <h3 class="text-sm font-black text-red-900 dark:text-red-300 uppercase tracking-widest">Encerrar Conta</h3>
+                    <p class="text-sm text-red-700/70 dark:text-red-400/80 font-medium leading-relaxed">
+                      Ao excluir sua conta, todos os seus dados serão apagados permanentemente. Esta ação não pode ser desfeita.
+                    </p>
+                    <BaseButton 
+                      variant="outline" 
+                      size="sm" 
+                      class="w-full sm:w-auto text-red-600 dark:text-red-400 border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-950/40" 
+                      :disabled="isDeleting" 
+                      :loading="isDeleting"
+                      @click="deleteAccount"
+                    >
+                      {{ isDeleting ? 'Excluindo...' : 'Excluir Minha Conta' }}
+                    </BaseButton>
+                  </div>
                 </div>
-
-                <div class="p-8 bg-red-50/30 dark:bg-red-950/20 rounded-3xl border border-red-100 dark:border-red-900/30 space-y-4">
-                  <h3 class="text-sm font-black text-red-900 dark:text-red-300 uppercase tracking-widest">Encerrar Conta</h3>
-                  <p class="text-sm text-red-700/70 dark:text-red-400/80 font-medium leading-relaxed">
-                    Ao excluir sua conta, todos os seus dados serão apagados permanentemente. Esta ação não pode ser desfeita.
-                  </p>
-                  <BaseButton 
-                    variant="outline" 
-                    size="sm" 
-                    class="w-full sm:w-auto text-red-600 dark:text-red-400 border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-950/40" 
-                    :disabled="isDeleting" 
-                    :loading="isDeleting"
-                    @click="deleteAccount"
-                  >
-                    {{ isDeleting ? 'Excluindo...' : 'Excluir Minha Conta' }}
-                  </BaseButton>
-                </div>
-              </div>
-            </BaseSectionCard>
-          </div>
-
+              </BaseSectionCard>
+            </div>
+          </Transition>
         </div> <!-- end sections -->
       </div> <!-- end desktop flex -->
 
       <!-- Salvar (mobile) -->
       <div class="lg:hidden pt-6">
         <BaseButton type="button" :disabled="isSaving" :loading="isSaving" @click="updateProfile" class="w-full">
-          {{ isSaving ? 'Salvando...' : 'Salvar Todas as Configurações' }}
+          {{ isSaving ? 'Salvando...' : 'Salvar Configurações' }}
         </BaseButton>
       </div>
 

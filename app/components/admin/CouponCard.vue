@@ -46,15 +46,15 @@ defineEmits<{
     </div>
 
     <div class="flex items-center justify-end gap-1 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
-      <button @click="$emit('edit')" class="p-2 text-blue-500 hover:bg-blue-50 rounded-xl transition-all" title="Editar" aria-label="Editar cupom">
-        <Pencil class="w-5 h-5" />
-      </button>
-      <button v-if="coupon.active" @click="$emit('deactivate')" class="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all" title="Excluir (desativa)" aria-label="Desativar cupom">
-        <Trash2 class="w-5 h-5" />
-      </button>
-      <button v-else @click="$emit('reactivate')" class="p-2 text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all" title="Reativar" aria-label="Reativar cupom">
-        <RotateCcw class="w-5 h-5" />
-      </button>
+      <BaseButton variant="ghost" size="icon-sm" @click="$emit('edit')" class="text-blue-500 hover:text-blue-600" aria-label="Editar cupom" title="Editar">
+        <Pencil class="w-4 h-4" />
+      </BaseButton>
+      <BaseButton v-if="coupon.active" variant="ghost" size="icon-sm" @click="$emit('deactivate')" class="text-red-500 hover:text-red-600" aria-label="Desativar cupom" title="Excluir (desativa)">
+        <Trash2 class="w-4 h-4" />
+      </BaseButton>
+      <BaseButton v-else variant="ghost" size="icon-sm" @click="$emit('reactivate')" class="text-emerald-500 hover:text-emerald-600" aria-label="Reativar cupom" title="Reativar">
+        <RotateCcw class="w-4 h-4" />
+      </BaseButton>
     </div>
   </div>
 </template>

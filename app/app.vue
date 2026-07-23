@@ -23,14 +23,22 @@ onMounted(() => {
   initTracking()
 })
 
-function handleConfirm() {
-  if (options.value.onConfirm) options.value.onConfirm()
+async function handleConfirm() {
+  const onConfirm = options.value.onConfirm
   isOpen.value = false
+  if (onConfirm) {
+    await nextTick()
+    onConfirm()
+  }
 }
 
-function handleCancel() {
-  if (options.value.onCancel) options.value.onCancel()
+async function handleCancel() {
+  const onCancel = options.value.onCancel
   isOpen.value = false
+  if (onCancel) {
+    await nextTick()
+    onCancel()
+  }
 }
 </script>
 

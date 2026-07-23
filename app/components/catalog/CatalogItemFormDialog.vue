@@ -214,153 +214,141 @@ async function saveItem() {
       </div>
 
       <!-- Main Form Mode -->
-      <form v-else id="catalog-form" @submit.prevent="saveItem" class="space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-300 py-2">
+      <form v-else id="catalog-form" @submit.prevent="saveItem" class="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-300 py-2">
         
         <!-- Seção 1: Identidade Visual e Classificação -->
-        <div class="space-y-6">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center shrink-0">
-              <Package class="w-5 h-5 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div>
-              <h3 class="text-base font-black text-gray-900 dark:text-gray-50 uppercase tracking-tight">
-                Identidade e Classificação
-              </h3>
-              <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                Escolha a representação visual e o tipo do seu produto ou serviço.
-              </p>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-            
-            <!-- Identidade Visual (Ícone vs Foto) -->
-            <div class="space-y-2">
-              <div class="flex items-center justify-between min-h-[20px]">
-                <label class="text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">
-                  Amostra Visual
-                </label>
-                <div class="flex bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl w-[120px]">
-                  <button 
-                    type="button"
-                    @click="form.imageUrl = ''"
-                    :class="[!form.imageUrl ? 'bg-white dark:bg-gray-950 shadow-sm text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-400 dark:text-gray-500']"
-                    class="flex-1 px-2 py-1 rounded-lg text-[9px] font-black uppercase transition-all"
-                  >
-                    Ícone
-                  </button>
-                  <button 
-                    type="button"
-                    class="relative flex-1 px-2 py-1 rounded-lg text-[9px] font-black uppercase transition-all overflow-hidden"
-                    :class="[form.imageUrl ? 'bg-white dark:bg-gray-950 shadow-sm text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-400 dark:text-gray-500']"
-                  >
-                    Foto
-                    <input type="file" accept="image/*" @change="onFileChange" class="absolute inset-0 opacity-0 cursor-pointer">
-                  </button>
-                </div>
-              </div>
-
-              <!-- Preview de Imagem Enviada -->
-              <div v-if="form.imageUrl" class="relative group w-full h-[56px] bg-gray-50 dark:bg-gray-950 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-800 overflow-hidden flex items-center justify-center animate-in fade-in zoom-in-95 duration-200 shadow-sm">
-                <img :src="form.imageUrl" class="w-full h-full object-cover" loading="lazy">
-                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                  <label class="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center bg-white dark:bg-gray-800 rounded-xl text-gray-900 dark:text-white cursor-pointer hover:scale-105 transition-transform shadow-md">
-                    <Pencil class="w-4 h-4" />
-                    <input type="file" accept="image/*" @change="onFileChange" class="hidden">
-                  </label>
-                  <button type="button" @click="form.imageUrl = ''" class="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center bg-white dark:bg-gray-800 rounded-xl text-red-600 dark:text-red-400 hover:scale-105 transition-transform shadow-md">
-                    <Trash2 class="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+        <BaseSectionCard 
+          title="Identidade e Classificação"
+          subtitle="Escolha a representação visual e o tipo do seu produto ou serviço."
+          :icon="Package"
+        >
+          <div class="space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
               
-              <!-- Seletor de Ícones Padronizado -->
-              <div v-else class="w-full animate-in fade-in zoom-in-95 duration-200">
-                <BaseIconSelect v-model="form.icon" />
+              <!-- Identidade Visual (Ícone vs Foto) -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between min-h-[20px]">
+                  <label class="text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">
+                    Amostra Visual
+                  </label>
+                  <div class="flex bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl w-[120px]">
+                    <button 
+                      type="button"
+                      @click="form.imageUrl = ''"
+                      :class="[!form.imageUrl ? 'bg-white dark:bg-gray-950 shadow-sm text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-400 dark:text-gray-500']"
+                      class="flex-1 px-2 py-1 rounded-lg text-[9px] font-black uppercase transition-all"
+                    >
+                      Ícone
+                    </button>
+                    <button 
+                      type="button"
+                      class="relative flex-1 px-2 py-1 rounded-lg text-[9px] font-black uppercase transition-all overflow-hidden"
+                      :class="[form.imageUrl ? 'bg-white dark:bg-gray-950 shadow-sm text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-400 dark:text-gray-500']"
+                    >
+                      Foto
+                      <input type="file" accept="image/*" @change="onFileChange" class="absolute inset-0 opacity-0 cursor-pointer">
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Preview de Imagem Enviada -->
+                <div v-if="form.imageUrl" class="relative group w-full h-[56px] bg-gray-50 dark:bg-gray-950 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-800 overflow-hidden flex items-center justify-center animate-in fade-in zoom-in-95 duration-200 shadow-sm">
+                  <img :src="form.imageUrl" class="w-full h-full object-cover" loading="lazy">
+                  <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <label class="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center bg-white dark:bg-gray-800 rounded-xl text-gray-900 dark:text-white cursor-pointer hover:scale-105 transition-transform shadow-md">
+                      <Pencil class="w-4 h-4" />
+                      <input type="file" accept="image/*" @change="onFileChange" class="hidden">
+                    </label>
+                    <BaseButton type="button" variant="danger" size="icon-sm" @click="form.imageUrl = ''" aria-label="Remover Foto">
+                      <Trash2 class="w-4 h-4" />
+                    </BaseButton>
+                  </div>
+                </div>
+                
+                <!-- Seletor de Ícones Padronizado -->
+                <div v-else class="w-full animate-in fade-in zoom-in-95 duration-200">
+                  <BaseIconSelect v-model="form.icon" />
+                </div>
+              </div>
+
+              <!-- Tipo de Item e SKU -->
+              <div class="space-y-4">
+                <BaseSelect 
+                  v-model="form.type" 
+                  label="Tipo de Item *" 
+                  :options="typeOptions" 
+                  :icon="Layers"
+                  required
+                />
+                <BaseInput 
+                  v-model="form.sku" 
+                  label="SKU / Cód. (Opcional)" 
+                  placeholder="Ex: SRV-001" 
+                  :icon="Tag"
+                />
               </div>
             </div>
 
-            <!-- Tipo de Item e SKU -->
-            <div class="space-y-4">
-              <BaseSelect 
-                v-model="form.type" 
-                label="Tipo de Item *" 
-                :options="typeOptions" 
-                :icon="Layers"
-                required
-              />
-              <BaseInput 
-                v-model="form.sku" 
-                label="SKU / Cód. (Opcional)" 
-                placeholder="Ex: SRV-001" 
-                :icon="Tag"
-              />
-            </div>
-          </div>
-
-          <!-- Nome Comercial do Item -->
-          <BaseInput 
-            v-model="form.name" 
-            label="Nome Comercial do Item *" 
-            placeholder="Ex: Desenvolvimento de Website Institucional" 
-            required 
-          />
-        </div>
-
-        <!-- Seção 2: Preços e Descrição Comercial -->
-        <div class="space-y-6 pt-6 border-t border-gray-100 dark:border-gray-800">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center shrink-0">
-              <DollarSign class="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <div>
-              <h3 class="text-base font-black text-gray-900 dark:text-gray-50 uppercase tracking-tight">
-                Valores e Detalhes Comerciais
-              </h3>
-              <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                Defina o valor base e descreva os detalhes que aparecerão na proposta.
-              </p>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Nome Comercial do Item -->
             <BaseInput 
-              v-model="form.price" 
-              label="Preço Base (R$) *" 
-              mask="currency"
+              v-model="form.name" 
+              label="Nome Comercial do Item *" 
+              placeholder="Ex: Desenvolvimento de Website Institucional" 
               required 
             />
-            <BaseSelect 
-              v-model="form.unit" 
-              label="Unidade de Medida" 
-              :options="unitOptions" 
-            />
           </div>
+        </BaseSectionCard>
 
-          <!-- Descrição Comercial + Sugestão Inteligente com IA -->
-          <div class="space-y-2">
-            <div class="flex justify-between items-center px-1">
-              <label class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest">
-                Descrição Comercial
-              </label>
-              <button
-                type="button"
-                @click="suggestWithAI"
-                :disabled="isSuggesting || !form.name.trim()"
-                class="px-3 py-1.5 rounded-xl bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/60 font-black text-[10px] uppercase tracking-wider transition-all flex items-center gap-1.5 disabled:opacity-40 disabled:pointer-events-none"
-              >
-                <Loader2 v-if="isSuggesting" class="w-3.5 h-3.5 animate-spin" />
-                <!-- <Sparkles v-else class="w-3.5 h-3.5" /> -->
-                <!-- {{ creditLabel('catalogSuggest', 'Gerar Descrição com IA') }} -->
-              </button>
+        <!-- Seção 2: Preços e Descrição Comercial -->
+        <BaseSectionCard
+          title="Valores e Detalhes Comerciais"
+          subtitle="Defina o valor base e descreva os detalhes que aparecerão na proposta."
+          :icon="DollarSign"
+          icon-bg-class="bg-emerald-50 dark:bg-emerald-950/50"
+          icon-color-class="text-emerald-600 dark:text-emerald-400"
+        >
+          <div class="space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <BaseInput 
+                v-model="form.price" 
+                label="Preço Base (R$) *" 
+                mask="currency"
+                required 
+              />
+              <BaseSelect 
+                v-model="form.unit" 
+                label="Unidade de Medida" 
+                :options="unitOptions" 
+              />
             </div>
-            <BaseTextarea 
-              v-model="form.description" 
-              :rows="4" 
-              placeholder="Descreva em detalhes o que está incluído neste produto ou serviço..."
-            />
+
+            <!-- Descrição Comercial + Sugestão Inteligente com IA -->
+            <div class="space-y-2">
+              <div class="flex justify-between items-center px-1">
+                <label class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest">
+                  Descrição Comercial
+                </label>
+                <BaseButton
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  @click="suggestWithAI"
+                  :disabled="isSuggesting || !form.name.trim()"
+                  class="text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/40 font-black text-[10px] uppercase tracking-wider"
+                >
+                  <Loader2 v-if="isSuggesting" class="w-3.5 h-3.5 animate-spin mr-1" />
+                  <Sparkles v-else class="w-3.5 h-3.5 mr-1" />
+                  {{ creditLabel('catalogSuggest', 'Gerar Descrição com IA') }}
+                </BaseButton>
+              </div>
+              <BaseTextarea 
+                v-model="form.description" 
+                :rows="4" 
+                placeholder="Descreva em detalhes o que está incluído neste produto ou serviço..."
+              />
+            </div>
           </div>
-        </div>
+        </BaseSectionCard>
       </form>
 
       <!-- Rodapé do Modal -->

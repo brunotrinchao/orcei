@@ -99,11 +99,15 @@ onUnmounted(() => {
                 {{ description || title }}
               </DialogDescription>
             </div>
-            <DialogClose
-              class="ml-4 flex-shrink-0 rounded-xl p-2 text-gray-400 dark:text-gray-500 opacity-70 transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white hover:opacity-100 outline-none focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700"
-            >
-              <X class="h-5 w-5" />
-              <span class="sr-only">Fechar</span>
+            <DialogClose as-child>
+              <BaseButton
+                variant="ghost"
+                size="icon-sm"
+                class="ml-4 shrink-0"
+                aria-label="Fechar"
+              >
+                <X class="h-5 w-5" />
+              </BaseButton>
             </DialogClose>
           </div>
 

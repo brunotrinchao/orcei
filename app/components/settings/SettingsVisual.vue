@@ -74,13 +74,14 @@ async function cropLogo() {
         />
       </div>
       <div class="flex justify-end gap-3">
-        <button
+        <BaseButton
           type="button"
+          variant="ghost"
+          size="sm"
           @click="resetCropper()"
-          class="px-6 py-3 text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest hover:text-gray-900 dark:hover:text-gray-100 transition-all outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
         >
           Cancelar
-        </button>
+        </BaseButton>
         <BaseButton type="button" :disabled="isSaving" :loading="isSaving" @click="cropLogo">Confirmar Corte</BaseButton>
       </div>
     </div>

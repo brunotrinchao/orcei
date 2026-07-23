@@ -37,15 +37,15 @@ defineEmits<{
     </div>
 
     <div class="flex items-center justify-end gap-1 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
-      <button @click="$emit('adjust-credits')" class="p-2 text-blue-500 hover:bg-blue-50 rounded-xl transition-all" title="Ajustar Créditos" aria-label="Ajustar créditos">
-        <CreditCard class="w-5 h-5" />
-      </button>
-      <button v-if="user.role !== 'admin'" :disabled="isImpersonating" @click="$emit('impersonate')" class="p-2 text-amber-500 hover:bg-amber-50 rounded-xl transition-all disabled:opacity-50" title="Personificar Usuário" aria-label="Personificar usuário">
-        <LogIn class="w-5 h-5" />
-      </button>
-      <button v-if="user.role === 'admin'" class="p-2 text-red-500 bg-red-50 dark:bg-red-900/20 rounded-xl" title="Administrador" aria-label="Administrador">
-        <Shield class="w-5 h-5" />
-      </button>
+      <BaseButton variant="ghost" size="icon-sm" @click="$emit('adjust-credits')" class="text-blue-500 hover:text-blue-600" aria-label="Ajustar créditos" title="Ajustar Créditos">
+        <CreditCard class="w-4 h-4" />
+      </BaseButton>
+      <BaseButton v-if="user.role !== 'admin'" variant="ghost" size="icon-sm" :disabled="isImpersonating" @click="$emit('impersonate')" class="text-amber-500 hover:text-amber-600" aria-label="Personificar usuário" title="Personificar Usuário">
+        <LogIn class="w-4 h-4" />
+      </BaseButton>
+      <BaseButton v-if="user.role === 'admin'" variant="ghost" size="icon-sm" class="text-red-500" aria-label="Administrador" title="Administrador">
+        <Shield class="w-4 h-4" />
+      </BaseButton>
     </div>
   </div>
 </template>

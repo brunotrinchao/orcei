@@ -42,12 +42,12 @@ defineEmits<{
     </div>
 
     <div class="flex items-center justify-end gap-1 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
-      <button @click="$emit('edit')" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-xl transition-all" title="Editar" aria-label="Editar item">
-        <Pencil class="w-5 h-5" />
-      </button>
-      <button @click="$emit('delete')" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-all" title="Excluir" aria-label="Excluir item">
-        <Trash2 class="w-5 h-5" />
-      </button>
+      <BaseButton variant="ghost" size="icon-sm" @click="$emit('edit')" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" aria-label="Editar item" title="Editar">
+        <Pencil class="w-4 h-4" />
+      </BaseButton>
+      <BaseButton variant="ghost" size="icon-sm" @click="$emit('delete')" class="text-gray-400 hover:text-red-600 dark:hover:text-red-400" aria-label="Excluir item" title="Excluir">
+        <Trash2 class="w-4 h-4" />
+      </BaseButton>
     </div>
   </div>
 </template>

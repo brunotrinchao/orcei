@@ -1,7 +1,7 @@
 <!-- app/components/proposal/ProposalStepClient.vue -->
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Sparkles, Loader2 } from 'lucide-vue-next'
+import { Sparkles, Loader2, User } from 'lucide-vue-next'
 
 const props = defineProps<{
   form: any
@@ -28,22 +28,28 @@ const internalSelectedClient = computed({
 })
 
 const internalSearch = computed({
-  get: () => props.clientSearch,
+  get: () => props.clientSearch || '',
   set: (val) => emit('update:clientSearch', val)
 })
 
 function onClientSelect(clientId: string | undefined) {
   internalSelectedClient.value = clientId || ''
-  if (!clientId) return
-  const client = props.clients.find((c: any) => c._id === clientId)
-  if (client) {
-    props.form.client.name = client.name
-    props.form.client.email = client.email
-    props.form.client.phone = client.phone || ''
+  if (!clientId) {
+    props.form.client.name = ''
+    props.form.client.email = ''
+    props.form.client.phone = ''
+    return
+  }
+
+  const found = props.clients.find((c: any) => c._id === clientId)
+  if (found) {
+    props.form.client.name = found.name
+    props.form.client.email = found.email
+    props.form.client.phone = found.phone || ''
   }
 }
 
-// Controle do Extrator Cognitivo de Leads com IA
+// Extrator de Leads com IA
 const isAIExtractOpen = ref(false)
 const rawLeadText = ref('')
 const isExtracting = ref(false)
@@ -51,42 +57,40 @@ const { notify } = useAlerts()
 
 async function extractClient() {
   if (!rawLeadText.value.trim()) return
-  
+
   isExtracting.value = true
   try {
-    // 1. Chamar o serviço de extração com IA
-    const extractedData: any = await $fetch('/api/ai/client-extract', {
+    const data: any = await $fetch('/api/ai/extract-client', {
       method: 'POST',
       body: { text: rawLeadText.value }
     })
-    
-    if (!extractedData.name) {
-      throw new Error('Não foi possível identificar o nome do cliente. Tente detalhar mais.')
+
+    if (!data.name || !data.email) {
+      notify('Extração Parcial', 'A IA não conseguiu identificar nome e e-mail com clareza. Verifique o texto.')
+      return
     }
-    
-    // 2. Criar o cliente no banco de dados automaticamente
+
+    // Tenta salvar/cadastrar o cliente extraído via API
     const createdClient: any = await $fetch('/api/clients', {
       method: 'POST',
       body: {
-        name: extractedData.name,
-        email: extractedData.email || `${extractedData.name.toLowerCase().replace(/\s+/g, '')}@empresa.com`,
-        phone: extractedData.phone || ''
+        name: data.name,
+        email: data.email,
+        phone: data.phone || '',
+        notes: `Importado via IA em ${new Date().toLocaleDateString('pt-BR')}`
       }
     })
-    
-    // 3. Selecionar o cliente recém-criado e preencher o formulário
+
     emit('update:selectedClientId', createdClient._id || createdClient.id)
     props.form.client.name = createdClient.name
     props.form.client.email = createdClient.email
     props.form.client.phone = createdClient.phone || ''
-    
-    // Feedback de Sucesso e Fechamento
-    notify('Sucesso', 'Lead extraído e cliente cadastrado com sucesso!')
+
+    notify('Cliente Cadastrado!', `${createdClient.name} foi extraído e selecionado automaticamente.`)
     isAIExtractOpen.value = false
     rawLeadText.value = ''
   } catch (e: any) {
-    console.error('Extraction client error:', e)
-    notify('Erro na Extração', e.message || e.data?.statusMessage || 'Erro ao processar dados com IA.')
+    notify('Erro', e.data?.statusMessage || 'Não foi possível extrair os dados do cliente com IA.')
   } finally {
     isExtracting.value = false
   }
@@ -100,21 +104,21 @@ async function extractClient() {
       <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Comece dando um nome ao seu projeto e identificando o cliente.</p>
     </div>
 
-    <div class="space-y-6">
-      
-      <div class="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-800">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <label class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Dados do Cliente</label>
-          <button 
-            type="button"
-            @click="isAIExtractOpen = !isAIExtractOpen"
-            class="px-4 py-2 text-[10px] font-black uppercase tracking-wider text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/30 rounded-xl hover:bg-violet-100/80 transition-all inline-flex items-center justify-center gap-1.5 shrink-0 self-start sm:self-auto"
-          >
-            <Sparkles class="w-3.5 h-3.5 shrink-0" />
-            {{ isAIExtractOpen ? 'Buscar Cadastrado' : 'Importar Conversa/E-mail com IA' }}
-          </button>
-        </div>
-        
+    <BaseSectionCard title="Dados do Cliente" :icon="User">
+      <template #header-actions>
+        <BaseButton 
+          type="button"
+          variant="ghost"
+          size="sm"
+          @click="isAIExtractOpen = !isAIExtractOpen"
+          class="text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/30"
+        >
+          <Sparkles class="w-3.5 h-3.5 mr-1 shrink-0" />
+          {{ isAIExtractOpen ? 'Buscar Cadastrado' : 'Importar Conversa/E-mail com IA' }}
+        </BaseButton>
+      </template>
+
+      <div class="space-y-6">
         <!-- Extrator de Leads com IA (Design Glassmorphic/Premium) -->
         <div v-if="isAIExtractOpen" class="space-y-4 p-6 bg-gradient-to-br from-violet-50 to-fuchsia-50/50 dark:from-violet-950/20 dark:to-fuchsia-950/10 border border-violet-100/50 dark:border-violet-900/30 rounded-3xl animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div class="flex items-start gap-3">
@@ -135,7 +139,7 @@ async function extractClient() {
               type="button" 
               @click="extractClient" 
               :disabled="!rawLeadText.trim() || isExtracting"
-              class="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-black text-xs uppercase tracking-wider px-6 py-3 rounded-xl shadow-lg shadow-violet-500/20 active:scale-98 transition-all"
+              class="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white"
             >
               <Loader2 v-if="isExtracting" class="w-4 h-4 animate-spin mr-2" />
               <Sparkles v-else class="w-4 h-4 mr-2" />
@@ -163,6 +167,6 @@ async function extractClient() {
           <BaseInput v-model="form.client.phone" label="WhatsApp" readonly disabled />
         </div>
       </div>
-    </div>
+    </BaseSectionCard>
   </div>
 </template>

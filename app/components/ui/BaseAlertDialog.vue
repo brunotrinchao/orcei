@@ -61,24 +61,26 @@ const emit = defineEmits(['update:open', 'confirm', 'cancel'])
           <AlertDialogDescription v-if="description" class="text-sm text-gray-500 dark:text-gray-400 font-medium leading-relaxed mb-8" v-html="description" />
 
           <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
-            <AlertDialogCancel 
-              v-if="cancelText"
-              @click="emit('cancel')"
-              class="px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all border border-transparent dark:border-gray-700"
-            >
-              {{ cancelText }}
+            <AlertDialogCancel v-if="cancelText" as-child>
+              <BaseButton 
+                type="button"
+                variant="ghost"
+                size="sm"
+                @click="emit('cancel')"
+              >
+                {{ cancelText }}
+              </BaseButton>
             </AlertDialogCancel>
             
-            <AlertDialogAction 
-              @click="emit('confirm')"
-              :class="[
-                'px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg',
-                variant === 'destructive' 
-                  ? 'bg-red-500 text-white hover:bg-red-600 shadow-red-100 dark:shadow-none' 
-                  : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-black dark:hover:bg-gray-100 shadow-gray-100 dark:shadow-none'
-              ]"
-            >
-              {{ actionText }}
+            <AlertDialogAction as-child>
+              <BaseButton 
+                type="button"
+                :variant="variant === 'destructive' ? 'danger' : 'solid'"
+                size="sm"
+                @click="emit('confirm')"
+              >
+                {{ actionText }}
+              </BaseButton>
             </AlertDialogAction>
           </div>
         </AlertDialogContent>

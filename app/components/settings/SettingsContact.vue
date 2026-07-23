@@ -36,13 +36,15 @@ function removePhone(index: number) {
       <div class="space-y-4">
         <div class="flex justify-between items-center px-1">
           <label class="text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest">Telefones</label>
-          <button
+          <BaseButton
             type="button"
+            variant="ghost"
+            size="sm"
             @click="addPhone"
-            class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest flex items-center gap-1 hover:text-blue-700 dark:hover:text-blue-300 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+            class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest hover:text-blue-700 dark:hover:text-blue-300"
           >
-            <Plus class="w-3 h-3" /> Adicionar
-          </button>
+            <Plus class="w-3 h-3 mr-1" /> Adicionar
+          </BaseButton>
         </div>
         <div v-for="(phone, idx) in localContact.phones" :key="idx" class="flex flex-col sm:flex-row gap-4 p-6 bg-gray-50/50 dark:bg-gray-950/50 rounded-3xl border border-gray-100 dark:border-gray-800">
           <div class="flex-1">
@@ -55,15 +57,18 @@ function removePhone(index: number) {
                 <img :src="'/images/icons/whatsapp-svg.svg'" class="w-3 h-3" alt="WhatsApp" loading="lazy"/> WhatsApp
               </label>
             </div>
-            <button
+            <BaseButton
               v-if="localContact.phones.length > 1"
               type="button"
+              variant="ghost"
+              size="icon-sm"
               @click="removePhone(idx)"
-              class="p-2 text-red-400 hover:text-red-600 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded-xl"
+              class="text-red-400 hover:text-red-600"
               title="Remover telefone"
+              aria-label="Remover telefone"
             >
               <Trash2 class="w-4 h-4" />
-            </button>
+            </BaseButton>
           </div>
         </div>
       </div>

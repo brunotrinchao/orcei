@@ -60,24 +60,26 @@ const localTermsAndConditions = computed({
   <BaseSectionCard id="modelos" title="Modelos Legais" :icon="FileText" icon-bg-class="bg-purple-50 dark:bg-purple-950/50" icon-color-class="text-purple-600 dark:text-purple-400">
 
     <div class="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-2xl mb-8 max-w-sm">
-      <button
+      <BaseButton
         type="button"
         data-tour="config-modelo-contrato"
         @click="activeTab = 'contract'"
-        :class="activeTab === 'contract' ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-50 shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'"
-        class="flex-1 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
+        :variant="activeTab === 'contract' ? 'solid' : 'ghost'"
+        size="sm"
+        class="flex-1"
       >
         Contrato
-      </button>
-      <button
+      </BaseButton>
+      <BaseButton
         type="button"
         data-tour="config-modelo-termos"
         @click="activeTab = 'terms'"
-        :class="activeTab === 'terms' ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-50 shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'"
-        class="flex-1 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
+        :variant="activeTab === 'terms' ? 'solid' : 'ghost'"
+        size="sm"
+        class="flex-1"
       >
         Termos
-      </button>
+      </BaseButton>
     </div>
 
     <!-- Lista de Variáveis Dinâmicas -->

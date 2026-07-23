@@ -132,16 +132,12 @@ function isItemSelected(item: any) {
     </div>
 
     <!-- Escopo Principal -->
-    <div class="space-y-4 relative z-0">
-      <h3 class="text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1 flex justify-between">
-        <span>Itens Obrigatórios ({{ form.items.length }})</span>
-      </h3>
-      
+    <BaseSectionCard :title="`Itens Obrigatórios (${form.items.length})`">
       <div v-if="form.items.length === 0" class="p-8 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-3xl text-center text-gray-400 dark:text-gray-500 font-medium">
         Adicione itens buscando no catálogo acima ou clicando em "Novo".
       </div>
 
-      <div class="space-y-3">
+      <div v-else class="space-y-3">
         <div 
           v-for="(item, idx) in form.items" 
           :key="'item_'+idx" 
@@ -180,16 +176,16 @@ function isItemSelected(item: any) {
 
             <!-- Ações -->
             <div class="flex items-center gap-1 shrink-0 ml-2">
-              <button @click="toggleItemExpansion(idx)" type="button" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors" title="Editar Descrição">
-                <ChevronUp v-if="expandedItemIdx === idx" class="w-5 h-5" />
-                <ChevronDown v-else class="w-5 h-5" />
-              </button>
-              <button @click="moveToUpsell(idx)" type="button" class="hidden sm:flex p-2.5 min-h-[44px] min-w-[44px] items-center justify-center text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-lg transition-colors" title="Mover para Opcionais">
+              <BaseButton variant="ghost" size="icon-sm" @click="toggleItemExpansion(idx)" type="button" aria-label="Editar Descrição">
+                <ChevronUp v-if="expandedItemIdx === idx" class="w-4 h-4" />
+                <ChevronDown v-else class="w-4 h-4" />
+              </BaseButton>
+              <BaseButton variant="ghost" size="icon-sm" @click="moveToUpsell(idx)" type="button" class="hidden sm:inline-flex text-blue-400 hover:text-blue-600 dark:hover:text-blue-300" aria-label="Mover para Opcionais">
                 <ArrowDown class="w-4 h-4" />
-              </button>
-              <button @click="form.items.splice(idx, 1)" type="button" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-red-300 dark:text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors" title="Remover Item">
+              </BaseButton>
+              <BaseButton variant="ghost" size="icon-sm" @click="form.items.splice(idx, 1)" type="button" class="text-red-400 hover:text-red-600" aria-label="Remover Item">
                 <Trash2 class="w-4 h-4" />
-              </button>
+              </BaseButton>
             </div>
           </div>
 
@@ -211,21 +207,22 @@ function isItemSelected(item: any) {
               </div>
               <div class="flex sm:hidden justify-between items-center mt-2">
                 <span class="text-sm font-black text-gray-900 dark:text-gray-50">Total: R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-                <button @click="moveToUpsell(idx)" type="button" class="text-xs font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">
+                <BaseButton variant="ghost" size="sm" @click="moveToUpsell(idx)" type="button" class="text-blue-600 dark:text-blue-400">
                   Tornar Opcional
-                </button>
+                </BaseButton>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </BaseSectionCard>
 
     <!-- Escopo Opcional (Upsell) -->
-    <div v-if="form.upsellItems.length > 0" class="space-y-4 pt-6 border-t border-gray-100 dark:border-gray-800 relative z-0">
-      <h3 class="text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Itens Opcionais (Upsell)</h3>
-      <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 ml-1 mb-4 uppercase tracking-widest">O cliente pode aceitar ou recusar no momento da aprovação.</p>
-      
+    <BaseSectionCard 
+      v-if="form.upsellItems.length > 0"
+      title="Itens Opcionais (Upsell)"
+      subtitle="O cliente pode aceitar ou recusar no momento da aprovação."
+    >
       <div class="space-y-3">
         <div 
           v-for="(item, idx) in form.upsellItems" 
@@ -264,16 +261,16 @@ function isItemSelected(item: any) {
             </div>
 
             <div class="flex items-center gap-1 shrink-0 ml-2">
-              <button @click="toggleItemExpansion(idx, true)" type="button" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 dark:text-gray-500 hover:bg-white dark:hover:bg-gray-800 rounded-lg transition-colors" title="Editar Descrição">
-                <ChevronUp v-if="expandedUpsellIdx === idx" class="w-5 h-5" />
-                <ChevronDown v-else class="w-5 h-5" />
-              </button>
-              <button @click="moveToItems(idx)" type="button" class="hidden sm:flex p-2.5 min-h-[44px] min-w-[44px] items-center justify-center text-green-500 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-950/40 rounded-lg transition-colors" title="Tornar Obrigatório">
+              <BaseButton variant="ghost" size="icon-sm" @click="toggleItemExpansion(idx, true)" type="button" aria-label="Editar Descrição">
+                <ChevronUp v-if="expandedUpsellIdx === idx" class="w-4 h-4" />
+                <ChevronDown v-else class="w-4 h-4" />
+              </BaseButton>
+              <BaseButton variant="ghost" size="icon-sm" @click="moveToItems(idx)" type="button" class="hidden sm:inline-flex text-green-500 hover:text-green-600" aria-label="Tornar Obrigatório">
                 <Plus class="w-4 h-4" />
-              </button>
-              <button @click="form.upsellItems.splice(idx, 1)" type="button" class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-red-300 dark:text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors" title="Remover Opcional">
+              </BaseButton>
+              <BaseButton variant="ghost" size="icon-sm" @click="form.upsellItems.splice(idx, 1)" type="button" class="text-red-400 hover:text-red-600" aria-label="Remover Opcional">
                 <Trash2 class="w-4 h-4" />
-              </button>
+              </BaseButton>
             </div>
           </div>
 
@@ -295,15 +292,15 @@ function isItemSelected(item: any) {
               </div>
               <div class="flex sm:hidden justify-between items-center mt-2">
                 <span class="text-sm font-black text-gray-900 dark:text-gray-50">Total: R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-                <button @click="moveToItems(idx)" type="button" class="text-xs font-black text-green-600 dark:text-green-400 uppercase tracking-widest">
+                <BaseButton variant="ghost" size="sm" @click="moveToItems(idx)" type="button" class="text-green-600 dark:text-green-400">
                   Tornar Obrigatório
-                </button>
+                </BaseButton>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </BaseSectionCard>
     <!-- Modal para criar novo item no catálogo diretamente daqui -->
     <CatalogItemFormDialog 
       v-model:open="showCatalogItemFormDialog"

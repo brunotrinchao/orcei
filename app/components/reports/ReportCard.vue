@@ -27,15 +27,15 @@ defineEmits<{
     </span>
 
     <div class="flex items-center justify-end gap-1 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
-      <button @click="$emit('view')" class="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-xl transition-all" title="Visualizar" aria-label="Visualizar relatório">
-        <Eye class="w-5 h-5" />
-      </button>
-      <button @click="$emit('download')" class="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-xl transition-all" title="Download PDF" aria-label="Download PDF">
-        <Download class="w-5 h-5" />
-      </button>
-      <button @click="$emit('delete')" class="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-all" title="Excluir" aria-label="Excluir relatório">
-        <Trash2 class="w-5 h-5" />
-      </button>
+      <BaseButton variant="ghost" size="icon-sm" @click="$emit('view')" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" aria-label="Visualizar relatório" title="Visualizar">
+        <Eye class="w-4 h-4" />
+      </BaseButton>
+      <BaseButton variant="ghost" size="icon-sm" @click="$emit('download')" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" aria-label="Download PDF" title="Download PDF">
+        <Download class="w-4 h-4" />
+      </BaseButton>
+      <BaseButton variant="ghost" size="icon-sm" @click="$emit('delete')" class="text-gray-400 hover:text-red-600 dark:hover:text-red-400" aria-label="Excluir relatório" title="Excluir">
+        <Trash2 class="w-4 h-4" />
+      </BaseButton>
     </div>
   </div>
 </template>

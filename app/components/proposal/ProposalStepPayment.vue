@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { SendMethod } from '../../../types/enums'
+import { CreditCard } from 'lucide-vue-next'
 
 const props = defineProps<{
   form: any
@@ -16,48 +17,50 @@ const props = defineProps<{
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
       <div class="space-y-8">
-        <div class="bg-gray-50 dark:bg-gray-900 p-6 md:p-8 rounded-[3rem] space-y-6 border border-gray-100 dark:border-gray-800">
-          <h3 class="text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest">Execução & Pagamento</h3>
-          
-          <div class="space-y-3">
-            <BaseDateTimePicker 
-              v-model="form.executionDate" 
-              label="Data de Execução (Opcional)"
-              description="Sincroniza com Google Agenda se conectado."
-            />
-          </div>
+        <BaseSectionCard title="Execução & Pagamento" :icon="CreditCard">
+          <div class="space-y-6">
+            <div class="space-y-3">
+              <BaseDateTimePicker 
+                v-model="form.executionDate" 
+                label="Data de Execução (Opcional)"
+                description="Sincroniza com Google Agenda se conectado."
+              />
+            </div>
 
-          <div class="grid grid-cols-2 gap-4">
-            <BaseInput v-model.number="form.paymentConfig.installments" label="Max. Parcelas" type="number" />
-            <BaseInput v-model.number="form.paymentConfig.cashDiscount" label="Desc. À Vista (%)" type="number" />
-          </div>
+            <div class="grid grid-cols-2 gap-4">
+              <BaseInput v-model.number="form.paymentConfig.installments" label="Max. Parcelas" type="number" />
+              <BaseInput v-model.number="form.paymentConfig.cashDiscount" label="Desc. À Vista (%)" type="number" />
+            </div>
 
-          <div class="space-y-3">
-            <label class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Método de Envio</label>
-            <div role="radiogroup" aria-label="Método de Envio" class="flex flex-col sm:flex-row gap-2 p-1 bg-white dark:bg-gray-950 rounded-2xl border border-gray-200 dark:border-gray-800">
-              <button 
-                type="button"
-                role="radio"
-                :aria-checked="form.sendMethod === SendMethod.AUTO"
-                @click="form.sendMethod = SendMethod.AUTO"
-                :class="form.sendMethod === SendMethod.AUTO ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 outline-none'"
-                class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
-              >
-                Auto (E-mail)
-              </button>
-              <button 
-                type="button"
-                role="radio"
-                :aria-checked="form.sendMethod === SendMethod.MANUAL"
-                @click="form.sendMethod = SendMethod.MANUAL"
-                :class="form.sendMethod === SendMethod.MANUAL ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 outline-none'"
-                class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
-              >
-                Manual (Link)
-              </button>
+            <div class="space-y-3">
+              <label class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Método de Envio</label>
+              <div role="radiogroup" aria-label="Método de Envio" class="flex flex-col sm:flex-row gap-2 p-1 bg-white dark:bg-gray-950 rounded-2xl border border-gray-200 dark:border-gray-800">
+                <BaseButton 
+                  type="button"
+                  role="radio"
+                  :aria-checked="form.sendMethod === SendMethod.AUTO"
+                  @click="form.sendMethod = SendMethod.AUTO"
+                  :variant="form.sendMethod === SendMethod.AUTO ? 'primary' : 'ghost'"
+                  size="sm"
+                  class="flex-1 py-3"
+                >
+                  Auto (E-mail)
+                </BaseButton>
+                <BaseButton 
+                  type="button"
+                  role="radio"
+                  :aria-checked="form.sendMethod === SendMethod.MANUAL"
+                  @click="form.sendMethod = SendMethod.MANUAL"
+                  :variant="form.sendMethod === SendMethod.MANUAL ? 'primary' : 'ghost'"
+                  size="sm"
+                  class="flex-1 py-3"
+                >
+                  Manual (Link)
+                </BaseButton>
+              </div>
             </div>
           </div>
-        </div>
+        </BaseSectionCard>
       </div>
 
       <div class="space-y-8">

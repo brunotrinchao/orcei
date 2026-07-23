@@ -15,6 +15,7 @@ const { data: proposalsData, pending: pendingProposals } = useLazyFetch<any>('/a
 const isModalOpen = ref(false)
 const isSubmitting = ref(false)
 const selectedEvent = ref<any>(null)
+const config = useRuntimeConfig()
 
 const form = ref({
   title: '',
@@ -355,8 +356,8 @@ const linkedProposal = computed(() => {
             <h4 class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest flex items-center gap-1.5">
               <FileText class="w-3.5 h-3.5" /> Orçamento Vinculado
             </h4>
-            <NuxtLink :to="`/orcamentos/${linkedProposal._id}`" target="_blank" class="text-[10px] font-black text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
-              Ver Detalhes <ExternalLink class="w-3 h-3" />
+            <NuxtLink :to="`${linkedProposal.driveWebViewLink}`" target="_blank" class="text-[10px] font-black text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+              Ver PDF <ExternalLink class="w-3 h-3" />
             </NuxtLink>
           </div>
           <div class="space-y-1">

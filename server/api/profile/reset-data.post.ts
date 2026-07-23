@@ -8,12 +8,16 @@ import { Report } from '../../models/Report'
 import { Event } from '../../models/Event'
 import { Counter } from '../../models/Counter'
 import { AuditLog } from '../../models/AuditLog'
+import { checkRateLimit } from '../../utils/rate-limit'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
   if (!session?.user) {
     throw createError({ statusCode: 401, statusMessage: 'Não autorizado' })
   }
+
+  // Rate limit rigoroso: Máximo de 3 solicitações a cada 15 minutos
+  await checkRateLimit(event, { max: 3, windowMs: 15 * 60 * 1000, keyPrefix: 'reset-data' })
 
   const userId = (session.user as any).id
   const profile = await Profile.findOne({ userId })

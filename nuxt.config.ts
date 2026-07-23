@@ -203,6 +203,17 @@ export default defineNuxtConfig({
 
   nitro: {
     preset: 'vercel',
+    routeRules: {
+      '/**': {
+        headers: {
+          'X-Frame-Options': 'SAMEORIGIN',
+          'X-Content-Type-Options': 'nosniff',
+          'Referrer-Policy': 'strict-origin-when-cross-origin',
+          'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+          'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload'
+        }
+      }
+    }
   },
 
   compatibilityDate: '2024-04-03',

@@ -1,11 +1,15 @@
 import { Profile } from '../../models/Profile'
 import { QueueService } from '../../services/QueueService'
+import { checkRateLimit } from '../../utils/rate-limit'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
   if (!session.user) {
     throw createError({ statusCode: 401, statusMessage: 'Não autorizado' })
   }
+
+  // Rate limit: Máximo de 2 solicitações de backup por hora por usuário
+  await checkRateLimit(event, { max: 2, windowMs: 60 * 60 * 1000, keyPrefix: 'backup-csv' })
 
   const profile = await Profile.findOne({ userId: (session.user as any).id })
   if (!profile) {

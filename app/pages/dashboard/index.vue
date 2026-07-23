@@ -144,27 +144,38 @@ const periodLabels: Record<string, string> = {
 }
 const periodLabel = computed(() => periodLabels[period.value] || 'Todo o período')
 
+const { 
+  isCreditConfirmOpen, 
+  confirmTitle, 
+  confirmDescription, 
+  executeWithCreditCheck, 
+  handleCreditConfirm, 
+  handleCreditCancel 
+} = useConfirmCreditAction()
+
 async function generateAIReport() {
-  isAnalyzing.value = true
-  try {
-    // Relatório usa o mesmo filtro de período selecionado no dashboard
-    const data: any = await $fetch('/api/ai/analyze', { query: fetchQuery.value })
-    aiReport.value = data.text
-    refresh()
-  } catch (e: any) {
-    if (e.statusCode === 402) {
-      paywallReason.value = 'gerar relatório estratégico de IA'
-      isPaywallOpen.value = true
-    } else if (e.statusCode === 429) {
-      notify('Limite Atingido', 'Você fez muitas requisições seguidas. Tente novamente em um minuto.')
-    } else if (e.statusCode === 400) {
-      notify('Orçamento aprovado necessário', e.data?.statusMessage || 'É necessário ter pelo menos 1 orçamento aprovado para gerar um relatório estratégico.')
-    } else {
-      notify('Erro', e.data?.statusMessage || 'Erro ao gerar relatório estratégico')
+  executeWithCreditCheck('analyzeReport', async () => {
+    isAnalyzing.value = true
+    try {
+      // Relatório usa o mesmo filtro de período selecionado no dashboard
+      const data: any = await $fetch('/api/ai/analyze', { query: fetchQuery.value })
+      aiReport.value = data.text
+      refresh()
+    } catch (e: any) {
+      if (e.statusCode === 402) {
+        paywallReason.value = 'gerar relatório estratégico de IA'
+        isPaywallOpen.value = true
+      } else if (e.statusCode === 429) {
+        notify('Limite Atingido', 'Você fez muitas requisições seguidas. Tente novamente em um minuto.')
+      } else if (e.statusCode === 400) {
+        notify('Orçamento aprovado necessário', e.data?.statusMessage || 'É necessário ter pelo menos 1 orçamento aprovado para gerar um relatório estratégico.')
+      } else {
+        notify('Erro', e.data?.statusMessage || 'Erro ao gerar relatório estratégico')
+      }
+    } finally {
+      isAnalyzing.value = false
     }
-  } finally {
-    isAnalyzing.value = false
-  }
+  }, { title: 'Gerar Relatório Estratégico com IA' })
 }
 
 
@@ -711,6 +722,14 @@ function formatRelativeTime(minutesAgo: number) {
       :reason="paywallReason" 
     />
 
+    <!-- Modal de Confirmação de Consumo de Crédito IA -->
+    <ConfirmCreditDialog
+      v-model:open="isCreditConfirmOpen"
+      :title="confirmTitle"
+      :description="confirmDescription"
+      @confirm="handleCreditConfirm"
+      @cancel="handleCreditCancel"
+    />
 
   </div>
 </template>

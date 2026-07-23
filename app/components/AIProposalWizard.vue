@@ -35,14 +35,27 @@ const emit = defineEmits(['close', 'success'])
 
 const step = ref<'prompt' | 'loading' | 'results'>('prompt')
 const promptText = ref('')
-const results = ref<any>(null)
 const { notify } = useAlerts()
 const { creditLabel } = useCreditCosts()
+const { 
+  isCreditConfirmOpen, 
+  confirmTitle, 
+  confirmDescription, 
+  executeWithCreditCheck, 
+  handleCreditConfirm, 
+  handleCreditCancel 
+} = useConfirmCreditAction()
+
+function handleGenerateRequest() {
+  if (!promptText.value) return notify('Aviso', 'Digite o que você precisa no orçamento.')
+  executeWithCreditCheck('proposalSuggest', () => generate(), {
+    title: 'Gerar Orçamento com IA',
+    customDescription: 'A análise e criação do orçamento por IA consumirá créditos do seu saldo. Deseja continuar?'
+  })
+}
 
 // Simula a chamada da IA e o processamento de itens híbridos (Catálogo vs Mercado)
 async function generate() {
-  if (!promptText.value) return notify('Aviso', 'Digite o que você precisa no orçamento.')
-  
   step.value = 'loading'
   try {
     const data: any = await $fetch('/api/ai/proposal-suggest', {
@@ -207,14 +220,14 @@ function removeItem(idx: number) {
                 rows="6"
                 placeholder="Ex: Landing Page Premium com alta conversão, incluindo Copywriting estratégico e protótipo UI/UX responsivo em Figma..."
                 class="relative w-full px-6 py-5 bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] focus:ring-0 focus:border-slate-200 dark:focus:border-slate-700 transition-all outline-none font-bold text-slate-800 dark:text-slate-200 placeholder:text-slate-300 dark:placeholder:text-slate-700 shadow-sm resize-none"
-                @keydown.enter.ctrl="generate"
+                @keydown.enter.ctrl="handleGenerateRequest"
               ></textarea>
             </div>
             
             <div class="flex justify-between items-center pt-2">
               <span class="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest">Pressione Ctrl + Enter para gerar</span>
               <button 
-                @click="generate" 
+                @click="handleGenerateRequest" 
                 :disabled="!promptText"
                 class="px-6 py-3 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-violet-500/20 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center gap-2"
               >
@@ -397,6 +410,14 @@ function removeItem(idx: number) {
       </DialogContent>
     </DialogPortal>
   </DialogRoot>
+
+  <ConfirmCreditDialog
+    v-model:open="isCreditConfirmOpen"
+    :title="confirmTitle"
+    :description="confirmDescription"
+    @confirm="handleCreditConfirm"
+    @cancel="handleCreditCancel"
+  />
 </template>
 
 <style scoped>

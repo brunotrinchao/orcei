@@ -139,24 +139,34 @@ watch(() => props.prefilledItems, (newVal) => {
 }, { deep: true })
 
 const isGenerating = ref(false)
+const { 
+  isCreditConfirmOpen, 
+  confirmTitle, 
+  confirmDescription, 
+  executeWithCreditCheck, 
+  handleCreditConfirm, 
+  handleCreditCancel 
+} = useConfirmCreditAction()
 
 async function generateDescription({ index, isUpsell }: { index: number, isUpsell: boolean }) {
   const item = isUpsell ? form.value.upsellItems[index] : form.value.items[index]
   if (!item.name) return notify('Aviso', 'O item precisa de um nome para gerar a descrição.')
   
-  isGenerating.value = true
-  try {
-    const prompt = `Gere uma descrição profissional para um serviço/produto chamado: ${item.name}`
-    const data: any = await $fetch('/api/ai/generate', {
-      method: 'POST',
-      body: { prompt }
-    })
-    item.description = data.text
-  } catch (e) {
-    notify('Erro', 'Erro ao gerar descrição')
-  } finally {
-    isGenerating.value = false
-  }
+  executeWithCreditCheck('generate', async () => {
+    isGenerating.value = true
+    try {
+      const prompt = `Gere uma descrição profissional para um serviço/produto chamado: ${item.name}`
+      const data: any = await $fetch('/api/ai/generate', {
+        method: 'POST',
+        body: { prompt }
+      })
+      item.description = data.text
+    } catch (e) {
+      notify('Erro', 'Erro ao gerar descrição')
+    } finally {
+      isGenerating.value = false
+    }
+  }, { title: 'Gerar Descrição com IA' })
 }
 
 const finalTotal = computed(() => {
@@ -327,5 +337,13 @@ defineExpose({
       </div>
 
     </form>
+
+    <ConfirmCreditDialog
+      v-model:open="isCreditConfirmOpen"
+      :title="confirmTitle"
+      :description="confirmDescription"
+      @confirm="handleCreditConfirm"
+      @cancel="handleCreditCancel"
+    />
   </div>
 </template>

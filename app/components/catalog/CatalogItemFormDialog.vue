@@ -124,28 +124,30 @@ async function suggestWithAI() {
     return
   }
 
-  isSuggesting.value = true
-  try {
-    const data: any = await $fetch('/api/ai/catalog-suggest', {
-      method: 'POST',
-      body: {
-        name: form.value.name,
-        type: form.value.type,
-        context: form.value.description || undefined
-      }
-    })
+  executeWithCreditCheck('catalogSuggest', async () => {
+    isSuggesting.value = true
+    try {
+      const data: any = await $fetch('/api/ai/catalog-suggest', {
+        method: 'POST',
+        body: {
+          name: form.value.name,
+          type: form.value.type,
+          context: form.value.description || undefined
+        }
+      })
 
-    if (data.description) form.value.description = data.description
-    if (data.price) form.value.price = data.price
-    if (data.unit) form.value.unit = data.unit
-    aiAssisted.value = true
+      if (data.description) form.value.description = data.description
+      if (data.price) form.value.price = data.price
+      if (data.unit) form.value.unit = data.unit
+      aiAssisted.value = true
 
-    notify('Sucesso', 'Sugestão da IA aplicada com sucesso!')
-  } catch (e: any) {
-    notify('Erro', e.data?.statusMessage || 'Erro ao gerar sugestão com IA')
-  } finally {
-    isSuggesting.value = false
-  }
+      notify('Sucesso', 'Sugestão da IA aplicada com sucesso!')
+    } catch (e: any) {
+      notify('Erro', e.data?.statusMessage || 'Erro ao gerar sugestão com IA')
+    } finally {
+      isSuggesting.value = false
+    }
+  }, { title: 'Gerar Descrição do Catálogo com IA' })
 }
 
 async function saveItem() {
@@ -373,6 +375,14 @@ async function saveItem() {
         </template>
       </template>
     </BaseDialog>
+
+    <ConfirmCreditDialog
+      v-model:open="isCreditConfirmOpen"
+      :title="confirmTitle"
+      :description="confirmDescription"
+      @confirm="handleCreditConfirm"
+      @cancel="handleCreditCancel"
+    />
   </div>
 </template>
 

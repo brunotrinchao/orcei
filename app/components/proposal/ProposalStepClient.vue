@@ -54,46 +54,56 @@ const isAIExtractOpen = ref(false)
 const rawLeadText = ref('')
 const isExtracting = ref(false)
 const { notify } = useAlerts()
+const { 
+  isCreditConfirmOpen, 
+  confirmTitle, 
+  confirmDescription, 
+  executeWithCreditCheck, 
+  handleCreditConfirm, 
+  handleCreditCancel 
+} = useConfirmCreditAction()
 
 async function extractClient() {
   if (!rawLeadText.value.trim()) return
 
-  isExtracting.value = true
-  try {
-    const data: any = await $fetch('/api/ai/client-extract', {
-      method: 'POST',
-      body: { text: rawLeadText.value }
-    })
+  executeWithCreditCheck('clientExtract', async () => {
+    isExtracting.value = true
+    try {
+      const data: any = await $fetch('/api/ai/client-extract', {
+        method: 'POST',
+        body: { text: rawLeadText.value }
+      })
 
-    if (!data.name || !data.email) {
-      notify('Extração Parcial', 'A IA não conseguiu identificar nome e e-mail com clareza. Verifique o texto.')
-      return
-    }
-
-    // Tenta salvar/cadastrar o cliente extraído via API
-    const createdClient: any = await $fetch('/api/clients', {
-      method: 'POST',
-      body: {
-        name: data.name,
-        email: data.email,
-        phone: data.phone || '',
-        notes: `Importado via IA em ${new Date().toLocaleDateString('pt-BR')}`
+      if (!data.name || !data.email) {
+        notify('Extração Parcial', 'A IA não conseguiu identificar nome e e-mail com clareza. Verifique o texto.')
+        return
       }
-    })
 
-    emit('update:selectedClientId', createdClient._id || createdClient.id)
-    props.form.client.name = createdClient.name
-    props.form.client.email = createdClient.email
-    props.form.client.phone = createdClient.phone || ''
+      // Tenta salvar/cadastrar o cliente extraído via API
+      const createdClient: any = await $fetch('/api/clients', {
+        method: 'POST',
+        body: {
+          name: data.name,
+          email: data.email,
+          phone: data.phone || '',
+          notes: `Importado via IA em ${new Date().toLocaleDateString('pt-BR')}`
+        }
+      })
 
-    notify('Cliente Cadastrado!', `${createdClient.name} foi extraído e selecionado automaticamente.`)
-    isAIExtractOpen.value = false
-    rawLeadText.value = ''
-  } catch (e: any) {
-    notify('Erro', e.data?.statusMessage || 'Não foi possível extrair os dados do cliente com IA.')
-  } finally {
-    isExtracting.value = false
-  }
+      emit('update:selectedClientId', createdClient._id || createdClient.id)
+      props.form.client.name = createdClient.name
+      props.form.client.email = createdClient.email
+      props.form.client.phone = createdClient.phone || ''
+
+      notify('Cliente Cadastrado!', `${createdClient.name} foi extraído e selecionado automaticamente.`)
+      isAIExtractOpen.value = false
+      rawLeadText.value = ''
+    } catch (e: any) {
+      notify('Erro', e.data?.statusMessage || 'Não foi possível extrair os dados do cliente com IA.')
+    } finally {
+      isExtracting.value = false
+    }
+  }, { title: 'Extrair Dados do Cliente com IA' })
 }
 </script>
 
@@ -168,5 +178,13 @@ async function extractClient() {
         </div>
       </div>
     </BaseSectionCard>
+
+    <ConfirmCreditDialog
+      v-model:open="isCreditConfirmOpen"
+      :title="confirmTitle"
+      :description="confirmDescription"
+      @confirm="handleCreditConfirm"
+      @cancel="handleCreditCancel"
+    />
   </div>
 </template>

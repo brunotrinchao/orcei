@@ -46,7 +46,46 @@ async function fetchImageAsBase64(url: string): Promise<string | null> {
   }
 }
 
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+  let cleanHex = (hex || '#3B82F6').replace('#', '')
+  if (cleanHex.length === 3) {
+    cleanHex = cleanHex.split('').map(c => c + c).join('')
+  }
+  const num = parseInt(cleanHex, 16) || 0x3b82f6
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255
+  }
+}
+
+export function getBrandPalette(primaryHex?: string) {
+  const hex = primaryHex || '#3B82F6'
+  const { r, g, b } = hexToRgb(hex)
+  
+  // Escuro (títulos e destaques principais)
+  const darkR = Math.round(r * 0.50)
+  const darkG = Math.round(g * 0.50)
+  const darkB = Math.round(b * 0.50)
+  const primaryDark = `rgb(${darkR}, ${darkG}, ${darkB})`
+
+  // Fundo suave e bordas derivadas
+  const primaryLightBg = `rgba(${r}, ${g}, ${b}, 0.05)`
+  const headerBg = `rgba(${r}, ${g}, ${b}, 0.09)`
+  const primaryBorder = `rgba(${r}, ${g}, ${b}, 0.22)`
+
+  return {
+    primary: hex,
+    primaryDark,
+    primaryLightBg,
+    primaryBorder,
+    headerBg
+  }
+}
+
 export async function buildPdfHeaderHtml(profile: any, appName: string = 'ORCEI'): Promise<string> {
+  const primaryColor = profile?.brandConfig?.primaryColor || '#3B82F6'
+  const palette = getBrandPalette(primaryColor)
   const logoUrl = profile?.brandConfig?.logoUrl || process.env.APP_DOCUMENT_LOGO
   let logoContent: string
 
@@ -54,9 +93,9 @@ export async function buildPdfHeaderHtml(profile: any, appName: string = 'ORCEI'
     const dataUri = await fetchImageAsBase64(logoUrl)
     logoContent = dataUri
       ? `<img src="${dataUri}" style="max-height: 42px; width: auto; object-fit: contain;">`
-      : `<span style="font-size: 18px; font-weight: 900; color: #3B82F6; letter-spacing: -0.025em;">${appName.toUpperCase()}</span>`
+      : `<span style="font-size: 18px; font-weight: 900; color: ${palette.primary}; letter-spacing: -0.025em;">${appName.toUpperCase()}</span>`
   } else {
-    logoContent = `<span style="font-size: 18px; font-weight: 900; color: #3B82F6; letter-spacing: -0.025em;">${appName.toUpperCase()}</span>`
+    logoContent = `<span style="font-size: 18px; font-weight: 900; color: ${palette.primary}; letter-spacing: -0.025em;">${appName.toUpperCase()}</span>`
   }
 
   const companyName = profile?.company?.tradeName || profile?.company?.legalName || profile?.name || appName
@@ -82,7 +121,7 @@ export async function buildPdfHeaderHtml(profile: any, appName: string = 'ORCEI'
         width: 100%;
         margin: 0 40px;
         padding-bottom: 10px;
-        border-bottom: 2px solid #3B82F6;
+        border-bottom: 2px solid ${palette.primary};
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -112,6 +151,8 @@ export async function buildPdfHeaderHtml(profile: any, appName: string = 'ORCEI'
 }
 
 export async function buildPdfFooterHtml(profile: any, appName: string = 'ORCEI'): Promise<string> {
+  const primaryColor = profile?.brandConfig?.primaryColor || '#3B82F6'
+  const palette = getBrandPalette(primaryColor)
   const logoUrl = profile?.brandConfig?.logoUrl || process.env.APP_DOCUMENT_LOGO
 
   let logoHtml: string
@@ -119,9 +160,9 @@ export async function buildPdfFooterHtml(profile: any, appName: string = 'ORCEI'
     const dataUri = await fetchImageAsBase64(logoUrl)
     logoHtml = dataUri
       ? `<img src="${dataUri}" style="height: 14px; width: auto; vertical-align: middle; margin-right: 6px; object-fit: contain;">`
-      : `<strong style="color: #3B82F6; margin-right: 6px; font-size: 9px;">${appName.toUpperCase()}</strong>`
+      : `<strong style="color: ${palette.primary}; margin-right: 6px; font-size: 9px;">${appName.toUpperCase()}</strong>`
   } else {
-    logoHtml = `<strong style="color: #3B82F6; margin-right: 6px; font-size: 9px;">${appName.toUpperCase()}</strong>`
+    logoHtml = `<strong style="color: ${palette.primary}; margin-right: 6px; font-size: 9px;">${appName.toUpperCase()}</strong>`
   }
 
   const social = profile?.contact?.social || {}
@@ -249,6 +290,9 @@ export async function generatePdfFromHtml(htmlContent: string): Promise<Buffer> 
 }
 
 export function generateProposalHtml(proposal: any, profile: any, appName: string = 'ORCEI') {
+  const primaryColor = profile?.brandConfig?.primaryColor || '#3B82F6'
+  const palette = getBrandPalette(primaryColor)
+
   // Processar variáveis e sanitizar contra injeção de script
   const contractHtml = sanitizeHtml(processVariables(proposal.contractText || '', proposal, profile), sanitizeOptions)
   const termsHtml = sanitizeHtml(processVariables(proposal.termsAndConditions || '', proposal, profile), sanitizeOptions)
@@ -260,18 +304,18 @@ export function generateProposalHtml(proposal: any, profile: any, appName: strin
       <meta charset="UTF-8">
       <style>
         body { font-family: sans-serif; padding: 10px 0; color: #333; line-height: 1.6; font-size: 13px; }
-        .title { font-size: 26px; font-weight: 900; margin-bottom: 10px; color: #1E3A8A; }
-        .client-info { background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px; margin-bottom: 25px; }
-        .section-title { font-size: 16px; font-weight: bold; border-bottom: 2px solid #E2E8F0; padding-bottom: 5px; margin-top: 25px; margin-bottom: 15px; color: #1E3A8A; text-transform: uppercase; tracking: 0.05em; }
+        .title { font-size: 26px; font-weight: 900; margin-bottom: 10px; color: ${palette.primaryDark}; }
+        .client-info { background: ${palette.primaryLightBg}; border: 1px solid ${palette.primaryBorder}; border-left: 4px solid ${palette.primary}; padding: 16px; border-radius: 8px; margin-bottom: 25px; }
+        .section-title { font-size: 16px; font-weight: bold; border-bottom: 2px solid ${palette.primaryBorder}; padding-bottom: 5px; margin-top: 25px; margin-bottom: 15px; color: ${palette.primaryDark}; text-transform: uppercase; tracking: 0.05em; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
-        th { text-align: left; background: #F1F5F9; padding: 10px 12px; border-bottom: 2px solid #CBD5E1; font-size: 11px; text-transform: uppercase; color: #475569; }
+        th { text-align: left; background: ${palette.headerBg}; padding: 10px 12px; border-bottom: 2px solid ${palette.primaryBorder}; font-size: 11px; text-transform: uppercase; color: ${palette.primaryDark}; }
         td { padding: 10px 12px; border-bottom: 1px solid #E2E8F0; }
-        .total-box { background: #F1F5F9; padding: 16px 20px; border-radius: 8px; text-align: right; margin-top: 25px; border-left: 4px solid #3B82F6; }
-        .total-label { font-size: 12px; color: #64748B; font-weight: bold; text-transform: uppercase; }
-        .total-value { font-size: 22px; font-weight: 900; color: #0F172A; }
+        .total-box { background: ${palette.primaryLightBg}; border: 1px solid ${palette.primaryBorder}; padding: 16px 20px; border-radius: 8px; text-align: right; margin-top: 25px; border-left: 5px solid ${palette.primary}; }
+        .total-label { font-size: 12px; color: ${palette.primaryDark}; font-weight: bold; text-transform: uppercase; }
+        .total-value { font-size: 22px; font-weight: 900; color: ${palette.primaryDark}; }
         .page-break { page-break-before: always; break-before: page; margin-top: 0; }
         .contract, .terms { margin-top: 20px; }
-        .contract h2, .terms h2 { color: #1E3A8A; margin-top: 15px; font-size: 18px; }
+        .contract h2, .terms h2 { color: ${palette.primaryDark}; margin-top: 15px; font-size: 18px; }
         .prose p { margin-bottom: 12px; }
       </style>
     </head>

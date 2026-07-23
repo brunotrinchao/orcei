@@ -71,11 +71,12 @@ export default defineEventHandler(async (event) => {
     proposal.termsAndConditions = sanitizeHtml(processVariables(proposal.termsAndConditions || '', proposal as any, profile as any), sanitizeOptions)
   }
 
-  // Log view event only if consent is given and NOT owner preview
-  if (!isPreviewRequest && hasConsent) {
+  // Log view event for non-owner public proposal accesses
+  if (!isPreviewRequest) {
     const headers = getHeaders(event)
-    const ip = headers['x-forwarded-for'] || headers['x-real-ip'] || 'unknown'
-    const browser = headers['user-agent'] || 'unknown'
+    const rawIp = headers['x-forwarded-for'] || headers['x-real-ip'] || '127.0.0.1'
+    const ip = Array.isArray(rawIp) ? rawIp[0] : String(rawIp).split(',')[0].trim()
+    const browser = (headers['user-agent'] as string) || 'unknown'
     
     await ProposalService.logHistory(proposal._id as any, 'viewed', 'system', {
       ip,
@@ -83,10 +84,13 @@ export default defineEventHandler(async (event) => {
     })
 
     // Adiciona ao array nativo de views para telemetria no dashboard
+    if (!proposal.views) {
+      proposal.views = [] as any
+    }
     proposal.views.push({ ip, browser, location: 'Desconhecido', createdAt: new Date() })
     await proposal.save()
 
-    // If it was just created or sent/delivered, move to viewed
+    // Se o status anterior era inicial (created, sent, delivered), atualiza para viewed
     const statusHierarchy: Record<string, number> = {
       'created': 0,
       'sent': 1,

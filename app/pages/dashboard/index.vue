@@ -479,30 +479,13 @@ function formatRelativeTime(minutesAgo: number) {
             </div>
             
             <div class="space-y-4">
-              <!-- Rascunho -->
+              <!-- Em Aberto / Enviados -->
               <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest text-left md:text-right w-full md:w-20">
-                  Rascunhos
-                </span>
-                
-                <div class="w-full md:flex-1 h-10 bg-slate-50 dark:bg-slate-800/40 rounded-xl relative overflow-hidden">
-                  <div 
-                    class="h-full bg-slate-200/70 dark:bg-slate-700/60" 
-                    :style="{ width: stats.proposalsCount > 0 ? (stats.draftCount / stats.proposalsCount * 100) + '%' : '0%' }"
-                  ></div>
-                  <span class="absolute inset-y-0 left-4 flex items-center text-xs font-bold text-gray-700 dark:text-gray-300">
-                    {{ stats.draftCount }} rascunhos em elaboração
-                  </span>
-                </div>
-              </div>
-
-              <!-- Criado/Pendente (Enviado) -->
-              <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                <span class="w-full md:w-20 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest text-left md:text-right">Enviados</span>
+                <span class="w-full md:w-20 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest text-left md:text-right">Em Aberto</span>
                 <div class="w-full md:flex-1 h-10 bg-blue-50/50 dark:bg-blue-950/20 rounded-xl relative overflow-hidden">
                   <div class="h-full bg-blue-100 dark:bg-blue-900/50" :style="{ width: stats.proposalsCount > 0 ? (stats.pendingCount / stats.proposalsCount * 100) + '%' : '0%' }"></div>
                   <span class="absolute inset-y-0 left-4 flex items-center text-xs font-bold text-blue-800 dark:text-blue-300">
-                    {{ stats.pendingCount }} orçamentos aguardando resposta
+                    {{ stats.pendingCount }} orçamentos aguardando resposta do cliente
                   </span>
                 </div>
               </div>
@@ -551,7 +534,7 @@ function formatRelativeTime(minutesAgo: number) {
             >
               <div class="flex justify-between items-start">
                 <span class="text-[8px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest bg-orange-100/50 dark:bg-orange-950/40 px-2 py-0.5 rounded-full">
-                  Pendente {{ alert.daysAgo }} dias
+                  {{ alert.daysAgo === 0 ? 'Pendente hoje' : `Pendente há ${alert.daysAgo}d` }}
                 </span>
                 <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500">{{ alert.code }}</span>
               </div>

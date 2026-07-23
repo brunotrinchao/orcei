@@ -36,16 +36,15 @@ export default defineEventHandler(async (event) => {
   const proposalsCount = proposals.length
   const acceptedProposals = proposals.filter(p => p.status === 'accepted')
   const acceptedCount = acceptedProposals.length
-  const pendingCount = proposals.filter(p => ['pending', 'created'].includes(p.status)).length
-  const draftCount = proposals.filter(p => p.status === 'draft').length
-  const expiredCount = proposals.filter(p => p.status === 'expired').length
-  // Demais status de tracking (sent/delivered/opened/etc.) — garante que a soma dos buckets bata com proposalsCount
-  const otherCount = proposalsCount - acceptedCount - pendingCount - draftCount - expiredCount
+  
+  const activeStatuses = new Set(['pending', 'created', 'sent', 'delivered', 'viewed', 'opened', 'clicked', 'changes_requested'])
+  const pendingCount = proposals.filter(p => activeStatuses.has(p.status)).length
+  const expiredCount = proposals.filter(p => ['expired', 'declined'].includes(p.status)).length
+  const otherCount = proposalsCount - acceptedCount - pendingCount - expiredCount
 
   const totalRevenue = acceptedProposals.reduce((acc, p) => acc + (p.totals?.final || 0), 0)
   const ticketMedia = acceptedCount > 0 ? totalRevenue / acceptedCount : 0
-  const nonDraftCount = proposalsCount - draftCount
-  const approvalRate = nonDraftCount > 0 ? (acceptedCount / nonDraftCount) * 100 : 0
+  const approvalRate = proposalsCount > 0 ? (acceptedCount / proposalsCount) * 100 : 0
 
   // 1. Cálculo de TMA (Tempo Médio de Fechamento comercial em horas)
   // Utiliza a diferença entre updatedAt (aceite) e createdAt (criação/publicação)
@@ -94,7 +93,10 @@ export default defineEventHandler(async (event) => {
     return `${browser} no ${os}`
   }
 
-  const trackingViews = proposals.reduce((acc: any[], p: any) => {
+  // Buscar todas as propostas do usuário para capturar trackingViews e follow-ups de qualquer período
+  const allUserProposals = await Proposal.find({ profileId: profile._id })
+
+  const trackingViews = allUserProposals.reduce((acc: any[], p: any) => {
     if (p.views && p.views.length > 0) {
       p.views.forEach((v: any) => {
         const minutesAgo = Math.floor((Date.now() - new Date(v.createdAt).getTime()) / 60000)
@@ -113,19 +115,24 @@ export default defineEventHandler(async (event) => {
   }, []).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5)
 
   // 5. Alertas de Follow-ups Inteligentes
-  const followUpAlerts = proposals
-    .filter(p => p.status === 'pending' && (Date.now() - p.createdAt.getTime()) > 3 * 24 * 60 * 60 * 1000)
+  // Propostas ativas que aguardam resposta do cliente (criadas, enviadas, visualizadas ou em revisão)
+  const followUpAlerts = allUserProposals
+    .filter(p => activeStatuses.has(p.status))
+    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
     .slice(0, 3)
-    .map(p => ({
-      id: p._id,
-      code: p.code,
-      title: p.title,
-      clientName: p.client?.name,
-      clientPhone: p.client?.phone,
-      daysAgo: Math.floor((Date.now() - p.createdAt.getTime()) / (1000 * 60 * 60 * 24)),
-      slug: p.slug,
-      token: p.token,
-    }))
+    .map(p => {
+      const daysAgo = Math.floor((Date.now() - new Date(p.createdAt).getTime()) / (1000 * 60 * 60 * 24))
+      return {
+        id: p._id,
+        code: p.code,
+        title: p.title,
+        clientName: p.client?.name,
+        clientPhone: p.client?.phone,
+        daysAgo,
+        slug: p.slug,
+        token: p.token,
+      }
+    })
 
   // Revenue History (últimos 30 dias ou período)
   const revenueHistoryMap = acceptedProposals.reduce((acc: any, p) => {
@@ -194,7 +201,7 @@ export default defineEventHandler(async (event) => {
     servicesCount: itemsCount,
     acceptedCount,
     pendingCount,
-    draftCount,
+    draftCount: 0,
     expiredCount,
     otherCount,
     totalRevenue,

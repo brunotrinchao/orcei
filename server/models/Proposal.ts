@@ -53,7 +53,9 @@ const proposalSchema = new Schema({
   expiresAt: Date,
   executionDate: { type: Date, default: null },
   lastEmailId: String,
-  aiAssisted: { type: Boolean, default: false }
+  aiAssisted: { type: Boolean, default: false },
+  driveFileId: { type: String, default: null },
+  driveWebViewLink: { type: String, default: null }
 }, { timestamps: true })
 
 proposalSchema.index({ profileId: 1 })

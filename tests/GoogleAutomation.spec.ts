@@ -31,7 +31,8 @@ vi.mock('@upstash/qstash', () => {
 // Mocks
 vi.mock('../server/models/Proposal', () => ({
   Proposal: {
-    findById: vi.fn()
+    findById: vi.fn(),
+    findByIdAndUpdate: vi.fn().mockResolvedValue({})
   }
 }))
 
@@ -39,7 +40,10 @@ vi.mock('../server/services/GoogleService', () => ({
   GoogleService: {
     getAuthClient: vi.fn(),
     ensureFolder: vi.fn(),
+    ensureProposalsFolder: vi.fn().mockResolvedValue('proposals-folder-123'),
+    ensureClientFolder: vi.fn().mockResolvedValue('client-folder-123'),
     uploadPdf: vi.fn(),
+    downloadFile: vi.fn().mockResolvedValue(Buffer.from('pdf')),
     createEvent: vi.fn()
   }
 }))
@@ -112,6 +116,8 @@ describe('Google Automation (QStash Webhook)', () => {
 
     expect(GoogleService.getAuthClient).toHaveBeenCalled()
     expect(GoogleService.ensureFolder).toHaveBeenCalled()
+    expect(GoogleService.ensureProposalsFolder).toHaveBeenCalledWith(expect.anything(), expect.anything(), 'folder-123')
+    expect(GoogleService.ensureClientFolder).toHaveBeenCalledWith(expect.anything(), 'proposals-folder-123', 'John Doe')
     expect(GoogleService.uploadPdf).toHaveBeenCalled()
     expect(GoogleService.createEvent).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
       summary: expect.stringContaining('John Doe'),

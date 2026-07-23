@@ -192,11 +192,25 @@ async function handleProposalAccepted(payload: any) {
   console.log(`[Job] Iniciando automação Google para: ${proposal.code}`)
   
   const auth = GoogleService.getAuthClient(profile)
-  const folderId = profile.googleIntegration.driveFolderId || await GoogleService.ensureFolder(auth, profile)
+
+  // Garantir pasta raiz do app
+  const rootFolderId = await GoogleService.ensureFolder(auth, profile)
+
+  // Garantir sub-pasta "Propostas" dentro da raiz
+  const proposalsFolderId = await GoogleService.ensureProposalsFolder(auth, profile, rootFolderId!)
+
+  // Garantir sub-pasta do cliente dentro de "Propostas"
+  const clientFolderId = await GoogleService.ensureClientFolder(auth, proposalsFolderId, proposal.client.name)
 
   const pdfBuffer = await generateProposalPdfBuffer(proposal, profile)
   const fileName = `Proposta-${proposal.code}-${proposal.client.name}.pdf`
-  const driveFile = await GoogleService.uploadPdf(auth, folderId, fileName, pdfBuffer)
+  const driveFile = await GoogleService.uploadPdf(auth, clientFolderId, fileName, pdfBuffer)
+
+  // Salvar referência do Drive na proposta para evitar regerar o PDF no download
+  await Proposal.findByIdAndUpdate(proposalId, {
+    driveFileId: driveFile.id,
+    driveWebViewLink: driveFile.webViewLink
+  })
 
   if (proposal.executionDate) {
     await ProposalService.ensureApplicationCalendarEvent(proposal, profile)

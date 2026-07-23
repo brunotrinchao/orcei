@@ -1,6 +1,7 @@
 import { Proposal } from '../../../models/Proposal'
 import { Profile } from '../../../models/Profile'
 import { generateProposalPdfBuffer } from '../../../utils/pdf'
+import { GoogleService } from '../../../services/GoogleService'
 
 export default defineEventHandler(async (event) => {
   const { id } = event.context.params as { id: string }
@@ -23,10 +24,26 @@ export default defineEventHandler(async (event) => {
   }
 
   const config = useRuntimeConfig()
-  const pdf = await generateProposalPdfBuffer(proposal, profile, config.appName)
+  let pdfBuffer: Buffer
 
+  // Se o arquivo já foi enviado ao Drive, fazer download de lá (sem regerar)
+  if ((proposal as any).driveFileId && (profile as any).googleIntegration?.refreshToken) {
+    try {
+      const auth = GoogleService.getAuthClient(profile)
+      pdfBuffer = await GoogleService.downloadFile(auth, (proposal as any).driveFileId)
+    } catch (driveErr) {
+      console.warn('[pdf.get] Falha ao baixar do Drive, gerando localmente:', driveErr)
+      pdfBuffer = await generateProposalPdfBuffer(proposal, profile, config.appName)
+    }
+  } else {
+    // Fallback: gerar localmente (usuário sem integração Google ou proposta ainda não enviada)
+    pdfBuffer = await generateProposalPdfBuffer(proposal, profile, config.appName)
+  }
+
+  const fileName = `orcamento-${(proposal as any).code?.replace('#', '') || (proposal as any).slug}.pdf`
   event.node.res.setHeader('Content-Type', 'application/pdf')
-  event.node.res.setHeader('Content-Disposition', `attachment; filename=proposta-${proposal.slug}.pdf`)
+  event.node.res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`)
 
-  return pdf
+  return pdfBuffer
 })
+

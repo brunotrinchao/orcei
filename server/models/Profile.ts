@@ -122,7 +122,8 @@ Para dirimir quaisquer controvérsias oriundas desta proposta, fica eleito o for
     accessToken: String,
     refreshToken: String,
     expiryDate: Number,
-    driveFolderId: String
+    driveFolderId: String,
+    driveProposalsFolderId: String
   }
 }, { timestamps: true })
 

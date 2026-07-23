@@ -346,7 +346,7 @@ export const sendProposalAcceptedEmail = async (
       attachments: [
         {
           filename: `orcamento-${sanitizedCode}.pdf`,
-          content: pdfBuffer
+          content: Buffer.isBuffer(pdfBuffer) ? pdfBuffer.toString('base64') : Buffer.from(pdfBuffer).toString('base64')
         }
       ]
     })

@@ -125,6 +125,77 @@ export const GoogleService = {
     }
   },
 
+  /**
+   * Garante a sub-pasta "Propostas" dentro da pasta raiz do app.
+   * Persiste o ID no perfil para evitar buscas repetidas.
+   */
+  async ensureProposalsFolder(auth: any, profile: any, rootFolderId: string): Promise<string> {
+    const drive = google.drive({ version: 'v3', auth })
+
+    // Verificar se já temos o ID salvo
+    if (profile.googleIntegration?.driveProposalsFolderId) {
+      try {
+        const folder = await drive.files.get({
+          fileId: profile.googleIntegration.driveProposalsFolderId,
+          fields: 'id, trashed'
+        })
+        if (folder.data && !folder.data.trashed) {
+          return folder.data.id as string
+        }
+      } catch (e) {
+        console.warn('[GoogleService] Pasta Propostas inválida, recriando...')
+      }
+    }
+
+    // Buscar ou criar a pasta "Propostas" dentro da raiz
+    const res = await drive.files.list({
+      q: `name = 'Propostas' and mimeType = 'application/vnd.google-apps.folder' and '${rootFolderId}' in parents and trashed = false`,
+      fields: 'files(id)'
+    })
+
+    let proposalsFolderId: string
+    if (res.data.files?.length) {
+      proposalsFolderId = res.data.files[0].id as string
+    } else {
+      const folder = await drive.files.create({
+        requestBody: { name: 'Propostas', mimeType: 'application/vnd.google-apps.folder', parents: [rootFolderId] },
+        fields: 'id'
+      })
+      proposalsFolderId = folder.data.id as string
+    }
+
+    // Salvar no perfil
+    const { Profile } = await import('../models/Profile')
+    const googleIntegration = { ...(profile.googleIntegration || {}), driveProposalsFolderId: proposalsFolderId }
+    await Profile.findByIdAndUpdate(profile._id, { $set: { googleIntegration } })
+
+    return proposalsFolderId
+  },
+
+  /**
+   * Garante a sub-pasta com o nome do cliente dentro de "Propostas".
+   */
+  async ensureClientFolder(auth: any, proposalsFolderId: string, clientName: string): Promise<string> {
+    const drive = google.drive({ version: 'v3', auth })
+    // Sanitizar o nome do cliente para uso como nome de pasta
+    const safeName = clientName.replace(/[\/\\:*?"<>|]/g, '').trim() || 'Cliente'
+
+    const res = await drive.files.list({
+      q: `name = '${safeName}' and mimeType = 'application/vnd.google-apps.folder' and '${proposalsFolderId}' in parents and trashed = false`,
+      fields: 'files(id)'
+    })
+
+    if (res.data.files?.length) {
+      return res.data.files[0].id as string
+    }
+
+    const folder = await drive.files.create({
+      requestBody: { name: safeName, mimeType: 'application/vnd.google-apps.folder', parents: [proposalsFolderId] },
+      fields: 'id'
+    })
+    return folder.data.id as string
+  },
+
   async uploadPdf(auth: any, folderId: string, fileName: string, buffer: Buffer) {
     try {
       const drive = google.drive({ version: 'v3', auth })
@@ -142,6 +213,18 @@ export const GoogleService = {
       console.error('[GoogleService] Error in uploadPdf:', error)
       throw error
     }
+  },
+
+  /**
+   * Faz download do conteúdo de um arquivo do Drive e retorna como Buffer.
+   */
+  async downloadFile(auth: any, fileId: string): Promise<Buffer> {
+    const drive = google.drive({ version: 'v3', auth })
+    const res = await drive.files.get(
+      { fileId, alt: 'media' },
+      { responseType: 'arraybuffer' }
+    )
+    return Buffer.from(res.data as ArrayBuffer)
   },
 
   async createEvent(auth: any, data: GoogleEventData) {

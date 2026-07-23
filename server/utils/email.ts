@@ -309,3 +309,54 @@ export const sendPlanCancellationEmail = async (
     return null
   }
 }
+
+export const sendProposalAcceptedEmail = async (
+  clientEmail: string,
+  clientName: string,
+  proposalCode: string,
+  proposalTitle: string,
+  professionalName: string,
+  pdfBuffer: Buffer
+) => {
+  const resend = getResend()
+  if (!resend) return null
+
+  try {
+    const { appName, resendTestTo } = getEmailConfig()
+    const recipient = resendTestTo || clientEmail
+    const sanitizedCode = proposalCode.replace('#', '')
+
+    const { data, error } = await resend.emails.send({
+      from: `${appName} <contato@orceifacil.com.br>`,
+      to: recipient,
+      subject: `Confirmação de Aceite de Orçamento: ${proposalCode} - ${professionalName}`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; color: #333; line-height: 1.6;">
+          <h2 style="color: #3147F6; margin-bottom: 16px;">Orçamento Aceito com Sucesso! 🎉</h2>
+          <p>Olá, <strong>${clientName}</strong>,</p>
+          <p>Confirmamos o aceite do orçamento <strong>${proposalCode}</strong> (${proposalTitle}) emitido por <strong>${professionalName}</strong>.</p>
+          <p>Em anexo nesta mensagem você encontrará o documento em formato PDF com todos os detalhes dos serviços contratados, valores e termos acordados.</p>
+          <div style="margin-top: 30px; padding: 16px; background: #F3F4F6; border-radius: 8px; font-size: 13px; color: #555;">
+            Se tiver qualquer dúvida ou quiser tratar detalhes da execução, entre em contato diretamente com <strong>${professionalName}</strong>.
+          </div>
+          <p style="margin-top: 30px; font-size: 12px; color: #9CA3AF;">
+            Mensagem enviada automaticamente através do <strong>${appName}</strong>.
+          </p>
+        </div>
+      `,
+      attachments: [
+        {
+          filename: `orcamento-${sanitizedCode}.pdf`,
+          content: pdfBuffer
+        }
+      ]
+    })
+
+    if (error) console.error('[Resend] Proposal Accepted Email Error:', JSON.stringify(error))
+    return data
+  } catch (err) {
+    console.error('[Resend] Proposal Accepted Email Exception:', err)
+    return null
+  }
+}
+

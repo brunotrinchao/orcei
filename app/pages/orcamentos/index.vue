@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
-import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles, Send, CheckCheck, X, ArrowLeft, ArrowRight, Trash2, MoreVertical, Check, Copy, Variable } from 'lucide-vue-next'
+import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, Download, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles, Send, CheckCheck, X, ArrowLeft, ArrowRight, Trash2, MoreVertical, Check, Copy, Variable } from 'lucide-vue-next'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
 import { isToday, isYesterday, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -241,6 +241,10 @@ function onAIWizardSuccess(items: any[]) {
     quantity: 1
   }))
   openModal(null, formattedItems, true)
+}
+
+function downloadPdf(proposal: ProposalDTO) {
+  window.open(`/api/proposals/${proposal._id}/pdf`, '_blank')
 }
 
 function openPreview(proposal: ProposalDTO) {
@@ -567,11 +571,11 @@ async function saveContract() {
                       Ver Histórico
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      @click="openPreview(proposal)"
+                      @click="downloadPdf(proposal)"
                       class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
                     >
-                      <Eye class="w-4 h-4" />
-                      Visualizar Orçamento
+                      <Download class="w-4 h-4" />
+                      Baixar Orçamento
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       v-if="proposal.status !== 'draft' && proposal.status !== 'accepted'"
@@ -655,7 +659,7 @@ async function saveContract() {
           @open-chat="openChat(proposal)"
           @send-whatsapp="sendWhatsapp(proposal)"
           @open-history="openHistory(proposal)"
-          @open-preview="openPreview(proposal)"
+          @download-pdf="downloadPdf(proposal)"
           @resend-email="resendEmail(proposal)"
           @edit="openModal(proposal)"
           @delete="confirmDeleteProposal(proposal)"

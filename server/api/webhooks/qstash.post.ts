@@ -199,6 +199,7 @@ async function handleProposalAccepted(payload: any) {
   const driveFile = await GoogleService.uploadPdf(auth, folderId, fileName, pdfBuffer)
 
   if (proposal.executionDate) {
+    await ProposalService.ensureApplicationCalendarEvent(proposal, profile)
     await GoogleService.createEvent(auth, {
       summary: `Execução: ${proposal.title} (${proposal.client.name})`,
       location: profile.address?.city || '',

@@ -2,8 +2,11 @@ import { Proposal } from '../models/Proposal'
 import { Profile } from '../models/Profile'
 import { Counter } from '../models/Counter'
 import { ProposalHistory } from '../models/ProposalHistory'
+import { Event } from '../models/Event'
 import { nanoid } from 'nanoid'
 import { QueueService } from './QueueService'
+import { generateProposalPdfBuffer } from '../utils/pdf'
+import { sendProposalAcceptedEmail } from '../utils/email'
 
 import { ProposalStatus, PaymentMethod, SendMethod, SubscriptionStatus } from '../../types/enums'
 import { getActionCost, chargeCredit } from '../utils/credits'
@@ -292,6 +295,33 @@ export const ProposalService = {
     return updated
   },
 
+  async ensureApplicationCalendarEvent(proposal: any, profile: any) {
+    if (!proposal?.executionDate) return null
+    try {
+      const profileId = profile?._id || profile
+      const existing = await Event.findOne({ proposalId: proposal._id })
+      if (!existing) {
+        const start = new Date(proposal.executionDate)
+        const end = new Date(start.getTime() + 60 * 60 * 1000)
+        const createdEvent = await Event.create({
+          profileId,
+          proposalId: proposal._id,
+          title: `Execução: ${proposal.title || proposal.code}`,
+          description: `Orçamento Aceito: ${proposal.code}\nCliente: ${proposal.client?.name || ''}\nValor: R$ ${(proposal.totals?.final || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+          start,
+          end,
+          color: '#3B82F6'
+        })
+        console.log(`[ProposalService] Evento criado na agenda da aplicação para: ${proposal.code}`)
+        return createdEvent
+      }
+      return existing
+    } catch (err) {
+      console.error('[ProposalService] Erro ao criar evento na agenda da aplicação:', err)
+      return null
+    }
+  },
+
   async acceptProposal(slug: string, paymentMethod: PaymentMethod, selectedUpsells?: string[]) {
     const proposal = await Proposal.findOne({ slug }).populate('profileId')
     if (!proposal) return null
@@ -328,8 +358,30 @@ export const ProposalService = {
     if (updated) {
       await this.logHistory(updated._id, ProposalStatus.ACCEPTED, 'system', { paymentMethod })
 
-      // Agendar Automação Google via Fila
       const profile: any = proposal.profileId
+
+      // Se possuir data de execução, cria evento na agenda da aplicação se ainda não existir
+      await this.ensureApplicationCalendarEvent(updated, profile)
+
+      // Enviar e-mail de confirmação ao cliente com o PDF do orçamento em anexo
+      if (updated.client?.email) {
+        try {
+          const pdfBuffer = await generateProposalPdfBuffer(updated, profile)
+          await sendProposalAcceptedEmail(
+            updated.client.email,
+            updated.client.name,
+            updated.code,
+            updated.title || updated.code,
+            profile?.name || 'Profissional',
+            pdfBuffer
+          )
+          await this.logHistory(updated._id, ProposalStatus.ACCEPTED, 'email', { status: 'sent_with_pdf' })
+        } catch (emailErr) {
+          console.error(`[ProposalService] Erro ao enviar e-mail com PDF do orçamento aceito ${updated.code}:`, emailErr)
+        }
+      }
+
+      // Agendar Automação Google via Fila
       if (profile?.googleIntegration?.refreshToken) {
         try {
           await QueueService.publish('PROPOSAL_ACCEPTED', { proposalId: updated._id })

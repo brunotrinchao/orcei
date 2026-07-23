@@ -50,7 +50,8 @@ vi.mock('../server/utils/pdf', () => ({
 
 vi.mock('../server/services/ProposalService', () => ({
   ProposalService: {
-    logHistory: vi.fn()
+    logHistory: vi.fn(),
+    ensureApplicationCalendarEvent: vi.fn()
   }
 }))
 

@@ -31,6 +31,18 @@ vi.mock('../server/models/ProposalHistory', () => ({
     create: vi.fn()
   }
 }))
+vi.mock('../server/models/Event', () => ({
+  Event: {
+    create: vi.fn(),
+    findOne: vi.fn().mockResolvedValue(null)
+  }
+}))
+vi.mock('../server/utils/pdf', () => ({
+  generateProposalPdfBuffer: vi.fn().mockResolvedValue(Buffer.from('pdf'))
+}))
+vi.mock('../server/utils/email', () => ({
+  sendProposalAcceptedEmail: vi.fn().mockResolvedValue({ id: 'email-id' })
+}))
 vi.mock('../server/models/PlatformSettings', () => ({
   PlatformSettings: {
     findOne: vi.fn().mockReturnValue({ lean: vi.fn().mockResolvedValue(null) })

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { MessageCircle, MoreVertical, History, Eye, RefreshCcw, Mail, Pencil, Trash2 } from 'lucide-vue-next'
+import { MessageCircle, MoreVertical, History, Download, RefreshCcw, Mail, Pencil, Trash2 } from 'lucide-vue-next'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
 import type { ProposalDTO } from '../../../types'
 
@@ -15,7 +15,7 @@ defineEmits<{
   (e: 'open-chat'): void
   (e: 'send-whatsapp'): void
   (e: 'open-history'): void
-  (e: 'open-preview'): void
+  (e: 'download-pdf'): void
   (e: 'resend-email'): void
   (e: 'edit'): void
   (e: 'delete'): void
@@ -127,11 +127,11 @@ const validityBarColor = computed(() =>
               Ver Histórico
             </DropdownMenuItem>
             <DropdownMenuItem
-              @click="$emit('open-preview')"
+              @click="$emit('download-pdf')"
               class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
             >
-              <Eye class="w-4 h-4" />
-              Visualizar Orçamento
+              <Download class="w-4 h-4" />
+              Baixar Orçamento
             </DropdownMenuItem>
             <DropdownMenuItem
               v-if="proposal.status !== 'draft' && proposal.status !== 'accepted'"

@@ -34,9 +34,29 @@ const proposalList = computed<ProposalDTO[]>(() => {
   return []
 })
 
+// Conjunto de IDs de propostas que já possuem eventos na agenda da aplicação
+const scheduledProposalIds = computed(() => {
+  if (!events.value || !Array.isArray(events.value)) return new Set<string>()
+  const ids = new Set<string>()
+  events.value.forEach(e => {
+    const pId = e.proposalId?._id || e.proposalId
+    if (pId) ids.add(String(pId))
+  })
+  return ids
+})
+
 // Orçamentos com status Aceito
 const acceptedProposals = computed(() => {
   return proposalList.value.filter(p => p.status === 'accepted' || (p as any).status === 'ACEITO')
+})
+
+// Orçamentos aceitos que realmente aguardam agendamento (sem data de execução e não agendados)
+const pendingSchedulingProposals = computed(() => {
+  return acceptedProposals.value.filter(p => {
+    if (p.executionDate) return false
+    if (scheduledProposalIds.value.has(String(p._id))) return false
+    return true
+  })
 })
 
 const proposalOptions = computed(() => {
@@ -269,14 +289,14 @@ const linkedProposal = computed(() => {
     </PageHeader>
 
     <!-- Card de Alerta de Orçamentos Aceitos Pendentes de Agendamento -->
-    <div v-if="acceptedProposals.length > 0" class="bg-blue-50/80 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 p-4 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+    <div v-if="pendingSchedulingProposals.length > 0" class="bg-blue-50/80 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 p-4 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-2xl bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
           <Sparkles class="w-5 h-5" />
         </div>
         <div>
           <h4 class="text-xs font-black text-blue-950 dark:text-blue-100">
-            Você possui {{ acceptedProposals.length }} orçamento(s) aceito(s) aguardando agendamento!
+            Você possui {{ pendingSchedulingProposals.length }} orçamento(s) aceito(s) aguardando agendamento!
           </h4>
           <p class="text-[11px] font-medium text-blue-700 dark:text-blue-300">
             Selecione-os ao criar um novo evento para importar os dados do cliente e do serviço.

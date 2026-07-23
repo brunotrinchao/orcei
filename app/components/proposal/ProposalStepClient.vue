@@ -60,7 +60,7 @@ async function extractClient() {
 
   isExtracting.value = true
   try {
-    const data: any = await $fetch('/api/ai/extract-client', {
+    const data: any = await $fetch('/api/ai/client-extract', {
       method: 'POST',
       body: { text: rawLeadText.value }
     })

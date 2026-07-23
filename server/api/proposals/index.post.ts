@@ -48,6 +48,39 @@ export default defineEventHandler(async (event) => {
 
   const body = await bodyPromise
 
+  // Sanitização de campos
+  if (body.executionDate !== undefined) {
+    if (!body.executionDate || String(body.executionDate).trim() === '') {
+      body.executionDate = null
+    } else {
+      const d = new Date(body.executionDate)
+      body.executionDate = isNaN(d.getTime()) ? null : d
+    }
+  }
+
+  // Sanitizar items e upsellItems
+  if (Array.isArray(body.items)) {
+    body.items = body.items.map((item: any) => ({
+      catalogItemId: item.catalogItemId || undefined,
+      name: String(item.name || '').trim(),
+      description: item.description ? String(item.description).trim() : '',
+      price: Number(item.price) || 0,
+      quantity: Number(item.quantity) || 1,
+      isUpsell: false
+    }))
+  }
+
+  if (Array.isArray(body.upsellItems)) {
+    body.upsellItems = body.upsellItems.map((item: any) => ({
+      catalogItemId: item.catalogItemId || undefined,
+      name: String(item.name || '').trim(),
+      description: item.description ? String(item.description).trim() : '',
+      price: Number(item.price) || 0,
+      quantity: Number(item.quantity) || 1,
+      isUpsell: true
+    }))
+  }
+
   const errors = validateProposal(body)
   if (errors.length > 0) {
     throw createError({
@@ -58,8 +91,17 @@ export default defineEventHandler(async (event) => {
   }
 
   const isAdmin = (session.user as any).role === 'admin'
-  return await ProposalService.create({
-    ...body,
-    profileId: profile._id
-  }, isAdmin)
+  try {
+    return await ProposalService.create({
+      ...body,
+      profileId: profile._id
+    }, isAdmin)
+  } catch (err: any) {
+    if (err.statusCode) throw err
+    console.error('Error creating proposal:', err)
+    throw createError({
+      statusCode: 400,
+      statusMessage: err.message || 'Erro ao criar orçamento. Verifique os dados informados.'
+    })
+  }
 })

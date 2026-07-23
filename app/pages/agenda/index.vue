@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import ptBrLocale from '@fullcalendar/core/locales/pt-br'
-import { Plus, MapPin, Calendar, Clock, FileText, Trash2, X } from 'lucide-vue-next'
-import type { ProposalDTO } from '../../../../types'
+import { Plus, MapPin, Calendar as CalendarIcon, Clock, FileText, Trash2, X, ExternalLink, CheckCircle2, User, Sparkles } from 'lucide-vue-next'
+import type { ProposalDTO } from '../../types'
 
 const { notify, confirm: confirmAlert } = useAlerts()
 const { data: events, refresh: refreshEvents, pending: pendingEvents } = useLazyFetch<any[]>('/api/events')
-const { data: proposals, pending: pendingProposals } = useLazyFetch<ProposalDTO[]>('/api/proposals')
+const { data: proposalsData, pending: pendingProposals } = useLazyFetch<any>('/api/proposals?limit=100')
 
 const isModalOpen = ref(false)
 const isSubmitting = ref(false)
@@ -25,6 +25,64 @@ const form = ref({
   allDay: false,
   color: '#3B82F6'
 })
+
+// Garantir extração correta de array de propostas de forma segura
+const proposalList = computed<ProposalDTO[]>(() => {
+  if (!proposalsData.value) return []
+  if (Array.isArray(proposalsData.value)) return proposalsData.value
+  if (Array.isArray(proposalsData.value.items)) return proposalsData.value.items
+  return []
+})
+
+// Orçamentos com status Aceito
+const acceptedProposals = computed(() => {
+  return proposalList.value.filter(p => p.status === 'accepted' || (p as any).status === 'ACEITO')
+})
+
+const proposalOptions = computed(() => {
+  const options = acceptedProposals.value.map(p => ({
+    label: `✓ [ACEITO] #${p.code || 'S/N'} - ${p.title} (${p.client?.name || 'Cliente'})`,
+    value: p._id
+  }))
+
+  const otherProposals = proposalList.value.filter(p => p.status !== 'accepted' && (p as any).status !== 'ACEITO')
+  if (otherProposals.length > 0) {
+    options.push(...otherProposals.map(p => ({
+      label: `#${p.code || 'S/N'} - ${p.title} (${p.client?.name || 'Cliente'})`,
+      value: p._id
+    })))
+  }
+  return options
+})
+
+function onProposalSelect(proposalId: string) {
+  if (!proposalId) return
+  const p = proposalList.value.find(item => item._id === proposalId)
+  if (!p) return
+
+  // Auto preencher título e descrição
+  if (!form.value.title || form.value.title.trim() === '') {
+    form.value.title = `Execução: ${p.title}`
+  }
+
+  const clientInfo = p.client ? `Cliente: ${p.client.name}` : ''
+  const phoneInfo = p.client?.phone ? `Telefone: ${p.client.phone}` : ''
+  const emailInfo = p.client?.email ? `Email: ${p.client.email}` : ''
+  const totalValue = p.total ? `Valor do Serviço: R$ ${Number(p.total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : ''
+
+  const details = [
+    `Orçamento Aceito: #${p.code || 'S/N'}`,
+    clientInfo,
+    phoneInfo,
+    emailInfo,
+    totalValue,
+    p.notes ? `Observações do Orçamento: ${p.notes}` : ''
+  ].filter(Boolean).join('\n')
+
+  if (!form.value.description || form.value.description.trim() === '') {
+    form.value.description = details
+  }
+}
 
 const calendarOptions = computed(() => ({
   plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
@@ -41,8 +99,8 @@ const calendarOptions = computed(() => ({
     start: e.start,
     end: e.end,
     allDay: e.allDay,
-    backgroundColor: e.color,
-    borderColor: e.color,
+    backgroundColor: e.color || '#3B82F6',
+    borderColor: e.color || '#3B82F6',
     extendedProps: { ...e }
   })) || [],
   editable: true,
@@ -54,15 +112,48 @@ const calendarOptions = computed(() => ({
   height: 'auto'
 }))
 
-function handleDateSelect(selectInfo: any) {
+function openNewEventModal() {
   selectedEvent.value = null
+  const now = new Date()
+  const todayStr = now.toISOString().slice(0, 10)
+  const currentHour = String(now.getHours()).padStart(2, '0')
+  const nextHour = String((now.getHours() + 1) % 24).padStart(2, '0')
+
   form.value = {
     title: '',
     description: '',
-    start: selectInfo.startStr,
-    end: selectInfo.endStr,
+    start: `${todayStr}T${currentHour}:00`,
+    end: `${todayStr}T${nextHour}:00`,
     proposalId: '',
-    allDay: selectInfo.allDay,
+    allDay: false,
+    color: '#3B82F6'
+  }
+  isModalOpen.value = true
+}
+
+function handleDateSelect(selectInfo?: any) {
+  selectedEvent.value = null
+  const now = new Date()
+  const todayStr = now.toISOString().slice(0, 10)
+
+  const rawStart = selectInfo?.startStr || todayStr
+  const rawEnd = selectInfo?.endStr || rawStart
+
+  const startIso = rawStart.includes('T')
+    ? rawStart.slice(0, 16)
+    : `${rawStart}T09:00`
+
+  const endIso = rawEnd.includes('T')
+    ? rawEnd.slice(0, 16)
+    : `${rawStart}T10:00`
+
+  form.value = {
+    title: '',
+    description: '',
+    start: startIso,
+    end: endIso,
+    proposalId: '',
+    allDay: selectInfo?.allDay ?? false,
     color: '#3B82F6'
   }
   isModalOpen.value = true
@@ -74,10 +165,10 @@ function handleEventClick(clickInfo: any) {
   form.value = {
     title: e.title,
     description: e.description || '',
-    start: new Date(e.start).toISOString().slice(0, 16),
-    end: new Date(e.end).toISOString().slice(0, 16),
+    start: e.start ? new Date(e.start).toISOString().slice(0, 16) : '',
+    end: e.end ? new Date(e.end).toISOString().slice(0, 16) : '',
     proposalId: e.proposalId?._id || e.proposalId || '',
-    allDay: e.allDay,
+    allDay: e.allDay || false,
     color: e.color || '#3B82F6'
   }
   isModalOpen.value = true
@@ -94,8 +185,10 @@ async function handleEventDrop(dropInfo: any) {
         allDay: e.allDay
       }
     })
+    notify('Sucesso', 'Compromisso reagendado com sucesso!')
   } catch (err) {
     dropInfo.revert()
+    notify('Erro', 'Não foi possível mover o compromisso.')
   }
 }
 
@@ -109,25 +202,32 @@ async function handleEventResize(resizeInfo: any) {
         end: e.end?.toISOString()
       }
     })
+    notify('Sucesso', 'Duração do compromisso atualizada!')
   } catch (err) {
     resizeInfo.revert()
+    notify('Erro', 'Erro ao alterar a duração.')
   }
 }
 
 async function saveEvent() {
+  if (!form.value.title) {
+    notify('Atenção', 'Informe o título do compromisso.')
+    return
+  }
   isSubmitting.value = true
   try {
     const method = selectedEvent.value ? 'PUT' : 'POST'
     const endpoint = selectedEvent.value ? `/api/events/${selectedEvent.value._id}` : '/api/events'
-    
+
     await $fetch(endpoint, {
       method,
       body: form.value
     })
     isModalOpen.value = false
     refreshEvents()
+    notify('Sucesso', selectedEvent.value ? 'Compromisso atualizado!' : 'Compromisso agendado com sucesso!')
   } catch (e: any) {
-    notify('Erro', 'Erro ao salvar evento')
+    notify('Erro', 'Ocorreu um erro ao salvar o compromisso.')
   } finally {
     isSubmitting.value = false
   }
@@ -135,18 +235,19 @@ async function saveEvent() {
 
 async function deleteEvent() {
   if (!selectedEvent.value) return
-  
+
   confirmAlert({
     title: 'Excluir Compromisso',
-    description: 'Deseja excluir este compromisso?',
+    description: 'Deseja excluir este compromisso permanentemente?',
     variant: 'destructive',
     onConfirm: async () => {
       try {
         await $fetch(`/api/events/${selectedEvent.value?._id}`, { method: 'DELETE' })
         isModalOpen.value = false
         refreshEvents()
+        notify('Sucesso', 'Compromisso removido.')
       } catch (e) {
-        notify('Erro', 'Erro ao excluir')
+        notify('Erro', 'Erro ao excluir o compromisso.')
       }
     }
   })
@@ -154,90 +255,108 @@ async function deleteEvent() {
 
 const linkedProposal = computed(() => {
   if (!form.value.proposalId) return null
-  return proposals.value?.find(p => p._id === form.value.proposalId)
-})
-
-const proposalOptions = computed(() => {
-  return proposals.value?.map(p => ({
-    label: `${p.code || 'S/N'} - ${p.title} (${p.client.name})`,
-    value: p._id
-  })) || []
+  return proposalList.value.find(p => p._id === form.value.proposalId)
 })
 </script>
 
 <template>
-  <div class="space-y-10 relative">
-    <PageHeader title="Sua Agenda" subtitle="Organize seus serviços e reuniões de forma integrada.">
-      <BaseButton data-tour="agenda-novo-evento-btn" @click="isModalOpen = true" class="w-full sm:w-auto shadow-xl shadow-blue-100">
+  <div class="space-y-8 relative">
+    <PageHeader title="Sua Agenda" subtitle="Organize seus atendimentos, reuniões e orçamentos aprovados num único local.">
+      <BaseButton data-tour="agenda-novo-evento-btn" @click="openNewEventModal()" class="w-full sm:w-auto shadow-xl shadow-blue-500/10">
         <Plus class="w-5 h-5 mr-2" />
         Novo Compromisso
       </BaseButton>
     </PageHeader>
 
-    <div data-tour="agenda-calendario" class="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm">
-      <!-- ClientOnly: defers FullCalendar init, prevents SSR DOM errors (bundle-dynamic-imports) -->
+    <!-- Card de Alerta de Orçamentos Aceitos Pendentes de Agendamento -->
+    <div v-if="acceptedProposals.length > 0" class="bg-blue-50/80 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 p-4 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+          <Sparkles class="w-5 h-5" />
+        </div>
+        <div>
+          <h4 class="text-xs font-black text-blue-950 dark:text-blue-100">
+            Você possui {{ acceptedProposals.length }} orçamento(s) aceito(s) aguardando agendamento!
+          </h4>
+          <p class="text-[11px] font-medium text-blue-700 dark:text-blue-300">
+            Selecione-os ao criar um novo evento para importar os dados do cliente e do serviço.
+          </p>
+        </div>
+      </div>
+      <BaseButton size="sm" variant="secondary" @click="openNewEventModal()" class="shrink-0 w-full sm:w-auto">
+        Agendar Agora
+      </BaseButton>
+    </div>
+
+    <!-- Container da Agenda (Dark Mode & Touch Ready) -->
+    <div data-tour="agenda-calendario" class="bg-white dark:bg-gray-900 p-4 sm:p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
       <ClientOnly>
         <FullCalendar :options="calendarOptions" />
         <template #fallback>
-          <div class="h-[600px] bg-gray-50 rounded-3xl animate-pulse" />
+          <div class="h-[550px] bg-gray-50 dark:bg-gray-800/40 rounded-3xl animate-pulse flex items-center justify-center text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest">
+            Carregando agenda...
+          </div>
         </template>
       </ClientOnly>
     </div>
 
-    <!-- Modal de Evento -->
-    <BaseDialog v-model:open="isModalOpen" :title="selectedEvent ? 'Detalhes do Compromisso' : 'Novo Compromisso'" size="lg">
-      <form id="event-form" @submit.prevent="saveEvent" class="space-y-6 py-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="md:col-span-2">
-            <BaseInput v-model="form.title" label="Título" placeholder="Ex: Entrega do Projeto X" required />
-          </div>
-          <BaseInput v-model="form.start" type="datetime-local" label="Início" required />
-          <BaseInput v-model="form.end" type="datetime-local" label="Término" required />
-          
-          <div class="md:col-span-2">
-            <BaseSelect 
-              v-model="form.proposalId" 
-              label="Vincular Orçamento" 
-              placeholder="Selecione um orçamento..."
-              :options="proposalOptions"
-            />
-          </div>
-        </div>
-
-        <div v-if="linkedProposal" class="p-6 bg-blue-50/50 rounded-2xl border border-blue-100 space-y-4">
+    <!-- Modal de Configuração de Evento -->
+    <BaseDialog v-model:open="isModalOpen" :title="selectedEvent ? 'Editar Compromisso' : 'Novo Compromisso'" size="lg">
+      <form id="event-form" @submit.prevent="saveEvent" class="space-y-6 py-2">
+        <!-- Seleção de Orçamento Aceito / Qualquer Orçamento -->
+        <div class="bg-gray-50/80 dark:bg-gray-800/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-700/60 space-y-2">
           <div class="flex items-center justify-between">
-            <h3 class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Orçamento Vinculado</h3>
-            <NuxtLink :to="`/orcamentos`" class="text-[9px] font-black text-blue-400 hover:text-blue-600 uppercase">Ver Orçamento</NuxtLink>
+            <label class="text-xs font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+              <CheckCircle2 class="w-4 h-4 text-emerald-500" /> Vincular Orçamento Aceito
+            </label>
+            <span v-if="form.proposalId" class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+              Vinculado
+            </span>
           </div>
-          <div class="flex flex-col gap-1">
-            <span class="font-bold text-gray-900">{{ linkedProposal.title }}</span>
-            <span class="text-xs text-gray-500">{{ linkedProposal.client.name }}</span>
+          <BaseSelect
+            v-model="form.proposalId"
+            placeholder="Selecione um orçamento para importar os dados..."
+            :options="proposalOptions"
+            @update:modelValue="onProposalSelect"
+          />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="md:col-span-2">
+            <BaseInput v-model="form.title" label="Título do Compromisso" placeholder="Ex: Execução de Serviço - Cliente X" required />
           </div>
-          <div v-if="linkedProposal.client" class="flex flex-col gap-3 pt-2">
-            <div class="flex items-start gap-2 text-xs text-gray-600">
-              <MapPin class="w-3.5 h-3.5 mt-0.5 shrink-0 text-blue-500" />
-              <span>
-                Local do Atendimento: <br>
-                {{ linkedProposal.client.email }} <!-- Using email as placeholder for missing client address in ProposalDTO if not populated -->
-              </span>
-            </div>
-            <a 
-              :href="`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(linkedProposal.client.name)}`" 
-              target="_blank"
-              class="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-800 transition-colors bg-white px-4 py-2 rounded-lg border border-blue-100 shadow-sm w-fit"
-            >
-              <ExternalLink class="w-3 h-3" /> Abrir no Google Maps
-            </a>
+          <BaseInput v-model="form.start" type="datetime-local" label="Data e Hora de Início" required />
+          <BaseInput v-model="form.end" type="datetime-local" label="Data e Hora de Término" required />
+        </div>
+
+        <!-- Card de Detalhes do Orçamento Vinculado -->
+        <div v-if="linkedProposal" class="p-5 bg-blue-50/70 dark:bg-blue-950/30 rounded-2xl border border-blue-100 dark:border-blue-900/50 space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest flex items-center gap-1.5">
+              <FileText class="w-3.5 h-3.5" /> Orçamento Vinculado
+            </h4>
+            <NuxtLink :to="`/orcamentos/${linkedProposal._id}`" target="_blank" class="text-[10px] font-black text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+              Ver Detalhes <ExternalLink class="w-3 h-3" />
+            </NuxtLink>
+          </div>
+          <div class="space-y-1">
+            <p class="text-sm font-black text-gray-900 dark:text-gray-100">{{ linkedProposal.title }}</p>
+            <p v-if="linkedProposal.client" class="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
+              <User class="w-3.5 h-3.5 text-blue-500" />
+              <span><strong>Cliente:</strong> {{ linkedProposal.client.name }} ({{ linkedProposal.client.phone || linkedProposal.client.email }})</span>
+            </p>
+            <p v-if="linkedProposal.total" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 pt-1">
+              Valor Total: R$ {{ Number(linkedProposal.total).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
+            </p>
           </div>
         </div>
 
-        <BaseTextarea 
-          v-model="form.description" 
-          label="Observações"
-          :rows="3" 
-          placeholder="Detalhes adicionais..."
+        <BaseTextarea
+          v-model="form.description"
+          label="Observações / Detalhes do Serviço"
+          :rows="4"
+          placeholder="Descreva detalhes como endereço, instrução de acesso ou itens do serviço..."
         />
-
       </form>
 
       <template #footer>
@@ -245,13 +364,13 @@ const proposalOptions = computed(() => {
           v-if="selectedEvent"
           type="button"
           @click="deleteEvent"
-          class="mr-auto flex items-center gap-2 text-xs font-black text-red-500 hover:text-red-700 uppercase tracking-widest transition-colors"
+          class="mr-auto flex items-center gap-2 text-xs font-black text-red-500 hover:text-red-700 dark:hover:text-red-400 uppercase tracking-widest transition-colors"
         >
           <Trash2 class="w-4 h-4" /> Excluir
         </button>
         <BaseButton type="button" variant="secondary" @click="isModalOpen = false">Cancelar</BaseButton>
         <BaseButton type="button" :disabled="isSubmitting" :loading="isSubmitting" @click="saveEvent">
-          {{ selectedEvent ? 'Atualizar' : 'Agendar' }}
+          {{ selectedEvent ? 'Salvar Alterações' : 'Criar Compromisso' }}
         </BaseButton>
       </template>
     </BaseDialog>
@@ -271,21 +390,53 @@ const proposalOptions = computed(() => {
   --fc-today-bg-color: #eff6ff;
 }
 
+.dark .fc {
+  --fc-button-bg-color: #1f2937;
+  --fc-button-border-color: #374151;
+  --fc-button-hover-bg-color: #374151;
+  --fc-button-hover-border-color: #4b5563;
+  --fc-button-active-bg-color: #374151;
+  --fc-button-active-border-color: #4b5563;
+  --fc-button-text-color: #f9fafb;
+  --fc-border-color: #1f2937;
+  --fc-today-bg-color: rgba(30, 58, 138, 0.25);
+  --fc-page-bg-color: #111827;
+  --fc-neutral-bg-color: #1f2937;
+  --fc-list-event-hover-bg-color: #374151;
+}
+
 .fc .fc-toolbar-title {
-  @apply text-xl font-black text-gray-900 uppercase tracking-tight;
+  @apply text-lg sm:text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight;
+}
+
+.dark .fc .fc-col-header-cell-cushion,
+.dark .fc .fc-daygrid-day-number,
+.dark .fc .fc-list-day-text,
+.dark .fc .fc-list-day-side-text {
+  color: #9ca3af !important;
+}
+
+.dark .fc .fc-list-event-title,
+.dark .fc .fc-list-event-time {
+  color: #f3f4f6 !important;
+}
+
+.dark .fc .fc-list-empty {
+  background-color: transparent !important;
+  color: #9ca3af !important;
 }
 
 .fc .fc-button {
-  @apply rounded-xl font-black uppercase text-[10px] tracking-widest px-4 py-2 transition-all shadow-none;
+  @apply rounded-xl font-black uppercase text-[10px] tracking-widest px-3 py-2 transition-all shadow-none touch-manipulation;
 }
 
-.fc .fc-button-primary:not(:disabled).fc-button-active, 
+.fc .fc-button-primary:not(:disabled).fc-button-active,
 .fc .fc-button-primary:not(:disabled):active {
-  @apply bg-gray-900 border-gray-900 text-white;
+  @apply bg-blue-600 border-blue-600 text-white dark:bg-blue-600 dark:border-blue-600;
 }
 
 .fc .fc-daygrid-day-number {
-  @apply font-black text-xs text-gray-400 p-4;
+  @apply font-black text-xs text-gray-400 dark:text-gray-500 p-2 sm:p-4;
 }
 
 .fc .fc-event {

@@ -30,12 +30,15 @@ export default defineNuxtConfig({
           children: `
             (function() {
               try {
-                const theme = localStorage.getItem('orcei-dark-mode');
-                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                if (theme === 'dark' || (!theme && prefersDark)) {
+                var theme = localStorage.getItem('orcei-dark-mode');
+                var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var isDark = theme === 'true' || theme === 'dark' || ((!theme || theme === 'auto') && prefersDark);
+                if (isDark) {
                   document.documentElement.classList.add('dark');
+                  document.documentElement.style.colorScheme = 'dark';
                 } else {
                   document.documentElement.classList.remove('dark');
+                  document.documentElement.style.colorScheme = 'light';
                 }
               } catch (e) {}
             })();

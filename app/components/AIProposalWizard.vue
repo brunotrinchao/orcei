@@ -50,11 +50,12 @@ async function generate() {
       body: { prompt: promptText.value }
     })
     
-    // Mapeamos os itens para garantir que possuam estados locais de interação
+    // Mapeamos os itens para garantir que possuam estados locais de interação e chaves estáveis
     results.value = {
       ...data,
-      items: data.items.map((item: any) => ({
+      items: data.items.map((item: any, idx: number) => ({
         ...item,
+        _uid: item._uid || `ai_item_${idx}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
         // Define se o item é do catálogo ou sugerido baseado no retorno do backend
         isCatalog: !!item.catalogItemId,
         isSaving: false
@@ -278,7 +279,7 @@ function removeItem(idx: number) {
               >
                 <div 
                   v-for="(item, idx) in results.items" 
-                  :key="item.name" 
+                  :key="item._uid || idx" 
                   class="relative overflow-hidden bg-white dark:bg-slate-950/40 p-5 rounded-[2rem] border transition-all duration-300 hover:shadow-md flex flex-col gap-4 group"
                   :class="[
                     item.isCatalog 

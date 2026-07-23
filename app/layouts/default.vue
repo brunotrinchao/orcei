@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SubscriptionPlan } from '../../types/enums'
 import { onClickOutside } from '@vueuse/core'
-import { Shield, ArrowLeft, Home, FileText, Plus, Users, Settings, LogOut, BookOpen, ReceiptText, Coins, Moon, Sun, HelpCircle } from 'lucide-vue-next'
+import { Shield, ArrowLeft, Home, FileText, Plus, Users, Settings, LogOut, BookOpen, ReceiptText, Coins, Moon, Sun, HelpCircle, Menu, X, ChevronRight, Calendar } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../types'
 const { loggedIn, user, session, clear, fetch: refreshSession } = useUserSession()
 const { data: profile, refresh: refreshLayoutProfile } = useFetch<ProfileDTO>('/api/profile', { key: 'profile' })
@@ -17,6 +17,7 @@ async function stopImpersonating() {
 }
 
 const isMenuOpen = ref(false)
+const isMobileDrawerOpen = ref(false)
 const menuRef = ref<HTMLElement | null>(null)
 
 onClickOutside(menuRef, () => {
@@ -27,9 +28,19 @@ const route = useRoute()
 const { hasTourForRoute, startTour } = useOnboarding()
 const tourId = computed(() => hasTourForRoute(route.path))
 
+watch(() => route.path, () => {
+  isMobileDrawerOpen.value = false
+  isMenuOpen.value = false
+})
+
 function toggleMenu() {
   isMenuOpen.value = !isMenuOpen.value
 }
+
+function toggleMobileDrawer() {
+  isMobileDrawerOpen.value = !isMobileDrawerOpen.value
+}
+
 const { isDark, toggle } = useDarkMode()
 const { notify, confirm: confirmAlert } = useAlerts()
 const { resetConsent } = useCookieConsent()
@@ -41,6 +52,7 @@ async function logout() {
     actionText: 'Sair',
     variant: 'destructive',
     onConfirm: async () => {
+      isMobileDrawerOpen.value = false
       await $fetch('/api/auth/logout', { method: 'POST' })
       await clear()
       navigateTo('/')
@@ -69,7 +81,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50/50 dark:bg-gray-950 pb-16 md:pb-0 font-sans text-gray-900 dark:text-gray-50 antialiased">
+  <div class="min-h-screen bg-gray-50/50 dark:bg-gray-950 pb-0 font-sans text-gray-900 dark:text-gray-50 antialiased">
     <!-- Desktop/Mobile Header -->
     <header class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100 dark:border-gray-800">
       <nav class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -80,6 +92,7 @@ onUnmounted(() => {
             <NuxtLink to="/clientes" @mouseenter="preloadRouteComponents('/clientes')" @focus="preloadRouteComponents('/clientes')" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" active-class="text-gray-900 dark:text-white">Clientes</NuxtLink>
             <NuxtLink to="/catalogo" @mouseenter="preloadRouteComponents('/catalogo')" @focus="preloadRouteComponents('/catalogo')" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" active-class="text-gray-900 dark:text-white">Catálogo</NuxtLink>
             <NuxtLink to="/orcamentos" @mouseenter="preloadRouteComponents('/orcamentos')" @focus="preloadRouteComponents('/orcamentos')" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" active-class="text-gray-900 dark:text-white">Orçamentos</NuxtLink>
+            <NuxtLink to="/agenda" @mouseenter="preloadRouteComponents('/agenda')" @focus="preloadRouteComponents('/agenda')" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" active-class="text-gray-900 dark:text-white">Agenda</NuxtLink>
             <NuxtLink to="/relatorios" @mouseenter="preloadRouteComponents('/relatorios')" @focus="preloadRouteComponents('/relatorios')" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" active-class="text-gray-900 dark:text-white">Relatórios</NuxtLink>
           </div>
           <div v-else class="hidden md:flex gap-8">
@@ -90,8 +103,8 @@ onUnmounted(() => {
 
         <div class="flex items-center gap-2 md:gap-3">
           <template v-if="loggedIn">
-            <!-- Credits & Plan Display -->
-            <div class="flex items-center gap-2 md:gap-3.5 bg-slate-50 dark:bg-slate-900/60 px-2.5 md:px-3.5 py-1.5 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-inner mr-0.5 md:mr-1">
+            <!-- Credits & Plan Display (Desktop) -->
+            <div class="hidden md:flex items-center gap-2 md:gap-3.5 bg-slate-50 dark:bg-slate-900/60 px-2.5 md:px-3.5 py-1.5 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-inner mr-0.5 md:mr-1">
               <!-- Créditos -->
               <div class="flex items-center gap-1.5 py-0.5">
                 <div class="w-6 h-6 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-500">
@@ -103,10 +116,10 @@ onUnmounted(() => {
                 </div>
               </div>
               
-              <!-- Divisor (Oculto no mobile) -->
+              <!-- Divisor -->
               <div v-if="profile?.subscriptionPlan && profile.subscriptionPlan !== SubscriptionPlan.FREE" class="hidden md:block h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
               
-              <!-- Plano (Oculto no mobile) -->
+              <!-- Plano -->
               <div v-if="profile?.subscriptionPlan && profile.subscriptionPlan !== SubscriptionPlan.FREE" class="hidden md:flex items-center gap-1.5 py-0.5">
                 <div class="flex flex-col">
                   <span class="text-[7px] uppercase font-black text-gray-400 dark:text-gray-500 tracking-wider leading-none">
@@ -126,7 +139,7 @@ onUnmounted(() => {
               </div>
             </div>
 
-            <!-- Admin Quick Access (Oculto no mobile) -->
+            <!-- Admin Quick Access (Desktop) -->
             <NuxtLink 
               v-if="user?.role === 'admin'"
               to="/admin" 
@@ -137,10 +150,10 @@ onUnmounted(() => {
               <Shield class="w-4.5 h-4.5" />
             </NuxtLink>
 
-            <!-- Onboarding Help Button (Oculto no mobile) -->
+            <!-- Onboarding Help Button (Desktop) -->
             <OnboardingHelpButton class="hidden md:flex" />
 
-            <!-- Dark Mode Toggle -->
+            <!-- Dark Mode Toggle (Desktop) -->
             <button
               @click="toggle()"
               class="hidden md:flex w-10 h-10 rounded-2xl items-center justify-center bg-gray-50 dark:bg-gray-900/60 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 border border-slate-100 dark:border-slate-800/80 shadow-sm hover:ring-4 ring-gray-100 dark:ring-gray-800/50 transition-all"
@@ -152,8 +165,8 @@ onUnmounted(() => {
               </ClientOnly>
             </button>
 
-            <!-- User Avatar -->
-            <div ref="menuRef" class="relative">
+            <!-- User Avatar (Desktop) -->
+            <div ref="menuRef" class="hidden md:block relative">
               <button 
                 @click="toggleMenu" 
                 class="w-10 h-10 rounded-2xl bg-gray-50 dark:bg-gray-900 flex items-center justify-center overflow-hidden hover:ring-4 ring-gray-100 dark:ring-gray-800/50 transition-all border border-slate-100 dark:border-slate-800/80 shadow-sm relative z-[60]"
@@ -162,7 +175,7 @@ onUnmounted(() => {
                 <span v-else class="text-sm font-black text-gray-900 dark:text-gray-50">{{ (user as any)?.name?.charAt(0).toUpperCase() || profile?.name?.charAt(0).toUpperCase() }}</span>
               </button>
 
-              <!-- Dropdown (Minimalist) -->
+              <!-- Dropdown Desktop -->
               <div v-if="isMenuOpen" class="absolute right-0 mt-3 w-48 bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-1.5 overflow-hidden ring-1 ring-black/5 dark:ring-white/5 z-[70]">
                 <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700 flex items-center gap-3">
                   <div class="w-6 h-6 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 shrink-0">
@@ -172,42 +185,24 @@ onUnmounted(() => {
                 </div>
                 <NuxtLink to="/configuracoes" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition">Configurações</NuxtLink>
                 <NuxtLink to="/planos" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition">Plano</NuxtLink>
-                
-                <!-- Alternar Aparência (Apenas no Mobile) -->
-                <button 
-                  @click="toggle()" 
-                  class="md:hidden w-full text-left px-4 py-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition flex items-center justify-between border-t border-gray-50 dark:border-gray-800"
-                >
-                  <span>Alternar Tema</span>
-                  <span class="flex items-center gap-1.5 text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase font-mono">
-                    <ClientOnly>
-                      <template v-if="isDark">
-                        <Moon class="w-3.5 h-3.5 text-blue-500" />
-                        <span>Escuro</span>
-                      </template>
-                      <template v-else>
-                        <Sun class="w-3.5 h-3.5 text-amber-500" />
-                        <span>Claro</span>
-                      </template>
-                    </ClientOnly>
-                  </span>
-                </button>
-
-                <!-- Tour Guiado (Apenas no Mobile se houver tour configurado) -->
-                <button 
-                  v-if="tourId"
-                  @click="startTour(tourId, { force: true }); isMenuOpen = false" 
-                  class="md:hidden w-full text-left px-4 py-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition flex items-center justify-between border-t border-gray-50 dark:border-gray-800"
-                >
-                  <span>Tour Guiado (Ajuda)</span>
-                  <HelpCircle class="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                </button>
-
                 <NuxtLink v-if="user?.role === 'admin'" to="/admin" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-red-600 dark:text-red-400 font-bold hover:bg-red-50 dark:hover:bg-red-950/30 transition border-t border-gray-50 dark:border-gray-800">Painel Admin</NuxtLink>
                 <button @click="logout" class="w-full text-left px-4 py-2 text-xs text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition border-t border-gray-50 dark:border-gray-800 mt-1">Sair</button>
               </div>
             </div>
+
+            <!-- Botão Hambúrguer (Mobile) -->
+            <BaseButton
+              variant="ghost"
+              size="icon"
+              @click="toggleMobileDrawer"
+              class="md:hidden text-gray-700 dark:text-gray-200"
+              aria-label="Abrir menu principal"
+            >
+              <Menu v-if="!isMobileDrawerOpen" class="w-6 h-6" />
+              <X v-else class="w-6 h-6" />
+            </BaseButton>
           </template>
+
           <template v-else>
             <NuxtLink
               to="/auth/login"
@@ -219,6 +214,240 @@ onUnmounted(() => {
         </div>
       </nav>
     </header>
+
+    <!-- Overlay & Drawer Lateral Mobile (Slideover) -->
+    <ClientOnly>
+      <Teleport to="body">
+        <!-- Backdrop Backdrop-blur -->
+        <Transition
+          enter-active-class="transition-opacity duration-300 ease-out"
+          enter-from-class="opacity-0"
+          enter-to-class="opacity-100"
+          leave-active-class="transition-opacity duration-200 ease-in"
+          leave-from-class="opacity-100"
+          leave-to-class="opacity-0"
+        >
+          <div
+            v-if="isMobileDrawerOpen"
+            @click="isMobileDrawerOpen = false"
+            class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[200] md:hidden"
+          ></div>
+        </Transition>
+
+        <!-- Drawer Content Container -->
+        <Transition
+          enter-active-class="transition-transform duration-300 ease-out"
+          enter-from-class="translate-x-full"
+          enter-to-class="translate-x-0"
+          leave-active-class="transition-transform duration-200 ease-in"
+          leave-from-class="translate-x-0"
+          leave-to-class="translate-x-full"
+        >
+          <aside
+            v-if="isMobileDrawerOpen"
+            class="fixed top-0 right-0 bottom-0 w-80 max-w-[85vw] bg-white dark:bg-gray-900 z-[201] shadow-2xl flex flex-col justify-between border-l border-gray-100 dark:border-gray-800 p-6 md:hidden overflow-y-auto custom-scrollbar"
+          >
+            <div class="space-y-6">
+              <!-- Header da Gaveta -->
+              <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
+                <AppLogo size="sm" :light="isDark" />
+                <BaseButton variant="ghost" size="icon-sm" @click="isMobileDrawerOpen = false" aria-label="Fechar menu">
+                  <X class="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                </BaseButton>
+              </div>
+
+              <!-- Card de Usuário & Créditos -->
+              <div class="bg-gray-50/80 dark:bg-gray-800/60 p-4 rounded-3xl border border-gray-100 dark:border-gray-800 space-y-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-11 h-11 rounded-2xl bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm shrink-0">
+                    <img v-if="(user as any)?.avatar || profile?.avatar" :src="(user as any)?.avatar || profile?.avatar" class="w-full h-full object-cover" loading="lazy">
+                    <span v-else class="text-base font-black text-gray-900 dark:text-gray-50">{{ (user as any)?.name?.charAt(0).toUpperCase() || profile?.name?.charAt(0).toUpperCase() }}</span>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <h4 class="text-sm font-black text-gray-900 dark:text-gray-50 truncate">{{ (user as any)?.name || profile?.name }}</h4>
+                    <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 truncate">{{ (user as any)?.email || profile?.email }}</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-3 border-t border-gray-200/50 dark:border-gray-700/50">
+                  <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-500">
+                      <Coins class="w-4 h-4" />
+                    </div>
+                    <span class="text-xs font-black text-gray-900 dark:text-gray-50">{{ profile?.creditsBalance ?? 0 }} créditos</span>
+                  </div>
+                  <span class="text-[9px] font-black uppercase px-2 py-1 rounded-lg bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 tracking-wider">
+                    {{ profile?.subscriptionPlan || 'FREE' }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Menu de Links -->
+              <div class="space-y-1">
+                <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 px-3 mb-2">Navegação</p>
+                <NuxtLink
+                  to="/dashboard"
+                  @click="isMobileDrawerOpen = false"
+                  class="flex items-center justify-between px-3 py-3 rounded-2xl text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  active-class="bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-black"
+                >
+                  <div class="flex items-center gap-3">
+                    <Home class="w-4.5 h-4.5" />
+                    <span>Dashboard</span>
+                  </div>
+                  <ChevronRight class="w-4 h-4 opacity-40" />
+                </NuxtLink>
+
+                <NuxtLink
+                  to="/clientes"
+                  @click="isMobileDrawerOpen = false"
+                  class="flex items-center justify-between px-3 py-3 rounded-2xl text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  active-class="bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-black"
+                >
+                  <div class="flex items-center gap-3">
+                    <Users class="w-4.5 h-4.5" />
+                    <span>Clientes</span>
+                  </div>
+                  <ChevronRight class="w-4 h-4 opacity-40" />
+                </NuxtLink>
+
+                <NuxtLink
+                  to="/catalogo"
+                  @click="isMobileDrawerOpen = false"
+                  class="flex items-center justify-between px-3 py-3 rounded-2xl text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  active-class="bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-black"
+                >
+                  <div class="flex items-center gap-3">
+                    <BookOpen class="w-4.5 h-4.5" />
+                    <span>Catálogo</span>
+                  </div>
+                  <ChevronRight class="w-4 h-4 opacity-40" />
+                </NuxtLink>
+
+                <NuxtLink
+                  to="/orcamentos"
+                  @click="isMobileDrawerOpen = false"
+                  class="flex items-center justify-between px-3 py-3 rounded-2xl text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  active-class="bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-black"
+                >
+                  <div class="flex items-center gap-3">
+                    <FileText class="w-4.5 h-4.5" />
+                    <span>Orçamentos</span>
+                  </div>
+                  <ChevronRight class="w-4 h-4 opacity-40" />
+                </NuxtLink>
+
+                <NuxtLink
+                  to="/agenda"
+                  @click="isMobileDrawerOpen = false"
+                  class="flex items-center justify-between px-3 py-3 rounded-2xl text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  active-class="bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-black"
+                >
+                  <div class="flex items-center gap-3">
+                    <Calendar class="w-4.5 h-4.5" />
+                    <span>Agenda</span>
+                  </div>
+                  <ChevronRight class="w-4 h-4 opacity-40" />
+                </NuxtLink>
+
+                <NuxtLink
+                  to="/relatorios"
+                  @click="isMobileDrawerOpen = false"
+                  class="flex items-center justify-between px-3 py-3 rounded-2xl text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  active-class="bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-black"
+                >
+                  <div class="flex items-center gap-3">
+                    <ReceiptText class="w-4.5 h-4.5" />
+                    <span>Relatórios</span>
+                  </div>
+                  <ChevronRight class="w-4 h-4 opacity-40" />
+                </NuxtLink>
+
+                <NuxtLink
+                  to="/configuracoes"
+                  @click="isMobileDrawerOpen = false"
+                  class="flex items-center justify-between px-3 py-3 rounded-2xl text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  active-class="bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-black"
+                >
+                  <div class="flex items-center gap-3">
+                    <Settings class="w-4.5 h-4.5" />
+                    <span>Configurações</span>
+                  </div>
+                  <ChevronRight class="w-4 h-4 opacity-40" />
+                </NuxtLink>
+
+                <NuxtLink
+                  to="/planos"
+                  @click="isMobileDrawerOpen = false"
+                  class="flex items-center justify-between px-3 py-3 rounded-2xl text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  active-class="bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-black"
+                >
+                  <div class="flex items-center gap-3">
+                    <Coins class="w-4.5 h-4.5" />
+                    <span>Planos & Assinatura</span>
+                  </div>
+                  <ChevronRight class="w-4 h-4 opacity-40" />
+                </NuxtLink>
+              </div>
+
+              <!-- Seção de Preferências e Ferramentas -->
+              <div class="pt-4 border-t border-gray-100 dark:border-gray-800 space-y-2">
+                <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 px-3 mb-2">Preferências & Ajuda</p>
+
+                <!-- Dark Mode -->
+                <button
+                  @click="toggle()"
+                  class="w-full flex items-center justify-between px-3 py-3 rounded-2xl text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <div class="flex items-center gap-3">
+                    <Sun v-if="isDark" class="w-4.5 h-4.5 text-amber-500" />
+                    <Moon v-else class="w-4.5 h-4.5 text-slate-400" />
+                    <span>Aparência</span>
+                  </div>
+                  <span class="text-[10px] font-black uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                    {{ isDark ? 'Escuro' : 'Claro' }}
+                  </span>
+                </button>
+
+                <!-- Tour Guiado / Ajuda -->
+                <button
+                  v-if="tourId"
+                  @click="startTour(tourId, { force: true }); isMobileDrawerOpen = false"
+                  class="w-full flex items-center justify-between px-3 py-3 rounded-2xl text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <div class="flex items-center gap-3">
+                    <HelpCircle class="w-4.5 h-4.5 text-blue-600 dark:text-blue-400" />
+                    <span>Tour Guiado (Ajuda)</span>
+                  </div>
+                  <ChevronRight class="w-4 h-4 opacity-40" />
+                </button>
+
+                <!-- Painel Admin -->
+                <NuxtLink
+                  v-if="user?.role === 'admin'"
+                  to="/admin"
+                  @click="isMobileDrawerOpen = false"
+                  class="flex items-center justify-between px-3 py-3 rounded-2xl text-xs font-black text-red-600 dark:text-red-400 bg-red-50/50 dark:bg-red-950/20 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
+                >
+                  <div class="flex items-center gap-3">
+                    <Shield class="w-4.5 h-4.5" />
+                    <span>Painel Admin</span>
+                  </div>
+                  <ChevronRight class="w-4 h-4 opacity-40" />
+                </NuxtLink>
+              </div>
+            </div>
+
+            <!-- Rodapé com Botão de Sair -->
+            <div class="pt-6 border-t border-gray-100 dark:border-gray-800 mt-6">
+              <BaseButton variant="danger" size="md" class="w-full" @click="logout">
+                <LogOut class="w-4 h-4 mr-2" /> Sair da Conta
+              </BaseButton>
+            </div>
+          </aside>
+        </Transition>
+      </Teleport>
+    </ClientOnly>
 
     <!-- Impersonation Banner -->
     <div v-if="session?.impersonatedBy" class="bg-amber-500 text-white px-6 py-2.5 flex items-center justify-center gap-3 text-xs font-black uppercase tracking-widest sticky top-16 z-40">
@@ -293,94 +522,5 @@ onUnmounted(() => {
     </footer>
 
     <OnboardingController v-if="loggedIn" />
-
-    <nav
-      v-if="loggedIn"
-      aria-label="Navegação principal mobile"
-      class="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] pb-[env(safe-area-inset-bottom,0px)]"
-    >
-      <ul class="flex items-center justify-around h-16 px-2">
-        <li class="flex-1 flex justify-center h-full relative">
-          <NuxtLink
-            to="/dashboard"
-            class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white"
-            active-class="text-blue-600 dark:text-blue-400"
-          >
-            <Home class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
-            <span class="text-[9px] font-bold tracking-wide transition-colors">Início</span>
-          </NuxtLink>
-        </li>
-
-
-        <li class="flex-1 flex justify-center h-full relative">
-          <NuxtLink
-            to="/clientes"
-            class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white"
-            active-class="text-blue-600 dark:text-blue-400"
-          >
-            <Users class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
-            <span class="text-[9px] font-bold tracking-wide transition-colors">Clientes</span>
-          </NuxtLink>
-        </li>
-
-        <li class="flex-1 flex justify-center h-full relative">
-          <NuxtLink
-            to="/catalogo"
-            class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white"
-            active-class="text-blue-600 dark:text-blue-400"
-          >
-            <BookOpen class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
-            <span class="text-[9px] font-bold tracking-wide transition-colors">Catálogo</span>
-          </NuxtLink>
-        </li>
-
-        <!-- <li class="flex-1 flex justify-center h-full relative">
-          <NuxtLink
-            to="/orcamentos?new=true"
-            class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200"
-          >
-            <div class="absolute -top-6 flex flex-col items-center justify-center">
-              <div class="flex items-center justify-center w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg shadow-blue-200 active:scale-95 transition-transform duration-200 ring-4 ring-white">
-                <Plus class="w-6 h-6" aria-hidden="true" />
-              </div>
-              <span class="text-[9px] font-bold tracking-wide mt-1 text-gray-500">Novo</span>
-            </div>
-          </NuxtLink>
-        </li> -->
-
-        <li class="flex-1 flex justify-center h-full relative">
-          <NuxtLink
-            to="/orcamentos"
-            class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white"
-            active-class="text-blue-600 dark:text-blue-400"
-          >
-            <FileText class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
-            <span class="text-[9px] font-bold tracking-wide transition-colors">Orçamentos</span>
-          </NuxtLink>
-        </li>
-
-        <li class="flex-1 flex justify-center h-full relative">
-          <NuxtLink
-            to="/relatorios"
-            class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white"
-            active-class="text-blue-600 dark:text-blue-400"
-          >
-            <ReceiptText class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
-            <span class="text-[9px] font-bold tracking-wide transition-colors">Relatórios</span>
-          </NuxtLink>
-        </li>
-
-        <li class="flex-1 flex justify-center h-full relative">
-          <NuxtLink
-            to="/configuracoes"
-            class="group flex flex-col items-center justify-center w-full h-full gap-1 outline-none transition-all duration-200 text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white"
-            active-class="text-blue-600 dark:text-blue-400"
-          >
-            <Settings class="w-5 h-5 active:scale-90 transition-transform duration-200" aria-hidden="true" />
-            <span class="text-[9px] font-bold tracking-wide transition-colors">Ajustes</span>
-          </NuxtLink>
-        </li>
-      </ul>
-    </nav>
   </div>
 </template>

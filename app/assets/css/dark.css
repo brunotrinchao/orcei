@@ -1,3 +1,12 @@
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+  background-color: #020617; /* Slate 950 */
+}
+
 /*
  * Dark mode text inversions — automatically inverts gray-scale text.
  * Uses html.dark selector (specificity 0,2,1) to reliably override Tailwind

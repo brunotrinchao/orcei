@@ -28,11 +28,36 @@ const sanitizeOptions = {
   }
 }
 
-export function buildPdfHeaderHtml(profile: any, appName: string = 'ORCEI') {
+/**
+ * Converte uma URL de imagem remota para um data URI base64.
+ * Necessário porque o Puppeteer bloqueia carregamento de URLs externas
+ * nos templates de headerTemplate/footerTemplate.
+ */
+async function fetchImageAsBase64(url: string): Promise<string | null> {
+  try {
+    const response = await fetch(url)
+    if (!response.ok) return null
+    const arrayBuffer = await response.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+    const contentType = response.headers.get('content-type') || 'image/png'
+    return `data:${contentType};base64,${buffer.toString('base64')}`
+  } catch {
+    return null
+  }
+}
+
+export async function buildPdfHeaderHtml(profile: any, appName: string = 'ORCEI'): Promise<string> {
   const logoUrl = profile?.brandConfig?.logoUrl || process.env.APP_DOCUMENT_LOGO
-  const logoContent = logoUrl
-    ? `<img src="${logoUrl}" style="max-height: 42px; width: auto; object-fit: contain;">`
-    : `<span style="font-size: 18px; font-weight: 900; color: #3B82F6; letter-spacing: -0.025em;">${appName.toUpperCase()}</span>`
+  let logoContent: string
+
+  if (logoUrl) {
+    const dataUri = await fetchImageAsBase64(logoUrl)
+    logoContent = dataUri
+      ? `<img src="${dataUri}" style="max-height: 42px; width: auto; object-fit: contain;">`
+      : `<span style="font-size: 18px; font-weight: 900; color: #3B82F6; letter-spacing: -0.025em;">${appName.toUpperCase()}</span>`
+  } else {
+    logoContent = `<span style="font-size: 18px; font-weight: 900; color: #3B82F6; letter-spacing: -0.025em;">${appName.toUpperCase()}</span>`
+  }
 
   const companyName = profile?.company?.tradeName || profile?.company?.legalName || profile?.name || appName
   const email = profile?.email || ''
@@ -86,11 +111,18 @@ export function buildPdfHeaderHtml(profile: any, appName: string = 'ORCEI') {
   `
 }
 
-export function buildPdfFooterHtml(profile: any, appName: string = 'ORCEI') {
+export async function buildPdfFooterHtml(profile: any, appName: string = 'ORCEI'): Promise<string> {
   const logoUrl = profile?.brandConfig?.logoUrl || process.env.APP_DOCUMENT_LOGO
-  const logoHtml = logoUrl
-    ? `<img src="${logoUrl}" style="height: 14px; width: auto; vertical-align: middle; margin-right: 6px; object-fit: contain;">`
-    : `<strong style="color: #3B82F6; margin-right: 6px; font-size: 9px;">${appName.toUpperCase()}</strong>`
+
+  let logoHtml: string
+  if (logoUrl) {
+    const dataUri = await fetchImageAsBase64(logoUrl)
+    logoHtml = dataUri
+      ? `<img src="${dataUri}" style="height: 14px; width: auto; vertical-align: middle; margin-right: 6px; object-fit: contain;">`
+      : `<strong style="color: #3B82F6; margin-right: 6px; font-size: 9px;">${appName.toUpperCase()}</strong>`
+  } else {
+    logoHtml = `<strong style="color: #3B82F6; margin-right: 6px; font-size: 9px;">${appName.toUpperCase()}</strong>`
+  }
 
   const social = profile?.contact?.social || {}
   const socialParts: string[] = []
@@ -149,8 +181,10 @@ export function buildPdfFooterHtml(profile: any, appName: string = 'ORCEI') {
 
 export async function generateProposalPdfBuffer(proposal: any, profile: any, appName: string = 'ORCEI') {
   const htmlContent = generateProposalHtml(proposal, profile, appName)
-  const headerTemplate = buildPdfHeaderHtml(profile, appName)
-  const footerTemplate = buildPdfFooterHtml(profile, appName)
+  const [headerTemplate, footerTemplate] = await Promise.all([
+    buildPdfHeaderHtml(profile, appName),
+    buildPdfFooterHtml(profile, appName)
+  ])
   
   let browser
   const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL

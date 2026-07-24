@@ -2,14 +2,25 @@
 import { FileText, Download, Eye, Search, Calendar, RefreshCcw, Trash2, AlertTriangle, MoreVertical, Sparkles } from 'lucide-vue-next'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
 import GenerateReportDrawer from '~/components/reports/GenerateReportDrawer.vue'
+import ConfirmCreditDialog from '~/components/ui/ConfirmCreditDialog.vue'
+import PaywallExpressModal from '~/components/ui/PaywallExpressModal.vue'
 
 const searchQuery = ref('')
 const startDate = ref('')
 const endDate = ref('')
 const { data: profile } = useLazyFetch<any>('/api/profile', { key: 'profile' })
 const { getCost } = useCreditCosts()
-const { executeWithCreditCheck } = useConfirmCreditAction()
+const { 
+  isCreditConfirmOpen, 
+  confirmTitle, 
+  confirmDescription, 
+  executeWithCreditCheck, 
+  handleCreditConfirm, 
+  handleCreditCancel 
+} = useConfirmCreditAction()
 
+const isPaywallOpen = ref(false)
+const paywallReason = ref('')
 const isReportDrawerOpen = ref(false)
 const isGeneratingReport = ref(false)
 
@@ -95,7 +106,14 @@ async function handleConfirmReport(payload: { period: string }) {
       notify('Relatório em Segundo Plano', res.message || 'Seu relatório estratégico de IA está sendo gerado em segundo plano. Assim que estiver pronto, você será notificado na Central de Notificações!')
       isReportDrawerOpen.value = false
     } catch (e: any) {
-      notify('Erro', e.data?.statusMessage || 'Erro ao gerar relatório')
+      if (e.statusCode === 402) {
+        paywallReason.value = 'gerar relatório estratégico de IA'
+        isPaywallOpen.value = true
+      } else if (e.statusCode === 429) {
+        notify('Limite Atingido', 'Você fez muitas requisições seguidas. Tente novamente em um minuto.')
+      } else {
+        notify('Erro', e.data?.statusMessage || 'Erro ao gerar relatório')
+      }
     } finally {
       isGeneratingReport.value = false
     }
@@ -300,6 +318,21 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
       :loading="isGeneratingReport"
       :allow-change-period="true"
       @confirm="handleConfirmReport"
+    />
+
+    <!-- Modal de Paywall Express -->
+    <PaywallExpressModal 
+      v-model:open="isPaywallOpen" 
+      :reason="paywallReason" 
+    />
+
+    <!-- Modal de Confirmação de Consumo de Crédito IA -->
+    <ConfirmCreditDialog
+      v-model:open="isCreditConfirmOpen"
+      :title="confirmTitle"
+      :description="confirmDescription"
+      @confirm="handleCreditConfirm"
+      @cancel="handleCreditCancel"
     />
   </div>
 </template>

@@ -14,7 +14,7 @@ export interface INotification {
 }
 
 const notificationSchema = new Schema({
-  profileId: { type: Schema.Types.ObjectId, ref: 'Profile', required: true, index: true },
+  profileId: { type: Schema.Types.Mixed, ref: 'Profile', required: true, index: true },
   type: { 
     type: String, 
     enum: ['proposal_accepted', 'proposal_rejected', 'proposal_sent', 'report_generated'], 

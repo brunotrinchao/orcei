@@ -395,17 +395,19 @@ export const ProposalService = {
       // Notificar prestador de serviço sobre orçamento aceito
       try {
         const profileIdStr = typeof profile === 'object' ? profile._id.toString() : profile.toString()
+        const clientName = updated.client?.name || 'Cliente'
+        const clientEmail = updated.client?.email || ''
         await NotificationService.createNotification({
           profileId: profileIdStr,
           type: 'proposal_accepted',
           title: 'Orçamento Aceito!',
-          summary: `O cliente ${updated.client.name} aceitou a proposta #${updated.code}.`,
+          summary: `O cliente ${clientName} aceitou a proposta #${updated.code}.`,
           details: {
             proposalId: updated._id.toString(),
             code: updated.code,
             title: updated.title,
-            clientName: updated.client.name,
-            clientEmail: updated.client.email,
+            clientName,
+            clientEmail,
             finalValue: updated.totals?.final,
             paymentMethod: updated.paymentConfig?.method,
             acceptedAt: new Date().toISOString()
@@ -430,17 +432,19 @@ export const ProposalService = {
       await this.logHistory(updated._id, 'declined')
       try {
         const profileIdStr = typeof proposal.profileId === 'object' ? (proposal.profileId as any)._id.toString() : proposal.profileId.toString()
+        const clientName = updated.client?.name || 'Cliente'
+        const clientEmail = updated.client?.email || ''
         await NotificationService.createNotification({
           profileId: profileIdStr,
           type: 'proposal_rejected',
           title: 'Orçamento Rejeitado',
-          summary: `O cliente ${updated.client.name} recusou a proposta #${updated.code}.`,
+          summary: `O cliente ${clientName} recusou a proposta #${updated.code}.`,
           details: {
             proposalId: updated._id.toString(),
             code: updated.code,
             title: updated.title,
-            clientName: updated.client.name,
-            clientEmail: updated.client.email,
+            clientName,
+            clientEmail,
             rejectedAt: new Date().toISOString()
           },
           metadata: {

@@ -416,11 +416,44 @@ function buildSocialLinksHtml(social: any) {
   `
 }
 
-export function generateReportHtml(report: any, profile: any, appName: string = 'Orcei') {
-  const logoUrl = profile?.brandConfig?.logoUrl || process.env.APP_DOCUMENT_LOGO
-  const logoHtml = logoUrl
-    ? `<img src="${logoUrl}" width="150" height="108">`
-    : appName.toUpperCase()
+import MarkdownIt from 'markdown-it'
+
+export function buildReportFilename(startDate?: Date | string, endDate?: Date | string, reportId?: string) {
+  const hash = String(reportId || Math.random().toString(36).substring(2, 10)).slice(-8)
+  const formatDMY = (d: Date) => {
+    const day = String(d.getDate()).padStart(2, '0')
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const year = d.getFullYear()
+    return `${day}-${month}-${year}`
+  }
+
+  let startStr = ''
+  let endStr = ''
+
+  if (startDate && endDate) {
+    startStr = formatDMY(new Date(startDate))
+    endStr = formatDMY(new Date(endDate))
+  } else {
+    const now = new Date()
+    endStr = formatDMY(now)
+    const thirtyDaysAgo = new Date(now)
+    thirtyDaysAgo.setDate(now.getDate() - 30)
+    startStr = formatDMY(thirtyDaysAgo)
+  }
+
+  return `relatorio-estrategico-${startStr}-A-${endStr}-${hash}.pdf`
+}
+
+export function generateReportHtml(report: any, profile: any, appName: string = 'ORCEI') {
+  const primaryColor = profile?.brandConfig?.primaryColor || '#3B82F6'
+  const palette = getBrandPalette(primaryColor)
+
+  const md = new MarkdownIt({ html: true })
+  const rawHtml = report.contentHtml || md.render(report.content || '')
+  const contentHtml = sanitizeHtml(rawHtml, sanitizeOptions)
+
+  const periodLabel = report.context?.period || 'Período Comercial Analisado'
+  const createdDateStr = new Date(report.createdAt || Date.now()).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })
 
   return `
     <!DOCTYPE html>
@@ -428,39 +461,86 @@ export function generateReportHtml(report: any, profile: any, appName: string = 
     <head>
       <meta charset="UTF-8">
       <style>
-        body { font-family: sans-serif; padding: 40px; color: #333; line-height: 1.6; }
-        .header { display: flex; justify-content: space-between; border-bottom: 2px solid #3B82F6; padding-bottom: 20px; margin-bottom: 40px; }
-        .logo { font-size: 24px; font-weight: bold; color: #3B82F6; }
-        .title { font-size: 28px; font-weight: 900; margin-bottom: 10px; }
-        .date { font-size: 14px; color: #6b7280; margin-bottom: 40px; }
-        .content { margin-top: 20px; }
-        .content h1, .content h2, .content h3 { color: #3B82F6; margin-top: 30px; }
-        .content p { margin-bottom: 15px; }
-        .content ul { margin-bottom: 15px; }
-        .footer { margin-top: 50px; border-top: 1px solid #eee; pt-20px; font-size: 10px; color: #999; text-align: center; }
+        body { font-family: sans-serif; padding: 10px 0; color: #333; line-height: 1.6; font-size: 13px; }
+        .title { font-size: 24px; font-weight: 900; margin-bottom: 10px; color: ${palette.primaryDark}; }
+        .info-card { background: ${palette.primaryLightBg}; border: 1px solid ${palette.primaryBorder}; border-left: 4px solid ${palette.primary}; padding: 16px; border-radius: 8px; margin-bottom: 25px; }
+        .disclaimer { background: #FFFBEB; border: 1px solid #FCD34D; border-left: 4px solid #F59E0B; color: #92400E; padding: 12px 16px; border-radius: 8px; font-size: 11px; font-weight: 600; margin-bottom: 25px; }
+        .content h1, .content h2, .content h3 { color: ${palette.primaryDark}; border-bottom: 2px solid ${palette.primaryBorder}; padding-bottom: 4px; margin-top: 25px; margin-bottom: 12px; }
+        .content h2 { font-size: 16px; text-transform: uppercase; }
+        .content h3 { font-size: 14px; }
+        .content p { margin-bottom: 12px; text-align: justify; }
+        .content ul, .content ol { margin-bottom: 15px; padding-left: 20px; }
+        .content li { margin-bottom: 6px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 20px; }
+        th { text-align: left; background: ${palette.headerBg}; padding: 10px 12px; border-bottom: 2px solid ${palette.primaryBorder}; font-size: 11px; text-transform: uppercase; color: ${palette.primaryDark}; }
+        td { padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 12px; }
+        blockquote { background: ${palette.primaryLightBg}; border-left: 3px solid ${palette.primary}; margin: 15px 0; padding: 10px 15px; font-style: italic; color: #4B5563; }
       </style>
     </head>
     <body>
-      <div class="header">
-        <div class="logo">${logoHtml}</div>
-        <div style="text-align: right">
-          <div style="font-weight: bold">${profile.name}</div>
-          <div style="font-size: 12px; color: #666">${profile.email}</div>
+      <div class="title">Relatório Estratégico IA</div>
+
+      <div class="info-card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <strong>Emissor:</strong> ${profile?.name || 'Profissional'}<br>
+            <strong>E-mail:</strong> ${profile?.email || ''}<br>
+            <strong>Filtro / Escopo:</strong> ${periodLabel}
+          </div>
+          <div style="text-align: right; font-size: 11px; color: #64748B;">
+            <strong>Gerado em:</strong> ${createdDateStr}<br>
+            <strong>Sistema:</strong> ${appName} IA Copilot
+          </div>
         </div>
       </div>
 
-      <div class="title">Relatório Estratégico IA</div>
-      <div class="date">Gerado em: ${new Date(report.createdAt).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</div>
-
-      <div class="content">
-        ${sanitizeHtml(report.contentHtml, sanitizeOptions)}
+      <div class="disclaimer">
+        ⚡ <strong>Aviso Importante:</strong> Este relatório é produzido por Inteligência Artificial com base nos dados comerciais do seu negócio. As análises e estimativas devem ser validadas antes de tomadas de decisão críticas.
       </div>
 
-      <div class="footer">
-        Este relatório foi gerado automaticamente pela Inteligência Artificial do ${appName} e pode conter equívocos — valide as informações antes de tomar decisões críticas.<br>
-        © 2026 ${appName} - Todos os direitos reservados.
+      <div class="content">
+        ${contentHtml}
       </div>
     </body>
     </html>
   `
+}
+
+export async function generateReportPdfBuffer(report: any, profile: any, appName: string = 'ORCEI') {
+  const htmlContent = generateReportHtml(report, profile, appName)
+  const [headerTemplate, footerTemplate] = await Promise.all([
+    buildPdfHeaderHtml(profile, appName),
+    buildPdfFooterHtml(profile, appName)
+  ])
+
+  let browser
+  const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL
+
+  if (isProd) {
+    const puppeteerCore = await import('puppeteer-core').then(m => m.default || m)
+    const chromium = await import('@sparticuz/chromium').then(m => m.default || m)
+
+    browser = await puppeteerCore.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    })
+  } else {
+    const puppeteer = await import('puppeteer').then(m => m.default || m)
+    browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] })
+  }
+
+  const page = await browser.newPage()
+  await page.setContent(htmlContent)
+  const pdf = await page.pdf({
+    format: 'A4',
+    printBackground: true,
+    displayHeaderFooter: true,
+    headerTemplate,
+    footerTemplate,
+    margin: { top: '120px', bottom: '80px', left: '40px', right: '40px' }
+  })
+  await browser.close()
+  return pdf
 }

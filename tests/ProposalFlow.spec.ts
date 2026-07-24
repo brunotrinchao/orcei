@@ -26,6 +26,15 @@ vi.mock('../server/models/Counter', () => ({
     findOneAndUpdate: vi.fn()
   }
 }))
+vi.mock('../server/models/Notification', () => ({
+  Notification: {
+    create: vi.fn().mockResolvedValue({}),
+    find: vi.fn(),
+    countDocuments: vi.fn(),
+    findOneAndUpdate: vi.fn(),
+    updateMany: vi.fn()
+  }
+}))
 vi.mock('../server/models/ProposalHistory', () => ({
   ProposalHistory: {
     create: vi.fn()

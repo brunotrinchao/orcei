@@ -173,6 +173,50 @@ export const GoogleService = {
   },
 
   /**
+   * Garante a sub-pasta "Relatórios" dentro da pasta raiz do app.
+   * Persiste o ID no perfil para evitar buscas repetidas.
+   */
+  async ensureReportsFolder(auth: any, profile: any, rootFolderId: string): Promise<string> {
+    const drive = google.drive({ version: 'v3', auth })
+
+    if (profile.googleIntegration?.driveReportsFolderId) {
+      try {
+        const folder = await drive.files.get({
+          fileId: profile.googleIntegration.driveReportsFolderId,
+          fields: 'id, trashed'
+        })
+        if (folder.data && !folder.data.trashed) {
+          return folder.data.id as string
+        }
+      } catch (e) {
+        console.warn('[GoogleService] Pasta Relatórios inválida, recriando...')
+      }
+    }
+
+    const res = await drive.files.list({
+      q: `name = 'Relatórios' and mimeType = 'application/vnd.google-apps.folder' and '${rootFolderId}' in parents and trashed = false`,
+      fields: 'files(id)'
+    })
+
+    let reportsFolderId: string
+    if (res.data.files?.length) {
+      reportsFolderId = res.data.files[0].id as string
+    } else {
+      const folder = await drive.files.create({
+        requestBody: { name: 'Relatórios', mimeType: 'application/vnd.google-apps.folder', parents: [rootFolderId] },
+        fields: 'id'
+      })
+      reportsFolderId = folder.data.id as string
+    }
+
+    const { Profile } = await import('../models/Profile')
+    const googleIntegration = { ...(profile.googleIntegration || {}), driveReportsFolderId: reportsFolderId }
+    await Profile.findByIdAndUpdate(profile._id, { $set: { googleIntegration } })
+
+    return reportsFolderId
+  },
+
+  /**
    * Garante a sub-pasta com o nome do cliente dentro de "Propostas".
    */
   async ensureClientFolder(auth: any, proposalsFolderId: string, clientName: string): Promise<string> {

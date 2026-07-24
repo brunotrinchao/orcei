@@ -6,8 +6,10 @@ import { CatalogItem } from '../../models/CatalogItem'
 import { Report } from '../../models/Report'
 import { AIService } from '../../services/AIService'
 import { NotificationService } from '../../services/NotificationService'
+import { GoogleService } from '../../services/GoogleService'
 import { checkRateLimit } from '../../utils/rate-limit'
 import { getActionCost, requireCreditBalance, chargeCredit } from '../../utils/credits'
+import { generateReportPdfBuffer, buildReportFilename } from '../../utils/pdf'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -140,6 +142,23 @@ Um insight estratégico profundo e não-óbvio, específico para este negócio c
 
 Tom: Consultor sênior, direto, baseado em dados, sem frases motivacionais vazias. Use os números reais para embasar cada recomendação.`
 
+  const formatPeriodText = (s?: any, e?: any) => {
+    if (!s || !e) return 'todo o período'
+    try {
+      const startDate = new Date(s as string)
+      const endDate = new Date(e as string)
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return 'período selecionado'
+      const startFmt = startDate.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })
+      const endFmt = endDate.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })
+      if (startFmt === endFmt) return `dia ${startFmt}`
+      return `período de ${startFmt} a ${endFmt}`
+    } catch {
+      return 'período selecionado'
+    }
+  }
+
+  const periodFormatted = formatPeriodText(start, end)
+
   const generateReportTask = async () => {
     try {
       const analysis = await AIService.generateDescription(prompt)
@@ -151,7 +170,7 @@ Tom: Consultor sênior, direto, baseado em dados, sem frases motivacionais vazia
         context: {
           totalProposals: context.totalProposals,
           totalRevenue: context.totalRevenue,
-          period: start && end ? `${start} a ${end}` : 'Todo o período'
+          period: periodFormatted
         }
       })
 
@@ -161,18 +180,42 @@ Tom: Consultor sênior, direto, baseado em dados, sem frases motivacionais vazia
         errorMessage: 'Saldo de créditos insuficiente. Adquira créditos para gerar relatórios com IA.'
       })
 
+      // Gerar PDF do relatório via motor unificado e enviar para o Google Drive (se integrado)
+      if (profile.googleIntegration?.refreshToken) {
+        try {
+          const config = useRuntimeConfig()
+          const pdfBuffer = await generateReportPdfBuffer(newReport, profile, config.appName || 'ORCEI')
+          const auth = GoogleService.getAuthClient(profile)
+          const rootFolderId = await GoogleService.ensureFolder(auth, profile)
+          const reportsFolderId = await GoogleService.ensureReportsFolder(auth, profile, rootFolderId)
+
+          const startDate = start ? new Date(start as string) : new Date(Date.now() - 30 * 86400000)
+          const endDate = end ? new Date(end as string) : new Date()
+          const fileName = buildReportFilename(startDate, endDate, newReport._id.toString())
+
+          const driveFile = await GoogleService.uploadPdf(auth, reportsFolderId, fileName, pdfBuffer)
+          
+          await Report.findByIdAndUpdate(newReport._id, {
+            driveFileId: driveFile.id,
+            driveWebViewLink: driveFile.webViewLink
+          })
+          console.log(`[AI Analyze] Relatório enviado para a pasta Relatórios no Google Drive: ${fileName}`)
+        } catch (driveErr) {
+          console.error(`[AI Analyze] Erro ao enviar relatório para o Google Drive:`, driveErr)
+        }
+      }
+
       // Notificar usuário na Central de Notificações
       try {
-        const periodText = start && end ? `${start} a ${end}` : 'todo o período'
         await NotificationService.createNotification({
           profileId: profile._id.toString(),
           type: 'report_generated',
           title: 'Relatório IA Concluído',
-          summary: `Sua análise estratégica de IA (${periodText}) foi concluída com sucesso!`,
+          summary: `Sua análise estratégica de IA (${periodFormatted}) foi concluída com sucesso!`,
           details: {
             reportId: newReport._id.toString(),
             content: analysis,
-            period: periodText,
+            period: periodFormatted,
             totalProposals: context.totalProposals,
             totalRevenue: context.totalRevenue,
             generatedAt: new Date().toISOString()

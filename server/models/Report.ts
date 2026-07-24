@@ -3,7 +3,9 @@ import { Schema, model } from 'mongoose'
 const reportSchema = new Schema({
   profileId: { type: Schema.Types.ObjectId, ref: 'Profile', required: true, index: true },
   content: { type: String, required: true },
-  context: { type: Schema.Types.Mixed } // Snapshot of the data used for the analysis
+  context: { type: Schema.Types.Mixed }, // Snapshot of the data used for the analysis
+  driveFileId: { type: String },
+  driveWebViewLink: { type: String }
 }, { timestamps: true })
 
 // Index for daily limit check and filtering

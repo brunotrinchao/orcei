@@ -135,7 +135,9 @@ Liste 5 ações concretas, priorizadas por impacto/esforço, no formato:
 Cada ação deve ser específica e executável imediatamente.
 
 ## 🎯 5. Dica de Ouro
-Um insight estratégico profundo e não-óbvio, específico para este negócio com base nos dados apresentados. Deve ser algo que um consultor de R$500/hora diria.
+Um insight estratégico profundo e não-óbvio, específico para este negócio com base nos dados apresentados. Deve ser algo que um consultor de R$500/hora diria. Desenvolva o raciocínio por completo e conclua com uma recomendação clara e finalizada.
+
+IMPORTANTE: É obrigatório concluir integralmente todas as 5 seções do relatório. Certifique-se de finalizar completamente o texto da Seção 5 antes de encerrar sua resposta.
 
 Tom: Consultor sênior, direto, baseado em dados, sem frases motivacionais vazias. Use os números reais para embasar cada recomendação.`
 

@@ -5,7 +5,7 @@ export const AIService = {
     return useRuntimeConfig()
   },
 
-  async generateDescription(prompt: string) {
+  async generateDescription(prompt: string, maxTokens: number = 8192) {
     const config = this._getConfig()
     
     try {
@@ -19,7 +19,7 @@ export const AIService = {
             temperature: 0.7,
             topP: 0.95,
             topK: 40,
-            maxOutputTokens: 8192
+            maxOutputTokens: maxTokens
           }
         })
         
@@ -31,7 +31,7 @@ export const AIService = {
         const fallbackRegex = config.cloudflareFallbackRegex
         if (fallbackRegex && fallbackRegex !== 'true' && new RegExp(fallbackRegex, 'i').test(text)) {
           console.log('Gemini response matched fallback regex. Switching to Cloudflare.')
-          return await this.generateFallback(prompt)
+          return await this.generateFallback(prompt, maxTokens)
         }
 
         return text
@@ -41,7 +41,7 @@ export const AIService = {
     }
 
     // 2. Fallback para Cloudflare / OpenRouter
-    return await this.generateFallback(prompt)
+    return await this.generateFallback(prompt, maxTokens)
   },
 
   async extractClientInfo(text: string) {
@@ -168,7 +168,7 @@ export const AIService = {
     }
   },
 
-  async generateWithCloudflare(prompt: string) {
+  async generateWithCloudflare(prompt: string, maxTokens: number = 8192) {
     const config = this._getConfig()
     const { cloudflareAccountId: accountId, cloudflareApiKey: apiKey, cloudflareAiModel: model } = config
 
@@ -190,7 +190,7 @@ export const AIService = {
               { role: 'system', content: 'Você é um redator profissional de orçamentos comerciais.' },
               { role: 'user', content: prompt }
             ],
-            max_tokens: 2048
+            max_tokens: maxTokens
           })
         }
       )
@@ -207,7 +207,7 @@ export const AIService = {
     }
   },
 
-  async generateWithOpenRouter(prompt: string) {
+  async generateWithOpenRouter(prompt: string, maxTokens: number = 8192) {
     const config = this._getConfig()
     const { openrouterApiKey: apiKey, openrouterModel: model } = config
 
@@ -228,7 +228,7 @@ export const AIService = {
             { role: 'system', content: 'Você é um redator profissional de orçamentos comerciais.' },
             { role: 'user', content: prompt }
           ],
-          max_tokens: 2048
+          max_tokens: maxTokens
         })
       })
 
@@ -242,12 +242,12 @@ export const AIService = {
     }
   },
 
-  async generateFallback(prompt: string) {
+  async generateFallback(prompt: string, maxTokens: number = 8192) {
     try {
-      return await this.generateWithCloudflare(prompt)
+      return await this.generateWithCloudflare(prompt, maxTokens)
     } catch (e) {
       console.error('Cloudflare fallback failed, trying OpenRouter:', e)
-      return await this.generateWithOpenRouter(prompt)
+      return await this.generateWithOpenRouter(prompt, maxTokens)
     }
   },
 

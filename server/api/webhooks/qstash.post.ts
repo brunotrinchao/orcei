@@ -8,6 +8,7 @@ import { Report } from '../../models/Report'
 import { AuditService } from '../../services/AuditService'
 import { ProposalService } from '../../services/ProposalService'
 import { GoogleService } from '../../services/GoogleService'
+import { NotificationService } from '../../services/NotificationService'
 import { generateProposalPdfBuffer } from '../../utils/pdf'
 import { jsonToCsv } from '../../utils/csv'
 import { 
@@ -236,9 +237,36 @@ async function handleSendEmailProposal(payload: any) {
   
   const emailRes = await sendProposalEmail(clientEmail, clientName, url, profileName)
 
-  if (emailRes && proposalId) {
-    await Proposal.findByIdAndUpdate(proposalId, { lastEmailId: emailRes.id })
-    console.log(`[Job] Proposta ${proposalId} atualizada com emailId: ${emailRes.id}`)
+  if (proposalId) {
+    const proposal = await Proposal.findById(proposalId)
+    if (proposal) {
+      if (emailRes) {
+        await Proposal.findByIdAndUpdate(proposalId, { lastEmailId: emailRes.id })
+      }
+      try {
+        await NotificationService.createNotification({
+          profileId: proposal.profileId.toString(),
+          type: 'proposal_sent',
+          title: 'E-mail de Orçamento Enviado',
+          summary: `Proposta #${proposal.code} enviada com sucesso para ${clientEmail}.`,
+          details: {
+            proposalId: proposal._id.toString(),
+            code: proposal.code,
+            title: proposal.title,
+            clientName,
+            clientEmail,
+            url,
+            sentAt: new Date().toISOString()
+          },
+          metadata: {
+            proposalId: proposal._id.toString(),
+            code: proposal.code
+          }
+        })
+      } catch (notifErr) {
+        console.error(`[QStash Webhook] Erro ao criar notificação de e-mail enviado:`, notifErr)
+      }
+    }
   }
 }
 

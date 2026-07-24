@@ -5,6 +5,7 @@ import { ProposalHistory } from '../models/ProposalHistory'
 import { Event } from '../models/Event'
 import { nanoid } from 'nanoid'
 import { QueueService } from './QueueService'
+import { NotificationService } from './NotificationService'
 import { generateProposalPdfBuffer } from '../utils/pdf'
 import { sendProposalAcceptedEmail } from '../utils/email'
 
@@ -390,15 +391,66 @@ export const ProposalService = {
           console.error(`[ProposalService] Erro ao agendar automação Google para ${updated.code}:`, error)
         }
       }
+
+      // Notificar prestador de serviço sobre orçamento aceito
+      try {
+        const profileIdStr = typeof profile === 'object' ? profile._id.toString() : profile.toString()
+        await NotificationService.createNotification({
+          profileId: profileIdStr,
+          type: 'proposal_accepted',
+          title: 'Orçamento Aceito!',
+          summary: `O cliente ${updated.client.name} aceitou a proposta #${updated.code}.`,
+          details: {
+            proposalId: updated._id.toString(),
+            code: updated.code,
+            title: updated.title,
+            clientName: updated.client.name,
+            clientEmail: updated.client.email,
+            finalValue: updated.totals?.final,
+            paymentMethod: updated.paymentConfig?.method,
+            acceptedAt: new Date().toISOString()
+          },
+          metadata: {
+            proposalId: updated._id.toString(),
+            code: updated.code
+          }
+        })
+      } catch (notifErr) {
+        console.error(`[ProposalService] Erro ao criar notificação de proposta aceita:`, notifErr)
+      }
     }
 
     return updated
   },
 
   async declineProposal(slug: string) {
+    const proposal = await Proposal.findOne({ slug }).populate('profileId')
     const updated = await Proposal.findOneAndUpdate({ slug }, { status: ProposalStatus.EXPIRED }, { returnDocument: 'after' })
-    if (updated) {
+    if (updated && proposal) {
       await this.logHistory(updated._id, 'declined')
+      try {
+        const profileIdStr = typeof proposal.profileId === 'object' ? (proposal.profileId as any)._id.toString() : proposal.profileId.toString()
+        await NotificationService.createNotification({
+          profileId: profileIdStr,
+          type: 'proposal_rejected',
+          title: 'Orçamento Rejeitado',
+          summary: `O cliente ${updated.client.name} recusou a proposta #${updated.code}.`,
+          details: {
+            proposalId: updated._id.toString(),
+            code: updated.code,
+            title: updated.title,
+            clientName: updated.client.name,
+            clientEmail: updated.client.email,
+            rejectedAt: new Date().toISOString()
+          },
+          metadata: {
+            proposalId: updated._id.toString(),
+            code: updated.code
+          }
+        })
+      } catch (notifErr) {
+        console.error(`[ProposalService] Erro ao criar notificação de proposta recusada:`, notifErr)
+      }
     }
     return updated
   },

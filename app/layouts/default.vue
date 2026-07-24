@@ -1,10 +1,29 @@
 <script setup lang="ts">
 import { SubscriptionPlan } from '../../types/enums'
 import { onClickOutside } from '@vueuse/core'
-import { Shield, ArrowLeft, Home, FileText, Plus, Users, Settings, LogOut, BookOpen, ReceiptText, Coins, Moon, Sun, HelpCircle, Menu, X, ChevronRight, Calendar } from 'lucide-vue-next'
+import { Shield, ArrowLeft, Home, FileText, Plus, Users, Settings, LogOut, BookOpen, ReceiptText, Coins, Moon, Sun, HelpCircle, Menu, X, ChevronRight, Calendar, Bell } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../types'
+import NotificationCenterDrawer from '~/components/notifications/NotificationCenterDrawer.vue'
+import { useNotifications } from '~/composables/useNotifications'
+
 const { loggedIn, user, session, clear, fetch: refreshSession } = useUserSession()
 const { data: profile, refresh: refreshLayoutProfile } = useFetch<ProfileDTO>('/api/profile', { key: 'profile' })
+const { unreadCount, isDrawerOpen, startPolling, stopPolling, fetchNotifications } = useNotifications()
+
+onMounted(() => {
+  if (loggedIn.value) {
+    startPolling(15000)
+  }
+})
+
+onUnmounted(() => {
+  stopPolling()
+})
+
+function openNotificationCenter() {
+  fetchNotifications()
+  isDrawerOpen.value = true
+}
 
 watch(() => user.value?.id, (newId, oldId) => {
   if (newId && newId !== oldId) refreshLayoutProfile()
@@ -163,6 +182,22 @@ onUnmounted(() => {
                 <Sun v-if="isDark" class="w-4.5 h-4.5 text-amber-500" />
                 <Moon v-else class="w-4.5 h-4.5 text-slate-400" />
               </ClientOnly>
+            </button>
+
+            <!-- Central de Notificações (Sino com Badge) -->
+            <button
+              @click="openNotificationCenter"
+              class="relative w-10 h-10 rounded-2xl items-center justify-center bg-gray-50 dark:bg-gray-900/60 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 border border-slate-100 dark:border-slate-800/80 shadow-sm hover:ring-4 ring-gray-100 dark:ring-gray-800/50 transition-all flex cursor-pointer"
+              aria-label="Abrir Central de Notificações"
+              title="Central de Notificações"
+            >
+              <Bell class="w-4.5 h-4.5 text-slate-600 dark:text-slate-300" />
+              <span 
+                v-if="unreadCount > 0" 
+                class="absolute -top-1 -right-1 min-w-[20px] h-5 px-1.5 flex items-center justify-center bg-blue-600 text-white text-[10px] font-black rounded-full border-2 border-white dark:border-slate-950 animate-pulse"
+              >
+                {{ unreadCount > 99 ? '99+' : unreadCount }}
+              </span>
             </button>
 
             <!-- User Avatar (Desktop) -->
@@ -526,5 +561,6 @@ onUnmounted(() => {
     </footer>
 
     <OnboardingController v-if="loggedIn" />
+    <NotificationCenterDrawer v-model:open="isDrawerOpen" />
   </div>
 </template>

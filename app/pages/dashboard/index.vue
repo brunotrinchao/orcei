@@ -204,10 +204,9 @@ async function confirmAndGenerateReport(payload?: { period?: string }) {
   executeWithCreditCheck('analyzeReport', async () => {
     isAnalyzing.value = true
     try {
-      // Relatório usa o mesmo filtro de período selecionado no dashboard
-      const data: any = await $fetch('/api/ai/analyze', { query: fetchQuery.value })
-      aiReport.value = data.text
-      refresh()
+      const query: any = { ...fetchQuery.value, background: 'true' }
+      const res: any = await $fetch('/api/ai/analyze', { query })
+      notify('Relatório em Segundo Plano', res.message || 'Seu relatório estratégico está sendo gerado em segundo plano. Assim que estiver pronto, você será notificado na Central!')
       isReportDrawerOpen.value = false
     } catch (e: any) {
       if (e.statusCode === 402) {

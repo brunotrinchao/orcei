@@ -5,6 +5,7 @@ import { Proposal } from '../../models/Proposal'
 import { CatalogItem } from '../../models/CatalogItem'
 import { Report } from '../../models/Report'
 import { AIService } from '../../services/AIService'
+import { NotificationService } from '../../services/NotificationService'
 import { checkRateLimit } from '../../utils/rate-limit'
 import { getActionCost, requireCreditBalance, chargeCredit } from '../../utils/credits'
 
@@ -16,7 +17,7 @@ export default defineEventHandler(async (event) => {
   await checkRateLimit(event, { max: 5, windowMs: 60 * 1000, keyPrefix: 'ai-analyze' })
 
   const isAdmin = (session.user as any).role === 'admin'
-  const { start, end } = getQuery(event)
+  const { start, end, background } = getQuery(event)
 
   const { profile, cost, proposals, catalog } = await all({
     async profile() {
@@ -139,33 +140,70 @@ Um insight estratégico profundo e não-óbvio, específico para este negócio c
 
 Tom: Consultor sênior, direto, baseado em dados, sem frases motivacionais vazias. Use os números reais para embasar cada recomendação.`
 
-  try {
-    const analysis = await AIService.generateDescription(prompt)
+  const generateReportTask = async () => {
+    try {
+      const analysis = await AIService.generateDescription(prompt)
 
-    // Save report to database
-    await Report.create({
-      profileId: profile._id,
-      content: analysis,
-      context: {
-        totalProposals: context.totalProposals,
-        totalRevenue: context.totalRevenue,
-        period: start && end ? `${start} a ${end}` : 'Todo o período'
+      // Save report to database
+      const newReport = await Report.create({
+        profileId: profile._id,
+        content: analysis,
+        context: {
+          totalProposals: context.totalProposals,
+          totalRevenue: context.totalRevenue,
+          period: start && end ? `${start} a ${end}` : 'Todo o período'
+        }
+      })
+
+      // Dedução de crédito SOMENTE após relatório gerado e salvo com sucesso (atômica)
+      await chargeCredit(profile._id, cost, isAdmin, {
+        aiUsageField: 'aiUsage.reports',
+        errorMessage: 'Saldo de créditos insuficiente. Adquira créditos para gerar relatórios com IA.'
+      })
+
+      // Notificar usuário na Central de Notificações
+      try {
+        const periodText = start && end ? `${start} a ${end}` : 'todo o período'
+        await NotificationService.createNotification({
+          profileId: profile._id.toString(),
+          type: 'report_generated',
+          title: 'Relatório IA Concluído',
+          summary: `Sua análise estratégica de IA (${periodText}) foi concluída com sucesso!`,
+          details: {
+            reportId: newReport._id.toString(),
+            content: analysis,
+            period: periodText,
+            totalProposals: context.totalProposals,
+            totalRevenue: context.totalRevenue,
+            generatedAt: new Date().toISOString()
+          },
+          metadata: {
+            reportId: newReport._id.toString()
+          }
+        })
+      } catch (notifErr) {
+        console.error('[AI Analyze] Erro ao emitir notificação de relatório gerado:', notifErr)
       }
-    })
 
-    // Dedução de crédito SOMENTE após relatório gerado e salvo com sucesso (atômica)
-    await chargeCredit(profile._id, cost, isAdmin, {
-      aiUsageField: 'aiUsage.reports',
-      errorMessage: 'Saldo de créditos insuficiente. Adquira créditos para gerar relatórios com IA.'
-    })
-
-    return { text: analysis }
-  } catch (e: any) {
-    if (e.statusCode) throw e
-    console.error('AI Analysis Error:', e)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Não foi possível gerar a análise estratégica no momento. Tente novamente em alguns minutos.'
-    })
+      return { text: analysis, reportId: newReport._id }
+    } catch (e: any) {
+      console.error('AI Analysis Error:', e)
+      throw e
+    }
   }
+
+  // Se background for solicitado ou padrão para evitar blocking da UI
+  if (background === 'true' || background === true || background === undefined) {
+    setImmediate(() => {
+      generateReportTask().catch(err => console.error('[Background AI Report Error]:', err))
+    })
+
+    return {
+      success: true,
+      background: true,
+      message: 'Seu relatório estratégico está sendo gerado em segundo plano. Assim que estiver pronto, você será notificado na Central de Notificações.'
+    }
+  }
+
+  return await generateReportTask()
 })

@@ -85,21 +85,15 @@ async function handleConfirmReport(payload: { period: string }) {
       else if (payload.period === 'last_90_days') start.setDate(now.getDate() - 90)
       else if (payload.period === 'year') start = new Date(now.getFullYear(), 0, 1)
 
-      const query: any = payload.period === 'all' ? {} : { start: start.toISOString(), end: now.toISOString() }
-      const data: any = await $fetch('/api/ai/analyze', { query })
-      notify('Sucesso', 'Relatório estratégico de IA gerado com sucesso!')
-      refresh()
-      
-      isReportDrawerOpen.value = false
-
-      if (data?.text) {
-        selectedReport.value = {
-          _id: data.reportId || 'new',
-          content: data.text,
-          createdAt: new Date().toISOString()
-        }
-        isViewModalOpen.value = true
+      const query: any = { background: 'true' }
+      if (payload.period !== 'all') {
+        query.start = start.toISOString()
+        query.end = now.toISOString()
       }
+
+      const res: any = await $fetch('/api/ai/analyze', { query })
+      notify('Relatório em Segundo Plano', res.message || 'Seu relatório estratégico de IA está sendo gerado em segundo plano. Assim que estiver pronto, você será notificado na Central de Notificações!')
+      isReportDrawerOpen.value = false
     } catch (e: any) {
       notify('Erro', e.data?.statusMessage || 'Erro ao gerar relatório')
     } finally {

@@ -31,10 +31,15 @@ const props = defineProps<{
   open: boolean
 }>()
 
-const emit = defineEmits(['close', 'success'])
+const emit = defineEmits<{
+  (e: 'close'): void
+  (e: 'update:open', val: boolean): void
+  (e: 'success', items: any[]): void
+}>()
 
 const step = ref<'prompt' | 'loading' | 'results'>('prompt')
 const promptText = ref('')
+const results = ref<any>(null)
 const { notify } = useAlerts()
 const { creditLabel } = useCreditCosts()
 const { 
@@ -151,6 +156,7 @@ function close() {
   promptText.value = ''
   results.value = null
   emit('close')
+  emit('update:open', false)
 }
 
 function removeItem(idx: number) {
@@ -191,7 +197,7 @@ function removeItem(idx: number) {
             </div>
           </div>
           
-          <DialogClose @click="close" class="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+          <DialogClose type="button" @click="close" class="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer">
             <X class="w-5 h-5" />
           </DialogClose>
         </div>

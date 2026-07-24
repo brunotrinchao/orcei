@@ -61,23 +61,23 @@ const emit = defineEmits(['update:open', 'confirm', 'cancel'])
           <AlertDialogDescription v-if="description" class="text-sm text-gray-500 dark:text-gray-400 font-medium leading-relaxed mb-8" v-html="description" />
 
           <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
-            <AlertDialogCancel v-if="cancelText" as-child>
+            <AlertDialogCancel v-if="cancelText" @click="emit('update:open', false); emit('cancel')" as-child>
               <BaseButton 
                 type="button"
                 variant="ghost"
                 size="sm"
-                @click="emit('cancel')"
+                @click="emit('update:open', false); emit('cancel')"
               >
                 {{ cancelText }}
               </BaseButton>
             </AlertDialogCancel>
             
-            <AlertDialogAction as-child>
+            <AlertDialogAction @click="emit('update:open', false); emit('confirm')" as-child>
               <BaseButton 
                 type="button"
                 :variant="variant === 'destructive' ? 'danger' : 'solid'"
                 size="sm"
-                @click="emit('confirm')"
+                @click="emit('update:open', false); emit('confirm')"
               >
                 {{ actionText }}
               </BaseButton>

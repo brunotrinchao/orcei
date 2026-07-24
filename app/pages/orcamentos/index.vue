@@ -835,7 +835,7 @@ async function saveContract() {
     </BaseDialog>
 
     <AIProposalWizard
-      :open="isAIWizardOpen"
+      v-model:open="isAIWizardOpen"
       @close="isAIWizardOpen = false"
       @success="onAIWizardSuccess"
     />

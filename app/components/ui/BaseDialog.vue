@@ -99,12 +99,14 @@ onUnmounted(() => {
                 {{ description || title }}
               </DialogDescription>
             </div>
-            <DialogClose as-child>
+            <DialogClose @click="open = false" as-child>
               <BaseButton
+                type="button"
                 variant="ghost"
                 size="icon-sm"
-                class="ml-4 shrink-0"
+                class="ml-4 shrink-0 cursor-pointer"
                 aria-label="Fechar"
+                @click="open = false"
               >
                 <X class="h-5 w-5" />
               </BaseButton>

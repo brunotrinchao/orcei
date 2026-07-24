@@ -20,9 +20,11 @@ export const ReportGeneratorService = {
     const newReport = await Report.create({
       profileId: profile._id,
       content: analysis,
+      score: context.commercialScore,
       context: {
         totalProposals: context.totalProposals,
         totalRevenue: context.totalRevenue,
+        score: context.commercialScore,
         period: periodFormatted
       }
     })

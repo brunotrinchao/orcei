@@ -3,6 +3,7 @@ import { Schema, model } from 'mongoose'
 const reportSchema = new Schema({
   profileId: { type: Schema.Types.ObjectId, ref: 'Profile', required: true, index: true },
   content: { type: String, required: true },
+  score: { type: Number },
   context: { type: Schema.Types.Mixed }, // Snapshot of the data used for the analysis
   driveFileId: { type: String },
   driveWebViewLink: { type: String }

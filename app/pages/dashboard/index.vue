@@ -2,10 +2,12 @@
 import { 
   Sparkles, Loader2, ArrowUpRight, CheckCircle2, Clock, DollarSign, 
   TrendingUp, BarChart3, Users, FileText, ChevronRight, Activity, 
-  Calendar, Award, Zap, ShieldCheck, Share2, MessageSquare, AlertCircle 
+  Calendar, Award, Zap, ShieldCheck, Share2, MessageSquare, AlertCircle, Coins,
+  UserPlus, Wand2, BookOpen, ReceiptText
 } from 'lucide-vue-next'
 import { Line, Doughnut } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement, ArcElement } from 'chart.js'
+import GenerateReportDrawer from '~/components/reports/GenerateReportDrawer.vue'
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement, ArcElement)
 
@@ -13,9 +15,68 @@ const period = ref('last_30_days')
 const { loggedIn, user } = useUserSession()
 const { notify } = useAlerts()
 const { isDark } = useDarkMode()
-const { creditLabel } = useCreditCosts()
+const { getCost, creditLabel } = useCreditCosts()
 const config = useRuntimeConfig()
 const publicProposalUrl = config.public.publicProposalUrl || ''
+
+const { data: profile } = useLazyFetch<any>('/api/profile', { key: 'profile' })
+const isCostTableModalOpen = ref(false)
+
+function costText(action: string): string {
+  const cost = getCost(action)
+  return cost === 0 ? 'Grátis' : `${cost} ${cost === 1 ? 'crédito' : 'créditos'}`
+}
+
+const actionCostsList = computed(() => [
+  {
+    key: 'proposalSend',
+    name: 'Envio de Proposta Comercial',
+    description: 'Notificação por e-mail e disponibilização de link público rastreável com notificações em tempo real',
+    icon: FileText,
+    badge: 'Comercial',
+    badgeColor: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border-blue-100 dark:border-blue-900/40'
+  },
+  {
+    key: 'proposalSuggest',
+    name: 'Assistente de Orçamentos IA',
+    description: 'Criação assistida de propostas comerciais completas e personalizadas a partir de texto livre',
+    icon: Sparkles,
+    badge: 'Inteligência Artificial',
+    badgeColor: 'bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400 border-violet-100 dark:border-violet-900/40'
+  },
+  {
+    key: 'clientExtract',
+    name: 'Extração de Leads / Clientes',
+    description: 'Identificação e cadastro automático de dados de contatos a partir de mensagens brutas de clientes',
+    icon: UserPlus,
+    badge: 'Inteligência Artificial',
+    badgeColor: 'bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400 border-violet-100 dark:border-violet-900/40'
+  },
+  {
+    key: 'generate',
+    name: 'Gerador de Descrições de Itens',
+    description: 'Redação profissional de escopos e descrições técnicas detalhadas para produtos ou serviços',
+    icon: Wand2,
+    badge: 'Inteligência Artificial',
+    badgeColor: 'bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400 border-violet-100 dark:border-violet-900/40'
+  },
+  {
+    key: 'catalogSuggest',
+    name: 'Sugestão para Catálogo por IA',
+    description: 'Enriquecimento de itens e sugestão inteligente de precificação para seu catálogo de serviços',
+    icon: BookOpen,
+    badge: 'Inteligência Artificial',
+    badgeColor: 'bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400 border-violet-100 dark:border-violet-900/40'
+  },
+  {
+    key: 'analyzeReport',
+    name: 'Relatório Estratégico de IA',
+    description: 'Análise avançada de métricas do funil comercial, projeções de receita e recomendações acionáveis',
+    icon: ReceiptText,
+    badge: 'Análise Estratégica',
+    badgeColor: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/40'
+  }
+])
 
 const fetchQuery = computed(() => {
   const now = new Date()
@@ -134,6 +195,36 @@ const aiReport = ref<string | null>(null)
 const isAnalyzing = ref(false)
 const isPaywallOpen = ref(false)
 const paywallReason = ref('')
+const isReportDrawerOpen = ref(false)
+
+async function confirmAndGenerateReport(payload?: { period?: string }) {
+  if (payload?.period && payload.period !== period.value) {
+    period.value = payload.period
+  }
+  executeWithCreditCheck('analyzeReport', async () => {
+    isAnalyzing.value = true
+    try {
+      // Relatório usa o mesmo filtro de período selecionado no dashboard
+      const data: any = await $fetch('/api/ai/analyze', { query: fetchQuery.value })
+      aiReport.value = data.text
+      refresh()
+      isReportDrawerOpen.value = false
+    } catch (e: any) {
+      if (e.statusCode === 402) {
+        paywallReason.value = 'gerar relatório estratégico de IA'
+        isPaywallOpen.value = true
+      } else if (e.statusCode === 429) {
+        notify('Limite Atingido', 'Você fez muitas requisições seguidas. Tente novamente em um minuto.')
+      } else if (e.statusCode === 400) {
+        notify('Orçamento aprovado necessário', e.data?.statusMessage || 'É necessário ter pelo menos 1 orçamento aprovado para gerar um relatório estratégico.')
+      } else {
+        notify('Erro', e.data?.statusMessage || 'Erro ao gerar relatório estratégico')
+      }
+    } finally {
+      isAnalyzing.value = false
+    }
+  }, { title: 'Gerar Relatório Estratégico com IA' })
+}
 
 const periodLabels: Record<string, string> = {
   last_7_days: 'Últimos 7 dias',
@@ -209,7 +300,7 @@ function formatRelativeTime(minutesAgo: number) {
           ]" 
           :key="p.value"
           @click="period = p.value"
-          :class="period === p.value ? 'bg-white dark:bg-gray-750 text-blue-600 dark:text-blue-400 shadow-sm font-black' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-bold'"
+          :class="period === p.value ? 'bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 border border-gray-200/60 dark:border-gray-700 shadow-sm font-black' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-bold hover:bg-gray-200/40 dark:hover:bg-gray-700/40'"
           class="md:px-5 px-3 py-2 rounded-2xl text-[10px] uppercase tracking-widest transition-all whitespace-nowrap"
         >
           {{ p.label }}
@@ -396,7 +487,7 @@ function formatRelativeTime(minutesAgo: number) {
           <!-- Textos e ROI Geral -->
           <div class="space-y-6 flex-1">
             <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
-              <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500/20 backdrop-blur-md rounded-full text-indigo-200 text-[9px] font-black uppercase tracking-widest border border-indigo-500/30">
+              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-indigo-500/20 backdrop-blur-md rounded-full text-indigo-200 text-[9px] font-black uppercase tracking-widest border border-indigo-500/30">
                 <Sparkles class="w-3.5 h-3.5 text-indigo-400 animate-pulse" /> Inteligência Artificial Orcei Fácil
               </div>
               <p class="text-slate-400 font-bold text-xs">
@@ -415,20 +506,20 @@ function formatRelativeTime(minutesAgo: number) {
 
             <!-- Barras de Adoção de IA -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-              <div class="space-y-2">
+              <div class="space-y-2 bg-slate-950/40 p-4 rounded-2xl border border-white/5">
                 <div class="flex justify-between text-xs font-bold text-slate-300">
-                  <span class="uppercase tracking-widest text-[9px] text-slate-400">Uso de IA em Propostas</span>
-                  <span>{{ Math.round(stats.aiRoi?.adoptionRates?.proposals || 0) }}%</span>
+                  <span class="uppercase tracking-widest text-[9px] text-slate-400">Adoção em Propostas</span>
+                  <span class="text-indigo-400">{{ Math.round(stats.aiRoi?.adoptionRates?.proposals || 0) }}%</span>
                 </div>
                 <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
                   <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full" :style="{ width: (stats.aiRoi?.adoptionRates?.proposals || 0) + '%' }"></div>
                 </div>
               </div>
               
-              <div class="space-y-2">
+              <div class="space-y-2 bg-slate-950/40 p-4 rounded-2xl border border-white/5">
                 <div class="flex justify-between text-xs font-bold text-slate-300">
-                  <span class="uppercase tracking-widest text-[9px] text-slate-400">Uso de IA em Catálogo</span>
-                  <span>{{ Math.round(stats.aiRoi?.adoptionRates?.catalog || 0) }}%</span>
+                  <span class="uppercase tracking-widest text-[9px] text-slate-400">Adoção no Catálogo</span>
+                  <span class="text-emerald-400">{{ Math.round(stats.aiRoi?.adoptionRates?.catalog || 0) }}%</span>
                 </div>
                 <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
                   <div class="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full" :style="{ width: (stats.aiRoi?.adoptionRates?.catalog || 0) + '%' }"></div>
@@ -437,42 +528,76 @@ function formatRelativeTime(minutesAgo: number) {
             </div>
           </div>
 
-          <!-- Créditos Consumidos & Botão de Geração -->
-          <div class="flex flex-col justify-between items-center lg:items-end gap-6 bg-slate-950/40 p-6 rounded-[2rem] border border-white/5 lg:w-80 shrink-0">
-            <div class="w-full text-center lg:text-right">
-              <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Créditos de IA Usados</p>
-              <p class="text-3xl font-black text-white">
-                {{ stats.aiRoi?.creditsUsed }} <span class="text-xs font-bold text-slate-500">/ {{ stats.aiRoi?.creditsLimit }}</span>
-              </p>
+          <!-- Painel Reformulado de Créditos e Ações de IA -->
+          <div class="flex flex-col justify-between items-stretch gap-6 bg-slate-950/60 p-6 rounded-[2.5rem] border border-white/10 lg:w-80 shrink-0 shadow-inner">
+            <!-- Mini Cards de Saldo e Consumo -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Painel de Créditos</span>
+                <button 
+                  @click="isCostTableModalOpen = true"
+                  class="text-[9px] font-black text-indigo-400 hover:text-indigo-300 uppercase tracking-widest bg-indigo-500/10 hover:bg-indigo-500/20 px-2 py-0.5 rounded-lg border border-indigo-500/20 transition-all flex items-center gap-1 cursor-pointer active:scale-95"
+                  title="Ver Tabela Completa de Custos"
+                >
+                  Tabela de Custos <ChevronRight class="w-3 h-3" />
+                </button>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <!-- Saldo Atual -->
+                <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-white/5 space-y-1">
+                  <div class="flex items-center gap-1.5 text-blue-400">
+                    <Coins class="w-3.5 h-3.5 animate-pulse" />
+                    <span class="text-[8px] font-black uppercase tracking-wider text-slate-400">Saldo Atual</span>
+                  </div>
+                  <p class="text-xl font-black text-white">
+                    {{ profile?.creditsBalance ?? 0 }}
+                  </p>
+                  <p class="text-[8px] font-bold text-slate-500 uppercase">Créditos</p>
+                </div>
+
+                <!-- Créditos Consumidos -->
+                <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-white/5 space-y-1">
+                  <div class="flex items-center gap-1.5 text-violet-400">
+                    <Zap class="w-3.5 h-3.5" />
+                    <span class="text-[8px] font-black uppercase tracking-wider text-slate-400">Utilizados</span>
+                  </div>
+                  <p class="text-xl font-black text-white">
+                    {{ stats.aiRoi?.creditsUsed || 0 }}
+                  </p>
+                  <p class="text-[8px] font-bold text-slate-500 uppercase">Total Geral</p>
+                </div>
+              </div>
             </div>
             
-            <div class="w-full space-y-3">
+            <!-- Ação Principal + Atalho para Recarga -->
+            <div class="space-y-3 pt-2 border-t border-white/5">
               <BaseButton
                 data-tour="dashboard-ai-report"
-                @click="generateAIReport"
+                @click="isReportDrawerOpen = true"
                 :disabled="isAnalyzing"
                 variant="primary" 
-                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl py-4 text-xs font-black tracking-widest uppercase shadow-xl shadow-indigo-600/10"
+                class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white rounded-2xl py-4 text-xs font-black tracking-widest uppercase shadow-xl shadow-indigo-600/20 transition-all border border-indigo-400/20 cursor-pointer flex items-center justify-center gap-2"
               >
                 <template v-if="isAnalyzing">
                   <Loader2 class="w-4 h-4 animate-spin mr-2" /> Analisando Dados...
                 </template>
                 <template v-else>
-                  {{ creditLabel('analyzeReport', 'Gerar Relatório IA') }}
+                  <Sparkles class="w-4 h-4 text-indigo-200" /> Gerar Relatório
                 </template>
               </BaseButton>
-              <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest text-center lg:text-right">
-                Baseado no período: {{ periodLabel }}
-              </p>
 
-
-              <NuxtLink 
-                to="/planos"
-                class="block w-full text-center py-2 text-[9px] font-black text-indigo-400 hover:text-indigo-300 tracking-[0.15em] uppercase hover:underline"
-              >
-                Obter Créditos Premium
-              </NuxtLink>
+              <div class="flex items-center justify-between text-[9px] font-bold">
+                <span class="text-slate-500 uppercase tracking-wider">Período: {{ periodLabel }}</span>
+                <NuxtLink 
+                  to="/planos"
+                  class="text-indigo-400 hover:text-indigo-300 font-black tracking-wider uppercase hover:underline flex items-center gap-0.5"
+                >
+                  Recarregar <ChevronRight class="w-3 h-3" />
+                </NuxtLink>
+              </div>
             </div>
+
           </div>
 
         </div>
@@ -729,6 +854,66 @@ function formatRelativeTime(minutesAgo: number) {
       :description="confirmDescription"
       @confirm="handleCreditConfirm"
       @cancel="handleCreditCancel"
+    />
+
+    <!-- Modal da Tabela Transparente de Custos por Ação -->
+    <BaseDialog
+      v-model:open="isCostTableModalOpen"
+      title="Tabela de Custos por Ação"
+      size="xl"
+    >
+      <div class="space-y-6 py-2">
+        <p class="text-xs font-bold text-gray-500 dark:text-gray-400 leading-relaxed">
+          Confira abaixo a relação completa de funcionalidades comerciais e de inteligência artificial da plataforma com os respectivos custos em créditos.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div 
+            v-for="item in actionCostsList" 
+            :key="item.key"
+            class="bg-gray-50/60 dark:bg-gray-800/60 p-5 rounded-2xl border border-gray-100 dark:border-gray-700/60 flex flex-col justify-between space-y-4"
+          >
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between gap-2">
+                <div class="w-8 h-8 rounded-xl bg-white dark:bg-gray-700 flex items-center justify-center text-gray-900 dark:text-white border border-gray-100 dark:border-gray-600 shadow-sm shrink-0">
+                  <component :is="item.icon" class="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                </div>
+                <span :class="['text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md border', item.badgeColor]">
+                  {{ item.badge }}
+                </span>
+              </div>
+              <div>
+                <h4 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-tight">{{ item.name }}</h4>
+                <p class="text-[11px] font-medium text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{{ item.description }}</p>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
+              <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Custo</span>
+              <span class="text-xs font-black text-gray-900 dark:text-white bg-white dark:bg-gray-900 px-3 py-1 rounded-xl border border-gray-200/60 dark:border-gray-700">
+                {{ costText(item.key) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <template #footer>
+        <BaseButton variant="secondary" size="sm" @click="isCostTableModalOpen = false">Fechar</BaseButton>
+      </template>
+    </BaseDialog>
+
+    <!-- Drawer de Geração de Relatório IA -->
+    <GenerateReportDrawer
+      v-model:open="isReportDrawerOpen"
+      :period="period"
+      :period-label="periodLabel"
+      :stats="stats"
+      :credits-balance="profile?.creditsBalance || 0"
+      :credit-cost="getCost('analyzeReport')"
+      :loading="isAnalyzing"
+      :allow-change-period="true"
+      @confirm="confirmAndGenerateReport"
     />
 
   </div>

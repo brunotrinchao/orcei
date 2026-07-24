@@ -1,10 +1,17 @@
 <script setup lang="ts">
-import { FileText, Download, Eye, Search, Calendar, RefreshCcw, Trash2, AlertTriangle, MoreVertical } from 'lucide-vue-next'
-
+import { FileText, Download, Eye, Search, Calendar, RefreshCcw, Trash2, AlertTriangle, MoreVertical, Sparkles } from 'lucide-vue-next'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
+import GenerateReportDrawer from '~/components/reports/GenerateReportDrawer.vue'
+
 const searchQuery = ref('')
 const startDate = ref('')
 const endDate = ref('')
+const { data: profile } = useLazyFetch<any>('/api/profile', { key: 'profile' })
+const { getCost } = useCreditCosts()
+const { executeWithCreditCheck } = useConfirmCreditAction()
+
+const isReportDrawerOpen = ref(false)
+const isGeneratingReport = ref(false)
 
 const activeFiltersCount = computed(() => {
   let count = 0
@@ -67,13 +74,48 @@ function confirmDeleteReport(report: any) {
   })
 }
 
+async function handleConfirmReport(payload: { period: string }) {
+  executeWithCreditCheck('analyzeReport', async () => {
+    isGeneratingReport.value = true
+    try {
+      const now = new Date()
+      let start = new Date()
+      if (payload.period === 'last_7_days') start.setDate(now.getDate() - 7)
+      else if (payload.period === 'last_30_days') start.setDate(now.getDate() - 30)
+      else if (payload.period === 'last_90_days') start.setDate(now.getDate() - 90)
+      else if (payload.period === 'year') start = new Date(now.getFullYear(), 0, 1)
+
+      const query: any = payload.period === 'all' ? {} : { start: start.toISOString(), end: now.toISOString() }
+      const data: any = await $fetch('/api/ai/analyze', { query })
+      notify('Sucesso', 'Relatório estratégico de IA gerado com sucesso!')
+      refresh()
+      
+      isReportDrawerOpen.value = false
+
+      if (data?.text) {
+        selectedReport.value = {
+          _id: data.reportId || 'new',
+          content: data.text,
+          createdAt: new Date().toISOString()
+        }
+        isViewModalOpen.value = true
+      }
+    } catch (e: any) {
+      notify('Erro', e.data?.statusMessage || 'Erro ao gerar relatório')
+    } finally {
+      isGeneratingReport.value = false
+    }
+  }, { title: 'Gerar Relatório Estratégico com IA' })
+}
+
 const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
 </script>
 
 <template>
   <div class="space-y-10 relative">
     <PageHeader title="Meus Relatórios IA" subtitle="Analises estratégicas geradas pela inteligência artificial.">
-      <BaseButton data-tour="relatorios-gerar-btn" to="/dashboard" variant="secondary">
+      <BaseButton data-tour="relatorios-gerar-btn" @click="isReportDrawerOpen = true" variant="primary" class="cursor-pointer">
+        <Sparkles class="w-4 h-4 mr-2" />
         Gerar Novo Relatório
       </BaseButton>
 
@@ -254,5 +296,16 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
         </div>
       </template>
     </BaseDialog>
+
+    <!-- Drawer de Geração de Relatório IA com seletor de dias -->
+    <GenerateReportDrawer
+      v-model:open="isReportDrawerOpen"
+      period="last_30_days"
+      :credits-balance="profile?.creditsBalance || 0"
+      :credit-cost="getCost('analyzeReport')"
+      :loading="isGeneratingReport"
+      :allow-change-period="true"
+      @confirm="handleConfirmReport"
+    />
   </div>
 </template>

@@ -38,7 +38,8 @@ withDefaults(defineProps<Props>(), {
   animation: shimmer 1.5s infinite linear;
 }
 
-:root.dark .skeleton-shimmer {
+:global(.dark) .skeleton-shimmer,
+:global(html.dark) .skeleton-shimmer {
   background: linear-gradient(
     90deg,
     #1f2937 25%,

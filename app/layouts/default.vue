@@ -480,10 +480,14 @@ onUnmounted(() => {
           
           <div class="space-y-4">
             <h3 class="text-[10px] font-black text-gray-900 dark:text-gray-50 uppercase tracking-widest">Navegação</h3>
-            <nav class="flex flex-col gap-3">
+            <nav class="flex flex-col gap-2.5">
               <NuxtLink to="/dashboard" class="text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Dashboard</NuxtLink>
-              <NuxtLink to="/orcamentos" class="text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Orçamentos</NuxtLink>
               <NuxtLink to="/clientes" class="text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Clientes</NuxtLink>
+              <NuxtLink to="/catalogo" class="text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Catálogo</NuxtLink>
+              <NuxtLink to="/orcamentos" class="text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Orçamentos</NuxtLink>
+              <NuxtLink to="/agenda" class="text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Agenda</NuxtLink>
+              <NuxtLink to="/relatorios" class="text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Relatórios</NuxtLink>
+              <NuxtLink to="/planos" class="text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Planos & Assinatura</NuxtLink>
             </nav>
           </div>
 

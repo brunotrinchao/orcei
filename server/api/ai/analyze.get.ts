@@ -3,13 +3,10 @@ import { ProfileService } from '../../services/ProfileService'
 import { Profile } from '../../models/Profile'
 import { Proposal } from '../../models/Proposal'
 import { CatalogItem } from '../../models/CatalogItem'
-import { Report } from '../../models/Report'
-import { AIService } from '../../services/AIService'
-import { NotificationService } from '../../services/NotificationService'
-import { GoogleService } from '../../services/GoogleService'
+import { QueueService } from '../../services/QueueService'
+import { ReportGeneratorService } from '../../services/ReportGeneratorService'
 import { checkRateLimit } from '../../utils/rate-limit'
-import { getActionCost, requireCreditBalance, chargeCredit } from '../../utils/credits'
-import { generateReportPdfBuffer, buildReportFilename } from '../../utils/pdf'
+import { getActionCost, requireCreditBalance } from '../../utils/credits'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -19,7 +16,7 @@ export default defineEventHandler(async (event) => {
   await checkRateLimit(event, { max: 5, windowMs: 60 * 1000, keyPrefix: 'ai-analyze' })
 
   const isAdmin = (session.user as any).role === 'admin'
-  const { start, end, background } = getQuery(event)
+  const { start, end } = getQuery(event)
 
   const { profile, cost, proposals, catalog } = await all({
     async profile() {
@@ -158,95 +155,30 @@ Tom: Consultor sênior, direto, baseado em dados, sem frases motivacionais vazia
   }
 
   const periodFormatted = formatPeriodText(start, end)
-
-  const generateReportTask = async () => {
-    try {
-      const analysis = await AIService.generateDescription(prompt)
-
-      // Save report to database
-      const newReport = await Report.create({
-        profileId: profile._id,
-        content: analysis,
-        context: {
-          totalProposals: context.totalProposals,
-          totalRevenue: context.totalRevenue,
-          period: periodFormatted
-        }
-      })
-
-      // Dedução de crédito SOMENTE após relatório gerado e salvo com sucesso (atômica)
-      await chargeCredit(profile._id, cost, isAdmin, {
-        aiUsageField: 'aiUsage.reports',
-        errorMessage: 'Saldo de créditos insuficiente. Adquira créditos para gerar relatórios com IA.'
-      })
-
-      // Gerar PDF do relatório via motor unificado e enviar para o Google Drive (se integrado)
-      if (profile.googleIntegration?.refreshToken) {
-        try {
-          const config = useRuntimeConfig()
-          const pdfBuffer = await generateReportPdfBuffer(newReport, profile, config.appName || 'ORCEI')
-          const auth = GoogleService.getAuthClient(profile)
-          const rootFolderId = await GoogleService.ensureFolder(auth, profile)
-          const reportsFolderId = await GoogleService.ensureReportsFolder(auth, profile, rootFolderId)
-
-          const startDate = start ? new Date(start as string) : new Date(Date.now() - 30 * 86400000)
-          const endDate = end ? new Date(end as string) : new Date()
-          const fileName = buildReportFilename(startDate, endDate, newReport._id.toString())
-
-          const driveFile = await GoogleService.uploadPdf(auth, reportsFolderId, fileName, pdfBuffer)
-          
-          await Report.findByIdAndUpdate(newReport._id, {
-            driveFileId: driveFile.id,
-            driveWebViewLink: driveFile.webViewLink
-          })
-          console.log(`[AI Analyze] Relatório enviado para a pasta Relatórios no Google Drive: ${fileName}`)
-        } catch (driveErr) {
-          console.error(`[AI Analyze] Erro ao enviar relatório para o Google Drive:`, driveErr)
-        }
-      }
-
-      // Notificar usuário na Central de Notificações
-      try {
-        await NotificationService.createNotification({
-          profileId: profile._id.toString(),
-          type: 'report_generated',
-          title: 'Relatório IA Concluído',
-          summary: `Sua análise estratégica de IA (${periodFormatted}) foi concluída com sucesso!`,
-          details: {
-            reportId: newReport._id.toString(),
-            content: analysis,
-            period: periodFormatted,
-            totalProposals: context.totalProposals,
-            totalRevenue: context.totalRevenue,
-            generatedAt: new Date().toISOString()
-          },
-          metadata: {
-            reportId: newReport._id.toString()
-          }
-        })
-      } catch (notifErr) {
-        console.error('[AI Analyze] Erro ao emitir notificação de relatório gerado:', notifErr)
-      }
-
-      return { text: analysis, reportId: newReport._id }
-    } catch (e: any) {
-      console.error('AI Analysis Error:', e)
-      throw e
-    }
+  const payload = {
+    profileId: profile._id.toString(),
+    prompt,
+    context,
+    cost,
+    isAdmin,
+    start: start ? String(start) : undefined,
+    end: end ? String(end) : undefined,
+    periodFormatted
   }
 
-  // Se background for solicitado ou padrão para evitar blocking da UI
-  if (background === 'true' || background === true || background === undefined) {
+  // Publicar job na fila do QStash (mesmo padrão de e-mails/backups)
+  const queueRes = await QueueService.publish('GENERATE_REPORT', payload)
+
+  // Em desenvolvimento local ou sem QStash token, executa via setImmediate
+  if (queueRes?.messageId === 'local-dev-id' || !queueRes) {
     setImmediate(() => {
-      generateReportTask().catch(err => console.error('[Background AI Report Error]:', err))
+      ReportGeneratorService.handleGenerateReport(payload).catch(err => console.error('[Local Dev AI Report Error]:', err))
     })
-
-    return {
-      success: true,
-      background: true,
-      message: 'Seu relatório estratégico está sendo gerado em segundo plano. Assim que estiver pronto, você será notificado na Central de Notificações.'
-    }
   }
 
-  return await generateReportTask()
+  return {
+    success: true,
+    background: true,
+    message: 'Seu relatório estratégico está sendo gerado em segundo plano. Assim que estiver pronto, você será notificado na Central de Notificações.'
+  }
 })

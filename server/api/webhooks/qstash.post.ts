@@ -9,6 +9,7 @@ import { AuditService } from '../../services/AuditService'
 import { ProposalService } from '../../services/ProposalService'
 import { GoogleService } from '../../services/GoogleService'
 import { NotificationService } from '../../services/NotificationService'
+import { ReportGeneratorService } from '../../services/ReportGeneratorService'
 import { generateProposalPdfBuffer } from '../../utils/pdf'
 import { jsonToCsv } from '../../utils/csv'
 import { 
@@ -110,6 +111,10 @@ export default defineEventHandler(async (event) => {
 
       case 'GENERATE_BACKUP_CSV':
         await handleGenerateBackupCsv(body)
+        break
+
+      case 'GENERATE_REPORT':
+        await ReportGeneratorService.handleGenerateReport(body)
         break
 
       case 'TEST_JOB':

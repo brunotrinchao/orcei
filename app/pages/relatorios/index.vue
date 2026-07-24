@@ -67,6 +67,7 @@ function downloadPdf(reportId: string) {
 }
 
 function confirmDeleteReport(report: any) {
+  if (!report || !report._id) return
   confirm({
     title: 'Excluir Relatório',
     description: 'Tem certeza que deseja excluir este relatório? Essa ação não pode ser desfeita.',
@@ -76,8 +77,11 @@ function confirmDeleteReport(report: any) {
       try {
         await $fetch(`/api/reports/${report._id}`, { method: 'DELETE' })
         notify('Sucesso', 'Relatório excluído com sucesso.')
-        if (selectedReport.value?._id === report._id) isViewModalOpen.value = false
-        refresh()
+        if (selectedReport.value?._id === report._id) {
+          isViewModalOpen.value = false
+          selectedReport.value = null
+        }
+        await refresh()
       } catch (e: any) {
         notify('Erro', e.data?.statusMessage || 'Erro ao excluir relatório')
       }

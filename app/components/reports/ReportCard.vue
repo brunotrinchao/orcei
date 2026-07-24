@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Calendar, Eye, Download, Trash2, ShieldCheck, Sparkles } from 'lucide-vue-next'
+import { computed } from 'vue'
+import { Calendar, Eye, Download, Trash2, ShieldCheck } from 'lucide-vue-next'
 
 const props = defineProps<{
   report: any
@@ -15,6 +16,13 @@ defineEmits<{
 const score = computed(() => {
   if (typeof props.report?.score === 'number') return props.report.score
   if (typeof props.report?.context?.score === 'number') return props.report.context.score
+  if (props.report?.content) {
+    const match = props.report.content.match(/Score[^\d\n]*(\d{1,3})/i)
+    if (match && match[1]) {
+      const val = parseInt(match[1], 10)
+      if (val >= 0 && val <= 100) return val
+    }
+  }
   return null
 })
 </script>
@@ -25,17 +33,17 @@ const score = computed(() => {
       <div class="flex items-start justify-between gap-2">
         <h4 class="text-lg font-black text-gray-900 dark:text-gray-50 leading-tight">Análise Estratégica IA</h4>
         
-        <!-- Badge de Score Comercial -->
+        <!-- Badge de Score Comercial com cores vivas -->
         <div 
           v-if="score !== null"
           class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border shrink-0"
           :class="{
-            'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900/50': score >= 70,
-            'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-900/50': score >= 50 && score < 70,
-            'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-900/50': score < 50
+            'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800': score >= 70,
+            'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800': score >= 50 && score < 70,
+            'bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800': score < 50
           }"
         >
-          <ShieldCheck class="w-3.5 h-3.5" />
+          <ShieldCheck class="w-3.5 h-3.5 shrink-0" />
           Score {{ score }}/100
         </div>
       </div>

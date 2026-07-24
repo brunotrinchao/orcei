@@ -57,6 +57,20 @@ const { notify, confirm } = useAlerts()
 const selectedReport = ref<any>(null)
 const isViewModalOpen = ref(false)
 
+function getReportScore(report: any): number | null {
+  if (!report) return null
+  if (typeof report.score === 'number') return report.score
+  if (typeof report.context?.score === 'number') return report.context.score
+  if (report.content) {
+    const match = report.content.match(/Score[^\d\n]*(\d{1,3})/i)
+    if (match && match[1]) {
+      const val = parseInt(match[1], 10)
+      if (val >= 0 && val <= 100) return val
+    }
+  }
+  return null
+}
+
 function openView(report: any) {
   selectedReport.value = report
   isViewModalOpen.value = true
@@ -187,12 +201,14 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
                     {{ report.context?.totalProposals || 0 }} Orçamentos analisados
                   </BaseBadge>
                 </span>
-                <span v-if="report.score !== undefined || report.context?.score !== undefined" class="w-1 h-1 bg-gray-200 dark:bg-gray-700 rounded-full"></span>
-                <span v-if="report.score !== undefined || report.context?.score !== undefined">
-                  <BaseBadge :variant="(report.score ?? report.context?.score ?? 0) >= 70 ? 'success' : ((report.score ?? report.context?.score ?? 0) >= 50 ? 'warning' : 'danger')">
-                    Score {{ report.score ?? report.context?.score }}/100
-                  </BaseBadge>
-                </span>
+                <template v-if="getReportScore(report) !== null">
+                  <span class="w-1 h-1 bg-gray-200 dark:bg-gray-700 rounded-full"></span>
+                  <span>
+                    <BaseBadge :variant="getReportScore(report)! >= 70 ? 'success' : (getReportScore(report)! >= 50 ? 'warning' : 'error')">
+                      Score {{ getReportScore(report) }}/100
+                    </BaseBadge>
+                  </span>
+                </template>
               </div>
             </div>
           </div>

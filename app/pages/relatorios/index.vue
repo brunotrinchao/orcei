@@ -187,6 +187,12 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
                     {{ report.context?.totalProposals || 0 }} Orçamentos analisados
                   </BaseBadge>
                 </span>
+                <span v-if="report.score !== undefined || report.context?.score !== undefined" class="w-1 h-1 bg-gray-200 dark:bg-gray-700 rounded-full"></span>
+                <span v-if="report.score !== undefined || report.context?.score !== undefined">
+                  <BaseBadge :variant="(report.score ?? report.context?.score ?? 0) >= 70 ? 'success' : ((report.score ?? report.context?.score ?? 0) >= 50 ? 'warning' : 'danger')">
+                    Score {{ report.score ?? report.context?.score }}/100
+                  </BaseBadge>
+                </span>
               </div>
             </div>
           </div>

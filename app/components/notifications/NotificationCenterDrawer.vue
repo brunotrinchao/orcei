@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { 
   DialogRoot, 
   DialogPortal, 
@@ -39,9 +39,16 @@ const {
   markAllAsRead 
 } = useNotifications()
 
-const activeTab = ref<'all' | 'unread'>('all')
+const activeTab = ref<'unread' | 'all'>('unread')
 const selectedNotification = ref<INotificationItem | null>(null)
 const isDetailModalOpen = ref(false)
+
+watch(() => props.open, (isOpen) => {
+  if (isOpen) {
+    activeTab.value = 'unread'
+    fetchNotifications()
+  }
+})
 
 function handleOpenUpdate(val: boolean) {
   if (!val) {
@@ -130,13 +137,6 @@ function timeAgo(dateStr: string) {
             <div class="flex items-center justify-between pt-2">
               <div class="flex bg-slate-200/60 dark:bg-slate-800/60 p-1 rounded-xl gap-1">
                 <button
-                  @click="activeTab = 'all'"
-                  class="px-3 py-1.5 text-xs font-black rounded-lg transition-all"
-                  :class="activeTab === 'all' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
-                >
-                  Todas
-                </button>
-                <button
                   @click="activeTab = 'unread'"
                   class="px-3 py-1.5 text-xs font-black rounded-lg transition-all flex items-center gap-1.5"
                   :class="activeTab === 'unread' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
@@ -145,6 +145,13 @@ function timeAgo(dateStr: string) {
                   <span v-if="unreadCount > 0" class="px-1.5 py-0.5 text-[9px] font-extrabold bg-blue-600 text-white rounded-full">
                     {{ unreadCount }}
                   </span>
+                </button>
+                <button
+                  @click="activeTab = 'all'"
+                  class="px-3 py-1.5 text-xs font-black rounded-lg transition-all"
+                  :class="activeTab === 'all' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
+                >
+                  Todas
                 </button>
               </div>
 
@@ -170,7 +177,7 @@ function timeAgo(dateStr: string) {
                 <Inbox class="w-8 h-8" />
               </div>
               <p class="text-xs font-black uppercase text-slate-400 tracking-wider">
-                Nenhuma notificação por aqui
+                {{ activeTab === 'unread' ? 'Nenhuma notificação não lida' : 'Nenhuma notificação por aqui' }}
               </p>
             </div>
 

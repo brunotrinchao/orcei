@@ -172,18 +172,6 @@ onUnmounted(() => {
             <!-- Onboarding Help Button (Desktop) -->
             <OnboardingHelpButton class="hidden md:flex" />
 
-            <!-- Dark Mode Toggle (Desktop) -->
-            <button
-              @click="toggle()"
-              class="hidden md:flex w-10 h-10 rounded-2xl items-center justify-center bg-gray-50 dark:bg-gray-900/60 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 border border-slate-100 dark:border-slate-800/80 shadow-sm hover:ring-4 ring-gray-100 dark:ring-gray-800/50 transition-all"
-              :aria-label="isDark ? 'Ativar modo claro' : 'Ativar modo escuro'"
-            >
-              <ClientOnly>
-                <Sun v-if="isDark" class="w-4.5 h-4.5 text-amber-500" />
-                <Moon v-else class="w-4.5 h-4.5 text-slate-400" />
-              </ClientOnly>
-            </button>
-
             <!-- Central de Notificações (Sino com Badge) -->
             <button
               @click="openNotificationCenter"
@@ -220,6 +208,14 @@ onUnmounted(() => {
                 </div>
                 <NuxtLink to="/configuracoes" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition" active-class="!text-blue-600 dark:!text-blue-400 font-bold bg-blue-50/50 dark:bg-blue-950/30">Configurações</NuxtLink>
                 <NuxtLink to="/planos" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition" active-class="!text-blue-600 dark:!text-blue-400 font-bold bg-blue-50/50 dark:bg-blue-950/30">Plano</NuxtLink>
+                <button @click="toggle()" class="w-full text-left px-4 py-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition flex items-center justify-between">
+                  <span>Aparência</span>
+                  <span class="text-[10px] font-black uppercase text-gray-400 flex items-center gap-1">
+                    <Sun v-if="isDark" class="w-3.5 h-3.5 text-amber-500" />
+                    <Moon v-else class="w-3.5 h-3.5 text-slate-400" />
+                    {{ isDark ? 'Escuro' : 'Claro' }}
+                  </span>
+                </button>
                 <NuxtLink v-if="user?.role === 'admin'" to="/admin" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-red-600 dark:text-red-400 font-bold hover:bg-red-50 dark:hover:bg-red-950/30 transition border-t border-gray-50 dark:border-gray-800">Painel Admin</NuxtLink>
                 <button @click="logout" class="w-full text-left px-4 py-2 text-xs text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition border-t border-gray-50 dark:border-gray-800 mt-1">Sair</button>
               </div>

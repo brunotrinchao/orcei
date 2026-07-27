@@ -223,7 +223,7 @@ const formatDate = (date: any, format: any) => {
 const profileWhatsapp = computed(() => {
   const phones = (proposal.value?.profileId as any)?.contact?.phones
   if (!phones?.length) return null
-  const wa = phones.find((p: any) => p.isWhatsapp)
+  const wa = phones.find((p: any) => p?.isWhatsapp)
   return (wa || phones[0])?.number || null
 })
 
@@ -385,7 +385,7 @@ const statusMap: any = {
             <div class="flex items-center gap-2 mb-2">
               <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Proposta Elaborada para</span>
             </div>
-            <p class="font-black text-black text-base leading-tight mb-4">{{ proposal.client.name }}</p>
+            <p class="font-black text-black text-base leading-tight mb-4">{{ proposal.client?.name }}</p>
             <div class="grid grid-cols-3 gap-3 text-[10px] text-slate-400 font-bold">
               <div>
                 <p class="text-[9px] text-slate-400 font-bold uppercase">Data de Emissão</p>
@@ -415,8 +415,8 @@ const statusMap: any = {
               <div class="flex items-center gap-1.5">
                 <p class="font-bold text-slate-400 text-[9px] uppercase w-12 block">TELEFONE:</p>
                 <p class="font-bold text-slate-800">
-                  <img v-if="proposal.profileId?.contact?.phones[0].isWhatsapp" :src="'/images/icons/whatsapp-svg.svg'" class="w-4 h-4 inline-block" alt="WhatsApp" loading="lazy"/>
-                  {{ proposal.profileId?.contact?.phones[0].number }}</p>
+                  <img v-if="proposal.profileId?.contact?.phones[0]?.isWhatsapp" :src="'/images/icons/whatsapp-svg.svg'" class="w-4 h-4 inline-block" alt="WhatsApp" loading="lazy"/>
+                  {{ proposal.profileId?.contact?.phones[0]?.number }}</p>
               </div>  
             </div>
           </div>

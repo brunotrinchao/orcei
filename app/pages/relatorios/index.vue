@@ -181,7 +181,7 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
       empty-title="Nenhum relatório encontrado"
       empty-subtitle="Você ainda não gerou relatórios IA ou os filtros não retornaram resultados."
     >
-    <template #header>
+      <template #header>
         <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Relatórios</th>
       </template>
 
@@ -267,6 +267,7 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
             <div class="space-y-2">
               <BaseSkeleton width="180px" height="1.25rem" />
               <BaseSkeleton width="250px" height="0.75rem" />
+              <!-- <BaseSkeleton width="250px" height="0.50rem" /> -->
             </div>
           </div>
           <div class="flex gap-3">

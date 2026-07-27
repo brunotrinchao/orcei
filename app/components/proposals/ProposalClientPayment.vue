@@ -34,7 +34,7 @@ function selectMethod(method: 'cash' | 'credit_card') {
         :aria-checked="modelValue === 'cash'"
         @click="selectMethod('cash')"
         :class="[
-          'relative text-left rounded-3xl border-2 p-7 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2',
+          'relative text-left rounded-[0.5rem] border-2 p-7 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2',
           modelValue === 'cash'
             ? 'border-[#3147F6] bg-[#3147F6]/5 shadow-lg shadow-[#3147F6]/10'
             : 'border-gray-100 bg-white hover:border-blue-200 hover:shadow-md'
@@ -49,7 +49,7 @@ function selectMethod(method: 'cash' | 'credit_card') {
         </div>
 
         <div class="mb-5">
-          <div class="w-11 h-11 bg-green-50 rounded-2xl flex items-center justify-center mb-4">
+          <div class="w-11 h-11 bg-green-50 rounded-[0.5rem] flex items-center justify-center mb-4">
             <Banknote class="w-5 h-5 text-green-600" />
           </div>
           <h3 class="font-black text-gray-900 text-lg tracking-tight leading-snug">À Vista</h3>
@@ -80,7 +80,7 @@ function selectMethod(method: 'cash' | 'credit_card') {
         :aria-checked="modelValue === 'credit_card'"
         @click="selectMethod('credit_card')"
         :class="[
-          'relative text-left rounded-3xl border-2 p-7 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2',
+          'relative text-left rounded-[0.5rem] border-2 p-7 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2',
           modelValue === 'credit_card'
             ? 'border-[#3147F6] bg-[#3147F6]/5 shadow-lg shadow-[#3147F6]/10'
             : 'border-gray-100 bg-white hover:border-blue-200 hover:shadow-md'
@@ -95,7 +95,7 @@ function selectMethod(method: 'cash' | 'credit_card') {
         </div>
 
         <div class="mb-5">
-          <div class="w-11 h-11 bg-blue-50 rounded-2xl flex items-center justify-center mb-4">
+          <div class="w-11 h-11 bg-blue-50 rounded-[0.5rem] flex items-center justify-center mb-4">
             <CreditCard class="w-5 h-5 text-[#3147F6]" />
           </div>
           <h3 class="font-black text-gray-900 text-lg tracking-tight leading-snug">Cartão de Crédito</h3>

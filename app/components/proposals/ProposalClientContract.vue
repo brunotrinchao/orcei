@@ -9,7 +9,7 @@ const safeContractText = computed(() => useSanitizeHtml(props.contractText))
 </script>
 
 <template>
-  <section class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+  <section class="bg-white rounded-[0.5rem] border border-gray-100 shadow-sm overflow-hidden">
     <details class="group">
       <summary class="px-8 py-6 flex items-center justify-between cursor-pointer select-none list-none outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-inset">
         <div class="flex items-center gap-3">

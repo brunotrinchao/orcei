@@ -29,7 +29,7 @@ function toggleUpsell(itemId: string) {
 </script>
 
 <template>
-  <section class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+  <section class="bg-white rounded-[0.5rem] border border-gray-100 shadow-sm overflow-hidden">
     <!-- Section header -->
     <div class="px-8 py-6 border-b border-gray-100 flex items-center gap-3">
       <div class="w-8 h-8 bg-[#3147F6]/10 rounded-xl flex items-center justify-center">
@@ -46,7 +46,7 @@ function toggleUpsell(itemId: string) {
         class="px-8 py-7 flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6"
       >
         <!-- Index bubble -->
-        <div class="shrink-0 w-9 h-9 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center">
+        <div class="shrink-0 w-9 h-9 rounded-[0.5rem] bg-gray-50 border border-gray-100 flex items-center justify-center">
           <span class="text-xs font-black text-gray-600">{{ String(idx + 1).padStart(2, '0') }}</span>
         </div>
 

@@ -291,14 +291,14 @@ const statusMap: any = {
         <div class="w-1/2 h-6 bg-white/10 animate-pulse rounded-lg"></div>
         
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6 mt-12">
-          <div v-for="i in 3" :key="i" class="h-24 bg-white/5 border border-white/10 animate-pulse rounded-2xl"></div>
+          <div v-for="i in 3" :key="i" class="h-24 bg-white/5 border border-white/10 animate-pulse rounded-[0.5rem]"></div>
         </div>
       </div>
     </div>
 
     <!-- Content Skeleton -->
     <main class="max-w-6xl mx-auto px-5 sm:px-8 py-12 space-y-10 flex-1">
-      <div class="bg-white rounded-3xl border border-gray-100 p-8 space-y-8">
+      <div class="bg-white rounded-[0.5rem] border border-gray-100 p-8 space-y-8">
         <div class="w-48 h-4 bg-gray-100 animate-pulse rounded"></div>
         <div v-for="i in 3" :key="i" class="flex gap-6 border-b border-gray-50 pb-8 last:border-0 last:pb-0">
           <div class="w-10 h-10 bg-gray-100 animate-pulse rounded-xl"></div>
@@ -319,7 +319,7 @@ const statusMap: any = {
 
   <div v-else-if="error" class="min-h-screen bg-gray-50 flex items-center justify-center px-6">
     <div class="text-center max-w-sm">
-      <div class="w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+      <div class="w-20 h-20 bg-red-50 rounded-[0.5rem] flex items-center justify-center mx-auto mb-6">
         <AlertCircle class="w-10 h-10 text-red-400" />
       </div>
       <h1 class="text-2xl font-black text-gray-900 tracking-tight mb-2">
@@ -381,7 +381,7 @@ const statusMap: any = {
         <!-- Stats row -->
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
 
-          <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 backdrop-blur-sm">
+          <div class="bg-gray-50 border border-gray-100 rounded-[0.5rem] p-5 backdrop-blur-sm">
             <div class="flex items-center gap-2 mb-2">
               <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Proposta Elaborada para</span>
             </div>
@@ -402,7 +402,7 @@ const statusMap: any = {
             </div>
           </div>
 
-          <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 backdrop-blur-sm">
+          <div class="bg-gray-50 border border-gray-100 rounded-[0.5rem] p-5 backdrop-blur-sm">
             <div class="flex items-center gap-2 mb-2">
               <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Profissional Responsável</span>
             </div>
@@ -423,7 +423,7 @@ const statusMap: any = {
 
           
           <!-- Total -->
-          <div class="col-span-2 sm:col-span-1 bg-[#3147F6] border border-blue-500/40 rounded-2xl p-5">
+          <div class="col-span-2 sm:col-span-1 bg-[#3147F6] border border-blue-500/40 rounded-[0.5rem] p-5">
             <div class="flex items-center gap-2 mb-2">
               <span class="text-[10px] font-black text-blue-100 uppercase tracking-widest">Valor Total</span>
             </div>
@@ -468,7 +468,7 @@ const statusMap: any = {
       />
 
       <!-- ── DECISION PANEL ──────────────────────────────────────── -->
-      <section class="relative overflow-hidden rounded-3xl bg-gray-900 shadow-2xl">
+      <section class="relative overflow-hidden rounded-[0.5rem] bg-gray-900 shadow-2xl">
         <!-- Accepted overlay -->
         <Transition name="accepted-overlay">
           <div
@@ -511,13 +511,13 @@ const statusMap: any = {
               <template v-if="!isPreview">
                 <button
                   @click="openActionModal('decline')"
-                  class="px-7 py-4 rounded-2xl text-xs font-black uppercase tracking-widest border-2 border-transparent text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                  class="px-7 py-4 rounded-[0.5rem] text-xs font-black uppercase tracking-widest border-2 border-transparent text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                 >
                   Recusar Proposta
                 </button>
                 <button
                   @click="isChatModalOpen = true"
-                  class="px-7 py-4 rounded-2xl text-xs font-black uppercase tracking-widest border-2 border-white/10 text-gray-300 hover:bg-white/10 transition-all relative outline-none focus-visible:ring-2 focus-visible:ring-white"
+                  class="px-7 py-4 rounded-[0.5rem] text-xs font-black uppercase tracking-widest border-2 border-white/10 text-gray-300 hover:bg-white/10 transition-all relative outline-none focus-visible:ring-2 focus-visible:ring-white"
                 >
                   Chat com o Profissional
                   <span 
@@ -530,13 +530,13 @@ const statusMap: any = {
                 <button
                   @click="handleAccept"
                   :disabled="isAccepting"
-                  class="px-9 py-4 bg-[#3147F6] hover:bg-blue-600 rounded-2xl text-xs font-black uppercase tracking-widest text-white shadow-xl shadow-[#3147F6]/30 transition-all flex items-center gap-2 disabled:opacity-60 outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2"
+                  class="px-9 py-4 bg-[#3147F6] hover:bg-blue-600 rounded-[0.5rem] text-xs font-black uppercase tracking-widest text-white shadow-xl shadow-[#3147F6]/30 transition-all flex items-center gap-2 disabled:opacity-60 outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2"
                 >
                   <Loader2 v-if="isAccepting" class="w-4 h-4 animate-spin" />
                   Aceitar Proposta
                 </button>
               </template>
-              <div v-else class="px-7 py-4 rounded-2xl text-xs font-black uppercase tracking-widest bg-white/5 text-gray-500 border border-white/10">
+              <div v-else class="px-7 py-4 rounded-[0.5rem] text-xs font-black uppercase tracking-widest bg-white/5 text-gray-500 border border-white/10">
                 Modo Visualização
               </div>
             </div>
@@ -547,7 +547,7 @@ const statusMap: any = {
             <a
               :href="`mailto:${proposal.profileId.email}`"
               @click="isPreview ? $event.preventDefault() : null"
-              class="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10 transition-all group outline-none focus-visible:ring-2 focus-visible:ring-white"
+              class="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-[0.5rem] border border-white/10 transition-all group outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <div class="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
                 <Mail class="w-4 h-4 text-gray-300 group-hover:text-white transition-colors" />
@@ -562,7 +562,7 @@ const statusMap: any = {
               @click="isPreview ? $event.preventDefault() : null"
               :href="`https://wa.me/${profileWhatsapp.replace(/\D/g, '')}`"
               target="_blank"
-              class="flex items-center gap-3 p-4 bg-white/5 hover:bg-green-500/10 rounded-2xl border border-white/10 hover:border-green-500/30 transition-all group outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+              class="flex items-center gap-3 p-4 bg-white/5 hover:bg-green-500/10 rounded-[0.5rem] border border-white/10 hover:border-green-500/30 transition-all group outline-none focus-visible:ring-2 focus-visible:ring-green-500"
             >
               <div class="w-9 h-9 bg-white/10 group-hover:bg-green-500/20 rounded-xl flex items-center justify-center shrink-0 transition-colors">
                 <MessageCircle class="w-4 h-4 text-gray-300 group-hover:text-green-400 transition-colors" />

@@ -36,7 +36,7 @@ useIntersectionObserver(sentinelRef, ([entry]) => {
 <template>
   <div class="w-full">
     <!-- TABLE TYPE -->
-    <div v-if="type === 'table'" class="bg-white dark:bg-gray-900 rounded-[2.5rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden transition-all">
+    <div v-if="type === 'table'" class="bg-white dark:bg-gray-900 rounded-[0.5rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden transition-all">
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead v-if="$slots.header">

@@ -107,12 +107,12 @@ onUnmounted(() => {
         <div class="flex items-center gap-12">
           <NuxtLink :to="loggedIn ? '/dashboard' : '/'"><AppLogo size="sm" :light="isDark" /></NuxtLink>
           <div v-if="loggedIn" class="hidden md:flex gap-1.5 items-center">
-            <NuxtLink to="/dashboard" @mouseenter="preloadRouteComponents('/dashboard')" @focus="preloadRouteComponents('/dashboard')" class="px-3.5 py-2 rounded-xl text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-all" active-class="!text-blue-600 dark:!text-blue-400 font-black bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/40 shadow-sm">Dashboard</NuxtLink>
-            <NuxtLink to="/clientes" @mouseenter="preloadRouteComponents('/clientes')" @focus="preloadRouteComponents('/clientes')" class="px-3.5 py-2 rounded-xl text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-all" active-class="!text-blue-600 dark:!text-blue-400 font-black bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/40 shadow-sm">Clientes</NuxtLink>
-            <NuxtLink to="/catalogo" @mouseenter="preloadRouteComponents('/catalogo')" @focus="preloadRouteComponents('/catalogo')" class="px-3.5 py-2 rounded-xl text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-all" active-class="!text-blue-600 dark:!text-blue-400 font-black bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/40 shadow-sm">Catálogo</NuxtLink>
-            <NuxtLink to="/orcamentos" @mouseenter="preloadRouteComponents('/orcamentos')" @focus="preloadRouteComponents('/orcamentos')" class="px-3.5 py-2 rounded-xl text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-all" active-class="!text-blue-600 dark:!text-blue-400 font-black bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/40 shadow-sm">Orçamentos</NuxtLink>
-            <NuxtLink to="/agenda" @mouseenter="preloadRouteComponents('/agenda')" @focus="preloadRouteComponents('/agenda')" class="px-3.5 py-2 rounded-xl text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-all" active-class="!text-blue-600 dark:!text-blue-400 font-black bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/40 shadow-sm">Agenda</NuxtLink>
-            <NuxtLink to="/relatorios" @mouseenter="preloadRouteComponents('/relatorios')" @focus="preloadRouteComponents('/relatorios')" class="px-3.5 py-2 rounded-xl text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-all" active-class="!text-blue-600 dark:!text-blue-400 font-black bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/40 shadow-sm">Relatórios</NuxtLink>
+            <NuxtLink to="/dashboard" @mouseenter="preloadRouteComponents('/dashboard')" @focus="preloadRouteComponents('/dashboard')" class="px-3.5 py-2 rounded-[0.5rem] text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-all" active-class="!text-blue-600 dark:!text-blue-400 font-black bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/40 shadow-sm">Dashboard</NuxtLink>
+            <NuxtLink to="/clientes" @mouseenter="preloadRouteComponents('/clientes')" @focus="preloadRouteComponents('/clientes')" class="px-3.5 py-2 rounded-[0.5rem] text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-all" active-class="!text-blue-600 dark:!text-blue-400 font-black bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/40 shadow-sm">Clientes</NuxtLink>
+            <NuxtLink to="/catalogo" @mouseenter="preloadRouteComponents('/catalogo')" @focus="preloadRouteComponents('/catalogo')" class="px-3.5 py-2 rounded-[0.5rem] text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-all" active-class="!text-blue-600 dark:!text-blue-400 font-black bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/40 shadow-sm">Catálogo</NuxtLink>
+            <NuxtLink to="/orcamentos" @mouseenter="preloadRouteComponents('/orcamentos')" @focus="preloadRouteComponents('/orcamentos')" class="px-3.5 py-2 rounded-[0.5rem] text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-all" active-class="!text-blue-600 dark:!text-blue-400 font-black bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/40 shadow-sm">Orçamentos</NuxtLink>
+            <NuxtLink to="/agenda" @mouseenter="preloadRouteComponents('/agenda')" @focus="preloadRouteComponents('/agenda')" class="px-3.5 py-2 rounded-[0.5rem] text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-all" active-class="!text-blue-600 dark:!text-blue-400 font-black bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/40 shadow-sm">Agenda</NuxtLink>
+            <NuxtLink to="/relatorios" @mouseenter="preloadRouteComponents('/relatorios')" @focus="preloadRouteComponents('/relatorios')" class="px-3.5 py-2 rounded-[0.5rem] text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-all" active-class="!text-blue-600 dark:!text-blue-400 font-black bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/40 shadow-sm">Relatórios</NuxtLink>
           </div>
           <div v-else class="hidden md:flex gap-8">
             <a href="#features" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Funcionalidades</a>
@@ -123,7 +123,7 @@ onUnmounted(() => {
         <div class="flex items-center gap-2 md:gap-3">
           <template v-if="loggedIn">
             <!-- Credits & Plan Display (Desktop) -->
-            <div class="hidden md:flex items-center gap-2 md:gap-3.5 bg-slate-50 dark:bg-slate-900/60 px-2.5 md:px-3.5 py-1.5 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-inner mr-0.5 md:mr-1">
+            <div class="hidden md:flex items-center gap-2 md:gap-3.5 bg-slate-50 dark:bg-slate-900/60 px-2.5 md:px-3.5 py-1.5 rounded-[0.5rem] border border-slate-100 dark:border-slate-800/80 shadow-inner mr-0.5 md:mr-1">
               <!-- Créditos -->
               <div class="flex items-center gap-1.5 py-0.5">
                 <div class="w-6 h-6 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-500">
@@ -162,7 +162,7 @@ onUnmounted(() => {
             <NuxtLink 
               v-if="user?.role === 'admin'"
               to="/admin" 
-              class="hidden md:flex w-10 h-10 rounded-2xl items-center justify-center bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-600 dark:text-red-400 shadow-sm hover:ring-4 ring-red-500/5 dark:ring-red-950/20 transition-all"
+              class="hidden md:flex w-10 h-10 rounded-[0.5rem] items-center justify-center bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-600 dark:text-red-400 shadow-sm hover:ring-4 ring-red-500/5 dark:ring-red-950/20 transition-all"
               title="Painel de Administração"
               aria-label="Acessar Painel de Administração"
             >
@@ -175,7 +175,7 @@ onUnmounted(() => {
             <!-- Central de Notificações (Sino com Badge) -->
             <button
               @click="openNotificationCenter"
-              class="relative w-10 h-10 rounded-2xl items-center justify-center bg-gray-50 dark:bg-gray-900/60 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 border border-slate-100 dark:border-slate-800/80 shadow-sm hover:ring-4 ring-gray-100 dark:ring-gray-800/50 transition-all flex cursor-pointer"
+              class="relative w-10 h-10 rounded-[0.5rem] items-center justify-center bg-gray-50 dark:bg-gray-900/60 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 border border-slate-100 dark:border-slate-800/80 shadow-sm hover:ring-4 ring-gray-100 dark:ring-gray-800/50 transition-all flex cursor-pointer"
               aria-label="Abrir Central de Notificações"
               title="Central de Notificações"
             >
@@ -192,14 +192,14 @@ onUnmounted(() => {
             <div ref="menuRef" class="hidden md:block relative">
               <button 
                 @click="toggleMenu" 
-                class="w-10 h-10 rounded-2xl bg-gray-50 dark:bg-gray-900 flex items-center justify-center overflow-hidden hover:ring-4 ring-gray-100 dark:ring-gray-800/50 transition-all border border-slate-100 dark:border-slate-800/80 shadow-sm relative z-[60]"
+                class="w-10 h-10 rounded-[0.5rem] bg-gray-50 dark:bg-gray-900 flex items-center justify-center overflow-hidden hover:ring-4 ring-gray-100 dark:ring-gray-800/50 transition-all border border-slate-100 dark:border-slate-800/80 shadow-sm relative z-[60]"
               >
                 <img v-if="(user as any)?.avatar || profile?.avatar" :src="(user as any)?.avatar || profile?.avatar" class="w-full h-full object-cover" loading="lazy">
                 <span v-else class="text-sm font-black text-gray-900 dark:text-gray-50">{{ (user as any)?.name?.charAt(0).toUpperCase() || profile?.name?.charAt(0).toUpperCase() }}</span>
               </button>
 
               <!-- Dropdown Desktop -->
-              <div v-if="isMenuOpen" class="absolute right-0 mt-3 w-48 bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-1.5 overflow-hidden ring-1 ring-black/5 dark:ring-white/5 z-[70]">
+              <div v-if="isMenuOpen" class="absolute right-0 mt-3 w-48 bg-white dark:bg-gray-900 rounded-[0.5rem] shadow-xl border border-gray-100 dark:border-gray-700 py-1.5 overflow-hidden ring-1 ring-black/5 dark:ring-white/5 z-[70]">
                 <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700 flex items-center gap-3">
                   <div class="w-6 h-6 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 shrink-0">
                     <img v-if="(user as any)?.avatar || profile?.avatar" :src="(user as any)?.avatar || profile?.avatar" class="w-full h-full object-cover" loading="lazy">

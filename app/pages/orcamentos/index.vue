@@ -421,7 +421,7 @@ async function saveContract() {
       <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
         <button 
           @click="isAIWizardOpen = true" 
-          class="px-6 py-3 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-violet-500/20 active:scale-98 transition-all flex items-center justify-center gap-2 self-stretch sm:self-auto"
+          class="px-6 py-3 rounded-[0.5rem] bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-violet-500/20 active:scale-98 transition-all flex items-center justify-center gap-2 self-stretch sm:self-auto"
         >
           <Sparkles class="w-4 h-4 text-white animate-pulse" />
           Criar com IA
@@ -439,7 +439,7 @@ async function saveContract() {
               v-model="searchQuery"
               type="text"
               placeholder="Buscar por título, cliente ou código..."
-              class="w-full h-[52px] pl-12 pr-5 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-sm"
+              class="w-full h-[52px] pl-12 pr-5 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-[0.5rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-sm"
             >
             <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
               <Search class="w-5 h-5" />
@@ -467,7 +467,7 @@ async function saveContract() {
             />
           </div>
 
-          <div class="flex items-center gap-3 px-5 h-[52px] bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-2xl hover:border-gray-200 dark:hover:border-gray-700 transition-all group cursor-pointer shadow-sm shrink-0">
+          <div class="flex items-center gap-3 px-5 h-[52px] bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-[0.5rem] hover:border-gray-200 dark:hover:border-gray-700 transition-all group cursor-pointer shadow-sm shrink-0">
             <BaseCheckbox v-model="filterPendingChat" id="pending-chat" />
             <label for="pending-chat" class="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest cursor-pointer group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors whitespace-nowrap">
               Chat Pendente
@@ -541,7 +541,7 @@ async function saveContract() {
               <button 
                 v-if="proposal.client.phone"
                 @click="sendWhatsapp(proposal)"
-                class="p-2.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-2xl transition-all"
+                class="p-2.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-[0.5rem] transition-all"
                 title="Enviar via WhatsApp"
                 aria-label="Enviar via WhatsApp"
               >
@@ -550,7 +550,7 @@ async function saveContract() {
               <DropdownMenuRoot>
                 <DropdownMenuTrigger as-child>
                   <button
-                    class="p-2.5 text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl transition-all"
+                    class="p-2.5 text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[0.5rem] transition-all"
                     title="Mais ações"
                     aria-label="Mais ações do orçamento"
                   >
@@ -561,18 +561,18 @@ async function saveContract() {
                   <DropdownMenuContent
                     align="end"
                     :side-offset="6"
-                    class="min-w-[220px] bg-white dark:bg-gray-950 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
+                    class="min-w-[220px] bg-white dark:bg-gray-950 rounded-[0.5rem] shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
                   >
                     <DropdownMenuItem
                       @click="openHistory(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-[0.5rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
                     >
                       <History class="w-4 h-4 text-blue-500" />
                       Ver Histórico
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       @click="downloadPdf(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-[0.5rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
                     >
                       <Download class="w-4 h-4 text-blue-500" />
                       Baixar Orçamento
@@ -581,7 +581,7 @@ async function saveContract() {
                       v-if="proposal.status !== 'draft' && proposal.status !== 'accepted'"
                       :disabled="isResending === proposal._id"
                       @click="resendEmail(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer outline-none transition-all disabled:opacity-50"
+                      class="flex items-center gap-3 px-4 py-3 rounded-[0.5rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer outline-none transition-all disabled:opacity-50"
                     >
                       <RefreshCcw v-if="isResending === proposal._id" class="w-4 h-4 animate-spin text-indigo-500" />
                       <Mail v-else class="w-4 h-4 text-indigo-500" />
@@ -590,7 +590,7 @@ async function saveContract() {
                     <DropdownMenuItem
                       v-if="proposal.status !== 'accepted'"
                       @click="openModal(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:text-amber-600 dark:hover:text-amber-400 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-[0.5rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:text-amber-600 dark:hover:text-amber-400 cursor-pointer outline-none transition-all"
                     >
                       <Pencil class="w-4 h-4 text-amber-500" />
                       Editar
@@ -598,7 +598,7 @@ async function saveContract() {
                     <DropdownMenuItem
                       v-if="proposal.status === 'pending'"
                       @click="openContractModal(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-sky-50 dark:hover:bg-sky-950/40 hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-[0.5rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-sky-50 dark:hover:bg-sky-950/40 hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer outline-none transition-all"
                     >
                       <FileText class="w-4 h-4 text-sky-500" />
                       Editar Contrato
@@ -606,7 +606,7 @@ async function saveContract() {
                     <DropdownMenuItem
                       v-if="proposal.status !== 'accepted'"
                       @click="confirmDeleteProposal(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-600 dark:hover:text-red-300 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-[0.5rem] text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-600 dark:hover:text-red-300 cursor-pointer outline-none transition-all"
                     >
                       <Trash2 class="w-4 h-4 text-red-500" />
                       Excluir
@@ -708,7 +708,8 @@ async function saveContract() {
           v-if="proposalFormRef?.currentStep < proposalFormRef?.totalSteps" 
           type="button" 
           variant="primary" 
-          @click="proposalFormRef.nextStep()"
+          :disabled="proposalFormRef?.isStepInvalid"
+          @click.prevent="proposalFormRef.nextStep()"
         >
           Próximo Passo
           <ArrowRight class="w-4 h-4 ml-2" />
@@ -743,8 +744,8 @@ async function saveContract() {
       @close="selectedProposal = null"
     >
       <div v-if="selectedProposal" class="">
-        <div class="bg-green-500 rounded-2xl p-6 flex items-center gap-4 mb-6">
-          <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
+        <div class="bg-green-500 rounded-[0.5rem] p-6 flex items-center gap-4 mb-6">
+          <div class="w-14 h-14 bg-white/20 rounded-[0.5rem] flex items-center justify-center shrink-0">
             <CheckCircle2 class="w-8 h-8 text-white" />
           </div>
           <div class="flex-1 min-w-0">
@@ -758,7 +759,7 @@ async function saveContract() {
           </div>
         </div>
 
-        <div class="bg-gray-50 dark:bg-gray-900/60 rounded-2xl p-6 mb-4">
+        <div class="bg-gray-50 dark:bg-gray-900/60 rounded-[0.5rem] p-6 mb-4">
           <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4">Cliente</p>
           <div class="flex items-center justify-between gap-4 flex-wrap">
             <div class="flex items-center gap-3">
@@ -789,7 +790,7 @@ async function saveContract() {
           </div>
         </div>
 
-        <div class="flex items-center gap-3 px-4 py-3 bg-blue-50 dark:bg-blue-950/30 rounded-2xl mb-4">
+        <div class="flex items-center gap-3 px-4 py-3 bg-blue-50 dark:bg-blue-950/30 rounded-[0.5rem] mb-4">
           <CreditCard v-if="selectedProposal.paymentConfig?.method === 'credit_card'" class="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
           <Banknote v-else class="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
           <p class="text-sm font-black text-blue-900 dark:text-blue-200">
@@ -799,7 +800,7 @@ async function saveContract() {
           </p>
         </div>
 
-        <div class="border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden mb-4">
+        <div class="border border-gray-100 dark:border-gray-800 rounded-[0.5rem] overflow-hidden mb-4">
           <div class="px-5 py-3 bg-gray-50 dark:bg-gray-900/60 border-b border-gray-100 dark:border-gray-800">
             <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Itens do Orçamento</p>
           </div>
@@ -856,7 +857,7 @@ async function saveContract() {
           <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">O orçamento foi criado e o e-mail de notificação já foi enviado para o cliente.</p>
         </div>
 
-        <div class="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-2xl border border-blue-100 dark:border-blue-900/30 flex items-center gap-4 text-left">
+        <div class="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-[0.5rem] border border-blue-100 dark:border-blue-900/30 flex items-center gap-4 text-left">
           <div class="w-10 h-10 bg-green-50 dark:bg-green-950/40 rounded-xl flex items-center justify-center shrink-0">
             <img :src="'/images/icons/whatsapp-svg.svg'" class="w-6 h-6" alt="WhatsApp" loading="lazy"/>
           </div>
@@ -912,9 +913,6 @@ async function saveContract() {
           <p class="text-gray-400 text-sm italic">Nenhum evento registrado ainda.</p>
         </div>
       </div>
-      <template #footer>
-        <BaseButton variant="secondary" size="sm" @click="isHistoryOpen = false">Fechar</BaseButton>
-      </template>
     </BaseDialog>
 
 
@@ -922,7 +920,7 @@ async function saveContract() {
     <BaseDialog v-model:open="isContractModalOpen" title="Editar Contrato" size="xl">
       <div class="p-6 space-y-6">
         <!-- Variáveis -->
-        <div class="p-5 bg-slate-50/50 dark:bg-slate-900/50 rounded-3xl border border-slate-100 dark:border-slate-800">
+        <div class="p-5 bg-slate-50/50 dark:bg-slate-900/50 rounded-[0.5rem] border border-slate-100 dark:border-slate-800">
           <div class="flex items-center gap-2 mb-3">
             <Variable class="w-4 h-4 text-slate-500 dark:text-slate-400" />
             <h3 class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Variáveis Dinâmicas</h3>
@@ -949,7 +947,7 @@ async function saveContract() {
         <!-- Editor -->
         <div class="space-y-2">
           <label class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Contrato</label>
-          <LazyRichTextEditor v-model="localContractText" class="min-h-[350px] border-2 border-gray-50 dark:border-gray-800 rounded-3xl overflow-hidden" />
+          <LazyRichTextEditor v-model="localContractText" class="min-h-[350px] border-2 border-gray-50 dark:border-gray-800 rounded-[0.5rem] overflow-hidden" />
         </div>
       </div>
       <template #footer>

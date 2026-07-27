@@ -53,7 +53,7 @@ const id = useId()
         <SelectTrigger
           :aria-labelledby="label ? `label-${id}` : undefined"
           :class="[
-            'inline-flex items-center justify-between w-full h-[56px] bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-50 group disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:cursor-not-allowed shadow-sm',
+            'inline-flex items-center justify-between w-full h-[56px] bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 rounded-[0.5rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-50 group disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:cursor-not-allowed shadow-sm',
             icon || $slots.icon ? 'pl-12 pr-5' : 'px-5',
             error ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500/20' : ''
           ]"
@@ -66,7 +66,7 @@ const id = useId()
 
         <SelectPortal>
           <SelectContent
-            class="z-[9999] min-w-[var(--radix-select-trigger-width)] bg-white dark:bg-gray-900 rounded-2xl border-2 border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+            class="z-[9999] min-w-[var(--radix-select-trigger-width)] bg-white dark:bg-gray-900 rounded-[0.5rem] border-2 border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
             position="popper"
             :side-offset="8"
             :avoid-collisions="true"
@@ -84,7 +84,7 @@ const id = useId()
                 v-for="option in options"
                 :key="option.value"
                 :value="option.value || '__EMPTY__'"
-                class="relative flex items-center px-8 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 rounded-xl cursor-pointer outline-none focus:bg-gray-50 dark:focus:bg-gray-800 focus:text-gray-900 dark:focus:text-white data-[state=checked]:text-gray-900 dark:data-[state=checked]:text-white data-[state=checked]:bg-gray-50 dark:data-[state=checked]:bg-gray-800 transition-colors"
+                class="relative flex items-center px-8 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 rounded-[0.5rem] cursor-pointer outline-none focus:bg-gray-50 dark:focus:bg-gray-800 focus:text-gray-900 dark:focus:text-white data-[state=checked]:text-gray-900 dark:data-[state=checked]:text-white data-[state=checked]:bg-gray-50 dark:data-[state=checked]:bg-gray-800 transition-colors"
               >
                 <SelectItemIndicator class="absolute left-2 inline-flex items-center justify-center">
                   <Check class="w-4 h-4 text-gray-900 dark:text-white" />

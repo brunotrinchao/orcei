@@ -124,7 +124,7 @@ function isItemSelected(item: any) {
             @update:model-value="onCatalogItemSelect"
           />
         </div>
-        <BaseButton type="button" variant="secondary" @click="showCatalogItemFormDialog = true" class="shrink-0 h-[56px] px-6 rounded-2xl">
+        <BaseButton type="button" variant="secondary" @click="showCatalogItemFormDialog = true" class="shrink-0 h-[56px] px-6 rounded-[0.5rem]">
           <Plus class="w-5 h-5 mr-2" />
           Novo
         </BaseButton>
@@ -133,7 +133,7 @@ function isItemSelected(item: any) {
 
     <!-- Escopo Principal -->
     <BaseSectionCard :title="`Itens Obrigatórios (${form.items.length})`">
-      <div v-if="form.items.length === 0" class="p-8 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-3xl text-center text-gray-400 dark:text-gray-500 font-medium">
+      <div v-if="form.items.length === 0" class="p-8 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-[0.5rem] text-center text-gray-400 dark:text-gray-500 font-medium">
         Adicione itens buscando no catálogo acima ou clicando em "Novo".
       </div>
 
@@ -141,7 +141,7 @@ function isItemSelected(item: any) {
         <div 
           v-for="(item, idx) in form.items" 
           :key="'item_'+idx" 
-          class="bg-white dark:bg-gray-900 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 shadow-sm overflow-hidden transition-all group"
+          class="bg-white dark:bg-gray-900 rounded-[0.5rem] border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 shadow-sm overflow-hidden transition-all group"
         >
           <!-- Cabecalho Compacto (Sempre visível) -->
           <div class="p-4 flex items-center gap-4">
@@ -162,11 +162,11 @@ function isItemSelected(item: any) {
             <div class="flex items-center gap-3 sm:gap-6 shrink-0">
               <div class="flex items-center gap-2">
                 <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase hidden sm:block">Qtd</span>
-                <input v-model.number="item.quantity" type="number" class="w-14 sm:w-16 bg-gray-50 dark:bg-gray-950 px-2 py-1.5 rounded-lg font-bold text-sm border border-transparent focus:border-blue-500 text-gray-900 dark:text-gray-50 outline-none text-center">
+                <input v-model.number="item.quantity" type="number" class="w-14 sm:w-16 bg-gray-50 dark:bg-gray-950 px-2 py-1.5 rounded-[0.5rem] font-bold text-sm border border-transparent focus:border-blue-500 text-gray-900 dark:text-gray-50 outline-none text-center">
               </div>
               <div class="flex items-center gap-2">
                 <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase hidden sm:block">R$</span>
-                <input v-model.number="item.price" type="number" class="w-20 sm:w-24 bg-gray-50 dark:bg-gray-950 px-2 py-1.5 rounded-lg font-bold text-sm border border-transparent focus:border-blue-500 text-gray-900 dark:text-gray-50 outline-none text-right">
+                <input v-model.number="item.price" type="number" class="w-20 sm:w-24 bg-gray-50 dark:bg-gray-950 px-2 py-1.5 rounded-[0.5rem] font-bold text-sm border border-transparent focus:border-blue-500 text-gray-900 dark:text-gray-50 outline-none text-right">
               </div>
               
               <div class="hidden md:block text-right min-w-[80px]">
@@ -227,7 +227,7 @@ function isItemSelected(item: any) {
         <div 
           v-for="(item, idx) in form.upsellItems" 
           :key="'upsell_'+idx" 
-          class="bg-blue-50/30 dark:bg-blue-950/20 rounded-2xl border-2 border-dashed border-blue-200 dark:border-blue-900/50 hover:border-blue-300 dark:hover:border-blue-800 shadow-sm overflow-hidden transition-all group"
+          class="bg-blue-50/30 dark:bg-blue-950/20 rounded-[0.5rem] border-2 border-dashed border-blue-200 dark:border-blue-900/50 hover:border-blue-300 dark:hover:border-blue-800 shadow-sm overflow-hidden transition-all group"
         >
           <!-- Cabecalho Compacto -->
           <div class="p-4 flex items-center gap-4">
@@ -248,11 +248,11 @@ function isItemSelected(item: any) {
             <div class="flex items-center gap-3 sm:gap-6 shrink-0">
               <div class="flex items-center gap-2">
                 <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase hidden sm:block">Qtd</span>
-                <input v-model.number="item.quantity" type="number" class="w-14 sm:w-16 bg-white dark:bg-gray-950 px-2 py-1.5 rounded-lg font-bold text-sm border border-blue-100 dark:border-blue-900/50 text-gray-900 dark:text-gray-50 focus:border-blue-500 outline-none text-center">
+                <input v-model.number="item.quantity" type="number" class="w-14 sm:w-16 bg-white dark:bg-gray-950 px-2 py-1.5 rounded-[0.5rem] font-bold text-sm border border-blue-100 dark:border-blue-900/50 text-gray-900 dark:text-gray-50 focus:border-blue-500 outline-none text-center">
               </div>
               <div class="flex items-center gap-2">
                 <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase hidden sm:block">R$</span>
-                <input v-model.number="item.price" type="number" class="w-20 sm:w-24 bg-white dark:bg-gray-950 px-2 py-1.5 rounded-lg font-bold text-sm border border-blue-100 dark:border-blue-900/50 text-gray-900 dark:text-gray-50 focus:border-blue-500 outline-none text-right">
+                <input v-model.number="item.price" type="number" class="w-20 sm:w-24 bg-white dark:bg-gray-950 px-2 py-1.5 rounded-[0.5rem] font-bold text-sm border border-blue-100 dark:border-blue-900/50 text-gray-900 dark:text-gray-50 focus:border-blue-500 outline-none text-right">
               </div>
               
               <div class="hidden md:block text-right min-w-[80px]">

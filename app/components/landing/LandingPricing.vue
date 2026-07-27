@@ -54,7 +54,6 @@ const { packages } = useCreditPackages()
             <div class="mb-6">
               <div class="flex items-baseline gap-1 mt-1">
                 <span class="text-4xl font-black text-white">{{ pack.price }}</span>
-                <span class="text-xs text-slate-400 font-bold">/ único</span>
               </div>
               <p class="text-[10px] text-purple-400/80 mt-2 font-bold uppercase tracking-wider">{{ pack.unitPrice }}</p>
             </div>

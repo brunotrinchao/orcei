@@ -138,7 +138,7 @@ onMounted(() => {
       </div>
       
       <!-- Saldo Glowing -->
-      <div class="bg-slate-900 dark:bg-slate-900/90 text-white px-8 py-5 rounded-[2rem] shadow-2xl flex items-center gap-6 border border-white/5 relative overflow-hidden shrink-0">
+      <div class="bg-slate-900 dark:bg-slate-900/90 text-white px-5 py-5 rounded-[0.5rem] shadow-2xl flex items-center gap-6 border border-white/5 relative overflow-hidden shrink-0">
         <div class="absolute -top-10 -right-10 w-24 h-24 bg-blue-500/10 rounded-full blur-xl"></div>
         <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-blue-400">
           <Coins class="w-6 h-6 animate-pulse" />
@@ -153,18 +153,18 @@ onMounted(() => {
     </header>
 
     <!-- Banners de Notificação Stripe -->
-    <div v-if="success" class="bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-100 dark:border-emerald-900/50 p-6 rounded-3xl flex items-center gap-4 text-emerald-700 dark:text-emerald-300 animate-in fade-in slide-in-from-top-4">
+    <div v-if="success" class="bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-100 dark:border-emerald-900/50 p-6 rounded-[0.5rem] flex items-center gap-4 text-emerald-700 dark:text-emerald-300 animate-in fade-in slide-in-from-top-4">
       <CheckCircle2 class="w-6 h-6 shrink-0" />
       <p class="font-bold">Recarga efetuada com sucesso! Seus créditos vitalícios foram adicionados ao saldo.</p>
     </div>
 
-    <div v-if="canceled" class="bg-orange-50 dark:bg-orange-950/40 border-2 border-orange-100 dark:border-orange-900/50 p-6 rounded-3xl flex items-center gap-4 text-orange-700 dark:text-orange-300 animate-in fade-in slide-in-from-top-4">
+    <div v-if="canceled" class="bg-orange-50 dark:bg-orange-950/40 border-2 border-orange-100 dark:border-orange-900/50 p-6 rounded-[0.5rem] flex items-center gap-4 text-orange-700 dark:text-orange-300 animate-in fade-in slide-in-from-top-4">
       <AlertCircle class="w-6 h-6 shrink-0 text-orange-500" />
       <p class="font-bold">A compra de créditos foi cancelada ou não pôde ser processada.</p>
     </div>
 
     <!-- Banner Hero: Garantia de Créditos Vitalícios -->
-    <section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-8 rounded-[2.5rem] border border-indigo-500/20 shadow-xl shadow-indigo-500/5">
+    <section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-8 rounded-[0.5rem] border border-indigo-500/20 shadow-xl shadow-indigo-500/5">
       <div class="absolute -top-20 -left-20 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl opacity-60"></div>
       <div class="absolute -bottom-20 -right-20 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl opacity-60"></div>
       
@@ -182,9 +182,9 @@ onMounted(() => {
         </div>
         
         <!-- Resumo Rápido de Custos das Principais Ações + Botão para Abrir Modal -->
-        <div class="bg-slate-950/50 p-6 rounded-3xl border border-white/10 shrink-0 w-full lg:w-80 space-y-3">
+        <div class="bg-slate-950/50 p-6 rounded-[0.5rem] border border-white/10 shrink-0 w-full lg:w-80 space-y-3">
           <div class="flex items-center justify-between">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resumo de Créditos</p>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resumo</p>
             <button 
               @click="isCostTableModalOpen = true"
               class="text-[9px] font-black text-blue-400 hover:text-blue-300 uppercase tracking-widest bg-blue-500/10 hover:bg-blue-500/20 px-2 py-1 rounded-lg border border-blue-500/20 transition-all flex items-center gap-1 active:scale-95 cursor-pointer"
@@ -230,7 +230,7 @@ onMounted(() => {
           <div 
             v-for="item in actionCostsList" 
             :key="item.key"
-            class="bg-gray-50/60 dark:bg-gray-800/60 p-5 rounded-2xl border border-gray-100 dark:border-gray-700/60 flex flex-col justify-between space-y-4"
+            class="bg-gray-50/60 dark:bg-gray-800/60 p-5 rounded-[0.5rem] border border-gray-100 dark:border-gray-700/60 flex flex-col justify-between space-y-4"
           >
             <div class="space-y-2.5">
               <div class="flex items-center justify-between gap-2">
@@ -256,14 +256,10 @@ onMounted(() => {
           </div>
         </div>
       </div>
-
-      <template #footer>
-        <BaseButton variant="secondary" size="sm" @click="isCostTableModalOpen = false">Fechar</BaseButton>
-      </template>
     </BaseDialog>
 
     <!-- Cupom Promocional -->
-    <section class="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 shadow-sm">
+    <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 shadow-sm">
       <div class="flex flex-col md:flex-row md:items-end gap-4">
         <div class="flex-1">
           <BaseInput
@@ -292,7 +288,7 @@ onMounted(() => {
           v-for="pack in packages" 
           :key="pack.id"
           :class="[
-            'bg-white dark:bg-gray-900 p-8 rounded-[3rem] border transition-all flex flex-col justify-between relative overflow-hidden',
+            'bg-white dark:bg-gray-900 p-8 rounded-[0.5rem] border transition-all flex flex-col justify-between relative overflow-hidden',
             pack.highlight 
               ? 'border-blue-600 dark:border-blue-500 ring-8 ring-blue-50 dark:ring-blue-950/40 shadow-2xl scale-[1.03] z-10' 
               : 'border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-lg'
@@ -319,7 +315,6 @@ onMounted(() => {
             <div class="space-y-1">
               <div class="flex items-baseline gap-1">
                 <span class="text-4xl font-black text-gray-900 dark:text-white tracking-tight">{{ pack.price }}</span>
-                <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">/ único</span>
               </div>
               <p class="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest bg-blue-50 dark:bg-blue-950/50 px-2 py-0.5 rounded w-fit">
                 {{ pack.unitPrice }}
@@ -353,7 +348,7 @@ onMounted(() => {
             >
               <Loader2 v-if="isLoading === pack.id" class="w-4 h-4 animate-spin mr-2" />
               <template v-else>
-                Comprar {{ pack.credits }} {{ pack.credits === 1 ? 'Crédito' : 'Créditos' }}
+                {{ pack.credits }} {{ pack.credits === 1 ? 'Crédito' : 'Créditos' }}
               </template>
             </BaseButton>
           </div>
@@ -368,7 +363,7 @@ onMounted(() => {
         <div class="h-px flex-1 bg-gray-100 dark:bg-gray-800"></div>
       </div>
 
-      <div class="bg-white dark:bg-gray-900 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+      <div class="bg-white dark:bg-gray-900 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>

@@ -106,7 +106,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
         <button 
           @click="activeTab = 'system'"
           :class="activeTab === 'system' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-lg' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'"
-          class="flex items-center gap-3 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
+          class="flex items-center gap-3 px-6 py-4 rounded-[0.5rem] text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
         >
           <ShieldAlert class="w-4 h-4 shrink-0" />
           Sistema
@@ -114,7 +114,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
         <button 
           @click="activeTab = 'landing'"
           :class="activeTab === 'landing' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-lg' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'"
-          class="flex items-center gap-3 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
+          class="flex items-center gap-3 px-6 py-4 rounded-[0.5rem] text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
         >
           <Globe class="w-4 h-4 shrink-0" />
           Landing Page
@@ -122,7 +122,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
         <button
           @click="activeTab = 'credits'"
           :class="activeTab === 'credits' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-lg' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'"
-          class="flex items-center gap-3 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
+          class="flex items-center gap-3 px-6 py-4 rounded-[0.5rem] text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
         >
           <Sparkles class="w-4 h-4 shrink-0" />
           Créditos de IA
@@ -133,7 +133,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
       <div class="flex-1 space-y-10 min-w-0">
         <!-- SYSTEM SETTINGS -->
         <div v-if="activeTab === 'system'" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <section class="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-950/40 flex items-center justify-center">
                 <ShieldAlert class="w-5 h-5 text-red-600 dark:text-red-400" />
@@ -141,7 +141,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
               <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Estado do Sistema</h2>
             </div>
 
-            <div class="p-8 bg-gray-50/50 dark:bg-gray-950/50 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 flex items-center justify-between gap-6">
+            <div class="p-8 bg-gray-50/50 dark:bg-gray-950/50 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 flex items-center justify-between gap-6">
               <div class="space-y-1">
                 <h3 class="font-black text-gray-900 dark:text-gray-100 uppercase text-xs tracking-widest">Modo Manutenção</h3>
                 <p class="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
@@ -170,7 +170,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
             </div>
           </section>
 
-          <section class="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center">
                 <FileText class="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -190,7 +190,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
 
         <!-- LANDING PAGE SETTINGS -->
         <div v-if="activeTab === 'landing'" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <section class="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/40 flex items-center justify-center">
                 <Globe class="w-5 h-5 text-purple-600 dark:text-purple-400" />
@@ -208,7 +208,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
             </div>
           </section>
 
-          <section class="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
@@ -275,7 +275,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
 
         <!-- CRÉDITOS DE IA -->
         <div v-if="activeTab === 'credits'" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <section class="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-950/40 flex items-center justify-center">
                 <Sparkles class="w-5 h-5 text-violet-600 dark:text-violet-400" />
@@ -314,7 +314,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
             </div>
           </section>
 
-          <section class="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
                 <Sparkles class="w-5 h-5 text-emerald-600 dark:text-emerald-400" />

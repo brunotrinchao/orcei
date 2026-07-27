@@ -26,7 +26,7 @@ withDefaults(defineProps<Props>(), {
   <section
     :id="id"
     :data-tour="dataTour"
-    class="bg-white dark:bg-gray-900 p-6 md:p-8 rounded-[2.5rem] border border-gray-200 dark:border-gray-800 shadow-sm scroll-mt-8 transition-colors"
+    class="bg-white dark:bg-gray-900 p-6 md:p-8 rounded-[0.5rem] border border-gray-200 dark:border-gray-800 shadow-sm scroll-mt-8 transition-colors"
   >
     <!-- Header da Seção -->
     <div v-if="title || icon || $slots.icon || $slots['header-actions']" class="flex items-center justify-between gap-4 mb-6">

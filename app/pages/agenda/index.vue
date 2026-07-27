@@ -316,11 +316,11 @@ const linkedProposal = computed(() => {
     </div>
 
     <!-- Container da Agenda (Dark Mode & Touch Ready) -->
-    <div data-tour="agenda-calendario" class="bg-white dark:bg-gray-900 p-3 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+    <div data-tour="agenda-calendario" class="bg-white dark:bg-gray-900 p-3 sm:p-8 rounded-[0.5rem] sm:rounded-[0.5rem] border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
       <ClientOnly>
         <FullCalendar :options="calendarOptions" />
         <template #fallback>
-          <div class="h-[550px] bg-gray-50 dark:bg-gray-800/40 rounded-3xl animate-pulse flex items-center justify-center text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest">
+          <div class="h-[550px] bg-gray-50 dark:bg-gray-800/40 rounded-[0.5rem] animate-pulse flex items-center justify-center text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest">
             Carregando agenda...
           </div>
         </template>
@@ -331,7 +331,7 @@ const linkedProposal = computed(() => {
     <BaseDialog v-model:open="isModalOpen" :title="selectedEvent ? 'Editar Compromisso' : 'Novo Compromisso'" size="lg">
       <form id="event-form" @submit.prevent="saveEvent" class="space-y-6 py-2">
         <!-- Seleção de Orçamento Aceito / Qualquer Orçamento -->
-        <div class="bg-gray-50/80 dark:bg-gray-800/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-700/60 space-y-2">
+        <div class="bg-gray-50/80 dark:bg-gray-800/50 p-4 rounded-[0.5rem] border border-gray-100 dark:border-gray-700/60 space-y-2">
           <div class="flex items-center justify-between">
             <label class="text-xs font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
               <CheckCircle2 class="w-4 h-4 text-emerald-500" /> Vincular Orçamento Aceito
@@ -489,6 +489,7 @@ const linkedProposal = computed(() => {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
+    border-radius: 0.5rem !important;
   }
 }
 

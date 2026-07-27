@@ -77,7 +77,7 @@ async function handleCheckout() {
     <div class="space-y-6">
       
       <!-- Cabeçalho Persuasivo Premium (Midnight Sapphire Theme) -->
-      <div class="relative overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 p-6 rounded-3xl border border-indigo-500/20 text-center space-y-3">
+      <div class="relative overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 p-6 rounded-[0.5rem] border border-indigo-500/20 text-center space-y-3">
         <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl"></div>
         <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
         
@@ -104,7 +104,7 @@ async function handleCheckout() {
             :key="pack.id"
             @click="selectedPack = pack.id"
             :class="[
-              'p-4 rounded-2xl border text-left transition-all flex flex-col justify-between h-36 relative overflow-hidden',
+              'p-4 rounded-[0.5rem] border text-left transition-all flex flex-col justify-between h-36 relative overflow-hidden',
               selectedPack === pack.id
                 ? 'border-indigo-600 ring-2 ring-indigo-500/10 bg-indigo-50/10 dark:bg-indigo-950/30 shadow-md scale-[1.02]'
                 : 'border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 bg-white dark:bg-gray-900 hover:bg-gray-50/20'
@@ -136,7 +136,7 @@ async function handleCheckout() {
       </div>
 
       <!-- Detalhes da Opção Selecionada -->
-      <div class="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-5 border border-gray-100/50 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div class="bg-gray-50 dark:bg-gray-900/50 rounded-[0.5rem] p-5 border border-gray-100/50 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div class="space-y-1">
           <div class="flex items-center gap-2">
             <span class="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wide">Recarga de {{ activePack.credits }} Créditos</span>
@@ -160,7 +160,7 @@ async function handleCheckout() {
         <BaseButton 
           @click="handleCheckout"
           :disabled="!!isLoading"
-          class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl py-4.5 text-xs font-black tracking-widest uppercase shadow-lg shadow-indigo-600/10 flex items-center justify-center gap-2"
+          class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-[0.5rem] py-4.5 text-xs font-black tracking-widest uppercase shadow-lg shadow-indigo-600/10 flex items-center justify-center gap-2"
         >
           <Loader2 v-if="isLoading" class="w-4 h-4 animate-spin mr-2" />
           <template v-else>

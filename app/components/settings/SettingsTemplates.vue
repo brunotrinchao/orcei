@@ -59,7 +59,7 @@ const localTermsAndConditions = computed({
 <template>
   <BaseSectionCard id="modelos" title="Modelos Legais" :icon="FileText" icon-bg-class="bg-purple-50 dark:bg-purple-950/50" icon-color-class="text-purple-600 dark:text-purple-400">
 
-    <div class="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-2xl mb-8 max-w-sm">
+    <div class="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-[0.5rem] mb-8 max-w-sm">
       <BaseButton
         type="button"
         data-tour="config-modelo-contrato"
@@ -83,7 +83,7 @@ const localTermsAndConditions = computed({
     </div>
 
     <!-- Lista de Variáveis Dinâmicas -->
-    <div class="mb-8 p-6 bg-slate-50/50 dark:bg-slate-900/50 rounded-3xl border border-slate-100 dark:border-slate-800">
+    <div class="mb-8 p-6 bg-slate-50/50 dark:bg-slate-900/50 rounded-[0.5rem] border border-slate-100 dark:border-slate-800">
       <div class="flex items-center gap-2 mb-4">
         <Variable class="w-4 h-4 text-slate-500 dark:text-slate-400" />
         <h3 class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Variáveis Dinâmicas</h3>
@@ -96,7 +96,7 @@ const localTermsAndConditions = computed({
           v-for="v in availableVariables"
           :key="v.tag"
           @click="copyTag(v.tag)"
-          class="group flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-900 border border-slate-200 dark:border-slate-800 hover:border-violet-300 dark:hover:border-violet-700 hover:bg-violet-50 dark:hover:bg-violet-950/30 rounded-lg transition-all"
+          class="group flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-900 border border-slate-200 dark:border-slate-800 hover:border-violet-300 dark:hover:border-violet-700 hover:bg-violet-50 dark:hover:bg-violet-950/30 rounded-[0.5rem] transition-all"
           :title="v.desc"
         >
           <span class="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300 group-hover:text-violet-700 dark:group-hover:text-violet-400">{{ v.tag }}</span>
@@ -108,11 +108,11 @@ const localTermsAndConditions = computed({
 
     <div v-show="activeTab === 'contract'" class="space-y-4">
       <label class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Contrato Padrão</label>
-      <LazyRichTextEditor v-model="localContractTemplate" class="min-h-[350px] border-2 border-gray-50 dark:border-gray-800 rounded-3xl overflow-hidden" />
+      <LazyRichTextEditor v-model="localContractTemplate" class="min-h-[350px] border-2 border-gray-50 dark:border-gray-800 rounded-[0.5rem] overflow-hidden" />
     </div>
     <div v-show="activeTab === 'terms'" class="space-y-4">
       <label class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Termos e Condições</label>
-      <LazyRichTextEditor v-model="localTermsAndConditions" class="min-h-[350px] border-2 border-gray-50 dark:border-gray-800 rounded-3xl overflow-hidden" />
+      <LazyRichTextEditor v-model="localTermsAndConditions" class="min-h-[350px] border-2 border-gray-50 dark:border-gray-800 rounded-[0.5rem] overflow-hidden" />
     </div>
   </BaseSectionCard>
 </template>

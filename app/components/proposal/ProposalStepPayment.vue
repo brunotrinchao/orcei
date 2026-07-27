@@ -34,7 +34,7 @@ const props = defineProps<{
 
             <div class="space-y-3">
               <label class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Método de Envio</label>
-              <div role="radiogroup" aria-label="Método de Envio" class="flex flex-col sm:flex-row gap-2 p-1 bg-white dark:bg-gray-950 rounded-2xl border border-gray-200 dark:border-gray-800">
+              <div role="radiogroup" aria-label="Método de Envio" class="flex flex-col sm:flex-row gap-2 p-1 bg-white dark:bg-gray-950 rounded-[0.5rem] border border-gray-200 dark:border-gray-800">
                 <BaseButton 
                   type="button"
                   role="radio"
@@ -64,7 +64,7 @@ const props = defineProps<{
       </div>
 
       <div class="space-y-8">
-        <div class="bg-blue-600 text-white p-8 md:p-10 rounded-[3.5rem] shadow-2xl shadow-blue-200 dark:shadow-blue-950/50 relative overflow-hidden h-full flex flex-col justify-center">
+        <div class="bg-blue-600 text-white p-8 md:p-10 rounded-[0.5rem] shadow-2xl shadow-blue-200 dark:shadow-blue-950/50 relative overflow-hidden h-full flex flex-col justify-center">
           <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
           
           <div class="relative z-10 space-y-6">
@@ -80,11 +80,11 @@ const props = defineProps<{
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-xs font-bold">Acréscimo R$</span>
-                <input v-model.number="form.totals.additional" type="number" class="w-24 bg-white/10 border-none rounded-xl text-right font-black py-1 focus:ring-2 focus:ring-white/30 outline-none">
+                <input v-model.number="form.totals.additional" type="number" class="w-24 bg-white/10 border-none rounded-[0.5rem] text-right font-black py-1 focus:ring-2 focus:ring-white/30 outline-none">
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-xs font-bold">Desconto R$</span>
-                <input v-model.number="form.totals.discount" type="number" class="w-24 bg-white/10 border-none rounded-xl text-right font-black py-1 focus:ring-2 focus:ring-white/30 outline-none">
+                <input v-model.number="form.totals.discount" type="number" class="w-24 bg-white/10 border-none rounded-[0.5rem] text-right font-black py-1 focus:ring-2 focus:ring-white/30 outline-none">
               </div>
             </div>
 

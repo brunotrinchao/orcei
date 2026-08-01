@@ -1,7 +1,7 @@
 {
   "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"/home/brunotrinchao/.claude/squeez/bin/squeez wrap 'cd /home/brunotrinchao/Documentos/Bruno/Orcei\\ngrep -rn \\\"autoIndex\\\\|syncIndexes\\\\|createIndexes\\\" server/ nuxt.config.ts 2>/dev/null'\"...",
+  "tool_input_preview": "{\"command\":\"/home/brunotrinchao/.claude/squeez/bin/squeez wrap 'cd /home/brunotrinchao/Documentos/Bruno/Orcei\\ngrep -rn \\\"_tryDeepSeek\\\\|generateFallback\\\" . --include=*.ts --include=*.vue 2>/dev/null...",
   "error": "Exit code 1",
-  "timestamp": "2026-08-01T19:33:07.594Z",
+  "timestamp": "2026-08-01T20:35:31.500Z",
   "retry_count": 1
 }

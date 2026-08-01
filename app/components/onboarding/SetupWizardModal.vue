@@ -344,7 +344,7 @@ const socialList = computed(() => {
                 </div>
 
                 <div
-                  class="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-950/30 rounded-[0.5rem] border border-blue-200/50 dark:border-blue-900/40"
+                  class="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-950/30 rounded-[0.75rem] border border-blue-200/50 dark:border-blue-900/40"
                 >
                   <p
                     class="text-xs font-light text-blue-700 dark:text-blue-100 tracking-tight"
@@ -469,7 +469,7 @@ const socialList = computed(() => {
                         </h3>
                         <div class="space-y-4">
                       <div
-                        class="p-5 bg-gray-50/50 dark:bg-gray-900/50 rounded-[0.5rem] border border-gray-100 dark:border-gray-800"
+                        class="p-5 bg-gray-50/50 dark:bg-gray-900/50 rounded-[0.75rem] border border-gray-100 dark:border-gray-800"
                       >
                         <div class="flex items-center gap-4 mb-4">
                           <img
@@ -496,7 +496,7 @@ const socialList = computed(() => {
                         <div class="space-y-2">
                           <!-- Google Calendar -->
                           <div
-                            class="flex items-center justify-between gap-3 p-3 bg-white dark:bg-gray-950 rounded-[0.5rem] border border-gray-100 dark:border-gray-800"
+                            class="flex items-center justify-between gap-3 p-3 bg-white dark:bg-gray-950 rounded-[0.75rem] border border-gray-100 dark:border-gray-800"
                           >
                             <span
                               class="text-xs font-black text-gray-700 dark:text-gray-300 uppercase tracking-wider"
@@ -533,7 +533,7 @@ const socialList = computed(() => {
 
                           <!-- Google Drive -->
                           <div
-                            class="flex items-center justify-between gap-3 p-3 bg-white dark:bg-gray-950 rounded-[0.5rem] border border-gray-100 dark:border-gray-800"
+                            class="flex items-center justify-between gap-3 p-3 bg-white dark:bg-gray-950 rounded-[0.75rem] border border-gray-100 dark:border-gray-800"
                           >
                             <span
                               class="text-xs font-black text-gray-700 dark:text-gray-300 uppercase tracking-wider"
@@ -598,7 +598,7 @@ const socialList = computed(() => {
                                 : !i.value?.logoUrl,
                           )
                         "
-                        class="flex items-start gap-3 p-4 bg-amber-50/60 dark:bg-amber-950/20 rounded-[0.5rem] border border-amber-200/50 dark:border-amber-900/40 mt-4 align-top gap-3"
+                        class="flex items-start gap-3 p-4 bg-amber-50/60 dark:bg-amber-950/20 rounded-[0.75rem] border border-amber-200/50 dark:border-amber-900/40 mt-4 align-top gap-3"
                       >
                         <AlertTriangle
                           class="w-10 h-10 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5"
@@ -613,7 +613,7 @@ const socialList = computed(() => {
 
                       <div
                         v-else
-                        class="flex flex-row p-3 bg-green-50 dark:bg-green-950/30 rounded-[0.5rem] border border-green-200/50 dark:border-green-900/40 mb-4 items-center gap-3"
+                        class="flex flex-row p-3 bg-green-50 dark:bg-green-950/30 rounded-[0.75rem] border border-green-200/50 dark:border-green-900/40 mb-4 items-center gap-3"
                       >
                         <CheckCircle2
                           class="w-10 h-10 text-green-600 dark:text-green-400 shrink-0 mt-0.5"
@@ -637,7 +637,7 @@ const socialList = computed(() => {
                       <div
                         v-for="item in reviewItems"
                         :key="item.label"
-                        class="flex items-center justify-between gap-4 p-4 bg-gray-50/50 dark:bg-gray-900/50 rounded-[0.5rem] border border-gray-100 dark:border-gray-800"
+                        class="flex items-center justify-between gap-4 p-4 bg-gray-50/50 dark:bg-gray-900/50 rounded-[0.75rem] border border-gray-100 dark:border-gray-800"
                       >
                         <span
                           class="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-wide shrink-0"
@@ -656,7 +656,7 @@ const socialList = computed(() => {
                               v-if="item.value?.logoUrl"
                               :src="item.value.logoUrl"
                               alt="Logo"
-                              class="w-10 h-10 rounded-[0.5rem] object-cover border border-gray-200 dark:border-gray-700"
+                              class="w-10 h-10 rounded-[0.75rem] object-cover border border-gray-200 dark:border-gray-700"
                             />
                             <div
                               v-else

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Settings, ShieldAlert, FileText, Globe, Plus, Trash2, RefreshCcw, Save, ChevronUp, ChevronDown, Sparkles } from 'lucide-vue-next'
+import { Settings, ShieldAlert, FileText, Globe, Plus, Trash2, RefreshCcw, Save, ChevronUp, ChevronDown, Sparkles, Cpu, Loader2 } from 'lucide-vue-next'
 
 
 const { notify } = useAlerts()
@@ -83,7 +83,73 @@ function moveFeature(idx: number, direction: 'up' | 'down') {
   }
 }
 
-const activeTab = ref<'system' | 'landing' | 'credits'>('system')
+const activeTab = ref<'system' | 'landing' | 'credits' | 'aiProviders'>('system')
+
+// --- Telemetria de Provedores de IA (aba "Provedores de IA") ---
+const { data: aiUsage, error: aiUsageError, pending: aiUsagePending, refresh: refreshAiUsage } = useLazyFetch<any>('/api/admin/ai-usage', {
+  key: 'admin-ai-usage',
+  immediate: false
+})
+
+let aiUsageInterval: ReturnType<typeof setInterval> | null = null
+
+function startAiUsagePolling() {
+  refreshAiUsage()
+  if (aiUsageInterval) clearInterval(aiUsageInterval)
+  // Atualiza a cada 30s enquanto a aba estiver ativa.
+  aiUsageInterval = setInterval(() => refreshAiUsage(), 30000)
+}
+
+function stopAiUsagePolling() {
+  if (aiUsageInterval) {
+    clearInterval(aiUsageInterval)
+    aiUsageInterval = null
+  }
+}
+
+watch(activeTab, (tab) => {
+  if (tab === 'aiProviders') startAiUsagePolling()
+  else stopAiUsagePolling()
+})
+
+onUnmounted(() => stopAiUsagePolling())
+
+const PROVIDER_LABELS: Record<string, string> = {
+  gemini: 'Gemini',
+  deepseek: 'DeepSeek',
+  cloudflare: 'Cloudflare',
+  openrouter: 'OpenRouter'
+}
+
+const ACTION_LABELS: Record<string, string> = {
+  proposalSuggest: 'Sugestão de Orçamento',
+  catalogSuggest: 'Sugestão de Catálogo',
+  clientExtract: 'Extração de Lead',
+  generate: 'Geração de Texto',
+  analyzeReport: 'Relatório Estratégico'
+}
+
+function providerLabel(p: string) {
+  return PROVIDER_LABELS[p] || p
+}
+
+function actionLabel(a: string | null) {
+  if (!a) return '—'
+  return ACTION_LABELS[a] || a
+}
+
+function formatUsd(v: number) {
+  return `$${(v || 0).toFixed(4)}`
+}
+
+function formatInt(v: number) {
+  return new Intl.NumberFormat('pt-BR').format(v || 0)
+}
+
+function formatDateTime(iso: string | null) {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleString('pt-BR')
+}
 </script>
 
 <template>
@@ -106,7 +172,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
         <button 
           @click="activeTab = 'system'"
           :class="activeTab === 'system' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-lg' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'"
-          class="flex items-center gap-3 px-6 py-4 rounded-[0.5rem] text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
+          class="flex items-center gap-3 px-6 py-4 rounded-[0.75rem] text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
         >
           <ShieldAlert class="w-4 h-4 shrink-0" />
           Sistema
@@ -114,7 +180,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
         <button 
           @click="activeTab = 'landing'"
           :class="activeTab === 'landing' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-lg' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'"
-          class="flex items-center gap-3 px-6 py-4 rounded-[0.5rem] text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
+          class="flex items-center gap-3 px-6 py-4 rounded-[0.75rem] text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
         >
           <Globe class="w-4 h-4 shrink-0" />
           Landing Page
@@ -122,10 +188,18 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
         <button
           @click="activeTab = 'credits'"
           :class="activeTab === 'credits' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-lg' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'"
-          class="flex items-center gap-3 px-6 py-4 rounded-[0.5rem] text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
+          class="flex items-center gap-3 px-6 py-4 rounded-[0.75rem] text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
         >
           <Sparkles class="w-4 h-4 shrink-0" />
           Créditos de IA
+        </button>
+        <button
+          @click="activeTab = 'aiProviders'"
+          :class="activeTab === 'aiProviders' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-lg' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'"
+          class="flex items-center gap-3 px-6 py-4 rounded-[0.75rem] text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
+        >
+          <Cpu class="w-4 h-4 shrink-0" />
+          Provedores de IA
         </button>
       </aside>
 
@@ -133,7 +207,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
       <div class="flex-1 space-y-10 min-w-0">
         <!-- SYSTEM SETTINGS -->
         <div v-if="activeTab === 'system'" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-950/40 flex items-center justify-center">
                 <ShieldAlert class="w-5 h-5 text-red-600 dark:text-red-400" />
@@ -141,7 +215,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
               <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Estado do Sistema</h2>
             </div>
 
-            <div class="p-8 bg-gray-50/50 dark:bg-gray-950/50 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 flex items-center justify-between gap-6">
+            <div class="p-8 bg-gray-50/50 dark:bg-gray-950/50 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 flex items-center justify-between gap-6">
               <div class="space-y-1">
                 <h3 class="font-black text-gray-900 dark:text-gray-100 uppercase text-xs tracking-widest">Modo Manutenção</h3>
                 <p class="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
@@ -170,7 +244,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
             </div>
           </section>
 
-          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center">
                 <FileText class="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -190,7 +264,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
 
         <!-- LANDING PAGE SETTINGS -->
         <div v-if="activeTab === 'landing'" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center">
                 <Globe class="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -208,7 +282,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
             </div>
           </section>
 
-          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
@@ -275,7 +349,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
 
         <!-- CRÉDITOS DE IA -->
         <div v-if="activeTab === 'credits'" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-950/40 flex items-center justify-center">
                 <Sparkles class="w-5 h-5 text-violet-600 dark:text-violet-400" />
@@ -314,7 +388,7 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
             </div>
           </section>
 
-          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
                 <Sparkles class="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
@@ -327,6 +401,137 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
             <div class="max-w-xs space-y-1.5">
               <BaseInput v-model.number="localSettings.initialCredits" type="number" label="Créditos no Cadastro" />
               <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold ml-1">Defina 0 para não conceder créditos gratuitos</p>
+            </div>
+          </section>
+        </div>
+
+        <!-- PROVEDORES DE IA -->
+        <div v-if="activeTab === 'aiProviders'" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center">
+                  <Cpu class="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Provedores de IA</h2>
+              </div>
+              <button @click="refreshAiUsage()" class="flex items-center gap-2 text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest hover:underline">
+                <RefreshCcw class="w-4 h-4" />
+                Atualizar
+              </button>
+            </div>
+            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
+              Cadeia de fallback fixa: <strong>DeepSeek → Gemini → Cloudflare → OpenRouter</strong>. Se um provedor habilitado falhar, o próximo da lista é tentado automaticamente.
+              Ligue/desligue cada um pelas variáveis de ambiente <code class="font-mono">USE_DEEPSEEK</code>, <code class="font-mono">USE_GEMINI</code>, <code class="font-mono">USE_CLOUDFLARE</code>, <code class="font-mono">USE_OPENROUTER</code>.
+              Telemetria de uso real, atualiza automaticamente a cada 30 segundos.
+              O custo exibido é <strong>estimado</strong> a partir de uma tabela de preços pública por token — pode variar da fatura real do provedor.
+            </p>
+
+            <!-- Erro -->
+            <div v-if="aiUsageError" class="p-6 rounded-[0.75rem] border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 text-xs font-bold text-red-600 dark:text-red-400">
+              Não foi possível carregar a telemetria de IA: {{ aiUsageError.data?.statusMessage || aiUsageError.message || 'erro desconhecido' }}
+            </div>
+
+            <!-- Carregando (primeira vez) -->
+            <div v-else-if="aiUsagePending && !aiUsage" class="flex items-center gap-2 text-xs font-bold text-gray-400 dark:text-gray-500 py-6">
+              <Loader2 class="w-4 h-4 animate-spin" />
+              Carregando telemetria...
+            </div>
+
+            <!-- Cards por provedor -->
+            <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div
+                v-for="p in (aiUsage?.providers || [])"
+                :key="p.provider"
+                class="p-6 rounded-[0.75rem] border bg-gray-50/50 dark:bg-gray-950/50"
+                :class="(aiUsage?.enabledProviders || []).includes(p.provider) ? 'border-blue-300 dark:border-blue-800' : 'border-gray-100 dark:border-gray-800'"
+              >
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="font-black text-gray-900 dark:text-gray-100 uppercase text-sm tracking-widest">{{ providerLabel(p.provider) }}</h3>
+                  <span
+                    v-if="aiUsage?.primaryProvider === p.provider"
+                    class="px-2.5 py-1 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-[9px] font-black uppercase tracking-widest"
+                  >Principal</span>
+                  <span
+                    v-else-if="(aiUsage?.enabledProviders || []).includes(p.provider)"
+                    class="px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-[9px] font-black uppercase tracking-widest"
+                  >Fallback</span>
+                  <span
+                    v-else
+                    class="px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 text-[9px] font-black uppercase tracking-widest"
+                  >Desligado</span>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <p class="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest">Chamadas</p>
+                    <p class="text-lg font-black text-gray-900 dark:text-white">{{ formatInt(p.totalCalls) }}</p>
+                    <p class="text-[10px] text-gray-500 dark:text-gray-400 font-bold">
+                      <span class="text-emerald-600 dark:text-emerald-400">{{ formatInt(p.successCalls) }} ok</span>
+                      <span class="mx-1">·</span>
+                      <span class="text-red-500 dark:text-red-400">{{ formatInt(p.failedCalls) }} falha</span>
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest">Custo estimado</p>
+                    <p class="text-lg font-black text-gray-900 dark:text-white">{{ formatUsd(p.estimatedCostUsd) }}</p>
+                    <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold">estimativa</p>
+                  </div>
+                  <div>
+                    <p class="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest">Tokens (in / out)</p>
+                    <p class="text-sm font-black text-gray-900 dark:text-white">{{ formatInt(p.totalTokensInput) }} / {{ formatInt(p.totalTokensOutput) }}</p>
+                  </div>
+                  <div>
+                    <p class="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest">Última vez</p>
+                    <p class="text-xs font-bold text-gray-700 dark:text-gray-300">{{ formatDateTime(p.lastUsedAt) }}</p>
+                    <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold">{{ p.avgLatencyMs }}ms médio</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Chamadas recentes -->
+          <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-6">
+            <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest">Chamadas Recentes</h3>
+            <div v-if="(aiUsage?.recentCalls || []).length === 0" class="text-xs text-gray-400 dark:text-gray-500 font-bold py-6 text-center">
+              Nenhuma chamada registrada no período.
+            </div>
+            <div v-else class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead>
+                  <tr class="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest border-b border-gray-100 dark:border-gray-800">
+                    <th class="py-2 pr-4">Provedor</th>
+                    <th class="py-2 pr-4">Modelo</th>
+                    <th class="py-2 pr-4">Ação</th>
+                    <th class="py-2 pr-4">Tokens</th>
+                    <th class="py-2 pr-4">Custo</th>
+                    <th class="py-2 pr-4">Status</th>
+                    <th class="py-2 pr-4">Usuário</th>
+                    <th class="py-2 pr-4">Quando</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="c in (aiUsage?.recentCalls || [])"
+                    :key="c.id"
+                    class="border-b border-gray-50 dark:border-gray-800/50 text-gray-700 dark:text-gray-300"
+                  >
+                    <td class="py-2.5 pr-4 font-black">{{ providerLabel(c.provider) }}</td>
+                    <td class="py-2.5 pr-4 font-medium text-gray-500 dark:text-gray-400">{{ c.model }}</td>
+                    <td class="py-2.5 pr-4 font-medium">{{ actionLabel(c.action) }}</td>
+                    <td class="py-2.5 pr-4 font-medium tabular-nums">{{ formatInt(c.tokensInput) }} / {{ formatInt(c.tokensOutput) }}</td>
+                    <td class="py-2.5 pr-4 font-medium tabular-nums">{{ formatUsd(c.estimatedCostUsd) }}</td>
+                    <td class="py-2.5 pr-4">
+                      <span
+                        :class="c.success ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'"
+                        class="font-black uppercase text-[10px] tracking-widest"
+                      >{{ c.success ? 'OK' : 'Falha' }}</span>
+                    </td>
+                    <td class="py-2.5 pr-4 font-medium text-gray-500 dark:text-gray-400">{{ c.user?.email || '—' }}</td>
+                    <td class="py-2.5 pr-4 font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ formatDateTime(c.createdAt) }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </section>
         </div>

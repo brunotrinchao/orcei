@@ -303,15 +303,21 @@
       "type": "file"
     },
     {
-      "path": "app/pages/configuracoes/index.vue",
-      "accessCount": 29,
-      "lastAccessed": 1785612335201,
+      "path": "server/services/AIService.ts",
+      "accessCount": 56,
+      "lastAccessed": 1785616406097,
       "type": "file"
     },
     {
-      "path": "server/services/AIService.ts",
-      "accessCount": 22,
-      "lastAccessed": 1785607042353,
+      "path": "app/pages/p/[slug].vue",
+      "accessCount": 45,
+      "lastAccessed": 1785614271106,
+      "type": "file"
+    },
+    {
+      "path": "app/pages/configuracoes/index.vue",
+      "accessCount": 29,
+      "lastAccessed": 1785612335201,
       "type": "file"
     },
     {
@@ -342,12 +348,6 @@
       "path": "server/api/webhooks/qstash.post.ts",
       "accessCount": 8,
       "lastAccessed": 1785595639355,
-      "type": "file"
-    },
-    {
-      "path": "app/pages/p/[slug].vue",
-      "accessCount": 8,
-      "lastAccessed": 1785596809281,
       "type": "file"
     },
     {
@@ -411,6 +411,18 @@
       "type": "file"
     },
     {
+      "path": "server/utils/credits.ts",
+      "accessCount": 5,
+      "lastAccessed": 1785614760540,
+      "type": "file"
+    },
+    {
+      "path": "server/api/ai/proposal-suggest.post.ts",
+      "accessCount": 5,
+      "lastAccessed": 1785615044972,
+      "type": "file"
+    },
+    {
       "path": "server/api/profile/setup-wizard.post.ts",
       "accessCount": 4,
       "lastAccessed": 1785595339287,
@@ -429,6 +441,12 @@
       "type": "file"
     },
     {
+      "path": "server/models/Profile.ts",
+      "accessCount": 4,
+      "lastAccessed": 1785615442814,
+      "type": "file"
+    },
+    {
       "path": "server/api/proposals/public/action.post.ts",
       "accessCount": 3,
       "lastAccessed": 1785594528267,
@@ -441,33 +459,15 @@
       "type": "file"
     },
     {
-      "path": "server/utils/credits.ts",
-      "accessCount": 3,
-      "lastAccessed": 1785594528985,
-      "type": "file"
-    },
-    {
       "path": "types/index.ts",
       "accessCount": 3,
       "lastAccessed": 1785595619706,
       "type": "file"
     },
     {
-      "path": "server/models/Profile.ts",
-      "accessCount": 3,
-      "lastAccessed": 1785595621158,
-      "type": "file"
-    },
-    {
       "path": "server/api/proposals/[id]/pdf.get.ts",
       "accessCount": 3,
       "lastAccessed": 1785595647216,
-      "type": "file"
-    },
-    {
-      "path": "server/api/ai/proposal-suggest.post.ts",
-      "accessCount": 3,
-      "lastAccessed": 1785597645927,
       "type": "file"
     },
     {
@@ -550,14 +550,14 @@
     },
     {
       "path": "app/composables/useCreditCosts.ts",
-      "accessCount": 1,
-      "lastAccessed": 1785594144334,
+      "accessCount": 2,
+      "lastAccessed": 1785614394917,
       "type": "file"
     },
     {
       "path": "app/composables/useConfirmCreditAction.ts",
-      "accessCount": 1,
-      "lastAccessed": 1785594144802,
+      "accessCount": 2,
+      "lastAccessed": 1785614395644,
       "type": "file"
     },
     {

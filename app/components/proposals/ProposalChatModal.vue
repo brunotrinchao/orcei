@@ -84,8 +84,8 @@ const formatMessageTime = (date: any) => {
 
       <!-- Messages Area -->
       <div ref="chatMessagesRef" class="flex-1 overflow-y-auto p-6 space-y-4 bg-[#dfe4ea] dark:bg-gray-900/80 scrollbar-hide">
-        <div v-if="!groupedMessages?.length" class="text-center py-20 bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm rounded-[0.5rem] p-8 max-w-xs mx-auto mt-10">
-          <div class="w-16 h-16 bg-white dark:bg-gray-800 rounded-[0.5rem] flex items-center justify-center mx-auto mb-4 border border-gray-100 dark:border-gray-700 shadow-sm">
+        <div v-if="!groupedMessages?.length" class="text-center py-20 bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm rounded-[0.75rem] p-8 max-w-xs mx-auto mt-10">
+          <div class="w-16 h-16 bg-white dark:bg-gray-800 rounded-[0.75rem] flex items-center justify-center mx-auto mb-4 border border-gray-100 dark:border-gray-700 shadow-sm">
             <MessageCircle class="w-6 h-6 text-gray-300 dark:text-gray-500" />
           </div>
           <p class="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Nenhuma interação iniciada</p>
@@ -110,7 +110,7 @@ const formatMessageTime = (date: any) => {
             <!-- Bubble -->
             <div
               :class="[
-                'px-4 py-2.5 rounded-[0.5rem] text-sm font-medium leading-relaxed shadow-sm min-w-[80px]',
+                'px-4 py-2.5 rounded-[0.75rem] text-sm font-medium leading-relaxed shadow-sm min-w-[80px]',
                 msg.sender === 'freelancer'
                   ? 'bg-[#DCF8C6] dark:bg-emerald-950 dark:text-emerald-100 text-gray-800 rounded-tr-none'
                   : 'bg-white dark:bg-gray-800 dark:text-gray-100 text-gray-800 rounded-tl-none'
@@ -140,7 +140,7 @@ const formatMessageTime = (date: any) => {
             <input
               v-model="newMessage"
               placeholder="Digite uma mensagem..."
-              class="w-full px-6 py-3.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-emerald-500/20 rounded-[0.5rem] outline-none font-medium text-sm shadow-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+              class="w-full px-6 py-3.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-emerald-500/20 rounded-[0.75rem] outline-none font-medium text-sm shadow-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
             />
           </div>
           <button

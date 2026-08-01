@@ -108,7 +108,7 @@ const selectOption = (option: Option) => {
         @input="onInput"
         :placeholder="placeholder || 'Buscar...'"
         :disabled="disabled"
-        class="w-full px-5 py-4 pl-12 bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 rounded-[0.5rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 dark:text-gray-50 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+        class="w-full px-5 py-4 pl-12 bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 rounded-[0.75rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 dark:text-gray-50 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
         :class="{ 'border-red-300 dark:border-red-500/50 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500/20': error }"
       />
       
@@ -127,7 +127,7 @@ const selectOption = (option: Option) => {
       >
         <div 
           v-if="isOpen && !disabled"
-          class="absolute z-50 w-full mt-2 bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl rounded-[0.5rem] border-2 border-gray-200 dark:border-gray-700 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-gray-900/20 overflow-hidden"
+          class="absolute z-50 w-full mt-2 bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl rounded-[0.75rem] border-2 border-gray-200 dark:border-gray-700 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-gray-900/20 overflow-hidden"
         >
           <div class="max-h-[300px] overflow-y-auto p-2 space-y-1">
             <div v-if="internalSearch.length < 2" class="px-6 py-8 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] text-center">

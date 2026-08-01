@@ -1,4 +1,17 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { AiUsageLog } from '../models/AiUsageLog'
+import { estimateCostUsd } from '../utils/aiPricing'
+
+export type AiUsageMeta = { profileId?: string; action?: string }
+
+type ProviderName = 'deepseek' | 'gemini' | 'cloudflare' | 'openrouter'
+
+// Cadeia de fallback FIXA: DeepSeek → Gemini → Cloudflare → OpenRouter.
+// Cada provedor é ligado/desligado por variável de ambiente própria (ver
+// nuxt.config.ts: useDeepseek/useGemini/useCloudflare/useOpenrouter). Se um
+// provedor habilitado falhar (ou não estiver configurado), o próximo da
+// lista é tentado automaticamente, sucessivamente, até esgotar as opções.
+const PROVIDER_ORDER: ProviderName[] = ['deepseek', 'gemini', 'cloudflare', 'openrouter']
 
 export const AIService = {
   _getConfig() {
@@ -6,74 +19,182 @@ export const AIService = {
   },
 
   /**
-   * Chaveamento por variável de ambiente USE_DEEPSEEK: quando ativa, TODA
-   * chamada de IA vai pra DeepSeek e não cai de volta pro Gemini/Cloudflare/
-   * OpenRouter em caso de falha — decisão deliberada (ligar a flag é uma
-   * escolha explícita de operação, não deve mascarar erro de config caindo
-   * silenciosamente noutro provedor). Retorna null quando a flag está
-   * desligada, sinalizando pro chamador seguir o fluxo normal.
+   * Registra o uso real de um provedor de IA de forma NÃO BLOQUEANTE — falha de
+   * log é logada no console mas NUNCA propaga/atrasa a resposta da IA.
    */
-  async _tryDeepSeek(prompt: string, maxTokens: number = 8192): Promise<string | null> {
-    const config = this._getConfig()
-    if (!config.useDeepseek) return null
-
-    if (!config.deepseekApiKey) {
-      console.error('[AIService] USE_DEEPSEEK=true mas DEEPSEEK_API_KEY não configurada.')
-      throw createError({ statusCode: 500, statusMessage: 'DeepSeek habilitado mas chave de API não configurada.' })
-    }
-
+  _logUsage(entry: {
+    provider: ProviderName
+    model: string
+    success: boolean
+    tokensInput?: number
+    tokensOutput?: number
+    latencyMs?: number
+    errorMessage?: string
+    meta?: AiUsageMeta
+  }) {
     try {
-      return await this.generateWithDeepSeek(prompt, maxTokens)
-    } catch (e) {
-      console.error('[AIService] Falha na chamada à API DeepSeek:', e)
-      throw createError({ statusCode: 502, statusMessage: 'Falha ao gerar conteúdo via DeepSeek.' })
+      const tokensInput = entry.tokensInput || 0
+      const tokensOutput = entry.tokensOutput || 0
+      AiUsageLog.create({
+        profileId: entry.meta?.profileId || null,
+        provider: entry.provider,
+        model: entry.model,
+        action: entry.meta?.action,
+        tokensInput,
+        tokensOutput,
+        estimatedCostUsd: estimateCostUsd(entry.model, tokensInput, tokensOutput),
+        success: entry.success,
+        errorMessage: entry.errorMessage,
+        latencyMs: entry.latencyMs
+      }).catch(err => console.error('[AiUsageLog] Falha ao registrar:', err))
+    } catch (err) {
+      console.error('[AiUsageLog] Falha ao registrar:', err)
     }
   },
 
-  async generateDescription(prompt: string, maxTokens: number = 8192) {
+  // Só checa a flag de ligar/desligar — ausência de API key é tratada dentro
+  // de cada generateWithX (já lança erro claro), e cai naturalmente pro
+  // próximo provedor da cadeia via _generateWithFallback.
+  _isProviderEnabled(provider: ProviderName, config: any): boolean {
+    switch (provider) {
+      case 'deepseek': return !!config.useDeepseek
+      case 'gemini': return config.useGemini !== false
+      case 'cloudflare': return config.useCloudflare !== false
+      case 'openrouter': return config.useOpenrouter !== false
+    }
+  },
+
+  /**
+   * Executa a cadeia DeepSeek → Gemini → Cloudflare → OpenRouter, pulando
+   * provedores desligados e tentando o próximo sempre que um falhar (erro de
+   * config, erro de rede, resposta vazia, etc). Lança o último erro só se
+   * TODOS os provedores habilitados falharem.
+   *
+   * `opts.isAcceptable`, se informado, permite rejeitar uma resposta que
+   * tecnicamente teve sucesso mas não deve ser aceita (ex: Gemini retornando
+   * um texto que casa com o regex de qualidade configurado) — nesse caso
+   * também segue pro próximo provedor da cadeia.
+   */
+  async _generateWithFallback(prompt: string, opts: {
+    maxTokens?: number
+    geminiContents?: any
+    geminiGenerationConfig?: any
+    meta?: AiUsageMeta
+    isAcceptable?: (text: string, provider: ProviderName) => boolean
+  } = {}): Promise<string> {
     const config = this._getConfig()
+    const maxTokens = opts.maxTokens ?? 8192
+    let lastError: any = null
 
-    const deepseek = await this._tryDeepSeek(prompt, maxTokens)
-    if (deepseek !== null) return deepseek
+    for (const provider of PROVIDER_ORDER) {
+      if (!this._isProviderEnabled(provider, config)) continue
 
-    try {
-      // 1. Tentar Gemini
-      if (config.geminiApiKey) {
-        const genAI = new GoogleGenerativeAI(config.geminiApiKey)
-        // gemini-1.5-flash foi descontinuado, migrando para gemini-2.5-flash
-        const model = genAI.getGenerativeModel({
-          model: 'gemini-2.5-flash',
-          generationConfig: {
-            temperature: 0.7,
-            topP: 0.95,
-            topK: 40,
-            maxOutputTokens: maxTokens
-          }
-        })
-        
-        const result = await model.generateContent(prompt)
-        const response = await result.response
-        const text = response.text()
-        
-        // Verificar se casa com o regex de fallback do Cloudflare (ex: se for uma resposta padrão indesejada)
-        const fallbackRegex = config.cloudflareFallbackRegex
-        if (fallbackRegex && fallbackRegex !== 'true' && new RegExp(fallbackRegex, 'i').test(text)) {
-          console.log('Gemini response matched fallback regex. Switching to Cloudflare.')
-          return await this.generateFallback(prompt, maxTokens)
+      try {
+        let text: string
+        if (provider === 'gemini') {
+          text = await this._callGemini(prompt, maxTokens, opts.geminiGenerationConfig, opts.geminiContents, opts.meta)
+        } else if (provider === 'deepseek') {
+          text = await this.generateWithDeepSeek(prompt, maxTokens, opts.meta)
+        } else if (provider === 'cloudflare') {
+          text = await this.generateWithCloudflare(prompt, maxTokens, opts.meta)
+        } else {
+          text = await this.generateWithOpenRouter(prompt, maxTokens, opts.meta)
+        }
+
+        if (opts.isAcceptable && !opts.isAcceptable(text, provider)) {
+          console.log(`[AIService] Resposta do provedor "${provider}" não passou no filtro de qualidade, tentando próximo da cadeia.`)
+          continue
         }
 
         return text
+      } catch (e) {
+        console.error(`[AIService] Provedor "${provider}" falhou, tentando próximo da cadeia:`, e)
+        lastError = e
+        continue
       }
-    } catch (e) {
-      console.error('Gemini error:', e)
     }
 
-    // 2. Fallback para Cloudflare / OpenRouter
-    return await this.generateFallback(prompt, maxTokens)
+    throw lastError || createError({ statusCode: 502, statusMessage: 'Nenhum provedor de IA disponível ou configurado.' })
   },
 
-  async extractClientInfo(text: string) {
+  async _callGemini(prompt: string, maxTokens: number, generationConfig: any, contents: any, meta?: AiUsageMeta): Promise<string> {
     const config = this._getConfig()
+    if (!config.geminiApiKey) throw new Error('Gemini API key not configured')
+
+    const genAI = new GoogleGenerativeAI(config.geminiApiKey)
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash',
+      generationConfig: generationConfig || {
+        temperature: 0.7,
+        topP: 0.95,
+        topK: 40,
+        maxOutputTokens: maxTokens
+      }
+    })
+
+    const startedAt = Date.now()
+    try {
+      const result = contents ? await model.generateContent(contents) : await model.generateContent(prompt)
+      const response = await result.response
+      const text = response.text()
+      this._logUsage({
+        provider: 'gemini',
+        model: 'gemini-2.5-flash',
+        success: true,
+        tokensInput: response.usageMetadata?.promptTokenCount,
+        tokensOutput: response.usageMetadata?.candidatesTokenCount,
+        latencyMs: Date.now() - startedAt,
+        meta
+      })
+      return text
+    } catch (e) {
+      this._logUsage({ provider: 'gemini', model: 'gemini-2.5-flash', success: false, latencyMs: Date.now() - startedAt, errorMessage: (e as Error)?.message, meta })
+      throw e
+    }
+  },
+
+  // Isola/limpa um JSON possivelmente cercado de markdown/texto extra (comum
+  // em modelos sem "modo JSON" nativo, ex: DeepSeek/Cloudflare/OpenRouter).
+  // Aplicar isso num JSON já limpo (ex: saída do Gemini em responseMimeType
+  // "application/json") é inofensivo/idempotente — não altera o resultado.
+  _cleanJsonResponse(response: string, sanitizeWhitespace = true): string {
+    try {
+      let cleanJson = response.trim()
+      cleanJson = cleanJson.replace(/```json/g, '').replace(/```/g, '').trim()
+      const jsonStart = cleanJson.indexOf('{')
+      const jsonEnd = cleanJson.lastIndexOf('}')
+      if (jsonStart !== -1 && jsonEnd !== -1) {
+        const isolated = cleanJson.substring(jsonStart, jsonEnd + 1)
+        // Sanitiza quebras de linha/tabs literais dentro das strings do JSON
+        // (comum em modelos sem modo JSON), que quebram o parser com "Unterminated string".
+        return sanitizeWhitespace ? isolated.replace(/[\n\r\t]/g, ' ') : isolated
+      }
+      return cleanJson
+    } catch (e) {
+      console.error('[AIService] Failed to clean JSON response:', e)
+      return response
+    }
+  },
+
+  async generateDescription(prompt: string, maxTokens: number = 8192, meta?: AiUsageMeta) {
+    const config = this._getConfig()
+    const fallbackRegex = config.cloudflareFallbackRegex
+
+    return this._generateWithFallback(prompt, {
+      maxTokens,
+      meta,
+      // Regra de qualidade pré-existente: se o Gemini retornar um texto que
+      // case com o regex configurado (resposta padrão indesejada), não aceita
+      // e segue pro próximo provedor — só se aplica ao Gemini.
+      isAcceptable: (text, provider) => {
+        if (provider !== 'gemini') return true
+        if (!fallbackRegex || fallbackRegex === 'true') return true
+        return !new RegExp(fallbackRegex, 'i').test(text)
+      }
+    })
+  },
+
+  async extractClientInfo(text: string, meta?: AiUsageMeta) {
     const prompt = `
       Você é um assistente comercial e especialista em extração de informações.
       Analise o texto abaixo, que representa uma mensagem de cliente, e-mail ou transcrição de áudio, e extraia de forma estruturada as informações de contato.
@@ -101,128 +222,39 @@ export const AIService = {
       }
     `
 
-    const deepseek = await this._tryDeepSeek(prompt)
-    if (deepseek !== null) {
-      let cleanJson = deepseek.trim()
-      cleanJson = cleanJson.replace(/```json/g, '').replace(/```/g, '').trim()
-      const jsonStart = cleanJson.indexOf('{')
-      const jsonEnd = cleanJson.lastIndexOf('}')
-      return jsonStart !== -1 && jsonEnd !== -1 ? cleanJson.substring(jsonStart, jsonEnd + 1) : cleanJson
-    }
+    const raw = await this._generateWithFallback(prompt, {
+      maxTokens: 8192,
+      meta,
+      geminiGenerationConfig: { temperature: 0.1, responseMimeType: 'application/json' }
+    })
 
-    try {
-      if (config.geminiApiKey) {
-        const genAI = new GoogleGenerativeAI(config.geminiApiKey)
-        const model = genAI.getGenerativeModel({ 
-          model: 'gemini-2.5-flash',
-          generationConfig: {
-            temperature: 0.1,
-            responseMimeType: "application/json"
-          }
-        })
-        const result = await model.generateContent(prompt)
-        return result.response.text()
-      }
-    } catch (e) {
-      console.error('Gemini client extraction error:', e)
-    }
-
-    // Fallback: Tentar Cloudflare/OpenRouter se o Gemini falhar
-    const response = await this.generateFallback(prompt)
-    try {
-      let cleanJson = response.trim()
-      cleanJson = cleanJson.replace(/```json/g, '').replace(/```/g, '').trim()
-      const jsonStart = cleanJson.indexOf('{')
-      const jsonEnd = cleanJson.lastIndexOf('}')
-      if (jsonStart !== -1 && jsonEnd !== -1) {
-        return cleanJson.substring(jsonStart, jsonEnd + 1)
-      }
-      return cleanJson
-    } catch (e) {
-      return response
-    }
+    return this._cleanJsonResponse(raw, false)
   },
 
-  async suggestProposalItems(prompt: string, catalog: any[]) {
-    const config = this._getConfig()
+  async suggestProposalItems(prompt: string, catalog: any[], meta?: AiUsageMeta) {
+    const systemInstructions = this.getPrompt(prompt, catalog)
 
-    const deepseek = await this._tryDeepSeek(this.getPrompt(prompt, catalog))
-    if (deepseek !== null) {
-      try {
-        let cleanJson = deepseek.trim()
-        cleanJson = cleanJson.replace(/```json/g, '').replace(/```/g, '').trim()
-        const jsonStart = cleanJson.indexOf('{')
-        const jsonEnd = cleanJson.lastIndexOf('}')
-        if (jsonStart !== -1 && jsonEnd !== -1) {
-          return cleanJson.substring(jsonStart, jsonEnd + 1).replace(/[\n\r\t]/g, ' ')
-        }
-        return cleanJson
-      } catch (e) {
-        console.error('[AIService] Failed to clean DeepSeek JSON:', e)
-        return deepseek
-      }
-    }
+    const raw = await this._generateWithFallback(systemInstructions, {
+      maxTokens: 8192,
+      meta,
+      geminiGenerationConfig: {
+        temperature: 0.2,
+        topP: 0.85,
+        topK: 30,
+        maxOutputTokens: 4096,
+        responseMimeType: 'application/json',
+        thinkingConfig: { thinkingBudget: 0 }
+      },
+      geminiContents: [
+        { text: systemInstructions },
+        { text: `Pedido do Cliente: "${prompt}"` }
+      ]
+    })
 
-    try {
-      if (config.geminiApiKey) {
-        const genAI = new GoogleGenerativeAI(config.geminiApiKey)
-        // gemini-1.5-pro foi descontinuado, migrando para gemini-2.5-pro para lógica complexa
-        const model = genAI.getGenerativeModel({
-          model: 'gemini-2.5-flash',
-          generationConfig: {
-            temperature: 0.2,
-            topP: 0.85,
-            topK: 30,
-            maxOutputTokens: 4096,
-            responseMimeType: "application/json",
-            thinkingConfig: { thinkingBudget: 0 }
-          }
-        })
-
-        const systemInstructions = this.getPrompt(prompt, catalog)
-
-        const result = await model.generateContent([
-          { text: systemInstructions },
-          { text: `Pedido do Cliente: "${prompt}"` }
-        ])
-
-        return result.response.text()
-      }
-    } catch (e) {
-      console.error('Gemini suggest error:', e)
-    }
-
-    // Fallback para Cloudflare/OpenRouter se Gemini falhar ou não estiver configurado
-    console.log('Gemini failed or not configured. Switching to fallback for proposal suggestion.')
-    const cloudflarePrompt = this.getPrompt(prompt, catalog)
-
-    const response = await this.generateFallback(cloudflarePrompt)
-
-    // Limpar markdown ou texto extra que a Cloudflare possa ter enviado
-    try {
-      let cleanJson = response.trim()
-      
-      // Remover blocos de código markdown
-      cleanJson = cleanJson.replace(/```json/g, '').replace(/```/g, '').trim()
-      
-      // Isolar o objeto JSON encontrando as chaves
-      const jsonStart = cleanJson.indexOf('{')
-      const jsonEnd = cleanJson.lastIndexOf('}')
-      
-      if (jsonStart !== -1 && jsonEnd !== -1) {
-        // Sanitiza quebras de linha/tabs literais dentro das strings do JSON (comum em modelos Cloudflare),
-        // que quebram o parser com "Unterminated string"
-        return cleanJson.substring(jsonStart, jsonEnd + 1).replace(/[\n\r\t]/g, ' ')
-      }
-
-      return cleanJson
-    } catch (e) {
-      console.error('[AIService] Failed to clean Cloudflare JSON:', e)
-      return response
-    }
+    return this._cleanJsonResponse(raw, true)
   },
 
-  async generateWithCloudflare(prompt: string, maxTokens: number = 8192) {
+  async generateWithCloudflare(prompt: string, maxTokens: number = 8192, meta?: AiUsageMeta) {
     const config = this._getConfig()
     const { cloudflareAccountId: accountId, cloudflareApiKey: apiKey, cloudflareAiModel: model } = config
 
@@ -230,6 +262,7 @@ export const AIService = {
       throw new Error('Cloudflare credentials not configured for fallback')
     }
 
+    const startedAt = Date.now()
     try {
       const response = await fetch(
         `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,
@@ -252,16 +285,28 @@ export const AIService = {
       const result: any = await response.json()
       if (result.success) {
         const output = result.result.response
+        // Cloudflare Workers AI nem sempre retorna contagem de tokens; se ausente, grava 0.
+        const usage = result.result?.usage || {}
+        this._logUsage({
+          provider: 'cloudflare',
+          model: String(model),
+          success: true,
+          tokensInput: usage.prompt_tokens || 0,
+          tokensOutput: usage.completion_tokens || 0,
+          latencyMs: Date.now() - startedAt,
+          meta
+        })
         return typeof output === 'string' ? output : JSON.stringify(output)
       }
       throw new Error('Cloudflare AI failed')
     } catch (e) {
       console.error('Cloudflare error:', e)
+      this._logUsage({ provider: 'cloudflare', model: String(model), success: false, latencyMs: Date.now() - startedAt, errorMessage: (e as Error)?.message, meta })
       throw e
     }
   },
 
-  async generateWithOpenRouter(prompt: string, maxTokens: number = 8192) {
+  async generateWithOpenRouter(prompt: string, maxTokens: number = 8192, meta?: AiUsageMeta) {
     const config = this._getConfig()
     const { openrouterApiKey: apiKey, openrouterModel: model } = config
 
@@ -269,6 +314,7 @@ export const AIService = {
       throw new Error('OpenRouter credentials not configured for fallback')
     }
 
+    const startedAt = Date.now()
     try {
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
@@ -289,14 +335,24 @@ export const AIService = {
       const result: any = await response.json()
       const output = result.choices?.[0]?.message?.content
       if (!output) throw new Error('OpenRouter AI failed')
+      this._logUsage({
+        provider: 'openrouter',
+        model: String(model),
+        success: true,
+        tokensInput: result.usage?.prompt_tokens || 0,
+        tokensOutput: result.usage?.completion_tokens || 0,
+        latencyMs: Date.now() - startedAt,
+        meta
+      })
       return output
     } catch (e) {
       console.error('OpenRouter error:', e)
+      this._logUsage({ provider: 'openrouter', model: String(model), success: false, latencyMs: Date.now() - startedAt, errorMessage: (e as Error)?.message, meta })
       throw e
     }
   },
 
-  async generateWithDeepSeek(prompt: string, maxTokens: number = 8192) {
+  async generateWithDeepSeek(prompt: string, maxTokens: number = 8192, meta?: AiUsageMeta) {
     const config = this._getConfig()
     const apiKey = config.deepseekApiKey
     const model = config.deepseekModel || 'deepseek-chat'
@@ -305,34 +361,40 @@ export const AIService = {
       throw new Error('DeepSeek credentials not configured')
     }
 
-    const response = await fetch('https://api.deepseek.com/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: 'system', content: 'Você é um redator profissional de orçamentos comerciais.' },
-          { role: 'user', content: prompt }
-        ],
-        max_tokens: maxTokens
-      })
-    })
-
-    const result: any = await response.json()
-    const output = result.choices?.[0]?.message?.content
-    if (!output) throw new Error(`DeepSeek API failed: ${JSON.stringify(result.error || result)}`)
-    return output
-  },
-
-  async generateFallback(prompt: string, maxTokens: number = 8192) {
+    const startedAt = Date.now()
     try {
-      return await this.generateWithCloudflare(prompt, maxTokens)
+      const response = await fetch('https://api.deepseek.com/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: 'Você é um redator profissional de orçamentos comerciais.' },
+            { role: 'user', content: prompt }
+          ],
+          max_tokens: maxTokens
+        })
+      })
+
+      const result: any = await response.json()
+      const output = result.choices?.[0]?.message?.content
+      if (!output) throw new Error(`DeepSeek API failed: ${JSON.stringify(result.error || result)}`)
+      this._logUsage({
+        provider: 'deepseek',
+        model,
+        success: true,
+        tokensInput: result.usage?.prompt_tokens || 0,
+        tokensOutput: result.usage?.completion_tokens || 0,
+        latencyMs: Date.now() - startedAt,
+        meta
+      })
+      return output
     } catch (e) {
-      console.error('Cloudflare fallback failed, trying OpenRouter:', e)
-      return await this.generateWithOpenRouter(prompt, maxTokens)
+      this._logUsage({ provider: 'deepseek', model, success: false, latencyMs: Date.now() - startedAt, errorMessage: (e as Error)?.message, meta })
+      throw e
     }
   },
 
@@ -382,7 +444,7 @@ export const AIService = {
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       FORMATO DE SAÍDA — OBRIGATÓRIO
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      Responda EXCLUSIVAMENTE com o JSON abaixo. 
+      Responda EXCLUSIVAMENTE com o JSON abaixo.
       Não inclua explicações, markdown, blocos de código ou qualquer texto fora do JSON.
       O primeiro caractere da resposta deve ser { e o último deve ser }.
 
@@ -400,6 +462,6 @@ export const AIService = {
         }
       ]
       }
-    `;
+    `
   }
 }

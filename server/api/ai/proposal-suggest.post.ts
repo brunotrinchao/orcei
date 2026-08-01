@@ -51,6 +51,7 @@ export default defineEventHandler(async (event) => {
       },
       async responseText() {
         const items = await this.$.relevantCatalogItems
+        const p = await this.$.profile
         const catalogContext = items.map(item => ({
           id: item._id.toString(),
           name: item.name,
@@ -58,7 +59,7 @@ export default defineEventHandler(async (event) => {
           price: item.price,
           unit: item.unit
         }))
-        const res = await AIService.suggestProposalItems(prompt, catalogContext)
+        const res = await AIService.suggestProposalItems(prompt, catalogContext, { profileId: p!._id.toString(), action: 'proposalSuggest' })
         if (!res) throw new Error('IA retornou resposta vazia')
         return res
       }

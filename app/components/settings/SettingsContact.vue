@@ -46,7 +46,7 @@ function removePhone(index: number) {
             <Plus class="w-3 h-3 mr-1" /> Adicionar
           </BaseButton>
         </div>
-        <div v-for="(phone, idx) in localContact.phones" :key="idx" class="flex flex-col sm:flex-row gap-4 p-6 bg-gray-50/50 dark:bg-gray-950/50 rounded-[0.5rem] border border-gray-100 dark:border-gray-800">
+        <div v-for="(phone, idx) in localContact.phones" :key="idx" class="flex flex-col sm:flex-row gap-4 p-6 bg-gray-50/50 dark:bg-gray-950/50 rounded-[0.75rem] border border-gray-100 dark:border-gray-800">
           <div class="flex-1">
             <BaseInput v-model="phone.number" label="Número" placeholder="(00) 00000-0000" mask="phone" />
           </div>

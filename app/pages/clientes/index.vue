@@ -357,7 +357,7 @@ const formatPhone = (phone: string) => {
               <DropdownMenuRoot>
                 <DropdownMenuTrigger as-child>
                   <button
-                    class="p-2.5 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[0.5rem] transition-all"
+                    class="p-2.5 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[0.75rem] transition-all"
                     title="Mais ações"
                     aria-label="Mais ações do orçamento"
                   >
@@ -368,18 +368,18 @@ const formatPhone = (phone: string) => {
                   <DropdownMenuContent
                     align="end"
                     :side-offset="6"
-                    class="min-w-[220px] bg-white dark:bg-gray-950 rounded-[0.5rem] shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
+                    class="min-w-[220px] bg-white dark:bg-gray-950 rounded-[0.75rem] shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
                   >
                   <DropdownMenuItem
                       @click="openModal(client)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-[0.5rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
                     >
                       <Pencil class="w-4 h-4" />
                       Editar
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       @click="deleteClient(client._id)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-[0.5rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-red-600 dark:hover:text-red-400 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-red-600 dark:hover:text-red-400 cursor-pointer outline-none transition-all"
                     >
                       <Trash2 class="w-4 h-4" />
                       Excluir

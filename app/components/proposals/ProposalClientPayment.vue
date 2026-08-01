@@ -23,7 +23,7 @@ function selectMethod(method: 'cash' | 'credit_card') {
       <div class="w-8 h-8 bg-[#3147F6]/10 rounded-xl flex items-center justify-center">
         <CreditCard class="w-4 h-4 text-[#3147F6]" />
       </div>
-      <h2 class="text-[10px] font-black text-gray-600 uppercase tracking-[0.25em]">Forma de Pagamento</h2>
+      <h2 class="text-[10px] font-bold text-gray-600 uppercase tracking-[0.25em]">Forma de Pagamento</h2>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5" role="radiogroup" aria-label="Opções de forma de pagamento">
@@ -34,7 +34,7 @@ function selectMethod(method: 'cash' | 'credit_card') {
         :aria-checked="modelValue === 'cash'"
         @click="selectMethod('cash')"
         :class="[
-          'relative text-left rounded-[0.5rem] border-2 p-7 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2',
+          'relative text-left rounded-[0.75rem] border-2 p-5 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2',
           modelValue === 'cash'
             ? 'border-[#3147F6] bg-[#3147F6]/5 shadow-lg shadow-[#3147F6]/10'
             : 'border-gray-100 bg-white hover:border-blue-200 hover:shadow-md'
@@ -49,7 +49,7 @@ function selectMethod(method: 'cash' | 'credit_card') {
         </div>
 
         <div class="mb-5">
-          <div class="w-11 h-11 bg-green-50 rounded-[0.5rem] flex items-center justify-center mb-4">
+          <div class="w-11 h-11 bg-green-50 rounded-[0.75rem] flex items-center justify-center mb-4">
             <Banknote class="w-5 h-5 text-green-600" />
           </div>
           <h3 class="font-black text-gray-900 text-lg tracking-tight leading-snug">À Vista</h3>
@@ -63,7 +63,7 @@ function selectMethod(method: 'cash' | 'credit_card') {
         </p>
 
         <div class="pt-5 border-t border-gray-100">
-          <p class="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">Total com desconto</p>
+          <p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-1">Total com desconto</p>
           <p class="text-2xl font-black text-green-600">
             R$ {{ (totals.subtotal * (1 - paymentConfig.cashDiscount / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
           </p>
@@ -80,7 +80,7 @@ function selectMethod(method: 'cash' | 'credit_card') {
         :aria-checked="modelValue === 'credit_card'"
         @click="selectMethod('credit_card')"
         :class="[
-          'relative text-left rounded-[0.5rem] border-2 p-7 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2',
+          'relative text-left rounded-[0.75rem] border-2 p-5 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2',
           modelValue === 'credit_card'
             ? 'border-[#3147F6] bg-[#3147F6]/5 shadow-lg shadow-[#3147F6]/10'
             : 'border-gray-100 bg-white hover:border-blue-200 hover:shadow-md'
@@ -95,7 +95,7 @@ function selectMethod(method: 'cash' | 'credit_card') {
         </div>
 
         <div class="mb-5">
-          <div class="w-11 h-11 bg-blue-50 rounded-[0.5rem] flex items-center justify-center mb-4">
+          <div class="w-11 h-11 bg-blue-50 rounded-[0.75rem] flex items-center justify-center mb-4">
             <CreditCard class="w-5 h-5 text-[#3147F6]" />
           </div>
           <h3 class="font-black text-gray-900 text-lg tracking-tight leading-snug">Cartão de Crédito</h3>
@@ -111,7 +111,7 @@ function selectMethod(method: 'cash' | 'credit_card') {
         </p>
 
         <div class="pt-5 border-t border-gray-100">
-          <p class="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">Total</p>
+          <p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-1">Total</p>
           <p class="text-2xl font-black text-[#3147F6]">
             R$ {{ totals.subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
           </p>

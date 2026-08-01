@@ -14,7 +14,7 @@ export const ReportGeneratorService = {
     if (!profile) throw new Error(`Perfil ${profileId} não encontrado para geração de relatório`)
 
     console.log(`[Job] Gerando relatório estratégico IA para o perfil: ${profile._id}`)
-    const analysis = await AIService.generateDescription(prompt)
+    const analysis = await AIService.generateDescription(prompt, 8192, { profileId: profile._id.toString(), action: 'analyzeReport' })
 
     // Save report to database
     const newReport = await Report.create({

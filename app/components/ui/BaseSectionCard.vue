@@ -33,7 +33,7 @@ const borderClass = computed(() => {
   <section
     :id="id"
     :data-tour="dataTour"
-    class="bg-white dark:bg-gray-900 rounded-[0.5rem] shadow-sm scroll-mt-8 transition-colors"
+    class="bg-white dark:bg-gray-900 rounded-[0.75rem] shadow-sm scroll-mt-8 transition-colors"
     :class="borderClass"
   >
     <!-- Header da Seção -->

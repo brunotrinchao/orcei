@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useIntersectionObserver } from '@vueuse/core'
-import { Search, Plus, CreditCard, Mail, Trash2, Shield, User, Loader2, ArrowRight, LogIn } from 'lucide-vue-next'
+import { Search, Plus, CreditCard, Mail, Trash2, Shield, User, Loader2, ArrowRight, LogIn, Eye } from 'lucide-vue-next'
 
 
 const { notify, confirm } = useAlerts()
@@ -61,6 +61,16 @@ async function updateCredits() {
 }
 
 const formatDate = (date: string) => new Date(date).toLocaleDateString('pt-BR')
+
+// Modal de Detalhes do Usuário
+const isDetailModalOpen = ref(false)
+const selectedUserIdForDetail = ref<string | null>(null)
+
+function openUserDetail(user: any) {
+  if (user.role === 'admin') return
+  selectedUserIdForDetail.value = user._id
+  isDetailModalOpen.value = true
+}
 
 const isImpersonating = ref(false)
 
@@ -125,7 +135,11 @@ function confirmImpersonate(targetUser: any) {
       </template>
 
       <template #item="{ item: user }">
-        <tr class="hover:bg-gray-50/30 dark:hover:bg-gray-800/30 transition-all group">
+        <tr
+          class="hover:bg-gray-50/30 dark:hover:bg-gray-800/30 transition-all group"
+          :class="user.role !== 'admin' ? 'cursor-pointer' : ''"
+          @click="user.role !== 'admin' ? openUserDetail(user) : null"
+        >
           <td class="px-8 py-6">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden border-2 border-white dark:border-gray-800 shadow-sm">
@@ -151,13 +165,16 @@ function confirmImpersonate(targetUser: any) {
           </td>
           <td class="px-8 py-6 text-right">
             <div class="flex justify-end gap-2">
-              <button @click="openCreditModal(user)" class="p-2.5 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-xl transition-all" title="Ajustar Créditos">
+              <button v-if="user.role !== 'admin'" @click.stop="openUserDetail(user)" class="p-2.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800/60 rounded-xl transition-all" title="Ver Detalhes">
+                <Eye class="w-5 h-5" />
+              </button>
+              <button @click.stop="openCreditModal(user)" class="p-2.5 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-xl transition-all" title="Ajustar Créditos">
                 <CreditCard class="w-5 h-5" />
               </button>
-              <button v-if="user.role !== 'admin'" :disabled="isImpersonating" @click="confirmImpersonate(user)" class="p-2.5 text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-xl transition-all disabled:opacity-50" title="Personificar Usuário">
+              <button v-if="user.role !== 'admin'" :disabled="isImpersonating" @click.stop="confirmImpersonate(user)" class="p-2.5 text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-xl transition-all disabled:opacity-50" title="Personificar Usuário">
                 <LogIn class="w-5 h-5" />
               </button>
-              <button v-if="user.role === 'admin'" class="p-2.5 text-red-500 bg-red-50 dark:bg-red-950/40 rounded-xl" title="Administrador">
+              <button v-if="user.role === 'admin'" @click.stop class="p-2.5 text-red-500 bg-red-50 dark:bg-red-950/40 rounded-xl" title="Administrador">
                 <Shield class="w-5 h-5" />
               </button>
             </div>
@@ -205,6 +222,7 @@ function confirmImpersonate(targetUser: any) {
           :format-date="formatDate"
           @adjust-credits="openCreditModal(user)"
           @impersonate="confirmImpersonate(user)"
+          @view-details="openUserDetail(user)"
         />
         <div ref="mobileSentinelRef" v-if="hasMore" class="h-1" />
         <div v-if="loadingMore" class="py-4 text-center text-sm text-gray-400 font-bold">Carregando...</div>
@@ -255,5 +273,8 @@ function confirmImpersonate(targetUser: any) {
         </div>
       </div>
     </BaseDialog>
+
+    <!-- Modal de Detalhes do Usuário -->
+    <UserDetailModal v-model:open="isDetailModalOpen" :user-id="selectedUserIdForDetail" />
   </div>
 </template>

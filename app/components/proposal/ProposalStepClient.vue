@@ -194,7 +194,7 @@ async function extractClient() {
 
       <div class="space-y-6">
         <!-- Extrator de Leads com IA (Design Glassmorphic/Premium) -->
-        <div v-if="isAIExtractOpen" class="space-y-4 p-6 bg-gradient-to-br from-violet-50 to-fuchsia-50/50 dark:from-violet-950/20 dark:to-fuchsia-950/10 border border-violet-100/50 dark:border-violet-900/30 rounded-[0.5rem] animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div v-if="isAIExtractOpen" class="space-y-4 p-6 bg-gradient-to-br from-violet-50 to-fuchsia-50/50 dark:from-violet-950/20 dark:to-fuchsia-950/10 border border-violet-100/50 dark:border-violet-900/30 rounded-[0.75rem] animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div class="flex items-start gap-3">
             <Sparkles class="w-5 h-5 text-violet-600 dark:text-violet-400 shrink-0 mt-0.5 animate-pulse" />
             <p class="text-xs text-slate-600 dark:text-slate-400 font-bold leading-relaxed">
@@ -277,7 +277,6 @@ async function extractClient() {
       title="Novo Cliente"
       description="Informe nome e pelo menos um contato. Endereço e demais dados podem ser completados depois em Clientes."
       size="sm"
-      <!-- :noBorder="true" -->
     >
       <form id="manual-client-form" @submit.prevent="createManualClient" class="grid grid-cols-1 gap-4 py-2">
         <BaseInput v-model="manualClient.name" label="Nome do Cliente" placeholder="Ex: João Silva" required />

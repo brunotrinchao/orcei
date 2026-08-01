@@ -114,7 +114,7 @@ Regras:
 - unit: escolha a mais adequada entre UN, H, DIA, MES, KG, CM, ML`
 
   try {
-    const text = await AIService.generateDescription(prompt)
+    const text = await AIService.generateDescription(prompt, 8192, { profileId: profile._id.toString(), action: 'catalogSuggest' })
     const raw = text.trim().replace(/```json|```/g, '').trim()
     const json = JSON.parse(raw)
 

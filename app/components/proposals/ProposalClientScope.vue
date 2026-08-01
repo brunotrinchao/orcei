@@ -29,13 +29,13 @@ function toggleUpsell(itemId: string) {
 </script>
 
 <template>
-  <section class="bg-white rounded-[0.5rem] border border-gray-100 shadow-sm overflow-hidden">
+  <section class="bg-white rounded-[0.75rem] border border-gray-100 shadow-sm overflow-hidden">
     <!-- Section header -->
     <div class="px-8 py-6 border-b border-gray-100 flex items-center gap-3">
       <div class="w-8 h-8 bg-[#3147F6]/10 rounded-xl flex items-center justify-center">
         <FileText class="w-4 h-4 text-[#3147F6]" />
       </div>
-      <h2 class="text-[10px] font-black text-gray-600 uppercase tracking-[0.25em]">Escopo do Projeto</h2>
+      <h2 class="text-[10px] font-bold text-gray-600 uppercase tracking-[0.25em]">Escopo do Projeto</h2>
     </div>
 
     <!-- Items list -->
@@ -46,7 +46,7 @@ function toggleUpsell(itemId: string) {
         class="px-8 py-7 flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6"
       >
         <!-- Index bubble -->
-        <div class="shrink-0 w-9 h-9 rounded-[0.5rem] bg-gray-50 border border-gray-100 flex items-center justify-center">
+        <div class="shrink-0 w-9 h-9 rounded-[0.75rem] bg-gray-50 border border-gray-100 flex items-center justify-center">
           <span class="text-xs font-black text-gray-600">{{ String(idx + 1).padStart(2, '0') }}</span>
         </div>
 
@@ -56,7 +56,7 @@ function toggleUpsell(itemId: string) {
           <p v-if="item.description" class="text-sm text-gray-600 font-medium leading-relaxed">{{ item.description }}</p>
           <!-- Unit price × qty -->
           <div class="mt-3 flex flex-wrap items-center gap-2">
-            <span class="text-[10px] font-black text-gray-600 uppercase tracking-widest bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+            <span class="text-[10px] font-bold text-gray-600 uppercase tracking-widest bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
               R$ {{ item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }} × {{ item.quantity }}
             </span>
           </div>
@@ -64,7 +64,7 @@ function toggleUpsell(itemId: string) {
 
         <!-- Subtotal -->
         <div class="shrink-0 text-right">
-          <p class="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">Subtotal</p>
+          <p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-1">Subtotal</p>
           <p class="font-black text-gray-900 text-lg">
             R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
           </p>
@@ -75,7 +75,7 @@ function toggleUpsell(itemId: string) {
     <!-- Upsell Items list (Serviços adicionais sugeridos) -->
     <div v-if="upsellItems && upsellItems.length > 0" class="bg-blue-50/10 border-t border-b border-blue-50/30">
       <div class="px-8 py-5 bg-blue-50/40 flex items-center justify-between border-b border-blue-50/20">
-        <h3 class="text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
+        <h3 class="text-[10px] font-bold text-blue-600 uppercase tracking-widest flex items-center gap-2">
           <span class="inline-block w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
           Serviços Opcionais (Sugestão de Upsell)
         </h3>
@@ -116,20 +116,20 @@ function toggleUpsell(itemId: string) {
               <h4 class="font-black text-gray-900 text-sm tracking-tight leading-snug">{{ item.name }}</h4>
               <span
                 v-if="selectedUpsells.includes(item._id!)"
-                class="px-2 py-0.5 bg-blue-100 text-blue-700 text-[8px] font-black uppercase tracking-widest rounded"
+                class="px-2 py-0.5 bg-blue-100 text-blue-700 text-[8px] font-bold uppercase tracking-widest rounded"
               >
                 Adicionado
               </span>
             </div>
             <p v-if="item.description" class="text-xs text-gray-500 font-medium leading-relaxed">{{ item.description }}</p>
-            <div class="mt-2 text-[10px] font-black text-blue-600 bg-blue-50/40 inline-block px-2.5 py-1 rounded-md border border-blue-100/30">
+            <div class="mt-2 text-[10px] font-bold text-blue-600 bg-blue-50/40 inline-block px-2.5 py-1 rounded-md border border-blue-100/30">
               R$ {{ item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }} × {{ item.quantity }}
             </div>
           </div>
 
           <!-- Subtotal -->
           <div class="shrink-0 text-right">
-            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Investimento</p>
+            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Investimento</p>
             <p class="font-black text-gray-900 text-base">
               + R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
             </p>

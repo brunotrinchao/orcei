@@ -15,7 +15,7 @@ defineEmits(['update:currentPage'])
 </script>
 
 <template>
-  <div class="overflow-hidden bg-white dark:bg-gray-900 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 shadow-sm">
+  <div class="overflow-hidden bg-white dark:bg-gray-900 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm">
     <div class="overflow-x-auto">
       <table class="w-full text-left">
         <thead class="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">

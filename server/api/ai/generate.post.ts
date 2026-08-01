@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const text = await AIService.generateDescription(prompt)
+    const text = await AIService.generateDescription(prompt, 8192, { profileId: profile._id.toString(), action: 'generate' })
 
     // Dedução de crédito SOMENTE após geração bem-sucedida (atômica — previne race condition)
     await chargeCredit(profile._id, cost, isAdmin, {

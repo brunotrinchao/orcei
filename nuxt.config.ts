@@ -104,7 +104,15 @@ export default defineNuxtConfig({
     googleClientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID,
     googleClientSecret: process.env.NUXT_OAUTH_GOOGLE_CLIENT_SECRET,
     geminiApiKey: process.env.GEMINI_API_KEY,
+    // Cadeia de fallback de IA (DeepSeek → Gemini → Cloudflare → OpenRouter,
+    // ver server/services/AIService.ts): cada provedor liga/desliga por env
+    // var própria. DeepSeek é opt-in (default desligado, custo real); os
+    // outros 3 são opt-out (default ligado, comportamento já existente antes
+    // desta flag existir) — só desliga se a env var for explicitamente 'false'.
     useDeepseek: process.env.USE_DEEPSEEK === 'true',
+    useGemini: process.env.USE_GEMINI !== 'false',
+    useCloudflare: process.env.USE_CLOUDFLARE !== 'false',
+    useOpenrouter: process.env.USE_OPENROUTER !== 'false',
     deepseekApiKey: process.env.DEEPSEEK_API_KEY,
     deepseekModel: process.env.DEEPSEEK_MODEL || 'deepseek-chat',
     stripeSecretKey: process.env.STRIPE_SECRET_KEY,

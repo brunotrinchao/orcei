@@ -1,17 +1,33 @@
 import { ProfileService } from '../../services/ProfileService'
 
+// Login roda dentro de uma janela popup (ver app/composables/useGoogleLogin.ts),
+// não na aba principal. Em vez de redirecionar, fecha a própria janela e avisa
+// o app principal via BroadcastChannel — mesmo padrão já usado no fluxo de
+// integração Google (server/api/integrations/google/callback.get.ts).
+function popupClose(event: any, status: 'success' | 'error') {
+  setResponseHeader(event, 'Content-Type', 'text/html')
+  return `<!DOCTYPE html><html><body><script>
+    (function () {
+      var payload = { source: 'google-login', status: '${status}' }
+      try {
+        var channel = new BroadcastChannel('google-login')
+        channel.postMessage(payload)
+        channel.close()
+      } catch (e) {}
+      if (window.opener) {
+        try { window.opener.postMessage(payload, window.location.origin) } catch (e) {}
+      }
+      window.close()
+    })()
+  </script></body></html>`
+}
+
 export default defineOAuthGoogleEventHandler({
   config: {
     scope: [
       'https://www.googleapis.com/auth/userinfo.profile',
-      'https://www.googleapis.com/auth/userinfo.email',
-      'https://www.googleapis.com/auth/calendar.events',
-      'https://www.googleapis.com/auth/drive.file'
-    ],
-    authorizationParams: {
-      access_type: 'offline',
-      prompt: 'consent'
-    }
+      'https://www.googleapis.com/auth/userinfo.email'
+    ]
   },
   async onSuccess(event, { user, tokens }) {
     if (!user.email) {
@@ -37,16 +53,12 @@ export default defineOAuthGoogleEventHandler({
         profile.subscriptionPlan = 'free'
       }
 
-      // Salvar os tokens da integração Google diretamente no perfil
-      if (tokens) {
-        const existingIntegration = profile.googleIntegration || {}
-        profile.googleIntegration = {
-          ...existingIntegration,
-          email: user.email,
-          accessToken: tokens.access_token || existingIntegration.accessToken,
-          refreshToken: tokens.refresh_token || existingIntegration.refreshToken,
-          expiryDate: tokens.expires_in ? Date.now() + (tokens.expires_in * 1000) : existingIntegration.expiryDate
-        }
+      // Login não deve gravar/sobrescrever tokens de integração (Drive/Calendar) —
+      // isso é feito exclusivamente pelo fluxo dedicado em
+      // /api/integrations/google/connect + callback. Só mantemos o e-mail em dia.
+      profile.googleIntegration = {
+        ...(profile.googleIntegration || {}),
+        email: user.email
       }
 
       await profile.save()
@@ -59,11 +71,11 @@ export default defineOAuthGoogleEventHandler({
         creditsBalance: profile.creditsBalance
       }
     })
-    return sendRedirect(event, '/dashboard')
+    return popupClose(event, 'success')
   },
   onError(event, error) {
     console.error('Google OAuth error:', error)
-    return sendRedirect(event, '/')
+    return popupClose(event, 'error')
   },
 })
 

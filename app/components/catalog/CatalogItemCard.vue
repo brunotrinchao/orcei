@@ -30,7 +30,7 @@ defineEmits<{
 
     <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
       <span
-        :class="item.type === 'service' ? 'bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-900/30' : 'bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-900/30'"
+        :class="item.type === 'service' ? 'bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-900/30' : 'bg-gray-100 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700'"
         class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border"
       >
         {{ item.type === 'service' ? 'Serviço' : 'Produto' }}

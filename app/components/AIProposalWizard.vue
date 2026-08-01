@@ -224,6 +224,7 @@ function removeItem(idx: number) {
               <textarea
                 v-model="promptText"
                 rows="6"
+                aria-label="Descrição do serviço para a IA gerar a proposta"
                 placeholder="Ex: Landing Page Premium com alta conversão, incluindo Copywriting estratégico e protótipo UI/UX responsivo em Figma..."
                 class="relative w-full px-6 py-5 bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] focus:ring-0 focus:border-slate-200 dark:focus:border-slate-700 transition-all outline-none font-bold text-slate-800 dark:text-slate-200 placeholder:text-slate-300 dark:placeholder:text-slate-700 shadow-sm resize-none"
                 @keydown.enter.ctrl="handleGenerateRequest"
@@ -231,7 +232,7 @@ function removeItem(idx: number) {
             </div>
             
             <div class="flex justify-between items-center pt-2">
-              <span class="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest">Pressione Ctrl + Enter para gerar</span>
+              <span class="hidden sm:inline text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest">Pressione Ctrl + Enter para gerar</span>
               <button 
                 @click="handleGenerateRequest" 
                 :disabled="!promptText"

@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import { SendMethod } from '../../../types/enums'
-import { User, Calendar, CreditCard, Mail, Link as LinkIcon, AlertCircle, Sparkles, TrendingUp, CheckCircle2, ShieldAlert } from 'lucide-vue-next'
+import { User, Calendar, CreditCard, Mail, Link as LinkIcon, AlertCircle, Sparkles, CheckCircle2, ShieldAlert, Circle } from 'lucide-vue-next'
 
 const props = defineProps<{
   form: any
@@ -20,65 +20,90 @@ const getSendMethodLabel = (method: SendMethod) => {
   return 'Não definido'
 }
 
-// --- CONVERSION PREDICTOR SCORE POR IA (HEURÍSTICA INTELIGENTE DINÂMICA) ---
-const score = computed(() => {
-  let baseScore = 75
-  
-  // Influência do Valor vs Parcelamento
-  if (props.finalTotal > 5000 && (props.form.paymentConfig?.installments || 1) < 4) {
-    baseScore -= 12
-  } else if (props.finalTotal > 2000 && (props.form.paymentConfig?.installments || 1) >= 4) {
-    baseScore += 5
-  }
-  
-  // Influência de Descontos
-  if ((props.form.paymentConfig?.cashDiscount || 0) >= 5) {
-    baseScore += 8
-  }
-  
-  // Influência de Opcionais (Upsells)
-  if (props.form.upsellItems?.length > 0) {
-    baseScore += 6
-  }
-  
-  // Enriquecimento de Informações de Contato
-  if (props.form.client?.phone) {
-    baseScore += 4
-  }
-  
-  // Data de Execução
-  if (props.form.executionDate) {
-    baseScore += 5
-  }
-  
-  return Math.min(98, Math.max(45, baseScore))
+// --- SCORE DE OTIMIZAÇÃO DA PROPOSTA (heurística transparente, não é predição estatística real) ---
+// Cada critério abaixo é auditável: mostra exatamente o que foi avaliado, se
+// foi atendido e, se não, o que ajustar — em vez de só um número solto.
+const scopeHasDescriptions = computed(() => {
+  const items = props.form.items || []
+  return items.length > 0 && items.every((i: any) => i.description?.trim())
 })
 
-const scoreTips = computed(() => {
-  const tips = []
-  
-  if (props.finalTotal > 5000 && (props.form.paymentConfig?.installments || 1) < 4) {
-    tips.push('Para projetos acima de R$ 5.000,00, oferecer parcelamento em até 6x aumenta a conversão em 42%.')
-  }
-  
-  if ((props.form.paymentConfig?.cashDiscount || 0) < 5) {
-    tips.push('Adicionar um desconto à vista de pelo menos 5% estimula o pagamento rápido.')
-  }
-  
-  if (!props.form.upsellItems || props.form.upsellItems.length === 0) {
-    tips.push('Oferecer 1 ou 2 serviços opcionais (upsells) eleva o faturamento médio e dá opções ao cliente.')
-  }
-  
-  if (!props.form.executionDate) {
-    tips.push('Definir uma data de previsão de entrega reduz a ansiedade do cliente e passa segurança.')
-  }
-  
-  if (tips.length === 0) {
-    tips.push('Sua proposta está perfeita! Adicione "7 dias de garantia pós-entrega" para zerar as objeções do cliente.')
-  }
-  
-  return tips.slice(0, 2) // Retorna no máximo as 2 dicas mais relevantes
+const priceInstallmentMismatch = computed(() =>
+  props.finalTotal > 5000 && (props.form.paymentConfig?.installments || 1) < 4
+)
+const priceInstallmentGood = computed(() =>
+  props.finalTotal > 2000 && (props.form.paymentConfig?.installments || 1) >= 4
+)
+
+const scoreCriteria = computed(() => {
+  const upsellCount = props.form.upsellItems?.length || 0
+  const cashDiscount = props.form.paymentConfig?.cashDiscount || 0
+
+  return [
+    {
+      key: 'escopo',
+      label: 'Escopo',
+      met: scopeHasDescriptions.value,
+      points: scopeHasDescriptions.value ? 5 : 0,
+      detail: scopeHasDescriptions.value
+        ? `${props.form.items.length} item(ns), todos com descrição preenchida`
+        : 'Há item(ns) sem descrição preenchida',
+      tip: scopeHasDescriptions.value ? null : 'Descrever cada item do escopo deixa claro pro cliente o que está incluso e reduz dúvidas.'
+    },
+    {
+      key: 'prazo',
+      label: 'Prazo',
+      met: !!props.form.executionDate,
+      points: props.form.executionDate ? 5 : 0,
+      detail: props.form.executionDate ? 'Data de execução definida' : 'Sem data de execução prevista',
+      tip: props.form.executionDate ? null : 'Definir uma data de previsão de entrega reduz a ansiedade do cliente e passa segurança.'
+    },
+    {
+      key: 'opcoes',
+      label: 'Opções',
+      met: upsellCount > 0,
+      points: upsellCount > 0 ? 6 : 0,
+      detail: upsellCount > 0 ? `${upsellCount} opcional(is) ofertado(s)` : 'Nenhum opcional (upsell) ofertado',
+      tip: upsellCount > 0 ? null : 'Oferecer 1 ou 2 serviços opcionais (upsells) eleva o faturamento médio e dá opções ao cliente.'
+    },
+    {
+      key: 'preco',
+      label: 'Preço x Parcelamento',
+      met: !priceInstallmentMismatch.value,
+      points: priceInstallmentMismatch.value ? -12 : (priceInstallmentGood.value ? 5 : 0),
+      detail: priceInstallmentMismatch.value
+        ? `Valor de R$ ${props.finalTotal.toLocaleString('pt-BR')} com poucas parcelas (${props.form.paymentConfig?.installments || 1}x)`
+        : 'Parcelamento coerente com o valor total',
+      tip: priceInstallmentMismatch.value ? 'Para projetos acima de R$ 5.000,00, oferecer parcelamento em até 6x facilita a decisão do cliente.' : null
+    },
+    {
+      key: 'condicoes',
+      label: 'Condições de Pagamento',
+      met: cashDiscount >= 5,
+      points: cashDiscount >= 5 ? 8 : 0,
+      detail: cashDiscount >= 5 ? `${cashDiscount}% de desconto à vista` : 'Sem desconto à vista',
+      tip: cashDiscount >= 5 ? null : 'Adicionar um desconto à vista de pelo menos 5% estimula o pagamento rápido.'
+    },
+    {
+      key: 'dadosCliente',
+      label: 'Dados do Cliente',
+      met: !!props.form.client?.phone,
+      points: props.form.client?.phone ? 4 : 0,
+      detail: props.form.client?.phone ? 'Telefone/WhatsApp informado' : 'Sem telefone/WhatsApp informado',
+      tip: props.form.client?.phone ? null : 'Adicionar o telefone/WhatsApp do cliente facilita o contato e o follow-up.'
+    }
+  ]
 })
+
+const score = computed(() => {
+  const base = 75 + scoreCriteria.value.reduce((acc, c) => acc + c.points, 0)
+  return Math.min(98, Math.max(45, base))
+})
+
+const metCriteriaCount = computed(() => scoreCriteria.value.filter(c => c.met).length)
+const totalCriteriaCount = computed(() => scoreCriteria.value.length)
+
+const scoreLabel = computed(() => `${metCriteriaCount.value} de ${totalCriteriaCount.value} critérios otimizados`)
 
 const getScoreColor = (val: number) => {
   if (val >= 85) return 'text-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/30'
@@ -110,28 +135,34 @@ const getScoreColor = (val: number) => {
           </div>
         </div>
         
-        <span 
-          class="mt-3 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border"
+        <span
+          class="mt-3 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border text-center"
           :class="getScoreColor(score)"
         >
-          {{ score >= 85 ? 'Conversão Alta' : score >= 70 ? 'Conversão Média' : 'Conversão Baixa' }}
+          {{ scoreLabel }}
         </span>
       </div>
 
-      <div class="md:col-span-3 space-y-4">
+      <div class="md:col-span-3 space-y-3">
         <div class="flex items-center gap-2 text-violet-700 dark:text-violet-400">
-          <Sparkles class="w-4 h-4 shrink-0 text-violet-600 dark:text-violet-400 animate-pulse" />
-          <h4 class="text-xs font-black uppercase tracking-widest">Dicas de Negociação da IA</h4>
+          <Sparkles class="w-4 h-4 shrink-0 text-violet-600 dark:text-violet-400" />
+          <h4 class="text-xs font-black uppercase tracking-widest">Como esse score foi calculado</h4>
         </div>
-        
-        <ul class="space-y-3">
-          <li v-for="(tip, idx) in scoreTips" :key="idx" class="flex items-start gap-3">
-            <div class="w-5 h-5 rounded-lg bg-violet-100 dark:bg-violet-950/50 flex items-center justify-center shrink-0 mt-0.5">
-              <TrendingUp class="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
+
+        <ul class="space-y-2.5">
+          <li v-for="c in scoreCriteria" :key="c.key" class="flex items-start gap-3">
+            <div
+              class="w-5 h-5 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
+              :class="c.met ? 'bg-emerald-100 dark:bg-emerald-950/50' : 'bg-gray-100 dark:bg-gray-800'"
+            >
+              <CheckCircle2 v-if="c.met" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <Circle v-else class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
             </div>
-            <p class="text-xs text-slate-600 dark:text-slate-300 font-bold leading-relaxed">
-              {{ tip }}
-            </p>
+            <div class="text-xs leading-relaxed">
+              <span class="font-black text-slate-700 dark:text-slate-200">{{ c.label }}:</span>
+              <span class="text-slate-600 dark:text-slate-300 font-bold ml-1">{{ c.detail }}</span>
+              <p v-if="c.tip" class="text-slate-500 dark:text-slate-400 font-medium mt-0.5">{{ c.tip }}</p>
+            </div>
           </li>
         </ul>
       </div>

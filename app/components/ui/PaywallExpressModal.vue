@@ -77,9 +77,7 @@ async function handleCheckout() {
     <div class="space-y-6">
       
       <!-- Cabeçalho Persuasivo Premium (Midnight Sapphire Theme) -->
-      <div class="relative overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 p-6 rounded-[0.5rem] border border-indigo-500/20 text-center space-y-3">
-        <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl"></div>
-        <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
+      <div class="relative overflow-hidden bg-slate-950 p-6 rounded-[0.5rem] border border-indigo-500/20 text-center space-y-3">
         
         <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/20 backdrop-blur-md rounded-full text-indigo-200 text-[9px] font-black uppercase tracking-widest border border-indigo-500/30">
           <Sparkles class="w-3.5 h-3.5 text-indigo-400 animate-pulse" /> Orcei Fácil Premium
@@ -160,7 +158,7 @@ async function handleCheckout() {
         <BaseButton 
           @click="handleCheckout"
           :disabled="!!isLoading"
-          class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-[0.5rem] py-4.5 text-xs font-black tracking-widest uppercase shadow-lg shadow-indigo-600/10 flex items-center justify-center gap-2"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-[0.5rem] py-4.5 text-xs font-black tracking-widest uppercase shadow-lg shadow-indigo-600/10 flex items-center justify-center gap-2"
         >
           <Loader2 v-if="isLoading" class="w-4 h-4 animate-spin mr-2" />
           <template v-else>

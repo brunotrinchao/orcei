@@ -241,7 +241,7 @@ function handleConfirm() {
 
               <!-- TMA -->
               <div class="bg-gray-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-gray-100 dark:border-slate-800 space-y-1">
-                <div class="flex items-center gap-1 text-purple-600 dark:text-purple-400">
+                <div class="flex items-center gap-1 text-gray-500 dark:text-gray-400">
                   <Clock class="w-3.5 h-3.5" />
                   <span class="text-[8px] font-black uppercase tracking-wider text-gray-400 dark:text-gray-500">TMA Médio</span>
                 </div>

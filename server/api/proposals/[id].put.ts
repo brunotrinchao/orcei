@@ -62,10 +62,11 @@ export default defineEventHandler(async (event) => {
     return proposal
   } catch (err: any) {
     if (err.statusCode) throw err
-    console.error('Error updating proposal:', err)
+    const supportId = `ERR-${Date.now().toString(36).toUpperCase()}`
+    console.error(`[Proposal Update] [${supportId}]`, err)
     throw createError({
-      statusCode: 400,
-      statusMessage: err.message || 'Erro ao atualizar orçamento.'
+      statusCode: 500,
+      statusMessage: `Ocorreu um erro ao salvar seu orçamento. Tente novamente mais tarde. (Código: ${supportId})`
     })
   }
 })

@@ -49,7 +49,7 @@ async function searchCEP() {
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <BaseInput
         v-model="localAddress.zip"
-        label="CEP *"
+        label="CEP"
         mask="cep"
         placeholder="00000-000"
         :loading="isSearchingCEP"
@@ -58,14 +58,14 @@ async function searchCEP() {
       <div class="md:col-span-2">
         <BaseInput
           v-model="localAddress.street"
-          label="Rua / Logradouro *"
+          label="Rua / Logradouro"
           required
         />
       </div>
       <BaseInput v-model="(localAddress.number as any)" label="Número" />
-      <BaseInput v-model="localAddress.neighborhood" label="Bairro *" required />
-      <BaseInput v-model="localAddress.city" label="Cidade *" required />
-      <BaseInput v-model="localAddress.state" label="Estado (UF) *" required />
+      <BaseInput v-model="localAddress.neighborhood" label="Bairro" />
+      <BaseInput v-model="localAddress.city" label="Cidade" />
+      <BaseInput v-model="localAddress.state" label="Estado (UF)" />
     </div>
   </BaseSectionCard>
 </template>

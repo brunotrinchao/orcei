@@ -9,16 +9,19 @@ import {
   DialogDescription, 
   DialogClose 
 } from 'radix-vue'
-import { 
-  Bell, 
-  X, 
-  CheckCircle2, 
-  XCircle, 
-  Send, 
-  Sparkles, 
-  CheckCheck, 
-  Inbox, 
-  Clock 
+import {
+  Bell,
+  X,
+  CheckCircle2,
+  XCircle,
+  Send,
+  Sparkles,
+  CheckCheck,
+  Inbox,
+  Clock,
+  AlertTriangle,
+  UserPlus,
+  Coins
 } from 'lucide-vue-next'
 import BaseButton from '~/components/ui/BaseButton.vue'
 import NotificationDetailModal from './NotificationDetailModal.vue'
@@ -186,19 +189,36 @@ function timeAgo(dateStr: string) {
               :key="n._id"
               @click="openDetail(n)"
               class="p-4 rounded-2xl border transition-all cursor-pointer relative group flex gap-3 items-start"
-              :class="!n.read ? 'bg-blue-50/70 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/40 shadow-sm' : 'bg-white dark:bg-slate-900/50 border-slate-100 dark:border-slate-800/80 hover:border-slate-200 dark:hover:border-slate-700'"
+              :class="
+                n.type === 'admin_new_signup' ? 'bg-orange-50/80 dark:bg-orange-950/20 border-orange-300 dark:border-orange-800/50 shadow-sm' :
+                n.type === 'admin_credit_purchase' ? 'bg-emerald-50/80 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800/50 shadow-sm' :
+                !n.read ? 'bg-blue-50/70 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/40 shadow-sm' : 'bg-white dark:bg-slate-900/50 border-slate-100 dark:border-slate-800/80 hover:border-slate-200 dark:hover:border-slate-700'
+              "
             >
+              <!-- Avatar do usuário (cadastro/compra de crédito) no lugar do ícone genérico -->
+              <img
+                v-if="n.details?.userAvatar && (n.type === 'admin_new_signup' || n.type === 'admin_credit_purchase')"
+                :src="n.details.userAvatar"
+                class="w-9 h-9 rounded-xl object-cover shrink-0 ring-2"
+                :class="n.type === 'admin_new_signup' ? 'ring-orange-400' : 'ring-emerald-400'"
+                alt=""
+              />
               <!-- Ícone Distintivo por Tipo -->
-              <div class="p-2.5 rounded-xl shrink-0" :class="{
-                'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400': n.type === 'proposal_accepted',
+              <div v-else class="p-2.5 rounded-xl shrink-0" :class="{
+                'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400': n.type === 'proposal_accepted' || n.type === 'admin_credit_purchase',
                 'bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400': n.type === 'proposal_rejected',
                 'bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400': n.type === 'proposal_sent',
-                'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400': n.type === 'report_generated'
+                'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400': n.type === 'report_generated',
+                'bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400': n.type === 'google_sync_failed',
+                'bg-orange-100 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400': n.type === 'admin_new_signup'
               }">
                 <CheckCircle2 v-if="n.type === 'proposal_accepted'" class="w-4 h-4" />
                 <XCircle v-else-if="n.type === 'proposal_rejected'" class="w-4 h-4" />
                 <Send v-else-if="n.type === 'proposal_sent'" class="w-4 h-4" />
                 <Sparkles v-else-if="n.type === 'report_generated'" class="w-4 h-4" />
+                <AlertTriangle v-else-if="n.type === 'google_sync_failed'" class="w-4 h-4" />
+                <UserPlus v-else-if="n.type === 'admin_new_signup'" class="w-4 h-4" />
+                <Coins v-else-if="n.type === 'admin_credit_purchase'" class="w-4 h-4" />
               </div>
 
               <!-- Conteúdo Breve do Card -->

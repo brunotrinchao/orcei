@@ -60,12 +60,17 @@ export interface ProfileDTO {
   defaultTermsAndConditions: string
   onboardingCompletedTours?: string[]
   onboardingWelcomeSeen?: boolean
+  setupWizardCompleted?: boolean,
+  setupWizardSkippedAt?: Date,
   googleIntegration?: {
     email?: string
     accessToken?: string
     refreshToken?: string
     expiryDate?: number
     driveFolderId?: string
+    driveProposalsFolderId?: string
+    driveReportsFolderId?: string
+    grantedScopes?: string[]
   }
 }
 

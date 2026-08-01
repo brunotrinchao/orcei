@@ -3,7 +3,7 @@ import { Schema, model } from 'mongoose'
 export interface INotification {
   _id?: string
   profileId: Schema.Types.ObjectId | string
-  type: 'proposal_accepted' | 'proposal_rejected' | 'proposal_sent' | 'report_generated'
+  type: 'proposal_accepted' | 'proposal_rejected' | 'proposal_sent' | 'report_generated' | 'google_sync_failed' | 'admin_new_signup' | 'admin_credit_purchase'
   title: string
   summary: string
   details?: Record<string, any>
@@ -17,7 +17,7 @@ const notificationSchema = new Schema({
   profileId: { type: Schema.Types.Mixed, ref: 'Profile', required: true, index: true },
   type: { 
     type: String, 
-    enum: ['proposal_accepted', 'proposal_rejected', 'proposal_sent', 'report_generated'], 
+    enum: ['proposal_accepted', 'proposal_rejected', 'proposal_sent', 'report_generated', 'google_sync_failed', 'admin_new_signup', 'admin_credit_purchase'],
     required: true 
   },
   title: { type: String, required: true },

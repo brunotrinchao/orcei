@@ -57,7 +57,7 @@ const localTermsAndConditions = computed({
 </script>
 
 <template>
-  <BaseSectionCard id="modelos" title="Modelos Legais" :icon="FileText" icon-bg-class="bg-purple-50 dark:bg-purple-950/50" icon-color-class="text-purple-600 dark:text-purple-400">
+  <BaseSectionCard id="modelos" title="Modelos Legais" :icon="FileText" icon-bg-class="bg-blue-50 dark:bg-blue-950/50" icon-color-class="text-blue-600 dark:text-blue-400">
 
     <div class="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-[0.5rem] mb-8 max-w-sm">
       <BaseButton
@@ -96,12 +96,12 @@ const localTermsAndConditions = computed({
           v-for="v in availableVariables"
           :key="v.tag"
           @click="copyTag(v.tag)"
-          class="group flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-900 border border-slate-200 dark:border-slate-800 hover:border-violet-300 dark:hover:border-violet-700 hover:bg-violet-50 dark:hover:bg-violet-950/30 rounded-[0.5rem] transition-all"
+          class="group flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-900 border border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-[0.5rem] transition-all"
           :title="v.desc"
         >
-          <span class="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300 group-hover:text-violet-700 dark:group-hover:text-violet-400">{{ v.tag }}</span>
+          <span class="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300 group-hover:text-blue-700 dark:group-hover:text-blue-400">{{ v.tag }}</span>
           <Check v-if="copiedTag === v.tag" class="w-3 h-3 text-emerald-500" />
-          <Copy v-else class="w-3 h-3 text-slate-300 dark:text-slate-600 group-hover:text-violet-400" />
+          <Copy v-else class="w-3 h-3 text-slate-300 dark:text-slate-600 group-hover:text-blue-400" />
         </button>
       </div>
     </div>

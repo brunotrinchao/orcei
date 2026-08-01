@@ -39,8 +39,8 @@ const metrics = computed(() => [
     value: stats.value?.users?.total || 0,
     subValue: `+${stats.value?.users?.newMonth || 0} este mês | Churn: ${stats.value?.users?.churnRate ?? 0}%`,
     icon: Users,
-    color: 'text-purple-600 dark:text-purple-400',
-    bg: 'bg-purple-50 dark:bg-purple-950/30'
+    color: 'text-indigo-600 dark:text-indigo-400',
+    bg: 'bg-indigo-50 dark:bg-indigo-950/30'
   },
   { 
     label: 'Conversão Comercial', 
@@ -208,13 +208,13 @@ function formatLogTime(isoString: string) {
         <!-- Stickiness de Engajamento -->
         <div class="bg-slate-900 text-white p-6 rounded-[0.5rem] border border-white/5 shadow-inner flex items-center justify-between">
           <div class="space-y-1">
-            <span class="text-[8px] font-black text-purple-400 uppercase tracking-widest">Engajamento SaaS</span>
+            <span class="text-[8px] font-black text-blue-400 uppercase tracking-widest">Engajamento SaaS</span>
             <h4 class="text-xs font-black uppercase text-slate-300">Métrica Stickiness (DAU/MAU)</h4>
             <p class="text-2xl font-black text-white">
               {{ (stats.users?.stickiness ?? 0).toFixed(1) }}%
             </p>
           </div>
-          <div class="w-12 h-12 bg-white/5 rounded-[0.5rem] flex items-center justify-center text-purple-400">
+          <div class="w-12 h-12 bg-white/5 rounded-[0.5rem] flex items-center justify-center text-blue-400">
             <Activity class="w-6 h-6" />
           </div>
         </div>

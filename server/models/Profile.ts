@@ -117,13 +117,17 @@ Para dirimir quaisquer controvérsias oriundas desta proposta, fica eleito o for
   lastLoginAt: { type: Date, default: null },
   onboardingCompletedTours: { type: [String], default: [] },
   onboardingWelcomeSeen: { type: Boolean, default: false },
+  setupWizardCompleted: { type: Boolean, default: false },
+  setupWizardSkippedAt: { type: Date, default: null },
   googleIntegration: {
     email: String,
     accessToken: String,
     refreshToken: String,
     expiryDate: Number,
     driveFolderId: String,
-    driveProposalsFolderId: String
+    driveProposalsFolderId: String,
+    driveReportsFolderId: String,
+    grantedScopes: { type: [String], default: [] }
   }
 }, { timestamps: true })
 

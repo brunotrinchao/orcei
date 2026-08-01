@@ -1,6 +1,17 @@
 import { google } from 'googleapis'
 import { Readable } from 'stream'
 
+export const GOOGLE_SCOPES = {
+  EMAIL: 'https://www.googleapis.com/auth/userinfo.email',
+  CALENDAR: 'https://www.googleapis.com/auth/calendar.events',
+  DRIVE: 'https://www.googleapis.com/auth/drive.file'
+} as const
+
+/** Checa se um escopo específico foi de fato concedido pelo usuário (não só se existe um refreshToken). */
+export function hasGoogleScope(profile: any, scope: string): boolean {
+  return !!profile?.googleIntegration?.refreshToken && !!profile?.googleIntegration?.grantedScopes?.includes(scope)
+}
+
 export interface GoogleEventData {
   summary: string
   location?: string

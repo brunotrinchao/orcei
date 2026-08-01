@@ -98,10 +98,12 @@ export default defineEventHandler(async (event) => {
     }, isAdmin)
   } catch (err: any) {
     if (err.statusCode) throw err
-    console.error('Error creating proposal:', err)
+    // Nunca expor mensagem interna do banco/driver ao usuário — só log com ID de suporte pra rastrear.
+    const supportId = `ERR-${Date.now().toString(36).toUpperCase()}`
+    console.error(`[Proposal Create] [${supportId}]`, err)
     throw createError({
-      statusCode: 400,
-      statusMessage: err.message || 'Erro ao criar orçamento. Verifique os dados informados.'
+      statusCode: 500,
+      statusMessage: `Ocorreu um erro ao salvar seu orçamento. Tente novamente mais tarde. (Código: ${supportId})`
     })
   }
 })

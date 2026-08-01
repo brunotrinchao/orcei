@@ -13,6 +13,7 @@ ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale
 
 const period = ref('last_30_days')
 const { loggedIn, user } = useUserSession()
+const { openSetupWizard } = useOnboarding()
 const { notify } = useAlerts()
 const { isDark } = useDarkMode()
 const { getCost, creditLabel } = useCreditCosts()
@@ -288,7 +289,7 @@ function formatRelativeTime(minutesAgo: number) {
         <p class="text-gray-500 dark:text-gray-400 font-medium">Acompanhe suas conversões, produtividade IA e receitas acumuladas.</p>
       </div>
 
-      <div data-tour="dashboard-period-filter" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide bg-gray-100/80 dark:bg-gray-800 p-1.5 rounded-[0.5rem] border border-gray-200/50 dark:border-gray-700 md:w-auto w-full">
+      <div v-if="stats && stats.proposalsCount > 0" data-tour="dashboard-period-filter" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide bg-gray-100/80 dark:bg-gray-800 p-1.5 rounded-[0.5rem] border border-gray-200/50 dark:border-gray-700 md:w-auto w-full">
         <button 
           v-for="p in [
             { label: '7D', value: 'last_7_days' },
@@ -402,7 +403,8 @@ function formatRelativeTime(minutesAgo: number) {
     </template>
 
     <template v-else-if="stats">
-      
+      <template v-if="stats.proposalsCount > 0">
+
       <!-- Seção Principal de Métricas Claves -->
       <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         
@@ -639,7 +641,7 @@ function formatRelativeTime(minutesAgo: number) {
           </div>
 
           <!-- Receita de Opcionais (Upsell) -->
-          <div class="mt-8 p-6 bg-gradient-to-r from-emerald-50 to-teal-50/20 dark:from-emerald-950/20 dark:to-teal-950/10 border border-emerald-100 dark:border-emerald-900/30 rounded-[0.5rem] flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div class="mt-8 p-6 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 rounded-[0.5rem] flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="space-y-1 text-center sm:text-left">
               <span class="text-[9px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest bg-emerald-100/60 dark:bg-emerald-950/30 px-2 py-0.5 rounded-full">Exclusivo Upsell</span>
               <h4 class="font-black text-gray-900 dark:text-white uppercase text-xs tracking-widest">Receita de Itens Opcionais</h4>
@@ -822,6 +824,73 @@ function formatRelativeTime(minutesAgo: number) {
         </div>
 
       </section>
+
+      </template>
+      <template v-else>
+        <!-- Onboarding: conta sem nenhum orçamento ainda -->
+        <section class="flex flex-col items-center justify-center py-12 px-4">
+          <div class="max-w-3xl w-full space-y-8">
+            <div class="text-center space-y-2">
+              <h2 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Vamos começar!</h2>
+              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Siga os passos abaixo para criar seu primeiro orçamento.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <!-- Passo 1 -->
+              <div class="bg-white dark:bg-gray-900 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 p-6 flex flex-col gap-4">
+                <div class="w-12 h-12 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center">
+                  <UserPlus class="w-6 h-6" />
+                </div>
+                <div class="flex-1 space-y-1">
+                  <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-tight">Cadastre seu primeiro cliente</h3>
+                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Adicione os dados de quem receberá o orçamento.</p>
+                </div>
+                <NuxtLink to="/clientes">
+                  <BaseButton variant="secondary" class="w-full">Ir para Clientes</BaseButton>
+                </NuxtLink>
+              </div>
+
+              <!-- Passo 2 -->
+              <div class="bg-white dark:bg-gray-900 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 p-6 flex flex-col gap-4">
+                <div class="w-12 h-12 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center">
+                  <BookOpen class="w-6 h-6" />
+                </div>
+                <div class="flex-1 space-y-1">
+                  <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-tight">Adicione um serviço ao catálogo</h3>
+                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Defina os serviços que você oferece e seus preços.</p>
+                </div>
+                <NuxtLink to="/catalogo">
+                  <BaseButton variant="secondary" class="w-full">Ir para Catálogo</BaseButton>
+                </NuxtLink>
+              </div>
+
+              <!-- Passo 3 -->
+              <div class="bg-white dark:bg-gray-900 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 p-6 flex flex-col gap-4">
+                <div class="w-12 h-12 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center">
+                  <FileText class="w-6 h-6" />
+                </div>
+                <div class="flex-1 space-y-1">
+                  <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-tight">Crie seu primeiro orçamento</h3>
+                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Monte e envie seu primeiro orçamento para um cliente.</p>
+                </div>
+                <NuxtLink to="/orcamentos?new=true">
+                  <BaseButton variant="primary" class="w-full">Criar Orçamento</BaseButton>
+                </NuxtLink>
+              </div>
+            </div>
+
+            <div class="text-center">
+              <button
+                type="button"
+                class="text-xs font-bold text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 underline underline-offset-2 transition-colors"
+                @click="openSetupWizard"
+              >
+                Refazer configuração inicial (empresa, endereço, contatos, visual, integrações)
+              </button>
+            </div>
+          </div>
+        </section>
+      </template>
 
     </template>
 

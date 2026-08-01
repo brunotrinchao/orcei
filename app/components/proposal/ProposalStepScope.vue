@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { Plus, Trash2, ArrowDown, Search, ChevronDown, ChevronUp, GripVertical } from 'lucide-vue-next'
 import CatalogItemFormDialog from '../catalog/CatalogItemFormDialog.vue'
+import { useFormValidation } from '~/composables/useFormValidation'
 
 const props = defineProps<{
   form: any
@@ -21,6 +22,23 @@ const internalSearch = computed({
   get: () => props.catalogSearch,
   set: (val) => emit('update:catalogSearch', val)
 })
+
+// Validação padrão do wizard (mesmo composable/UX do Setup Wizard e do passo
+// de Cliente). Itens são lista dinâmica (não usam BaseInput), então a
+// validação de nome/preço/quantidade é manual aqui, reaproveitando o mesmo
+// `submitAttempted` pra manter o mesmo comportamento visual (borda vermelha,
+// erro só depois da 1ª tentativa de avançar).
+const { validate: validateRegisteredFields, reset, submitAttempted } = useFormValidation()
+
+function validateStep(): boolean {
+  const registeredOk = validateRegisteredFields()
+  const allItems = [...props.form.items, ...props.form.upsellItems]
+  const itemsOk = props.form.items.length > 0 &&
+    allItems.every((item: any) => item.name?.trim() && item.price >= 0 && item.quantity > 0)
+  return registeredOk && itemsOk
+}
+
+defineExpose({ validate: validateStep, reset })
 
 const selectedCatalogItemId = ref('')
 
@@ -104,7 +122,7 @@ function isItemSelected(item: any) {
 </script>
 
 <template>
-  <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
+  <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-5">
     <div class="space-y-2">
       <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight">Serviços e Valores</h3>
       <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Defina o escopo obrigatório e adicione pacotes opcionais (upsell).</p>
@@ -133,8 +151,13 @@ function isItemSelected(item: any) {
 
     <!-- Escopo Principal -->
     <BaseSectionCard :title="`Itens Obrigatórios (${form.items.length})`">
-      <div v-if="form.items.length === 0" class="p-8 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-[0.5rem] text-center text-gray-400 dark:text-gray-500 font-medium">
+      <div
+        v-if="form.items.length === 0"
+        class="p-8 border-2 border-dashed rounded-[0.5rem] text-center font-medium transition-colors"
+        :class="submitAttempted ? 'border-red-300 dark:border-red-500/50 text-red-500' : 'border-gray-200 dark:border-gray-800 text-gray-400 dark:text-gray-500'"
+      >
         Adicione itens buscando no catálogo acima ou clicando em "Novo".
+        <span v-if="submitAttempted" class="block text-[10px] font-black uppercase tracking-widest mt-2">Pelo menos 1 item obrigatório é necessário</span>
       </div>
 
       <div v-else class="space-y-3">
@@ -148,25 +171,26 @@ function isItemSelected(item: any) {
             <div class="flex-1 flex items-center gap-3 min-w-0">
               <GripVertical class="w-5 h-5 text-gray-300 dark:text-gray-600 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block shrink-0" />
               <template v-if="!item.catalogItemId">
-                <input 
-                  v-model="item.name" 
-                  class="flex-1 text-sm sm:text-base font-black text-gray-900 dark:text-gray-50 bg-transparent border-b border-transparent focus:border-blue-500 focus:ring-0 p-1 outline-none transition-all truncate" 
-                  placeholder="Nome do Serviço" 
+                <input
+                  v-model="item.name"
+                  class="flex-1 text-sm sm:text-base font-black text-gray-900 dark:text-gray-50 bg-transparent border-b focus:border-blue-500 focus:ring-0 p-1 outline-none transition-all truncate"
+                  :class="submitAttempted && !item.name.trim() ? 'border-red-400 dark:border-red-500' : 'border-transparent'"
+                  placeholder="Nome do Serviço"
                 >
               </template>
               <template v-else>
                 <span class="flex-1 text-sm sm:text-base font-black text-gray-900 dark:text-gray-50 p-1 truncate">{{ item.name }}</span>
               </template>
             </div>
-            
+
             <div class="flex items-center gap-3 sm:gap-6 shrink-0">
               <div class="flex items-center gap-2">
                 <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase hidden sm:block">Qtd</span>
-                <input v-model.number="item.quantity" type="number" class="w-14 sm:w-16 bg-gray-50 dark:bg-gray-950 px-2 py-1.5 rounded-[0.5rem] font-bold text-sm border border-transparent focus:border-blue-500 text-gray-900 dark:text-gray-50 outline-none text-center">
+                <input v-model.number="item.quantity" type="number" class="w-14 sm:w-16 bg-gray-50 dark:bg-gray-950 px-2 py-1.5 rounded-[0.5rem] font-bold text-sm border focus:border-blue-500 text-gray-900 dark:text-gray-50 outline-none text-center" :class="submitAttempted && !(item.quantity > 0) ? 'border-red-400 dark:border-red-500' : 'border-transparent'">
               </div>
               <div class="flex items-center gap-2">
                 <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase hidden sm:block">R$</span>
-                <input v-model.number="item.price" type="number" class="w-20 sm:w-24 bg-gray-50 dark:bg-gray-950 px-2 py-1.5 rounded-[0.5rem] font-bold text-sm border border-transparent focus:border-blue-500 text-gray-900 dark:text-gray-50 outline-none text-right">
+                <input v-model.number="item.price" type="number" class="w-20 sm:w-24 bg-gray-50 dark:bg-gray-950 px-2 py-1.5 rounded-[0.5rem] font-bold text-sm border focus:border-blue-500 text-gray-900 dark:text-gray-50 outline-none text-right" :class="submitAttempted && !(item.price >= 0) ? 'border-red-400 dark:border-red-500' : 'border-transparent'">
               </div>
               
               <div class="hidden md:block text-right min-w-[80px]">
@@ -234,25 +258,26 @@ function isItemSelected(item: any) {
             <div class="flex-1 flex items-center gap-3 min-w-0">
               <GripVertical class="w-5 h-5 text-blue-200 dark:text-blue-800 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block shrink-0" />
               <template v-if="!item.catalogItemId">
-                <input 
-                  v-model="item.name" 
-                  class="flex-1 text-sm sm:text-base font-black text-gray-900 dark:text-gray-50 bg-transparent border-b border-transparent focus:border-blue-500 focus:ring-0 p-1 outline-none transition-all truncate" 
-                  placeholder="Nome do Opcional" 
+                <input
+                  v-model="item.name"
+                  class="flex-1 text-sm sm:text-base font-black text-gray-900 dark:text-gray-50 bg-transparent border-b focus:border-blue-500 focus:ring-0 p-1 outline-none transition-all truncate"
+                  :class="submitAttempted && !item.name.trim() ? 'border-red-400 dark:border-red-500' : 'border-transparent'"
+                  placeholder="Nome do Opcional"
                 >
               </template>
               <template v-else>
                 <span class="flex-1 text-sm sm:text-base font-black text-gray-900 dark:text-gray-50 p-1 truncate">{{ item.name }}</span>
               </template>
             </div>
-            
+
             <div class="flex items-center gap-3 sm:gap-6 shrink-0">
               <div class="flex items-center gap-2">
                 <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase hidden sm:block">Qtd</span>
-                <input v-model.number="item.quantity" type="number" class="w-14 sm:w-16 bg-white dark:bg-gray-950 px-2 py-1.5 rounded-[0.5rem] font-bold text-sm border border-blue-100 dark:border-blue-900/50 text-gray-900 dark:text-gray-50 focus:border-blue-500 outline-none text-center">
+                <input v-model.number="item.quantity" type="number" class="w-14 sm:w-16 bg-white dark:bg-gray-950 px-2 py-1.5 rounded-[0.5rem] font-bold text-sm border text-gray-900 dark:text-gray-50 focus:border-blue-500 outline-none text-center" :class="submitAttempted && !(item.quantity > 0) ? 'border-red-400 dark:border-red-500' : 'border-blue-100 dark:border-blue-900/50'">
               </div>
               <div class="flex items-center gap-2">
                 <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase hidden sm:block">R$</span>
-                <input v-model.number="item.price" type="number" class="w-20 sm:w-24 bg-white dark:bg-gray-950 px-2 py-1.5 rounded-[0.5rem] font-bold text-sm border border-blue-100 dark:border-blue-900/50 text-gray-900 dark:text-gray-50 focus:border-blue-500 outline-none text-right">
+                <input v-model.number="item.price" type="number" class="w-20 sm:w-24 bg-white dark:bg-gray-950 px-2 py-1.5 rounded-[0.5rem] font-bold text-sm border text-gray-900 dark:text-gray-50 focus:border-blue-500 outline-none text-right" :class="submitAttempted && !(item.price >= 0) ? 'border-red-400 dark:border-red-500' : 'border-blue-100 dark:border-blue-900/50'">
               </div>
               
               <div class="hidden md:block text-right min-w-[80px]">

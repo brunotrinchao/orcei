@@ -14,6 +14,8 @@ const { data: proposalsData, pending: pendingProposals } = useLazyFetch<any>('/a
 
 const isModalOpen = ref(false)
 const isSubmitting = ref(false)
+const { validate, reset: resetValidation } = useFormValidation()
+watch(isModalOpen, (open) => { if (!open) resetValidation() })
 const selectedEvent = ref<any>(null)
 const config = useRuntimeConfig()
 
@@ -237,10 +239,7 @@ async function handleEventResize(resizeInfo: any) {
 }
 
 async function saveEvent() {
-  if (!form.value.title) {
-    notify('Atenção', 'Informe o título do compromisso.')
-    return
-  }
+  if (!validate()) return
   isSubmitting.value = true
   try {
     const method = selectedEvent.value ? 'PUT' : 'POST'

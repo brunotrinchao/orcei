@@ -1,4 +1,14 @@
 import { Notification } from '../models/Notification'
+import { Profile } from '../models/Profile'
+
+export type NotificationType =
+  | 'proposal_accepted'
+  | 'proposal_rejected'
+  | 'proposal_sent'
+  | 'report_generated'
+  | 'google_sync_failed'
+  | 'admin_new_signup'
+  | 'admin_credit_purchase'
 
 export const NotificationService = {
   /**
@@ -6,7 +16,7 @@ export const NotificationService = {
    */
   async createNotification(params: {
     profileId: string
-    type: 'proposal_accepted' | 'proposal_rejected' | 'proposal_sent' | 'report_generated'
+    type: NotificationType
     title: string
     summary: string
     details?: Record<string, any>
@@ -23,6 +33,33 @@ export const NotificationService = {
     })
 
     return notification
+  },
+
+  /**
+   * Notifica TODOS os admins ativos (usado pra eventos administrativos:
+   * novo cadastro, compra de crédito). Usuários comuns nunca recebem esses tipos.
+   */
+  async notifyAdmins(params: {
+    type: 'admin_new_signup' | 'admin_credit_purchase'
+    title: string
+    summary: string
+    details?: Record<string, any>
+    metadata?: Record<string, any>
+  }) {
+    const admins = await Profile.find({ role: 'admin', isDeleted: false }).select('_id').lean()
+
+    await Promise.all(
+      admins.map((admin: any) =>
+        this.createNotification({
+          profileId: admin._id.toString(),
+          type: params.type,
+          title: params.title,
+          summary: params.summary,
+          details: params.details,
+          metadata: params.metadata
+        }).catch((e) => console.error('[NotificationService] Falha ao notificar admin', admin._id?.toString(), e))
+      )
+    )
   },
 
   /**

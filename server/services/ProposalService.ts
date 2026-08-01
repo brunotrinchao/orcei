@@ -44,7 +44,31 @@ export const ProposalService = {
     return await ProposalHistory.find({ proposalId }).sort({ timestamp: -1 })
   },
 
+  /**
+   * Wrapper público: tenta criar a proposta dentro de uma transação; se o
+   * cluster MongoDB não suportar transações nessa topologia (ex: erro
+   * "Only servers in a sharded cluster can start a new transaction..." —
+   * comum em certas configurações standalone/serverless), repete UMA vez
+   * sem sessão em vez de propagar o erro cru do driver pro usuário.
+   */
   async create(data: any, isAdmin = false) {
+    try {
+      return await this._createTxn(data, isAdmin, true)
+    } catch (error: any) {
+      if (this._isUnsupportedTransactionError(error)) {
+        console.warn('[ProposalService] Transações não suportadas nesta topologia MongoDB — repetindo sem sessão.')
+        return await this._createTxn(data, isAdmin, false)
+      }
+      throw error
+    }
+  },
+
+  _isUnsupportedTransactionError(error: any): boolean {
+    const msg = String(error?.message || error?.errmsg || '')
+    return error?.code === 20 || /sharded cluster can start a new transaction/i.test(msg)
+  },
+
+  async _createTxn(data: any, isAdmin: boolean, useSession: boolean) {
     const slug = nanoid(10)
     const token = nanoid(20)
     const totals = this.calculateTotals(data.items, data.totals?.additional || 0, data.totals?.discount || 0, data.paymentConfig)
@@ -52,7 +76,7 @@ export const ProposalService = {
     // Numeração Sequencial
     const currentYear = new Date().getFullYear()
 
-    const session = typeof Profile.db?.startSession === 'function' ? await Profile.db.startSession() : null
+    const session = (useSession && typeof Profile.db?.startSession === 'function') ? await Profile.db.startSession() : null
     if (session) {
       session.startTransaction()
     }
@@ -157,7 +181,20 @@ export const ProposalService = {
     }
   },
 
+  /** Mesmo fallback de `create()`: repete sem sessão se a topologia não suportar transações. */
   async update(id: string, profileId: string, data: any, isAdmin = false) {
+    try {
+      return await this._updateTxn(id, profileId, data, isAdmin, true)
+    } catch (error: any) {
+      if (this._isUnsupportedTransactionError(error)) {
+        console.warn('[ProposalService] Transações não suportadas nesta topologia MongoDB — repetindo sem sessão.')
+        return await this._updateTxn(id, profileId, data, isAdmin, false)
+      }
+      throw error
+    }
+  },
+
+  async _updateTxn(id: string, profileId: string, data: any, isAdmin: boolean, useSession: boolean) {
     const oldProposal = await Proposal.findOne({ _id: id, profileId })
     if (!oldProposal) return null
     if (oldProposal.status === ProposalStatus.ACCEPTED) return null
@@ -179,7 +216,7 @@ export const ProposalService = {
     }
 
     let emailQueued = false
-    const session = typeof Profile.db?.startSession === 'function' ? await Profile.db.startSession() : null
+    const session = (useSession && typeof Profile.db?.startSession === 'function') ? await Profile.db.startSession() : null
     if (session) {
       session.startTransaction()
     }

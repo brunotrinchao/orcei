@@ -1,7 +1,7 @@
 import { Proposal } from '../../../models/Proposal'
 import { Profile } from '../../../models/Profile'
 import { generateProposalPdfBuffer } from '../../../utils/pdf'
-import { GoogleService } from '../../../services/GoogleService'
+import { GoogleService, GOOGLE_SCOPES, hasGoogleScope } from '../../../services/GoogleService'
 
 export default defineEventHandler(async (event) => {
   const { id } = event.context.params as { id: string }
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
   let pdfBuffer: Buffer
 
   // Se o arquivo já foi enviado ao Drive, fazer download de lá (sem regerar)
-  if ((proposal as any).driveFileId && (profile as any).googleIntegration?.refreshToken) {
+  if ((proposal as any).driveFileId && hasGoogleScope(profile, GOOGLE_SCOPES.DRIVE)) {
     try {
       const auth = GoogleService.getAuthClient(profile)
       pdfBuffer = await GoogleService.downloadFile(auth, (proposal as any).driveFileId)

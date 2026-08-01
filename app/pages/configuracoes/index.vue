@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SwatchBook, MapPin, Briefcase, FileText, Phone, RefreshCcw, Shield, Globe, ShieldCheck, Lock, CheckCircle2 } from 'lucide-vue-next'
+import { SwatchBook, MapPin, Briefcase, FileText, Phone, RefreshCcw, Shield, Globe, ShieldCheck, Lock, CheckCircle2, Wand2 } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../../types'
 import SettingsVisual from '../../components/settings/SettingsVisual.vue'
 import SettingsCompany from '../../components/settings/SettingsCompany.vue'
@@ -9,6 +9,7 @@ import SettingsTemplates from '../../components/settings/SettingsTemplates.vue'
 
 const { notify } = useAlerts()
 const { data: profile, refresh } = useFetch<ProfileDTO>('/api/profile', { key: 'profile' })
+const { openSetupWizard } = useOnboarding()
 const { public: publicConfig } = useRuntimeConfig()
 const integrationGoogleDriveCalendarStatus = publicConfig.integrationGoogleDriveCalendarStatus
 
@@ -37,16 +38,51 @@ watch(profile, (val) => {
 
 const isSaving = ref(false)
 
+// Escopos Google tratados de forma independente: Calendar e Drive podem ser
+// conectados separadamente (Drive é o único obrigatório pro fluxo de PDF).
+const GOOGLE_CALENDAR_SCOPE = 'https://www.googleapis.com/auth/calendar.events'
+const GOOGLE_DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file'
+
+function hasGoogleScope(scope: string) {
+  return !!localProfile.value?.googleIntegration?.refreshToken
+    && !!localProfile.value?.googleIntegration?.grantedScopes?.includes(scope)
+}
+
+const isDisconnecting = ref(false)
+const isConnecting = ref(false)
+const { connect } = useGoogleConnect()
+
+async function handleConnect(feature: 'drive' | 'calendar') {
+  isConnecting.value = true
+  try {
+    const ok = await connect(feature)
+    if (ok) {
+      await refresh()
+      notify('Sucesso', 'Integração conectada com sucesso.')
+    }
+  } finally {
+    isConnecting.value = false
+  }
+}
+
+async function disconnectGoogle() {
+  isDisconnecting.value = true
+  try {
+    await $fetch('/api/integrations/google/disconnect', { method: 'POST' })
+    await refresh()
+    notify('Integração desconectada', 'Sua conta Google foi desconectada com sucesso.')
+  } catch (e: any) {
+    notify('Erro ao desconectar', e?.data?.statusMessage || 'Não foi possível desconectar sua conta Google.')
+  } finally {
+    isDisconnecting.value = false
+  }
+}
+
+const { validate } = useFormValidation()
+
 async function updateProfile() {
   if (!localProfile.value) return
-  const addr = localProfile.value.address
-  if (!addr.zip || !addr.street || !addr.neighborhood || !addr.city || !addr.state) {
-    return notify('Aviso', 'Todos os campos de endereço são obrigatórios.')
-  }
-  const comp = localProfile.value.company
-  if (!comp.taxId || !comp.legalName || !comp.tradeName) {
-    return notify('Aviso', 'Dados da empresa são obrigatórios.')
-  }
+  if (!validate()) return
 
   isSaving.value = true
   try {
@@ -299,9 +335,29 @@ function selectSection(id: string) {
                         </span>
                       </h4>
                       <p class="text-xs text-emerald-800/80 dark:text-emerald-300/80 font-medium leading-relaxed">
-                        Suas integrações são ativadas automaticamente ao fazer login com o Google. Utilizamos <strong>escopos restritos</strong> pré-aprovados. O aplicativo interage exclusivamente com os arquivos e eventos que ele mesmo cria — <strong>sua privacidade e dados pessoais estão 100% protegidos.</strong>
+                        Suas integrações são configuradas separadamente do login, respeitando sua privacidade. Utilizamos <strong>escopos restritos</strong> pré-aprovados pelo Google. O aplicativo interage exclusivamente com os arquivos e eventos que ele mesmo cria — <strong>sua privacidade e dados pessoais estão 100% protegidos.</strong>
                       </p>
                     </div>
+                  </div>
+
+                  <!-- Refazer configuração inicial -->
+                  <div class="p-5 bg-gray-50/50 dark:bg-gray-950/50 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                      <div class="w-10 h-10 bg-white dark:bg-gray-900 rounded-[0.5rem] shadow-sm flex items-center justify-center shrink-0 border border-gray-100 dark:border-gray-800 text-sky-600 dark:text-sky-400">
+                        <Wand2 class="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 class="text-xs font-black text-gray-900 dark:text-gray-100 uppercase tracking-widest">Assistente de Configuração Inicial</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 font-bold mt-0.5">Refaça o passo a passo de empresa, endereço, contatos, marca e integrações.</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 text-[10px] font-black uppercase tracking-widest rounded-[0.5rem] border border-gray-200 dark:border-gray-700 hover:border-sky-400 hover:text-sky-600 transition-all"
+                      @click="openSetupWizard"
+                    >
+                      Refazer configuração inicial
+                    </button>
                   </div>
 
                   <!-- Card 1: Google Calendar -->
@@ -318,13 +374,30 @@ function selectSection(id: string) {
                           <p class="text-xs text-gray-500 dark:text-gray-400 font-bold mt-0.5">Agendamento automático de execuções de orçamentos.</p>
                         </div>
                       </div>
-                      <div class="shrink-0">
-                        <span v-if="localProfile.googleIntegration?.email" class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-green-200/50 dark:border-green-900/50">
-                          <CheckCircle2 class="w-3 h-3 text-green-600 dark:text-green-400" /> Ativo: {{ localProfile.googleIntegration.email }}
+                      <div class="shrink-0 flex items-center gap-2">
+                        <span v-if="hasGoogleScope(GOOGLE_CALENDAR_SCOPE)" class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-green-200/50 dark:border-green-900/50">
+                          <CheckCircle2 class="w-3 h-3 text-green-600 dark:text-green-400" /> Ativo
                         </span>
-                        <span v-else class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-amber-200/50 dark:border-amber-900/50">
-                          Ativado no Login com Google
-                        </span>
+                        <BaseButton
+                          v-if="!hasGoogleScope(GOOGLE_CALENDAR_SCOPE)"
+                          variant="outline"
+                          size="sm"
+                          class="text-[10px]"
+                          :loading="isConnecting"
+                          @click="handleConnect('calendar')"
+                        >
+                          Conectar com Google
+                        </BaseButton>
+                        <BaseButton
+                          v-else
+                          variant="ghost"
+                          size="sm"
+                          class="text-[10px] text-red-400 hover:text-red-600"
+                          :loading="isDisconnecting"
+                          @click="disconnectGoogle"
+                        >
+                          Desconectar
+                        </BaseButton>
                       </div>
                     </div>
 
@@ -358,13 +431,30 @@ function selectSection(id: string) {
                           <p class="text-xs text-gray-500 dark:text-gray-400 font-bold mt-0.5">Arquivamento automático dos PDFs dos seus orçamentos.</p>
                         </div>
                       </div>
-                      <div class="shrink-0">
-                        <span v-if="localProfile.googleIntegration?.email" class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-green-200/50 dark:border-green-900/50">
-                          <CheckCircle2 class="w-3 h-3 text-green-600 dark:text-green-400" /> Ativo: {{ localProfile.googleIntegration.email }}
+                      <div class="shrink-0 flex items-center gap-2">
+                        <span v-if="hasGoogleScope(GOOGLE_DRIVE_SCOPE)" class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-green-200/50 dark:border-green-900/50">
+                          <CheckCircle2 class="w-3 h-3 text-green-600 dark:text-green-400" /> Ativo
                         </span>
-                        <span v-else class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-amber-200/50 dark:border-amber-900/50">
-                          Ativado no Login com Google
-                        </span>
+                        <BaseButton
+                          v-if="!hasGoogleScope(GOOGLE_DRIVE_SCOPE)"
+                          variant="outline"
+                          size="sm"
+                          class="text-[10px]"
+                          :loading="isConnecting"
+                          @click="handleConnect('drive')"
+                        >
+                          Conectar com Google
+                        </BaseButton>
+                        <BaseButton
+                          v-else
+                          variant="ghost"
+                          size="sm"
+                          class="text-[10px] text-red-400 hover:text-red-600"
+                          :loading="isDisconnecting"
+                          @click="disconnectGoogle"
+                        >
+                          Desconectar
+                        </BaseButton>
                       </div>
                     </div>
 

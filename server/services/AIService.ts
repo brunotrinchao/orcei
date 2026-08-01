@@ -5,9 +5,37 @@ export const AIService = {
     return useRuntimeConfig()
   },
 
+  /**
+   * Chaveamento por variável de ambiente USE_DEEPSEEK: quando ativa, TODA
+   * chamada de IA vai pra DeepSeek e não cai de volta pro Gemini/Cloudflare/
+   * OpenRouter em caso de falha — decisão deliberada (ligar a flag é uma
+   * escolha explícita de operação, não deve mascarar erro de config caindo
+   * silenciosamente noutro provedor). Retorna null quando a flag está
+   * desligada, sinalizando pro chamador seguir o fluxo normal.
+   */
+  async _tryDeepSeek(prompt: string, maxTokens: number = 8192): Promise<string | null> {
+    const config = this._getConfig()
+    if (!config.useDeepseek) return null
+
+    if (!config.deepseekApiKey) {
+      console.error('[AIService] USE_DEEPSEEK=true mas DEEPSEEK_API_KEY não configurada.')
+      throw createError({ statusCode: 500, statusMessage: 'DeepSeek habilitado mas chave de API não configurada.' })
+    }
+
+    try {
+      return await this.generateWithDeepSeek(prompt, maxTokens)
+    } catch (e) {
+      console.error('[AIService] Falha na chamada à API DeepSeek:', e)
+      throw createError({ statusCode: 502, statusMessage: 'Falha ao gerar conteúdo via DeepSeek.' })
+    }
+  },
+
   async generateDescription(prompt: string, maxTokens: number = 8192) {
     const config = this._getConfig()
-    
+
+    const deepseek = await this._tryDeepSeek(prompt, maxTokens)
+    if (deepseek !== null) return deepseek
+
     try {
       // 1. Tentar Gemini
       if (config.geminiApiKey) {
@@ -73,6 +101,15 @@ export const AIService = {
       }
     `
 
+    const deepseek = await this._tryDeepSeek(prompt)
+    if (deepseek !== null) {
+      let cleanJson = deepseek.trim()
+      cleanJson = cleanJson.replace(/```json/g, '').replace(/```/g, '').trim()
+      const jsonStart = cleanJson.indexOf('{')
+      const jsonEnd = cleanJson.lastIndexOf('}')
+      return jsonStart !== -1 && jsonEnd !== -1 ? cleanJson.substring(jsonStart, jsonEnd + 1) : cleanJson
+    }
+
     try {
       if (config.geminiApiKey) {
         const genAI = new GoogleGenerativeAI(config.geminiApiKey)
@@ -108,7 +145,24 @@ export const AIService = {
 
   async suggestProposalItems(prompt: string, catalog: any[]) {
     const config = this._getConfig()
-    
+
+    const deepseek = await this._tryDeepSeek(this.getPrompt(prompt, catalog))
+    if (deepseek !== null) {
+      try {
+        let cleanJson = deepseek.trim()
+        cleanJson = cleanJson.replace(/```json/g, '').replace(/```/g, '').trim()
+        const jsonStart = cleanJson.indexOf('{')
+        const jsonEnd = cleanJson.lastIndexOf('}')
+        if (jsonStart !== -1 && jsonEnd !== -1) {
+          return cleanJson.substring(jsonStart, jsonEnd + 1).replace(/[\n\r\t]/g, ' ')
+        }
+        return cleanJson
+      } catch (e) {
+        console.error('[AIService] Failed to clean DeepSeek JSON:', e)
+        return deepseek
+      }
+    }
+
     try {
       if (config.geminiApiKey) {
         const genAI = new GoogleGenerativeAI(config.geminiApiKey)
@@ -240,6 +294,37 @@ export const AIService = {
       console.error('OpenRouter error:', e)
       throw e
     }
+  },
+
+  async generateWithDeepSeek(prompt: string, maxTokens: number = 8192) {
+    const config = this._getConfig()
+    const apiKey = config.deepseekApiKey
+    const model = config.deepseekModel || 'deepseek-chat'
+
+    if (!apiKey) {
+      throw new Error('DeepSeek credentials not configured')
+    }
+
+    const response = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: 'system', content: 'Você é um redator profissional de orçamentos comerciais.' },
+          { role: 'user', content: prompt }
+        ],
+        max_tokens: maxTokens
+      })
+    })
+
+    const result: any = await response.json()
+    const output = result.choices?.[0]?.message?.content
+    if (!output) throw new Error(`DeepSeek API failed: ${JSON.stringify(result.error || result)}`)
+    return output
   },
 
   async generateFallback(prompt: string, maxTokens: number = 8192) {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
 import { Search, Plus, Pencil, Trash2, RefreshCcw, MapPin, Mail, Phone, ExternalLink, MoreVertical } from 'lucide-vue-next'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
@@ -28,6 +28,8 @@ useIntersectionObserver(mobileSentinelRef, ([entry]) => {
 }, { threshold: 0.1 })
 
 const showForm = ref(false)
+const { validate, reset: resetValidation } = useFormValidation()
+watch(showForm, (open) => { if (!open) resetValidation() })
 const selectedClient = ref<ClientDTO | null>(null)
 
 const form = ref({
@@ -113,6 +115,7 @@ async function searchZip() {
 }
 
 async function saveClient() {
+  if (!validate()) return
   isSubmitting.value = true
   try {
     const method = selectedClient.value ? 'PUT' : 'POST'
@@ -216,19 +219,17 @@ const formatPhone = (phone: string) => {
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <BaseInput 
-            v-model="form.email" 
-            type="email" 
-            label="E-mail" 
-            placeholder="cliente@email.com" 
-            required 
+            v-model="form.email"
+            type="email"
+            label="E-mail"
+            placeholder="cliente@email.com"
           />
           <div class="space-y-3">
-            <BaseInput 
-              v-model="form.phone" 
-              label="Telefone / Celular" 
-              placeholder="(00) 00000-0000" 
+            <BaseInput
+              v-model="form.phone"
+              label="Telefone / Celular (informe e-mail ou telefone)"
+              placeholder="(00) 00000-0000"
               mask="phone"
-              required 
             />
             <div class="flex items-center gap-3 ml-2">
               <BaseCheckbox v-model="form.isWhatsapp" id="isWhatsapp" />
@@ -250,19 +251,17 @@ const formatPhone = (phone: string) => {
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <BaseInput 
-              v-model="form.address.zip" 
-              label="CEP" 
-              placeholder="00000-000" 
+              v-model="form.address.zip"
+              label="CEP (opcional)"
+              placeholder="00000-000"
               mask="cep"
               @update:model-value="searchZip"
-              required
             />
             <div class="md:col-span-2">
-              <BaseInput 
-                v-model="form.address.street" 
-                label="Logradouro" 
-                placeholder="Rua, Avenida..." 
-                required 
+              <BaseInput
+                v-model="form.address.street"
+                label="Logradouro"
+                placeholder="Rua, Avenida..."
               />
             </div>
           </div>
@@ -275,26 +274,23 @@ const formatPhone = (phone: string) => {
             />
             <div class="md:col-span-2">
               <BaseInput 
-                v-model="form.address.neighborhood" 
-                label="Bairro" 
-                placeholder="Ex: Centro" 
-                required 
+                v-model="form.address.neighborhood"
+                label="Bairro"
+                placeholder="Ex: Centro"
               />
             </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <BaseInput 
-              v-model="form.address.city" 
-              label="Cidade" 
-              placeholder="Ex: São Paulo" 
-              required 
+              v-model="form.address.city"
+              label="Cidade"
+              placeholder="Ex: São Paulo"
             />
-            <BaseInput 
-              v-model="form.address.state" 
-              label="Estado" 
-              placeholder="Ex: SP" 
-              required 
+            <BaseInput
+              v-model="form.address.state"
+              label="Estado"
+              placeholder="Ex: SP"
             />
           </div>
         </div>

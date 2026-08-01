@@ -308,7 +308,7 @@ const statusMap: any = {
   created: { label: 'Criado', color: 'bg-blue-50 text-blue-700' },
   sent: { label: 'Enviado', color: 'bg-blue-100 text-blue-800' },
   delivered: { label: 'Entregue', color: 'bg-green-100 text-green-800' },
-  opened: { label: 'Aberto', color: 'bg-purple-100 text-purple-800' },
+  opened: { label: 'Aberto', color: 'bg-sky-100 text-sky-800' },
   clicked: { label: 'Clicado', color: 'bg-orange-100 text-orange-800' },
   pending: { label: 'Pendente', color: 'bg-yellow-100 text-yellow-800' },
   accepted: { label: 'Aceito', color: 'bg-green-600 text-white' },
@@ -509,6 +509,7 @@ async function saveContract() {
           <td class="px-8 py-6">
             <div class="flex flex-col">
               <span class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">{{ proposal.client.name }}</span>
+              <span v-if="proposal.client.email" class="text-[10px] text-gray-400 dark:text-gray-500 font-medium normal-case mt-0.5">{{ proposal.client.email }}</span>
             </div>
           </td>
           <td class="px-8 py-6 text-sm text-gray-500 font-medium">
@@ -935,11 +936,11 @@ async function saveContract() {
               type="button"
               @click="copyContractTag(v.tag)"
               :title="v.desc"
-              class="group flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-900 border border-slate-200 dark:border-slate-800 hover:border-violet-300 dark:hover:border-violet-700 hover:bg-violet-50 dark:hover:bg-violet-950/30 rounded-lg transition-all"
+              class="group flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-900 border border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg transition-all"
             >
-              <span class="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300 group-hover:text-violet-700 dark:group-hover:text-violet-400">{{ v.tag }}</span>
+              <span class="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300 group-hover:text-blue-700 dark:group-hover:text-blue-400">{{ v.tag }}</span>
               <Check v-if="copiedContractTag === v.tag" class="w-3 h-3 text-emerald-500" />
-              <Copy v-else class="w-3 h-3 text-slate-300 dark:text-slate-600 group-hover:text-violet-400" />
+              <Copy v-else class="w-3 h-3 text-slate-300 dark:text-slate-600 group-hover:text-blue-400" />
             </button>
           </div>
         </div>

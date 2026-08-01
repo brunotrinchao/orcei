@@ -66,6 +66,23 @@ export const ProfileService = {
         }
       }
 
+      // Notifica admins sobre o novo cadastro (não bloqueia o fluxo de criação de perfil)
+      const { NotificationService } = await import('./NotificationService')
+      const notifyPromise = NotificationService.notifyAdmins({
+        type: 'admin_new_signup',
+        title: 'Novo Cadastro',
+        summary: `${profile.name || 'Novo usuário'} acabou de se cadastrar na plataforma.`,
+        details: {
+          userName: profile.name,
+          userEmail: profile.email,
+          userAvatar: profile.avatar
+        },
+        metadata: { profileId: profile._id.toString() }
+      }).catch(err => console.error('Failed to notify admins of new signup:', err))
+      if (event) {
+        event.waitUntil(notifyPromise)
+      }
+
       return profile
     } catch (dbErr: any) {
       // Rollback Stripe customer if DB fails

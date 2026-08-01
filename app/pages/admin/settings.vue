@@ -192,8 +192,8 @@ const activeTab = ref<'system' | 'landing' | 'credits'>('system')
         <div v-if="activeTab === 'landing'" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/40 flex items-center justify-center">
-                <Globe class="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center">
+                <Globe class="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </div>
               <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Hero Section (Início)</h2>
             </div>

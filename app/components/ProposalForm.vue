@@ -20,6 +20,12 @@ const emit = defineEmits(['submit'])
 
 const currentStep = ref(1)
 
+// Refs dos passos que têm validação própria (useFormValidation, mesmo
+// composable/UX do Setup Wizard) — delegamos a validação do passo pra eles
+// em vez de checar manualmente aqui.
+const stepClientRef = ref<{ validate: () => boolean } | null>(null)
+const stepScopeRef = ref<{ validate: () => boolean } | null>(null)
+
 const steps = [
   { step: 1, title: 'Cliente' },
   { step: 2, title: 'Serviços' },
@@ -179,45 +185,12 @@ const finalTotal = computed(() => {
   return baseTotal
 })
 
+// Validação por passo delegada ao próprio componente do passo (mesmo
+// composable useFormValidation do Setup Wizard): cada um mostra seus erros
+// inline (borda vermelha + texto abaixo do campo), sem alerta genérico.
 function validateStep(step: number): boolean {
-  if (step === 1) {
-    if (!form.value.client.name.trim()) {
-      notify('Aviso', 'Nome do cliente é obrigatório')
-      return false
-    }
-    if (!form.value.client.email.trim()) {
-      notify('Aviso', 'E-mail do cliente é obrigatório')
-      return false
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(form.value.client.email)) {
-      notify('Aviso', 'E-mail informado é inválido')
-      return false
-    }
-  }
-
-  if (step === 2) {
-    if (form.value.items.length === 0) {
-      notify('Aviso', 'Adicione pelo menos um item obrigatório ao escopo')
-      return false
-    }
-    const allItems = [...form.value.items, ...form.value.upsellItems]
-    for (const item of allItems) {
-      if (!item.name.trim()) {
-        notify('Aviso', 'Todos os itens precisam de um nome')
-        return false
-      }
-      if (item.price < 0) {
-        notify('Aviso', 'O preço não pode ser negativo')
-        return false
-      }
-      if (item.quantity <= 0) {
-        notify('Aviso', 'A quantidade deve ser maior que zero')
-        return false
-      }
-    }
-  }
-
+  if (step === 1) return stepClientRef.value?.validate() ?? true
+  if (step === 2) return stepScopeRef.value?.validate() ?? true
   return true
 }
 
@@ -302,7 +275,8 @@ defineExpose({
     <!-- Content Area -->
     <form @submit.prevent="submit" class="pb-6">
       <div class="min-h-[40vh]">
-        <ProposalStepClient 
+        <ProposalStepClient
+          ref="stepClientRef"
           v-show="currentStep === 1"
           :form="form"
           :clients="clients"
@@ -311,7 +285,8 @@ defineExpose({
           v-model:clientSearch="clientSearch"
         />
 
-        <ProposalStepScope 
+        <ProposalStepScope
+          ref="stepScopeRef"
           v-show="currentStep === 2"
           :form="form"
           :catalog-items="catalogItems"

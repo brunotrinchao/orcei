@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 export interface INotificationItem {
   _id: string
   profileId: string
-  type: 'proposal_accepted' | 'proposal_rejected' | 'proposal_sent' | 'report_generated'
+  type: 'proposal_accepted' | 'proposal_rejected' | 'proposal_sent' | 'report_generated' | 'google_sync_failed' | 'admin_new_signup' | 'admin_credit_purchase'
   title: string
   summary: string
   details?: Record<string, any>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Component } from 'vue'
 
 interface Props {
@@ -8,17 +9,23 @@ interface Props {
   subtitle?: string
   icon?: Component
   iconBgClass?: string
-  iconColorClass?: string
+  iconColorClass?: string,
+  noBorder?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   id: undefined,
   dataTour: undefined,
   title: undefined,
   subtitle: undefined,
   icon: undefined,
   iconBgClass: 'bg-blue-50 dark:bg-blue-950/50',
-  iconColorClass: 'text-blue-600 dark:text-blue-400'
+  iconColorClass: 'text-blue-600 dark:text-blue-400',
+  noBorder: false
+})
+
+const borderClass = computed(() => {
+  return props.noBorder ? '' : 'p-6 md:p-8 border border-gray-200 dark:border-gray-800'
 })
 </script>
 
@@ -26,7 +33,8 @@ withDefaults(defineProps<Props>(), {
   <section
     :id="id"
     :data-tour="dataTour"
-    class="bg-white dark:bg-gray-900 p-6 md:p-8 rounded-[0.5rem] border border-gray-200 dark:border-gray-800 shadow-sm scroll-mt-8 transition-colors"
+    class="bg-white dark:bg-gray-900 rounded-[0.5rem] shadow-sm scroll-mt-8 transition-colors"
+    :class="borderClass"
   >
     <!-- Header da Seção -->
     <div v-if="title || icon || $slots.icon || $slots['header-actions']" class="flex items-center justify-between gap-4 mb-6">

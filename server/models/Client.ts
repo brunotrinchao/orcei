@@ -4,17 +4,23 @@ const clientSchema = new Schema({
   profileId: { type: Schema.Types.ObjectId, ref: 'Profile', required: true },
   name: { type: String, required: true },
   taxId: String,
-  email: { type: String, required: true },
-  phone: { type: String, required: true },
+  // E-mail e telefone: pelo menos um dos dois é exigido na validação da API
+  // (server/utils/validate.ts::validateClient) — não obrigatórios individualmente
+  // no schema pra permitir cadastro rápido só com um dos contatos.
+  email: String,
+  phone: String,
   isWhatsapp: { type: Boolean, default: false },
   avatar: String,
+  // Endereço completo é opcional no cadastro inicial (lead rápido) — pode ser
+  // completado depois em Clientes. Ver validateClient: se algum campo do
+  // endereço for preenchido, todos passam a ser exigidos (evita meio-registro).
   address: {
-    street: { type: String, required: true },
+    street: String,
     number: String,
-    neighborhood: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    zip: { type: String, required: true }
+    neighborhood: String,
+    city: String,
+    state: String,
+    zip: String
   },
   notes: String,
   // Data-limite de retenção deste registro (CPF/CNPJ/endereço), se aplicável.

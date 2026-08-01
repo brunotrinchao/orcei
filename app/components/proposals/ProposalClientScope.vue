@@ -74,7 +74,7 @@ function toggleUpsell(itemId: string) {
 
     <!-- Upsell Items list (Serviços adicionais sugeridos) -->
     <div v-if="upsellItems && upsellItems.length > 0" class="bg-blue-50/10 border-t border-b border-blue-50/30">
-      <div class="px-8 py-5 bg-gradient-to-r from-blue-50/40 via-indigo-50/10 to-transparent flex items-center justify-between border-b border-blue-50/20">
+      <div class="px-8 py-5 bg-blue-50/40 flex items-center justify-between border-b border-blue-50/20">
         <h3 class="text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
           <span class="inline-block w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
           Serviços Opcionais (Sugestão de Upsell)

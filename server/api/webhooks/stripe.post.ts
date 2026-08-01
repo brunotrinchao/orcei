@@ -1,6 +1,7 @@
 import { Profile } from '../../models/Profile'
 import { StripeEvent } from '../../models/StripeEvent'
 import { QueueService } from '../../services/QueueService'
+import { NotificationService } from '../../services/NotificationService'
 
 export default defineEventHandler(async (event) => {
   setResponseStatus(event, 200)
@@ -170,6 +171,20 @@ export default defineEventHandler(async (event) => {
             creditsAdded: creditsToAdd,
             newBalance: updated.creditsBalance,
             amountPaid: amount
+          }))
+
+          await runNonBlocking(NotificationService.notifyAdmins({
+            type: 'admin_credit_purchase',
+            title: 'Compra de Créditos',
+            summary: `${updated.name || 'Um usuário'} comprou ${creditsToAdd} crédito${creditsToAdd === 1 ? '' : 's'}.`,
+            details: {
+              userName: updated.name,
+              userEmail: updated.email,
+              userAvatar: (updated as any).avatar,
+              creditsAdded: creditsToAdd,
+              newBalance: updated.creditsBalance
+            },
+            metadata: { profileId: updated._id.toString() }
           }))
         }
       }

@@ -5,6 +5,14 @@ import { loadTourSteps } from './registry'
 
 export function useOnboarding() {
   const isTourActive = useState('onboarding-active', () => false)
+  // Estado compartilhado do Setup Wizard: permite abri-lo tanto pelo fluxo
+  // automático (OnboardingController) quanto manualmente (ex: botão "Refazer
+  // configuração inicial" em Configurações), sem duplicar o componente.
+  const isSetupWizardOpen = useState('setup-wizard-open', () => false)
+
+  function openSetupWizard() {
+    isSetupWizardOpen.value = true
+  }
 
   async function completeTour(tourId: TourId) {
     const { data: profile } = useNuxtData<ProfileDTO>('profile')
@@ -57,5 +65,5 @@ export function useOnboarding() {
     } catch {}
   }
 
-  return { startTour, completeTour, autoStartForRoute, hasTourForRoute, markWelcomeSeen, isTourActive }
+  return { startTour, completeTour, autoStartForRoute, hasTourForRoute, markWelcomeSeen, isTourActive, isSetupWizardOpen, openSetupWizard }
 }

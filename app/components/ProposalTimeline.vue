@@ -77,7 +77,7 @@ const getActionColor = (action: string) => {
     'created': 'text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800',
     'sent': 'text-blue-500 dark:text-blue-400 bg-blue-100 dark:bg-blue-950/60',
     'delivered': 'text-green-500 dark:text-green-400 bg-green-100 dark:bg-green-950/60',
-    'opened': 'text-purple-500 dark:text-purple-400 bg-purple-100 dark:bg-purple-950/60',
+    'opened': 'text-sky-500 dark:text-sky-400 bg-sky-100 dark:bg-sky-950/60',
     'clicked': 'text-orange-500 dark:text-orange-400 bg-orange-100 dark:bg-orange-950/60',
     'viewed': 'text-indigo-500 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-950/60',
     'accepted': 'text-emerald-500 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60',

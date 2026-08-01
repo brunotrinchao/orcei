@@ -15,6 +15,8 @@ import {
   SelectScrollDownButton
 } from 'radix-vue'
 import { ChevronDown, ChevronUp, Check } from 'lucide-vue-next'
+import { computed, ref } from 'vue'
+import { useFieldValidation } from '~/composables/useFormValidation'
 
 interface Option {
   label: string
@@ -33,6 +35,17 @@ const props = defineProps<{
 
 const modelValue = defineModel<string>()
 const id = useId()
+
+// SelectTrigger é um botão Radix real por baixo — dá pra focar via $el.
+const triggerRef = ref<InstanceType<typeof SelectTrigger> | null>(null)
+
+const isEmpty = () => !!props.required && !modelValue.value
+const { submitAttempted } = useFieldValidation({
+  isEmpty,
+  focus: () => (triggerRef.value as any)?.$el?.focus?.()
+})
+const showRequiredError = computed(() => submitAttempted.value && isEmpty())
+const displayError = computed(() => props.error || (showRequiredError.value ? 'Campo obrigatório' : ''))
 </script>
 
 <template>
@@ -40,7 +53,7 @@ const id = useId()
     <label v-if="label" :id="`label-${id}`" class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">
       {{ label }} <span v-if="required" class="text-red-500">*</span>
     </label>
-    
+
     <div class="relative flex items-center w-full">
       <!-- Ícone na esquerda se fornecido -->
       <div v-if="icon || $slots.icon" class="absolute left-4 z-10 flex items-center gap-1.5 text-gray-400 dark:text-gray-500 pointer-events-none">
@@ -51,11 +64,12 @@ const id = useId()
 
       <SelectRoot v-model="modelValue" :disabled="disabled">
         <SelectTrigger
+          ref="triggerRef"
           :aria-labelledby="label ? `label-${id}` : undefined"
           :class="[
             'inline-flex items-center justify-between w-full h-[56px] bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 rounded-[0.5rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-50 group disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:cursor-not-allowed shadow-sm',
             icon || $slots.icon ? 'pl-12 pr-5' : 'px-5',
-            error ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500/20' : ''
+            displayError ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500/20' : ''
           ]"
         >
           <SelectValue :placeholder="placeholder || 'Selecione...'" />
@@ -104,8 +118,8 @@ const id = useId()
       </SelectRoot>
     </div>
 
-    <span v-if="error" class="text-[10px] font-bold text-red-500 ml-1 uppercase">
-      {{ error }}
+    <span class="block min-h-[14px] text-[10px] font-bold text-red-500 ml-1 uppercase leading-[14px]">
+      {{ displayError }}
     </span>
   </div>
 </template>

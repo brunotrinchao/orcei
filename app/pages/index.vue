@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import LandingHero from '~/components/landing/LandingHero.vue'
 import LandingStats from '~/components/landing/LandingStats.vue'
+import LandingPainPoints from '~/components/landing/LandingPainPoints.vue'
 import AIBeforeAfter from '~/components/landing/AIBeforeAfter.vue'
 import LandingFeatures from '~/components/landing/LandingFeatures.vue'
 import LandingHowItWorks from '~/components/landing/LandingHowItWorks.vue'
+import LandingTestimonials from '~/components/landing/LandingTestimonials.vue'
 import LandingFAQ from '~/components/landing/LandingFAQ.vue'
 import LandingCTA from '~/components/landing/LandingCTA.vue'
 
@@ -258,22 +260,28 @@ useHead({
     <!-- 2. Barra de Estatísticas & Prova Social -->
     <LandingStats />
 
-    <!-- 3. Componente Mágico Interativo de Antes e Depois -->
+    <!-- 3. Dor do freelancer antes da solução -->
+    <LandingPainPoints />
+
+    <!-- 4. Componente Mágico Interativo de Antes e Depois -->
     <AIBeforeAfter />
 
-    <!-- 4. Grade de Benefícios & Features (Tree-Shaking) -->
+    <!-- 5. Grade de Benefícios & Features (Tree-Shaking) -->
     <LandingFeatures :features="landing.features" />
 
-    <!-- 5. Fluxo de 3 Etapas (Como Funciona) -->
+    <!-- 6. Fluxo de 3 Etapas (Como Funciona) -->
     <LandingHowItWorks />
 
-    <!-- 6. Planos e Preços -->
+    <!-- 7. Planos e Preços -->
     <LandingPricing />
 
-    <!-- 7. FAQ com Respostas de objeções WAI-ARIA -->
+    <!-- 8. Depoimentos / Prova Social Qualitativa -->
+    <LandingTestimonials />
+
+    <!-- 9. FAQ com Respostas de objeções WAI-ARIA -->
     <LandingFAQ />
 
-    <!-- 7. CTA Final de alta conversão -->
+    <!-- 10. CTA Final de alta conversão -->
     <LandingCTA :app-name="landing.appName" />
   </main>
 </template>

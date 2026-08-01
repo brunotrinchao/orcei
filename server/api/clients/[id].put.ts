@@ -18,5 +18,9 @@ export default defineEventHandler(async (event) => {
   const body = await bodyPromise
   throwIfInvalid(validateClient(body))
 
+  if (body.email?.trim() && await ClientService.emailExists(profile._id as any, body.email, id)) {
+    throwIfInvalid([{ field: 'email', message: 'Já existe um cliente cadastrado com este e-mail.' }])
+  }
+
   return await ClientService.update(id, profile._id as any, body)
 })

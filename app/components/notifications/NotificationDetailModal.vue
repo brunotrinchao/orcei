@@ -1,16 +1,20 @@
 <script setup lang="ts">
-import { 
-  CheckCircle2, 
-  XCircle, 
-  Send, 
-  Sparkles, 
-  ExternalLink, 
-  FileText, 
+import {
+  CheckCircle2,
+  XCircle,
+  Send,
+  Sparkles,
+  ExternalLink,
+  FileText,
   Download,
   Calendar,
   User,
   DollarSign,
-  Mail
+  Mail,
+  AlertTriangle,
+  Settings,
+  UserPlus,
+  Coins
 } from 'lucide-vue-next'
 import BaseDialog from '~/components/ui/BaseDialog.vue'
 import BaseButton from '~/components/ui/BaseButton.vue'
@@ -57,6 +61,16 @@ function goToReports() {
   router.push('/relatorios')
 }
 
+function goToIntegrations() {
+  emit('update:open', false)
+  router.push('/configuracoes')
+}
+
+function goToUser() {
+  emit('update:open', false)
+  router.push('/admin/users')
+}
+
 function downloadPdf(reportId?: string) {
   if (reportId) {
     window.open(`/api/reports/${reportId}/pdf`, '_blank')
@@ -75,15 +89,27 @@ function downloadPdf(reportId?: string) {
       
       <!-- Cabeçalho com badge por tipo de notificação -->
       <div class="flex items-center gap-3 p-4 rounded-2xl border" :class="{
-        'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/40 text-emerald-800 dark:text-emerald-300': notification.type === 'proposal_accepted',
+        'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/40 text-emerald-800 dark:text-emerald-300': notification.type === 'proposal_accepted' || notification.type === 'admin_credit_purchase',
         'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900/40 text-rose-800 dark:text-rose-300': notification.type === 'proposal_rejected',
         'bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-900/40 text-blue-800 dark:text-blue-300': notification.type === 'proposal_sent',
-        'bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-900/40 text-indigo-800 dark:text-indigo-300': notification.type === 'report_generated'
+        'bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-900/40 text-indigo-800 dark:text-indigo-300': notification.type === 'report_generated',
+        'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/40 text-amber-800 dark:text-amber-300': notification.type === 'google_sync_failed',
+        'bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-900/40 text-orange-800 dark:text-orange-300': notification.type === 'admin_new_signup'
       }">
-        <CheckCircle2 v-if="notification.type === 'proposal_accepted'" class="w-7 h-7 text-emerald-600 dark:text-emerald-400 shrink-0" />
+        <img
+          v-if="notification.details?.userAvatar && (notification.type === 'admin_new_signup' || notification.type === 'admin_credit_purchase')"
+          :src="notification.details.userAvatar"
+          class="w-9 h-9 rounded-xl object-cover shrink-0 ring-2"
+          :class="notification.type === 'admin_new_signup' ? 'ring-orange-400' : 'ring-emerald-400'"
+          alt=""
+        />
+        <CheckCircle2 v-else-if="notification.type === 'proposal_accepted'" class="w-7 h-7 text-emerald-600 dark:text-emerald-400 shrink-0" />
         <XCircle v-else-if="notification.type === 'proposal_rejected'" class="w-7 h-7 text-rose-600 dark:text-rose-400 shrink-0" />
         <Send v-else-if="notification.type === 'proposal_sent'" class="w-7 h-7 text-blue-600 dark:text-blue-400 shrink-0" />
         <Sparkles v-else-if="notification.type === 'report_generated'" class="w-7 h-7 text-indigo-600 dark:text-indigo-400 shrink-0" />
+        <AlertTriangle v-else-if="notification.type === 'google_sync_failed'" class="w-7 h-7 text-amber-600 dark:text-amber-400 shrink-0" />
+        <UserPlus v-else-if="notification.type === 'admin_new_signup'" class="w-7 h-7 text-orange-600 dark:text-orange-400 shrink-0" />
+        <Coins v-else-if="notification.type === 'admin_credit_purchase'" class="w-7 h-7 text-emerald-600 dark:text-emerald-400 shrink-0" />
 
         <div>
           <h3 class="text-base font-black uppercase tracking-wider">{{ notification.title }}</h3>
@@ -164,6 +190,65 @@ function downloadPdf(reportId?: string) {
         </div>
       </div>
 
+      <div v-else-if="notification.type === 'google_sync_failed'" class="space-y-4">
+        <p class="text-sm font-bold text-gray-700 dark:text-gray-200 leading-relaxed">
+          {{ notification.summary }}
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800 text-xs font-bold">
+          <div class="space-y-1">
+            <span class="text-gray-400 uppercase">Código da Proposta</span>
+            <p class="text-gray-900 dark:text-white font-black text-sm">#{{ notification.details?.code }}</p>
+          </div>
+          <div class="space-y-1">
+            <span class="text-gray-400 uppercase">Falhou</span>
+            <p class="text-gray-900 dark:text-white font-black text-sm capitalize">{{ notification.details?.stage === 'calendar' ? 'Agenda do Google' : 'Google Drive' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div v-else-if="notification.type === 'admin_new_signup'" class="space-y-4">
+        <p class="text-sm font-bold text-gray-700 dark:text-gray-200 leading-relaxed">
+          {{ notification.summary }}
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800 text-xs font-bold">
+          <div class="space-y-1">
+            <span class="text-gray-400 uppercase flex items-center gap-1"><User class="w-3 h-3" /> Nome</span>
+            <p class="text-gray-900 dark:text-white font-black text-sm">{{ notification.details?.userName || 'Não informado' }}</p>
+          </div>
+          <div class="space-y-1">
+            <span class="text-gray-400 uppercase flex items-center gap-1"><Mail class="w-3 h-3" /> E-mail</span>
+            <p class="text-gray-900 dark:text-white font-black text-sm">{{ notification.details?.userEmail || 'Não informado' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div v-else-if="notification.type === 'admin_credit_purchase'" class="space-y-4">
+        <p class="text-sm font-bold text-gray-700 dark:text-gray-200 leading-relaxed">
+          {{ notification.summary }}
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800 text-xs font-bold">
+          <div class="space-y-1">
+            <span class="text-gray-400 uppercase flex items-center gap-1"><User class="w-3 h-3" /> Nome</span>
+            <p class="text-gray-900 dark:text-white font-black text-sm">{{ notification.details?.userName || 'Não informado' }}</p>
+          </div>
+          <div class="space-y-1">
+            <span class="text-gray-400 uppercase flex items-center gap-1"><Mail class="w-3 h-3" /> E-mail</span>
+            <p class="text-gray-900 dark:text-white font-black text-sm">{{ notification.details?.userEmail || 'Não informado' }}</p>
+          </div>
+          <div class="space-y-1">
+            <span class="text-gray-400 uppercase flex items-center gap-1"><Coins class="w-3 h-3" /> Créditos Comprados</span>
+            <p class="text-emerald-600 dark:text-emerald-400 font-black text-base">{{ notification.details?.creditsAdded }}</p>
+          </div>
+          <div class="space-y-1">
+            <span class="text-gray-400 uppercase">Novo Saldo</span>
+            <p class="text-gray-900 dark:text-white font-black text-sm">{{ notification.details?.newBalance }}</p>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <template #footer>
@@ -179,13 +264,31 @@ function downloadPdf(reportId?: string) {
           Ver Orçamentos
         </BaseButton>
 
-        <BaseButton 
-          v-else-if="notification?.type === 'report_generated'" 
-          variant="primary" 
+        <BaseButton
+          v-else-if="notification?.type === 'report_generated'"
+          variant="primary"
           @click="goToReports"
         >
           <Sparkles class="w-4 h-4 mr-2" />
           Meus Relatórios
+        </BaseButton>
+
+        <BaseButton
+          v-else-if="notification?.type === 'google_sync_failed'"
+          variant="primary"
+          @click="goToIntegrations"
+        >
+          <Settings class="w-4 h-4 mr-2" />
+          Ir para Integrações
+        </BaseButton>
+
+        <BaseButton
+          v-else-if="notification?.type === 'admin_new_signup' || notification?.type === 'admin_credit_purchase'"
+          variant="primary"
+          @click="goToUser"
+        >
+          <User class="w-4 h-4 mr-2" />
+          Ver Usuários
         </BaseButton>
       </div>
     </template>

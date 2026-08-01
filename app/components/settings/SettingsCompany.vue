@@ -21,7 +21,7 @@ const localCompany = computed({
 </script>
 
 <template>
-  <BaseSectionCard id="empresa" data-tour="config-empresa" title="Dados da Empresa" :icon="Briefcase" icon-bg-class="bg-purple-50 dark:bg-purple-950/50" icon-color-class="text-purple-600 dark:text-purple-400">
+  <BaseSectionCard id="empresa" data-tour="config-empresa" title="Dados da Empresa" :icon="Briefcase" icon-bg-class="bg-blue-50 dark:bg-blue-950/50" icon-color-class="text-blue-600 dark:text-blue-400">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <BaseInput v-model="localCompany.tradeName" label="Nome Fantasia" required />
       <BaseInput v-model="localCompany.taxId" label="CNPJ" mask="cnpj" required />

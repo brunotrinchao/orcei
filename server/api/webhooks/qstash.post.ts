@@ -7,7 +7,7 @@ import { CatalogItem } from '../../models/CatalogItem'
 import { Report } from '../../models/Report'
 import { AuditService } from '../../services/AuditService'
 import { ProposalService } from '../../services/ProposalService'
-import { GoogleService } from '../../services/GoogleService'
+import { GoogleService, GOOGLE_SCOPES, hasGoogleScope } from '../../services/GoogleService'
 import { NotificationService } from '../../services/NotificationService'
 import { ReportGeneratorService } from '../../services/ReportGeneratorService'
 import { generateProposalPdfBuffer } from '../../utils/pdf'
@@ -186,6 +186,25 @@ async function handleGenerateBackupCsv(payload: any) {
     console.error(`[Job][Abortado] E-mail de backup não enviado pois o upload falhou.`)
   }
 }
+async function notifyGoogleSyncFailure(profile: any, proposal: any, stage: 'drive' | 'calendar', error: any) {
+  console.error(`[Job] Falha na automação Google (${stage}) para ${proposal.code}:`, error?.message || error)
+  try {
+    const profileIdStr = typeof profile === 'object' ? profile._id.toString() : profile.toString()
+    await NotificationService.createNotification({
+      profileId: profileIdStr,
+      type: 'google_sync_failed',
+      title: stage === 'drive' ? 'Falha ao sincronizar com o Google Drive' : 'Falha ao criar evento na Agenda do Google',
+      summary: stage === 'drive'
+        ? `Não conseguimos salvar o PDF do orçamento #${proposal.code} no seu Google Drive. Verifique a conexão em Configurações.`
+        : `Não conseguimos criar o evento de execução do orçamento #${proposal.code} na sua Agenda do Google. Verifique a conexão em Configurações.`,
+      details: { proposalId: proposal._id.toString(), code: proposal.code, stage },
+      metadata: { proposalId: proposal._id.toString(), code: proposal.code, stage }
+    })
+  } catch (notifErr) {
+    console.error(`[Job] Erro ao criar notificação de falha de sincronização Google (${stage}):`, notifErr)
+  }
+}
+
 async function handleProposalAccepted(payload: any) {
   const { proposalId } = payload
 
@@ -196,43 +215,59 @@ async function handleProposalAccepted(payload: any) {
   if (!profile?.googleIntegration?.refreshToken) return
 
   console.log(`[Job] Iniciando automação Google para: ${proposal.code}`)
-  
+
   const auth = GoogleService.getAuthClient(profile)
 
-  // Garantir pasta raiz do app
-  const rootFolderId = await GoogleService.ensureFolder(auth, profile)
+  // Upload no Drive e criação do evento na Agenda são tratados de forma
+  // independente: falha em um (token revogado, escopo insuficiente, pasta
+  // deletada) não deve impedir o outro, e o usuário é avisado via notificação
+  // em vez de a automação simplesmente falhar em silêncio.
+  let driveFile: { id: string; webViewLink: string } | null = null
 
-  // Garantir sub-pasta "Propostas" dentro da raiz
-  const proposalsFolderId = await GoogleService.ensureProposalsFolder(auth, profile, rootFolderId!)
+  if (hasGoogleScope(profile, GOOGLE_SCOPES.DRIVE)) {
+    try {
+      // Garantir pasta raiz do app
+      const rootFolderId = await GoogleService.ensureFolder(auth, profile)
 
-  // Garantir sub-pasta do cliente dentro de "Propostas"
-  const clientFolderId = await GoogleService.ensureClientFolder(auth, proposalsFolderId, proposal.client.name)
+      // Garantir sub-pasta "Propostas" dentro da raiz
+      const proposalsFolderId = await GoogleService.ensureProposalsFolder(auth, profile, rootFolderId!)
 
-  const pdfBuffer = await generateProposalPdfBuffer(proposal, profile)
-  const fileName = `Proposta-${proposal.code}-${proposal.client.name}.pdf`
-  const driveFile = await GoogleService.uploadPdf(auth, clientFolderId, fileName, pdfBuffer)
+      // Garantir sub-pasta do cliente dentro de "Propostas"
+      const clientFolderId = await GoogleService.ensureClientFolder(auth, proposalsFolderId, proposal.client.name)
 
-  // Salvar referência do Drive na proposta para evitar regerar o PDF no download
-  await Proposal.findByIdAndUpdate(proposalId, {
-    driveFileId: driveFile.id,
-    driveWebViewLink: driveFile.webViewLink
-  })
+      const pdfBuffer = await generateProposalPdfBuffer(proposal, profile)
+      const fileName = `Proposta-${proposal.code}-${proposal.client.name}.pdf`
+      driveFile = await GoogleService.uploadPdf(auth, clientFolderId, fileName, pdfBuffer)
 
-  if (proposal.executionDate) {
-    await ProposalService.ensureApplicationCalendarEvent(proposal, profile)
-    await GoogleService.createEvent(auth, {
-      summary: `Execução: ${proposal.title} (${proposal.client.name})`,
-      location: profile.address?.city || '',
-      description: `Orçamento: ${proposal.code}\nCliente: ${proposal.client.name}\nValor: R$ ${proposal.totals.final.toLocaleString('pt-BR')}\n\nPDF: ${driveFile.webViewLink}`,
-      start: proposal.executionDate,
-      fileId: driveFile.id,
-      webViewLink: driveFile.webViewLink,
-      fileName
-    })
+      // Salvar referência do Drive na proposta para evitar regerar o PDF no download
+      await Proposal.findByIdAndUpdate(proposalId, {
+        driveFileId: driveFile.id,
+        driveWebViewLink: driveFile.webViewLink
+      })
+    } catch (driveErr) {
+      await notifyGoogleSyncFailure(profile, proposal, 'drive', driveErr)
+    }
   }
 
-  await ProposalService.logHistory(proposal._id, 'google_sync', 'system', { drive: true, calendar: !!proposal.executionDate })
-  
+  if (proposal.executionDate && hasGoogleScope(profile, GOOGLE_SCOPES.CALENDAR)) {
+    try {
+      await ProposalService.ensureApplicationCalendarEvent(proposal, profile)
+      await GoogleService.createEvent(auth, {
+        summary: `Execução: ${proposal.title} (${proposal.client.name})`,
+        location: profile.address?.city || '',
+        description: `Orçamento: ${proposal.code}\nCliente: ${proposal.client.name}\nValor: R$ ${proposal.totals.final.toLocaleString('pt-BR')}${driveFile ? `\n\nPDF: ${driveFile.webViewLink}` : ''}`,
+        start: proposal.executionDate,
+        fileId: driveFile?.id,
+        webViewLink: driveFile?.webViewLink,
+        fileName: driveFile ? `Proposta-${proposal.code}-${proposal.client.name}.pdf` : undefined
+      })
+    } catch (calendarErr) {
+      await notifyGoogleSyncFailure(profile, proposal, 'calendar', calendarErr)
+    }
+  }
+
+  await ProposalService.logHistory(proposal._id, 'google_sync', 'system', { drive: !!driveFile, calendar: !!proposal.executionDate })
+
   console.log(`[Job] Automação Google concluída para: ${proposal.code}`)
 }
 

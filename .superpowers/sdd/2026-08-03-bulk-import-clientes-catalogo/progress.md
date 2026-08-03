@@ -7,4 +7,5 @@ Not caused by this work; not in scope to fix.
 
 - [x] Task 1: BulkImportService — coerção e processamento de linhas (Cliente) [Commits: 1f4b839, 510dc1a]
 - [x] Task 2: BulkImportService.processCatalogRows + CatalogService.skuExists [Commits: 78d208e, 5323421, f406326]
+- [x] Task 3: Endpoints POST /api/clients/bulk e POST /api/catalog/bulk [Commit: 0761b54]
 

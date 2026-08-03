@@ -310,6 +310,12 @@
       "type": "file"
     },
     {
+      "path": "server/services/AIService.ts",
+      "accessCount": 6,
+      "lastAccessed": 1785770583552,
+      "type": "file"
+    },
+    {
       "path": "app/components/proposals/ProposalCard.vue",
       "accessCount": 5,
       "lastAccessed": 1785765264954,
@@ -319,12 +325,6 @@
       "path": "server/api/ai/catalog-suggest.post.ts",
       "accessCount": 5,
       "lastAccessed": 1785766770222,
-      "type": "file"
-    },
-    {
-      "path": "server/services/AIService.ts",
-      "accessCount": 4,
-      "lastAccessed": 1785765770954,
       "type": "file"
     },
     {
@@ -341,8 +341,8 @@
     },
     {
       "path": "server/api/ai/client-extract.post.ts",
-      "accessCount": 1,
-      "lastAccessed": 1785765743909,
+      "accessCount": 2,
+      "lastAccessed": 1785770503638,
       "type": "file"
     },
     {

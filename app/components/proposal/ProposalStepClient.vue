@@ -205,7 +205,7 @@ async function extractClient() {
           <BaseTextarea
             v-model="rawLeadText"
             :rows="4"
-            placeholder="Ex: Oi, sou o Bruno Trinchão. Preciso de uma proposta comercial. Meu e-mail é bruno@trinchao.dev e WhatsApp 11988887777..."
+            placeholder="Ex: Oi, sou o João Silva. Preciso de uma proposta comercial. Meu e-mail é [EMAIL_ADDRESS] e WhatsApp (11) 98888-7777..."
           />
           
           <div class="flex justify-end">

@@ -1,7 +1,7 @@
 {
   "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"/home/brunotrinchao/.claude/squeez/bin/squeez wrap 'npx vue-tsc --noEmit -p . 2>&1 | grep -i \\\"analyze.get\\\"'\",\"timeout\":120000,\"description\":\"Typecheck edited file for new errors\"}",
+  "tool_input_preview": "{\"command\":\"/home/brunotrinchao/.claude/squeez/bin/squeez wrap 'npx vue-tsc --noEmit -p . 2>&1 | grep -i \\\"AIService\\\"'\",\"timeout\":120000,\"description\":\"Typecheck edited AIService.ts for new errors\"}",
   "error": "Exit code 1",
-  "timestamp": "2026-08-03T14:59:04.387Z",
+  "timestamp": "2026-08-03T15:23:10.735Z",
   "retry_count": 1
 }

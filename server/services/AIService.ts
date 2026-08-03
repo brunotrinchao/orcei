@@ -195,32 +195,18 @@ export const AIService = {
   },
 
   async extractClientInfo(text: string, meta?: AiUsageMeta) {
-    const prompt = `
-      Você é um assistente comercial e especialista em extração de informações.
-      Analise o texto abaixo, que representa uma mensagem de cliente, e-mail ou transcrição de áudio, e extraia de forma estruturada as informações de contato.
+    const prompt = `Atue como assistente de extração de dados comerciais. Analise o texto abaixo (mensagem, e-mail ou transcrição) e retorne APENAS um JSON válido, sem markdown, começando com { e terminando com }.
 
-      Texto do Cliente:
-      "${text}"
+Texto: "${text}"
 
-      Extraia as seguintes informações em formato JSON:
-      - name: Nome do cliente (ou o nome da empresa se o nome pessoal não for encontrado, NUNCA deixe vazio)
-      - email: E-mail de contato do cliente (se encontrado)
-      - phone: Telefone/WhatsApp do cliente (se encontrado, formate com DDD + número, apenas números)
-      - segment: Segmento/Nicho de atuação da empresa (se mencionado)
-      - companySize: Porte da empresa (ex: Pequena, Média, Grande, se mencionado)
-
-      Responda EXCLUSIVAMENTE com o JSON abaixo.
-      Não inclua explicações, markdown ou blocos de código.
-      O primeiro caractere da resposta deve ser { e o último deve ser }.
-
-      {
-        "name": "<string>",
-        "email": "<string | null>",
-        "phone": "<string | null>",
-        "segment": "<string | null>",
-        "companySize": "<string | null>"
-      }
-    `
+Estrutura do JSON:
+{
+  "name": "nome da pessoa; se não houver, nome da empresa (obrigatório, nunca vazio)",
+  "email": "e-mail ou null",
+  "phone": "apenas números com DDD ou null",
+  "segment": "segmento/nicho de atuação ou null",
+  "companySize": "porte (ex: Pequena, Média, Grande) ou null"
+}`
 
     const raw = await this._generateWithFallback(prompt, {
       maxTokens: 8192,

@@ -47,6 +47,14 @@ const validityBarColor = computed(() =>
       ? 'bg-red-400'
       : 'bg-green-500'
 )
+
+function canShowChatButton(status: string) {
+  return !['draft', 'accepted', 'bounced'].includes(status)
+}
+
+function canShowWhatsappButton(status: string) {
+  return status !== 'draft'
+}
 </script>
 
 <template>
@@ -79,6 +87,7 @@ const validityBarColor = computed(() =>
     <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
       <div class="flex items-center gap-1">
         <button
+          v-if="canShowChatButton(proposal.status)"
           @click="$emit('open-chat')"
           class="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-xl transition-all relative"
           title="Chat e Interações"
@@ -93,7 +102,7 @@ const validityBarColor = computed(() =>
           </span>
         </button>
         <button
-          v-if="proposal.client.phone"
+          v-if="proposal.client.phone && canShowWhatsappButton(proposal.status)"
           @click="$emit('send-whatsapp')"
           class="p-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-xl transition-all"
           title="Enviar via WhatsApp"

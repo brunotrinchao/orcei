@@ -160,9 +160,26 @@ async function openHistory(proposal: ProposalDTO) {
   }
 }
 
+function canShowChatButton(status: string) {
+  return !['draft', 'accepted', 'bounced'].includes(status)
+}
+
+function canShowWhatsappButton(status: string) {
+  return status !== 'draft'
+}
+
 function sendWhatsapp(proposal: ProposalDTO) {
   if (!proposal.client.phone) return
-  
+
+  const phone = proposal.client.phone.replace(/\D/g, '')
+
+  // Aceito: sem mensagem inicial, só abre conversa caso o usuário queira falar com o cliente
+  if (proposal.status === 'accepted') {
+    window.open(`https://wa.me/55${phone}`, '_blank')
+    isSuccessModalOpen.value = false
+    return
+  }
+
   const tokenPart = proposal.token ? `?t=${proposal.token}` : ''
   const baseOrigin = siteOrigin.value || window.location.origin
   const message = encodeURIComponent(
@@ -173,10 +190,9 @@ function sendWhatsapp(proposal: ProposalDTO) {
     `Qualquer dúvida, estou à disposição!\n\n` +
     `*${currentProfile.value?.name || ''}*`
   )
-  
-  const phone = proposal.client.phone.replace(/\D/g, '')
+
   window.open(`https://wa.me/55${phone}?text=${message}`, '_blank')
-  
+
   isSuccessModalOpen.value = false
 }
 
@@ -525,22 +541,23 @@ async function saveContract() {
           </td>
           <td class="px-8 py-6 text-right">
             <div class="flex justify-end items-center gap-1">
-              <button 
+              <button
+                v-if="canShowChatButton(proposal.status)"
                 @click="openChat(proposal)"
                 class="p-2.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-2xl transition-all relative"
                 title="Chat e Interações"
                 aria-label="Abrir chat do orçamento"
               >
                 <MessageCircle class="w-5 h-5" />
-                <span 
+                <span
                   v-if="proposal.unreadMessages > 0"
                   class="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[8px] font-black text-white ring-2 ring-white"
                 >
                   {{ proposal.unreadMessages }}
                 </span>
               </button>
-              <button 
-                v-if="proposal.client.phone"
+              <button
+                v-if="proposal.client.phone && canShowWhatsappButton(proposal.status)"
                 @click="sendWhatsapp(proposal)"
                 class="p-2.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-[0.75rem] transition-all"
                 title="Enviar via WhatsApp"

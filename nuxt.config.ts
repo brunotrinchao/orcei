@@ -97,7 +97,9 @@ export default defineNuxtConfig({
         'date-fns/locale',
         'pusher-js',
         'papaparse',
-        'driver.js'
+        'driver.js',
+        'chart.js',
+        'vue-chartjs'
       ]
     }
   },

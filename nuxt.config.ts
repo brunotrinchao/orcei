@@ -96,7 +96,8 @@ export default defineNuxtConfig({
         'date-fns',
         'date-fns/locale',
         'pusher-js',
-        'papaparse'
+        'papaparse',
+        'driver.js'
       ]
     }
   },

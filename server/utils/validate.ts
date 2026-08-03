@@ -20,8 +20,11 @@ export function validateClient(body: any): ValidationError[] {
   // Cadastro rápido/lead: só exige nome + pelo menos um contato (e-mail OU telefone/WhatsApp).
   const hasEmail = !!body.email?.trim()
   const hasPhone = !!body.phone?.trim()
-  if (!hasEmail && !hasPhone) {
-    errors.push({ field: 'email', message: 'Informe ao menos um contato: e-mail ou telefone/WhatsApp' })
+  if (!hasEmail) {
+    errors.push({ field: 'email', message: 'E-mail é obrigatório' })
+  }
+  if (!hasPhone) {
+    errors.push({ field: 'phone', message: 'Telefone é obrigatório' })
   }
   if (hasEmail) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -49,10 +52,13 @@ export function validateCatalogItem(body: any): ValidationError[] {
   const errors: ValidationError[] = []
 
   if (!body.type || !['product', 'service'].includes(body.type)) {
-    errors.push({ field: 'type', message: 'Tipo deve ser "product" ou "service"' })
+    errors.push({ field: 'type', message: 'Tipo deve ser "produto" ou "serviço"' })
   }
   if (!body.name?.trim()) errors.push({ field: 'name', message: 'Nome é obrigatório' })
-  if (body.price != null && body.price < 0) {
+  if (!body.price?.trim()) {
+    errors.push({ field: 'price', message: 'Preço é obrigatório' })
+  }
+  if (body.price < 0) {
     errors.push({ field: 'price', message: 'Preço não pode ser negativo' })
   }
 

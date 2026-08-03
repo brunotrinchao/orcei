@@ -1,7 +1,7 @@
 {
   "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"/home/brunotrinchao/.claude/squeez/bin/squeez wrap 'npx vue-tsc --noEmit -p . 2>&1 | grep -i \\\"AIService\\\"'\",\"timeout\":120000,\"description\":\"Typecheck edited AIService.ts for new errors\"}",
+  "tool_input_preview": "{\"command\":\"/home/brunotrinchao/.claude/squeez/bin/squeez wrap 'grep -rn \\\"insertMany\\\\|bulkWrite\\\\|BulkImport\\\\|csvImport\\\\|importCsv\\\\|CsvImport\\\" server app --include=\\\"*.ts\\\" --include=\\\"*.vue\\\" |...",
   "error": "Exit code 1",
-  "timestamp": "2026-08-03T15:23:10.735Z",
-  "retry_count": 1
+  "timestamp": "2026-08-03T16:18:20.513Z",
+  "retry_count": 3
 }

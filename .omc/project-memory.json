@@ -305,8 +305,14 @@
     },
     {
       "path": "app/pages/orcamentos/index.vue",
-      "accessCount": 11,
-      "lastAccessed": 1785765249457,
+      "accessCount": 12,
+      "lastAccessed": 1785773539604,
+      "type": "file"
+    },
+    {
+      "path": "app/pages/configuracoes/index.vue",
+      "accessCount": 10,
+      "lastAccessed": 1785774074849,
       "type": "file"
     },
     {
@@ -334,6 +340,12 @@
       "type": "file"
     },
     {
+      "path": "server/models/CatalogItem.ts",
+      "accessCount": 3,
+      "lastAccessed": 1785774059021,
+      "type": "file"
+    },
+    {
       "path": "server/api/ai/proposal-suggest.post.ts",
       "accessCount": 2,
       "lastAccessed": 1785766093715,
@@ -343,6 +355,24 @@
       "path": "server/api/ai/client-extract.post.ts",
       "accessCount": 2,
       "lastAccessed": 1785770503638,
+      "type": "file"
+    },
+    {
+      "path": "server/models/Client.ts",
+      "accessCount": 2,
+      "lastAccessed": 1785774058341,
+      "type": "file"
+    },
+    {
+      "path": "app/components/ui/BaseDialog.vue",
+      "accessCount": 2,
+      "lastAccessed": 1785780191455,
+      "type": "file"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-08-03-bulk-import-clientes-catalogo.md",
+      "accessCount": 2,
+      "lastAccessed": 1785780463210,
       "type": "file"
     },
     {
@@ -382,15 +412,63 @@
       "type": "file"
     },
     {
-      "path": "server/models/CatalogItem.ts",
-      "accessCount": 1,
-      "lastAccessed": 1785765958104,
-      "type": "file"
-    },
-    {
       "path": "server/services/CatalogMatchingService.ts",
       "accessCount": 1,
       "lastAccessed": 1785766109811,
+      "type": "file"
+    },
+    {
+      "path": "server/models/Profile.ts",
+      "accessCount": 1,
+      "lastAccessed": 1785773528538,
+      "type": "file"
+    },
+    {
+      "path": "server/api/proposals/index.post.ts",
+      "accessCount": 1,
+      "lastAccessed": 1785773533076,
+      "type": "file"
+    },
+    {
+      "path": "app/pages/clientes/index.vue",
+      "accessCount": 1,
+      "lastAccessed": 1785773545989,
+      "type": "file"
+    },
+    {
+      "path": "app/pages/catalogo/index.vue",
+      "accessCount": 1,
+      "lastAccessed": 1785773546497,
+      "type": "file"
+    },
+    {
+      "path": "server/services/NotificationService.ts",
+      "accessCount": 1,
+      "lastAccessed": 1785773581088,
+      "type": "file"
+    },
+    {
+      "path": "server/api/clients/index.post.ts",
+      "accessCount": 1,
+      "lastAccessed": 1785774075368,
+      "type": "file"
+    },
+    {
+      "path": "server/api/catalog/index.post.ts",
+      "accessCount": 1,
+      "lastAccessed": 1785774075483,
+      "type": "file"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-05-14-settings-expansion.md",
+      "accessCount": 1,
+      "lastAccessed": 1785779975921,
+      "type": "file"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-08-03-bulk-import-clientes-catalogo-design.md",
+      "accessCount": 1,
+      "lastAccessed": 1785780011671,
       "type": "file"
     }
   ],

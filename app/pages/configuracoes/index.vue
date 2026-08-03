@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { SwatchBook, MapPin, Briefcase, FileText, Phone, RefreshCcw, Shield, Globe, ShieldCheck, Lock, CheckCircle2, Wand2 } from 'lucide-vue-next'
+import { SwatchBook, MapPin, Briefcase, FileText, Phone, RefreshCcw, Shield, Globe, ShieldCheck, Lock, CheckCircle2, Wand2, Upload } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../../types'
 import SettingsVisual from '../../components/settings/SettingsVisual.vue'
 import SettingsCompany from '../../components/settings/SettingsCompany.vue'
 import SettingsAddress from '../../components/settings/SettingsAddress.vue'
 import SettingsContact from '../../components/settings/SettingsContact.vue'
 import SettingsTemplates from '../../components/settings/SettingsTemplates.vue'
+import SettingsBulkImport from '../../components/settings/SettingsBulkImport.vue'
 
 const { notify } = useAlerts()
 const { data: profile, refresh } = useFetch<ProfileDTO>('/api/profile', { key: 'profile' })
@@ -103,6 +104,7 @@ const sections = [
   { id: 'endereco', label: 'Endereço', icon: MapPin },
   { id: 'contato',  label: 'Contato',  icon: Phone },
   { id: 'integracoes', label: 'Integrações', icon: Globe },
+  { id: 'multiplos-cadastros', label: 'Múltiplos Cadastros', icon: Upload },
   { id: 'negocio',  label: 'Negócio',  icon: RefreshCcw },
   { id: 'modelos',  label: 'Modelos',  icon: FileText },
   { id: 'privacidade', label: 'Privacidade', icon: Shield },
@@ -222,7 +224,11 @@ async function deleteAccount() {
   })
 }
 
-const activeSection = ref('visual')
+const route = useRoute()
+const initialSection = typeof route.query.section === 'string' && sections.some(s => s.id === route.query.section)
+  ? route.query.section
+  : 'visual'
+const activeSection = ref(initialSection)
 
 function selectSection(id: string) {
   activeSection.value = id
@@ -579,6 +585,11 @@ function selectSection(id: string) {
                   </div>
                 </div>
               </BaseSectionCard>
+
+              <!-- Múltiplos Cadastros -->
+              <SettingsBulkImport
+                v-else-if="activeSection === 'multiplos-cadastros'"
+              />
             </div>
           </Transition>
         </div> <!-- end sections -->

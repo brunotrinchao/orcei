@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
-import { Search, Plus, Pencil, Trash2, RefreshCcw, MapPin, Mail, Phone, ExternalLink, MoreVertical } from 'lucide-vue-next'
+import { Search, Plus, Pencil, Trash2, RefreshCcw, MapPin, Mail, Phone, ExternalLink, MoreVertical, Upload } from 'lucide-vue-next'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
 import type { ClientDTO } from '../../../../types'
 
@@ -174,9 +174,21 @@ const formatPhone = (phone: string) => {
 <template>
   <div class="space-y-10 relative">
     <PageHeader title="Seus Clientes" subtitle="Gerencie seus contatos e acelere seus orçamentos.">
-      <BaseButton data-tour="clientes-novo-btn" @click="openModal()" class="w-full sm:w-auto shadow-2xl shadow-blue-100">
-        Cadastrar Novo Cliente
-      </BaseButton>
+      <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+        <BaseButton
+          type="button"
+          variant="outline"
+          class="w-full sm:w-auto"
+          @click="navigateTo('/configuracoes?section=multiplos-cadastros')"
+        >
+          <Upload class="w-4 h-4 mr-2" />
+          Importar em massa
+        </BaseButton>
+
+        <BaseButton data-tour="clientes-novo-btn" @click="openModal()" class="w-full sm:w-auto shadow-2xl shadow-blue-100">
+          Cadastrar Novo Cliente
+        </BaseButton>
+      </div>
 
       <template #filters>
         <BaseFilters :active-filters-count="activeFiltersCount" @clear="clearFilters" data-tour="clientes-busca">

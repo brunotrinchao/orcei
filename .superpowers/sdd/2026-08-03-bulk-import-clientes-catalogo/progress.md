@@ -14,6 +14,8 @@ Not caused by this work; not in scope to fix.
 - [x] Task 7: SettingsBulkImport.vue (cards de Cliente/Catálogo) [Commit: 900c4d6]
 - [x] Task 8: BulkImportModal.vue — upload, preview, processamento em lote, resumo [Commit: 8c400c6]
 - [x] Task 9: CTA "Importar em massa" nas telas de Clientes e Catálogo [Commit: 586104f]
+- [x] Task 10: Suíte completa e verificação final (build OK, testes de unidade OK)
+
 
 
 

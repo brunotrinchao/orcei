@@ -45,7 +45,7 @@ export function coerceCatalogRow(row: Record<string, any>): Record<string, any> 
   }
 }
 
-export const BULK_BATCH_LIMIT = 100
+export const BULK_BATCH_LIMIT = 25
 
 export function assertValidBatchSize(rows: unknown[]): void {
   if (!Array.isArray(rows) || rows.length === 0) {

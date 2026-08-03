@@ -25,13 +25,13 @@ describe('BulkImportService.processClientRows', () => {
     vi.mocked(ClientService.create).mockResolvedValue({ _id: 'c1' } as any)
 
     const results = await BulkImportService.processClientRows(
-      [{ name: 'João', email: 'joao@email.com' }],
+      [{ name: 'João', email: 'joao@email.com', phone: '11999999999' }],
       'profile_1'
     )
 
     expect(results).toEqual([{ index: 0, status: 'created' }])
     expect(ClientService.create).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'João', email: 'joao@email.com', profileId: 'profile_1' })
+      expect.objectContaining({ name: 'João', email: 'joao@email.com', phone: '11999999999', profileId: 'profile_1' })
     )
   })
 
@@ -39,7 +39,7 @@ describe('BulkImportService.processClientRows', () => {
     vi.mocked(ClientService.emailExists).mockResolvedValue(true)
 
     const results = await BulkImportService.processClientRows(
-      [{ name: 'João', email: 'joao@email.com' }],
+      [{ name: 'João', email: 'joao@email.com', phone: '11999999999' }],
       'profile_1'
     )
 
@@ -49,7 +49,7 @@ describe('BulkImportService.processClientRows', () => {
 
   it('marca como error quando linha é inválida (sem nome)', async () => {
     const results = await BulkImportService.processClientRows(
-      [{ email: 'joao@email.com' }],
+      [{ email: 'joao@email.com', phone: '11999999999' }],
       'profile_1'
     )
 
@@ -66,9 +66,9 @@ describe('BulkImportService.processClientRows', () => {
 
     const results = await BulkImportService.processClientRows(
       [
-        { name: 'A', email: 'a@email.com' },
-        { name: '' , email: 'invalida' },
-        { name: 'C', email: 'c@email.com' }
+        { name: 'A', email: 'a@email.com', phone: '11999999999' },
+        { name: '' , email: 'invalida', phone: '11999999999' },
+        { name: 'C', email: 'c@email.com', phone: '11999999999' }
       ],
       'profile_1'
     )

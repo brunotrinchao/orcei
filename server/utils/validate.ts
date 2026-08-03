@@ -55,7 +55,8 @@ export function validateCatalogItem(body: any): ValidationError[] {
     errors.push({ field: 'type', message: 'Tipo deve ser "produto" ou "serviço"' })
   }
   if (!body.name?.trim()) errors.push({ field: 'name', message: 'Nome é obrigatório' })
-  if (!body.price?.trim()) {
+  const priceStr = String(body.price ?? '').trim()
+  if (priceStr === '' || Number.isNaN(Number(priceStr))) {
     errors.push({ field: 'price', message: 'Preço é obrigatório' })
   }
   if (body.price < 0) {

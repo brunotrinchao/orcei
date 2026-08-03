@@ -150,101 +150,67 @@ export default defineEventHandler(async (event) => {
     }))
   }
 
-  const prompt = `Você é um consultor de inteligência de negócios sênior especializado em freelancers e pequenas empresas brasileiras. Analise com máxima precisão técnica os dados comerciais fornecidos abaixo e produza um relatório estratégico estruturado.
+  // Catálogo: nomes únicos (dedup por nome) pro prompt — contagem real fica em context.catalogItems.length
+  const uniqueCatalogEntries = Array.from(new Map(context.catalogItems.map(i => [i.name, i])).values())
+  const catalogCompact = uniqueCatalogEntries
+    .map(i => `${i.name} (R$${i.price.toLocaleString('pt-BR')})`)
+    .join(', ')
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DADOS DO NEGÓCIO — PERÍODO ATUAL: ${start && end ? `${start} a ${end}` : 'Todo o período'}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- Total de Orçamentos Cadastrados: ${context.totalProposals} (Rascunhos: ${context.draftCount})
-- Orçamentos Válidos Analisados: ${context.nonDraftCount}
-- Orçamentos Aceitos: ${context.acceptedCount}
-- Orçamentos Pendentes: ${context.pendingCount}
-- Orçamentos Recusados / Expirados: ${context.rejectedCount}
-- Taxa de Aprovação Atual: ${context.approvalRate}%
-- Faturamento Realizado (Aceitos): R$ ${context.totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-- Receita Potencial Perdida (Recusados/Expirados): R$ ${context.rejectedTotalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-- Ticket Médio dos Aceitos: R$ ${context.averageValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-- Ticket Médio dos Recusados: R$ ${context.rejectedAverage.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-- SCORE COMERCIAL CALCULADO PELO SISTEMA: ${commercialScore}/100
+  // Histórico: status abreviado + cliente consolidado quando repetido em todos os itens
+  const STATUS_LABELS: Record<string, string> = {
+    accepted: 'Aceito', rejected: 'Recusado', expired: 'Expirado',
+    pending: 'Pendente', created: 'Criado', clicked: 'Clicado',
+    draft: 'Rascunho', bounced: 'Retornado'
+  }
+  const historyClients = [...new Set(context.recentHistory.map(h => h.clientName))]
+  const singleClient = historyClients.length === 1 ? historyClients[0] : null
+  const historyCompact = context.recentHistory
+    .map(h => {
+      const statusTxt = STATUS_LABELS[h.status] || h.status
+      const clientTxt = singleClient ? '' : `, ${h.clientName}`
+      return `${h.title} (R$${(h.value || 0).toLocaleString('pt-BR')}, ${statusTxt}${clientTxt})`
+    })
+    .join(', ')
+  const historyClientNote = singleClient ? ` Cliente em todos: ${singleClient}.` : ''
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DADOS DO PERÍODO ANTERIOR COMPARATIVO (Mês/Período Anterior):
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- Orçamentos Válidos Enviados Anteriormente: ${context.previousPeriod.nonDraftCount}
-- Orçamentos Aceitos Anteriormente: ${context.previousPeriod.acceptedCount}
-- Taxa de Aprovação Anterior: ${context.previousPeriod.approvalRate}%
-- Faturamento Realizado Anterior: R$ ${context.previousPeriod.totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-- Ticket Médio Anterior: R$ ${context.previousPeriod.averageValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+  const prompt = `Atue como consultor de negócios sênior para freelancers e pequenas empresas brasileiras. Analise os dados comerciais abaixo e produza o relatório estruturado estritamente nas seções solicitadas em Markdown.
 
-CATÁLOGO DE SERVIÇOS (${context.catalogItems.length} itens):
-- Item de Menor Preço (Produto de Entrada): ${context.lowestCatalogItem ? `${context.lowestCatalogItem.name} (R$ ${context.lowestCatalogItem.price.toLocaleString('pt-BR')})` : 'N/A'}
-- Item de Maior Preço (Ancoragem Premium): ${context.highestCatalogItem ? `${context.highestCatalogItem.name} (R$ ${context.highestCatalogItem.price.toLocaleString('pt-BR')})` : 'N/A'}
-- Lista de Itens do Catálogo:
-${JSON.stringify(context.catalogItems, null, 2)}
+DADOS:
+- Período: ${start && end ? `${start} a ${end}` : 'Todo o período'} | Orçamentos: ${context.nonDraftCount} (${context.acceptedCount} aceitos, ${context.pendingCount} pendentes, ${context.rejectedCount} recusados${context.draftCount ? `, ${context.draftCount} rascunhos` : ''})
+- Taxa Aprovação: ${context.approvalRate}% | Faturamento Realizado: R$ ${context.totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} | Receita Perdida: R$ ${context.rejectedTotalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} | Ticket Médio: R$ ${context.averageValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} (recusados: R$ ${context.rejectedAverage.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}) | Score: ${commercialScore}/100
+- Período Anterior: Faturamento R$ ${context.previousPeriod.totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} | Conversão ${context.previousPeriod.approvalRate}% | Ticket Médio R$ ${context.previousPeriod.averageValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+- Catálogo (${context.catalogItems.length} itens${uniqueCatalogEntries.length !== context.catalogItems.length ? `, ${uniqueCatalogEntries.length} únicos` : ''}): ${catalogCompact}
+- Histórico Recente: ${historyCompact}.${historyClientNote}
 
-HISTÓRICO RECENTE (últimos 10 orçamentos):
-${JSON.stringify(context.recentHistory, null, 2)}
+DIRETRIZES DE SAÍDA (obrigatório seguir em Markdown; use a taxonomia 📌[Fato] / 💡[Hipótese] / 🎯[Recomendação] nos pontos analisados):
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DIRETRIZES DE ANÁLISE E FORMATO DE SAÍDA (OBRIGATÓRIO)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Sua resposta DEVE seguir EXATAMENTE a estrutura de 6 seções abaixo em Markdown.
-
-1. **Amostra de Dados e Nível de Confiança**:
-   ${context.nonDraftCount < 5 
-     ? '⚠️ ATENÇÃO: A amostra de dados é REDUZIDA (' + context.nonDraftCount + ' orçamentos válidos). Defina a análise inicial como "Nível de Confiança: Baixo (Amostra Insuficiente)". NUNCA invente tendências de longo prazo ou sazonalidade inexistentes. Destaque claramente que a prioridade primária do negócio deve ser aumentar o volume de propostas enviadas.' 
-     : 'A amostra possui volume adequado (' + context.nonDraftCount + ' orçamentos válidos). Defina o "Nível de Confiança: Médio/Alto".'
-   }
-
-2. **Taxonomia das Conclusões**:
-   Para cada ponto analisado, explicite a classificação usando os marcadores:
-   - 📌 **[Fato]**: Dado extraído diretamente dos números do sistema.
-   - 💡 **[Hipótese]**: Interpretação lógica provável.
-   - 🎯 **[Recomendação]**: Ação prática sugerida.
-
---- ESTRUTURA DAS SEÇÕES ---
+1. **Amostra e Confiança**: ${context.nonDraftCount < 5
+    ? `⚠️ Amostra REDUZIDA (${context.nonDraftCount} orçamentos válidos) — defina "Nível de Confiança: Baixo (Amostra Insuficiente)", nunca invente tendências/sazonalidade inexistentes, e destaque que a prioridade é aumentar o volume de propostas enviadas.`
+    : `Amostra com volume adequado (${context.nonDraftCount} orçamentos válidos) — defina "Nível de Confiança: Médio/Alto".`
+  }
 
 ## 📋 Resumo Executivo & Score Comercial (Score: ${commercialScore}/100)
-- Apresente o **Score Comercial de ${commercialScore}/100** e faça a leitura sintética da pontuação.
-- Crie uma tabela síntese com:
-  | Indicador | Atual | Anterior | Nível |
-  | Conversão | ${context.approvalRate}% | ${context.previousPeriod.approvalRate}% | [Baixo/Saudável/Excelente] |
-  | Ticket Médio | R$ ${context.averageValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} | R$ ${context.previousPeriod.averageValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} | [Baixo/Saudável/Excelente] |
-  | Saúde do Catálogo | ${context.catalogItems.length} itens | - | [Risco/Regular/Ótimo] |
-- Destaque em 3 bullets curtos: Principal Oportunidade, Principal Risco e Ação Prioritária.
+Apresente o Score de ${commercialScore}/100 com leitura sintética; tabela (Conversão ${context.approvalRate}% vs ${context.previousPeriod.approvalRate}%; Ticket R$ ${context.averageValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} vs R$ ${context.previousPeriod.averageValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}; Catálogo ${context.catalogItems.length} itens); 3 bullets: Oportunidade, Risco, Ação Prioritária.
 
 ## 📊 1. Diagnóstico de Saúde Comercial & Comparativo de Períodos
-- Compare o desempenho do período atual com o período anterior (variação percentual no faturamento, evolução da taxa de conversão e variação no ticket médio).
-- Analise a discrepância entre o ticket médio dos aceitos (R$ ${context.averageValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}) e dos recusados (R$ ${context.rejectedAverage.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}).
-- Detalhe o impacto financeiro da receita perdida de R$ ${context.rejectedTotalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}.
+Compare o período atual com o anterior (faturamento, conversão, ticket médio) e detalhe o impacto financeiro da receita perdida.
 
 ## 💰 2. Estratégia de Precificação & Escada de Valor
-- Avalie o catálogo do profissional: identifique o produto de entrada, o item de ancoragem e lacunas de oferta no portfólio.
-- Sugira ajustes percentuais específicos para itens avulsos.
-- Proponha a criação de uma Escada de Valor (Produto de Entrada → Oferta Principal → Oferta Premium).
+Identifique produto de entrada, item de ancoragem e lacunas no catálogo; sugira ajustes de preço e uma Escada de Valor (Entrada → Principal → Premium).
 
 ## 🚀 3. Mix de Vendas, Upsell e Impacto Financeiro
-- Crie ao menos 2 pacotes comerciais otimizados com Nome, Composição, Preço Avulso Somado, Preço Sugerido do Pacote e Desconto Estratégico.
-- **Cálculo de Impacto Financeiro**: Simule numericamente o ganho mensal e anual caso 30% dos clientes migrem para o pacote sugerido de maior valor.
+Crie ao menos 2 pacotes (Nome, Composição, Preço Avulso Somado, Preço do Pacote, Desconto Estratégico) e simule o ganho mensal/anual com 30% dos clientes migrando para o pacote de maior valor.
 
 ## ⚡ 4. Plano de Ação Priorizado — Próximas 2 Semanas
-Crie a tabela priorizada de ações:
-| Ação | Impacto | Esforço | Prioridade | Ganho Esperado |
-|------|---------|---------|------------|----------------|
-(Liste 5 ações concretas com prazo e estimativa de retorno).
+Tabela com 5 ações: | Ação | Impacto | Esforço | Prioridade | Ganho Esperado |, com prazo e estimativa de retorno.
 
 ## ⚠️ 5. Principais Riscos Comerciais
-- Liste de 2 a 4 riscos críticos identificados (ex: dependência de poucos clientes, baixa conversão em propostas de alto valor, falta de follow-up).
+Liste de 2 a 4 riscos críticos (ex: dependência de poucos clientes, baixa conversão em propostas de alto valor, falta de follow-up).
 
 ## 🎯 6. Dica de Ouro
-- Um insight estratégico profundo e acionável que um consultor de R$ 500/hora forneceria. Finalize a recomendação com clareza total.
+Um insight estratégico profundo e acionável, no nível de um consultor de R$ 500/hora.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-REGRAS GERAIS DE EXECUÇÃO
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- NUNCA invente números ou assuma dados não fornecidos.
-- Mantenha tom de consultor sênior de negócios, direto e focado em resultados.
-- Garanta que TODAS as 6 seções sejam integralmente concluídas sem interrupção de texto.`
+REGRAS: use somente os dados reais informados acima (nunca invente números), mantenha tom consultivo sênior direto e focado em resultados, e entregue as 7 seções acima completas sem interrupção de texto.`
 
   const formatPeriodText = (s?: any, e?: any) => {
     if (!s || !e) return 'todo o período'

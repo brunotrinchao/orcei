@@ -1,7 +1,7 @@
 {
-  "tool_name": "Read",
-  "tool_input_preview": "{\"file_path\":\"/home/brunotrinchao/project/app/pages/orcamentos/index.vue\",\"limit\":1}",
-  "error": "File does not exist. Note: your current working directory is /home/brunotrinchao/Documentos/Bruno/Orcei.",
-  "timestamp": "2026-08-03T13:53:42.226Z",
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"/home/brunotrinchao/.claude/squeez/bin/squeez wrap 'npx vue-tsc --noEmit -p . 2>&1 | grep -i \\\"analyze.get\\\"'\",\"timeout\":120000,\"description\":\"Typecheck edited file for new errors\"}",
+  "error": "Exit code 1",
+  "timestamp": "2026-08-03T14:59:04.387Z",
   "retry_count": 1
 }

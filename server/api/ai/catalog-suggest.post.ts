@@ -64,8 +64,8 @@ export default defineEventHandler(async (event) => {
       name: { $regex: regex },
       price: { $gt: 0 }
     })
-      .select('name description price unit -_id')
-      .limit(8)
+      .select('name price unit -_id')
+      .limit(3)
       .lean()
   }
 
@@ -79,39 +79,41 @@ export default defineEventHandler(async (event) => {
       name: { $regex: firstKeyword },
       price: { $gt: 0 }
     })
-      .select('name description price unit -_id')
-      .limit(6)
+      .select('name price unit -_id')
+      .limit(3)
       .lean()
   }
 
-  // Montar seção de exemplos reais para o prompt
+  // Remove metragem/quantidade/peso do nome — medida é específica de cada
+  // cliente/projeto e não deve ser copiada pro item de catálogo sugerido
+  function stripMeasurement(name: string): string {
+    return name
+      .replace(/\(?\s*\d+[\d.,]*\s*(m²|m2|cm²?|cm2|mm²?|kg|g|l|ml|un\.?|unid\.?)\s*\)?/gi, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim()
+  }
+
+  // Montar seção de exemplos reais para o prompt (JSON compacto, sem description)
   let examplesSection = ''
   if (similarItems.length > 0) {
-    const examples = similarItems
-      .map(item =>
-        `- Nome: ${item.name} | Preço: R$${item.price} | Unidade: ${item.unit}${item.description ? ` | Desc: ${item.description}` : ''}`
-      )
-      .join('\n')
+    const examples = similarItems.map(item => ({
+      n: stripMeasurement(item.name),
+      p: item.price,
+      u: item.unit
+    }))
 
-    examplesSection = `\nExemplos reais cadastrados na plataforma (use como referência de mercado brasileiro):
-${examples}\n`
+    examplesSection = `\nExemplos de mercado BR (nome/preço/unidade de referência, JSON): ${JSON.stringify(examples)}\n`
   }
 
   const typeLabel = type === 'product' ? 'Produto' : 'Serviço'
-  const prompt = `Você é especialista em precificação e marketing para freelancers e pequenas empresas brasileiras.
+  const prompt = `Especialista em precificação e marketing para freelancers/pequenas empresas do Brasil.
 ${examplesSection}
-Com base nos exemplos acima (se houver), sugira para o ${typeLabel.toLowerCase()} abaixo:
+Sugira para: ${typeLabel} "${name}"${context ? ` | contexto: ${context}` : ''}
 
-Nome: ${name}
-Tipo: ${typeLabel}${context ? `\nContexto adicional: ${context}` : ''}
+Responda APENAS este JSON, sem markdown: {"description":"até 150 caracteres, tom direto/premium, foco em valor/benefícios","price":0,"unit":"UN"}
+Regras: price = número BRL baseado no mercado e exemplos acima; unit ∈ [UN,H,DIA,MES,KG,CM,ML].
 
-Retorne SOMENTE um JSON válido, sem texto extra, sem markdown:
-{"description":"descrição comercial persuasiva em até 150 caracteres","price":0,"unit":"UN"}
-
-Regras:
-- description: foque em valor e benefícios, tom direto e premium
-- price: número em reais baseado no mercado brasileiro e nos exemplos reais acima
-- unit: escolha a mais adequada entre UN, H, DIA, MES, KG, CM, ML`
+REGRA CRÍTICA: nunca inclua metragem, área (m²), quantidade, peso ou qualquer medida no description/nome — mesmo que os exemplos tenham, ignore esse padrão (medida é específica de cada cliente/projeto).`
 
   try {
     const text = await AIService.generateDescription(prompt, 8192, { profileId: profile._id.toString(), action: 'catalogSuggest' })

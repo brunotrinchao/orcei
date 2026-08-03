@@ -25,5 +25,13 @@ export const CatalogService = {
 
   async update(id: string, profileId: string, data: any) {
     return await CatalogItem.findOneAndUpdate({ _id: id, profileId }, data, { returnDocument: 'after' })
+  },
+
+  async skuExists(profileId: string, sku: string): Promise<boolean> {
+    const trimmed = sku?.trim()
+    if (!trimmed) return false
+    const existing = await CatalogItem.findOne({ profileId, sku: trimmed }).select('_id')
+    return !!existing
   }
 }
+

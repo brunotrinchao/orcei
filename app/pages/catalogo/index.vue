@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
 import * as LucideIcons from 'lucide-vue-next'
-import { Plus, Search, Image, Pencil, Trash2, Sparkles, RefreshCcw, Package, ShoppingBag, HelpCircle, MoreVertical } from 'lucide-vue-next'
+import { Plus, Search, Image, Pencil, Trash2, Sparkles, RefreshCcw, Package, ShoppingBag, HelpCircle, MoreVertical, Upload } from 'lucide-vue-next'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
 import type { CatalogItemDTO } from '../../../../types'
 
@@ -73,9 +73,21 @@ function clearFilters() {
 <template>
   <div class="space-y-10 relative">
     <PageHeader title="Seu Catálogo" subtitle="Unifique seus produtos e serviços em um só lugar.">
-      <BaseButton data-tour="catalogo-novo-item-btn" @click="openModal()" class="w-full sm:w-auto shadow-2xl shadow-blue-100">
-        Novo Item do Catálogo
-      </BaseButton>
+      <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+        <BaseButton
+          type="button"
+          variant="outline"
+          class="w-full sm:w-auto"
+          @click="navigateTo('/configuracoes?section=multiplos-cadastros')"
+        >
+          <Upload class="w-4 h-4 mr-2" />
+          Importar em massa
+        </BaseButton>
+
+        <BaseButton data-tour="catalogo-novo-item-btn" @click="openModal()" class="w-full sm:w-auto shadow-2xl shadow-blue-100">
+          Novo Item do Catálogo
+        </BaseButton>
+      </div>
 
       <template #filters>
         <BaseFilters :active-filters-count="activeFiltersCount" @clear="clearFilters" data-tour="catalogo-busca">

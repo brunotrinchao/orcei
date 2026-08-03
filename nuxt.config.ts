@@ -75,6 +75,11 @@ export default defineNuxtConfig({
     },
     optimizeDeps: {
       include: [
+        '@fullcalendar/core/locales/pt-br',
+        '@fullcalendar/daygrid',
+        '@fullcalendar/interaction',
+        '@fullcalendar/timegrid',
+        '@fullcalendar/vue3',
         '@vue/devtools-core',
         '@vue/devtools-kit',
         '@nuxtjs/cloudinary',
@@ -90,7 +95,8 @@ export default defineNuxtConfig({
         'markdown-it',
         'date-fns',
         'date-fns/locale',
-        'pusher-js'
+        'pusher-js',
+        'papaparse'
       ]
     }
   },

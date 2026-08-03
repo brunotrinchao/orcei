@@ -45,3 +45,14 @@ export function coerceCatalogRow(row: Record<string, any>): Record<string, any> 
   }
 }
 
+export const BULK_BATCH_LIMIT = 25
+
+export function assertValidBatchSize(rows: unknown[]): void {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    throw createError({ statusCode: 400, statusMessage: 'Lote de importação vazio.' })
+  }
+  if (rows.length > BULK_BATCH_LIMIT) {
+    throw createError({ statusCode: 400, statusMessage: `Lote de importação excede o limite de ${BULK_BATCH_LIMIT} linhas.` })
+  }
+}
+

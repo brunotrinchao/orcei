@@ -1,10 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { BulkImportService } from '../server/services/BulkImportService'
 import { ClientService } from '../server/services/ClientService'
+import { CatalogService } from '../server/services/CatalogService'
 
 vi.mock('../server/services/ClientService', () => ({
   ClientService: {
     emailExists: vi.fn(),
+    create: vi.fn()
+  }
+}))
+
+vi.mock('../server/services/CatalogService', () => ({
+  CatalogService: {
+    skuExists: vi.fn(),
     create: vi.fn()
   }
 }))
@@ -67,5 +75,55 @@ describe('BulkImportService.processClientRows', () => {
 
     expect(results.map(r => r.status)).toEqual(['created', 'error', 'skipped'])
     expect(results.map(r => r.index)).toEqual([0, 1, 2])
+  })
+})
+
+describe('BulkImportService.processCatalogRows', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('cria linha válida sem sku duplicado', async () => {
+    vi.mocked(CatalogService.skuExists).mockResolvedValue(false)
+    vi.mocked(CatalogService.create).mockResolvedValue({ _id: 'i1' } as any)
+
+    const results = await BulkImportService.processCatalogRows(
+      [{ type: 'product', name: 'Item', price: '10', sku: 'SKU-1' }],
+      'profile_1'
+    )
+
+    expect(results).toEqual([{ index: 0, status: 'created' }])
+  })
+
+  it('marca skipped quando sku já existe', async () => {
+    vi.mocked(CatalogService.skuExists).mockResolvedValue(true)
+
+    const results = await BulkImportService.processCatalogRows(
+      [{ type: 'product', name: 'Item', price: '10', sku: 'SKU-1' }],
+      'profile_1'
+    )
+
+    expect(results).toEqual([{ index: 0, status: 'skipped', message: 'SKU já cadastrado' }])
+    expect(CatalogService.create).not.toHaveBeenCalled()
+  })
+
+  it('marca error quando type é inválido', async () => {
+    const results = await BulkImportService.processCatalogRows(
+      [{ type: 'invalido', name: 'Item', price: '10' }],
+      'profile_1'
+    )
+
+    expect(results[0].status).toBe('error')
+    expect(CatalogService.create).not.toHaveBeenCalled()
+  })
+
+  it('não checa sku duplicado quando linha não tem sku', async () => {
+    vi.mocked(CatalogService.create).mockResolvedValue({ _id: 'i1' } as any)
+
+    const results = await BulkImportService.processCatalogRows(
+      [{ type: 'service', name: 'Corte', price: '30' }],
+      'profile_1'
+    )
+
+    expect(results).toEqual([{ index: 0, status: 'created' }])
+    expect(CatalogService.skuExists).not.toHaveBeenCalled()
   })
 })

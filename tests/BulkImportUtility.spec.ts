@@ -1,5 +1,26 @@
-import { describe, it, expect } from 'vitest'
-import { coerceClientRow } from '../server/utils/bulkImport'
+import { coerceClientRow, coerceCatalogRow } from '../server/utils/bulkImport'
+
+describe('coerceCatalogRow', () => {
+  it('converte price string para number', () => {
+    expect(coerceCatalogRow({ type: 'product', name: 'Item', price: '49.90' }).price).toBe(49.9)
+  })
+
+  it('mantém price inválido (não numérico) como NaN pra validação pegar depois', () => {
+    expect(Number.isNaN(coerceCatalogRow({ type: 'product', name: 'Item', price: 'abc' }).price)).toBe(true)
+  })
+
+  it('default unit para "UN" quando ausente', () => {
+    expect(coerceCatalogRow({ type: 'product', name: 'Item', price: '10' }).unit).toBe('UN')
+  })
+
+  it('mantém type, name, sku, description como strings com trim', () => {
+    const result = coerceCatalogRow({ type: ' service ', name: ' Corte ', price: '10', sku: ' SKU-1 ', description: ' desc ' })
+    expect(result.type).toBe('service')
+    expect(result.name).toBe('Corte')
+    expect(result.sku).toBe('SKU-1')
+    expect(result.description).toBe('desc')
+  })
+})
 
 describe('coerceClientRow', () => {
   it('converte isWhatsapp string "true"/"1" para boolean true', () => {

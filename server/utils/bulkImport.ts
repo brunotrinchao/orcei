@@ -33,3 +33,15 @@ export function coerceClientRow(row: Record<string, any>): Record<string, any> {
     ...(address ? { address } : {})
   }
 }
+
+export function coerceCatalogRow(row: Record<string, any>): Record<string, any> {
+  return {
+    type: str(row.type)?.toLowerCase(),
+    name: str(row.name),
+    description: str(row.description),
+    price: Number(String(row.price ?? '').trim().replace(',', '.')),
+    unit: str(row.unit) ?? 'UN',
+    sku: str(row.sku)
+  }
+}
+

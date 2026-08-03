@@ -12,6 +12,8 @@ Not caused by this work; not in scope to fix.
 - [x] Task 5: Templates CSV estáticos [Commit: 5667991]
 - [x] Task 6: Seção Múltiplos Cadastros em Configurações (navegação) [Commit: 361377b]
 - [x] Task 7: SettingsBulkImport.vue (cards de Cliente/Catálogo) [Commit: 900c4d6]
+- [x] Task 8: BulkImportModal.vue — upload, preview, processamento em lote, resumo [Commit: 8c400c6]
+
 
 
 

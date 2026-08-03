@@ -68,7 +68,8 @@
     "vue-advanced-cropper": "^2.8.9",
     "vue-chartjs": "^5.3.3",
     "vue-imask": "^7.6.1",
-    "vue-router": "^5.0.6"
+    "vue-router": "^5.0.6",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.4.0",

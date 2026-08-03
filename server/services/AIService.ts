@@ -1,10 +1,19 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai'
 import { AiUsageLog } from '../models/AiUsageLog'
 import { estimateCostUsd } from '../utils/aiPricing'
+import { sanitizeAiInput } from '../utils/aiGuardrails'
+import { ClientInfoSchema, SuggestedProposalSchema } from '../utils/aiSchemas'
 
 export type AiUsageMeta = { profileId?: string; action?: string }
 
 type ProviderName = 'deepseek' | 'gemini' | 'cloudflare' | 'openrouter'
+
+const GEMINI_SAFETY_SETTINGS = [
+  { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+  { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+  { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+  { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE }
+]
 
 // Cadeia de fallback FIXA: DeepSeek → Gemini → Cloudflare → OpenRouter.
 // Cada provedor é ligado/desligado por variável de ambiente própria (ver
@@ -57,7 +66,7 @@ export const AIService = {
   // próximo provedor da cadeia via _generateWithFallback.
   _isProviderEnabled(provider: ProviderName, config: any): boolean {
     switch (provider) {
-      case 'deepseek': return !!config.useDeepseek
+      case 'deepseek': return config.useDeepseek !== false
       case 'gemini': return config.useGemini !== false
       case 'cloudflare': return config.useCloudflare !== false
       case 'openrouter': return config.useOpenrouter !== false
@@ -124,6 +133,7 @@ export const AIService = {
     const genAI = new GoogleGenerativeAI(config.geminiApiKey)
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.5-flash',
+      safetySettings: GEMINI_SAFETY_SETTINGS,
       generationConfig: generationConfig || {
         temperature: 0.7,
         topP: 0.95,

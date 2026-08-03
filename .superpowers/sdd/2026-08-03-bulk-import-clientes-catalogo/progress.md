@@ -9,5 +9,7 @@ Not caused by this work; not in scope to fix.
 - [x] Task 2: BulkImportService.processCatalogRows + CatalogService.skuExists [Commits: 78d208e, 5323421, f406326]
 - [x] Task 3: Endpoints POST /api/clients/bulk e POST /api/catalog/bulk [Commit: 0761b54]
 - [x] Task 4: Dependência papaparse + composable de parsing/validação de arquivo [Commit: 100f4f8]
+- [x] Task 5: Templates CSV estáticos [Commit: 5667991]
+
 
 

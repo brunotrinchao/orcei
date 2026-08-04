@@ -15,9 +15,9 @@ defineEmits<{
 </script>
 
 <template>
-  <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-4">
+  <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-4 cursor-pointer hover:border-gray-300 dark:hover:border-gray-700 transition-all group" @click="$emit('view')">
     <div class="flex flex-col">
-      <span class="font-black text-lg text-gray-900 dark:text-gray-50 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transition-colors" @click="$emit('view')">{{ client.name }}</span>
+      <span class="font-black text-lg text-gray-900 dark:text-gray-50 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ client.name }}</span>
       <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">{{ client.taxId || 'Sem documento' }}</span>
     </div>
 
@@ -34,11 +34,11 @@ defineEmits<{
       <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest block mt-1">{{ client.address?.street }}, {{ client.address?.number }}</span>
     </div>
 
-    <div class="flex items-center justify-end gap-1 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
-      <BaseButton variant="ghost" size="icon-sm" @click="$emit('edit')" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" aria-label="Editar cliente" title="Editar">
+    <div class="flex items-center justify-end gap-1 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800" @click.stop>
+      <BaseButton variant="ghost" size="icon-sm" @click.stop="$emit('edit')" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" aria-label="Editar cliente" title="Editar">
         <Pencil class="w-4 h-4" />
       </BaseButton>
-      <BaseButton variant="ghost" size="icon-sm" @click="$emit('delete')" class="text-gray-400 hover:text-red-600 dark:hover:text-red-400" aria-label="Excluir cliente" title="Excluir">
+      <BaseButton variant="ghost" size="icon-sm" @click.stop="$emit('delete')" class="text-gray-400 hover:text-red-600 dark:hover:text-red-400" aria-label="Excluir cliente" title="Excluir">
         <Trash2 class="w-4 h-4" />
       </BaseButton>
     </div>

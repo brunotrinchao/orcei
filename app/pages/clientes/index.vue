@@ -680,10 +680,10 @@ const stateMap: Record<string, { label: string; uf: string }> = {
       </template>
 
       <template #item="{ item: client }">
-        <tr class="hover:bg-gray-50/30 dark:hover:bg-gray-800/20 transition-all group">
+        <tr class="hover:bg-gray-50/30 dark:hover:bg-gray-800/20 transition-all group cursor-pointer" @click="openInfoModal(client)">
           <td class="px-8 py-8">
-            <div class="flex flex-col cursor-pointer">
-              <span class="font-black text-lg text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" @click.prevent="openInfoModal(client)">{{ client.name }}</span>
+            <div class="flex flex-col">
+              <span class="font-black text-lg text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ client.name }}</span>
               <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">{{ client.taxId || 'Sem documento' }}</span>
             </div>
           </td>
@@ -702,14 +702,15 @@ const stateMap: Record<string, { label: string; uf: string }> = {
               <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest line-clamp-1 max-w-[400px] mt-1">{{ client.address?.street }}, {{ client.address?.number }}</span>
             </div>
           </td>
-          <td class="px-10 py-8 text-right">
+          <td class="px-10 py-8 text-right" @click.stop>
             <div class="flex justify-end gap-3 items-center">
               <DropdownMenuRoot>
                 <DropdownMenuTrigger as-child>
                   <button
+                    @click.stop
                     class="p-2.5 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[0.75rem] transition-all"
                     title="Mais ações"
-                    aria-label="Mais ações do orçamento"
+                    aria-label="Mais ações do cliente"
                   >
                     <MoreVertical class="w-5 h-5" />
                   </button>
@@ -720,15 +721,15 @@ const stateMap: Record<string, { label: string; uf: string }> = {
                     :side-offset="6"
                     class="min-w-[220px] bg-white dark:bg-gray-950 rounded-[0.75rem] shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
                   >
-                  <DropdownMenuItem
-                      @click="openModal(client)"
+                    <DropdownMenuItem
+                      @click.stop="openModal(client)"
                       class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
                     >
                       <Pencil class="w-4 h-4" />
                       Editar
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      @click="deleteClient(client._id)"
+                      @click.stop="deleteClient(client._id)"
                       class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-red-600 dark:hover:text-red-400 cursor-pointer outline-none transition-all"
                     >
                       <Trash2 class="w-4 h-4" />

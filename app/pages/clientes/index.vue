@@ -525,10 +525,7 @@ const stateMap: Record<string, { label: string; uf: string }> = {
       </div>
 
       <template #footer>
-        <div class="flex items-center justify-between w-full">
-          <BaseButton type="button" variant="outline" @click="showInfo = false">
-            Fechar
-          </BaseButton>
+        <div class="flex justify-end w-full">
           <BaseButton type="button" @click="showInfo = false; openModal(selectedClient)">
             <Pencil class="w-4 h-4 mr-2" />
             Editar Cliente

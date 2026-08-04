@@ -299,15 +299,15 @@ const stateMap: Record<string, { label: string; uf: string }> = {
     >
       <div v-if="selectedClient" class="space-y-6 py-2">
         <!-- Header do Cliente: Avatar + Nome + Documento + Botões Rápidos -->
-        <div class="bg-gradient-to-br from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 text-white p-6 rounded-[12px] shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="text-white py-5 rounded-[12px] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div class="flex items-center gap-4">
-            <div class="w-16 h-16 rounded-[12px] bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-blue-500/20 shrink-0">
+            <div class="w-14 h-14 rounded-[12px] bg-blue-600 dark:bg-blue-700 flex items-center justify-center text-white text-xl font-black shrink-0">
               {{ selectedClient.name?.substring(0, 2).toUpperCase() }}
             </div>
             <div>
               <h2 class="text-xl font-black tracking-tight text-white">{{ selectedClient.name }}</h2>
               <div class="flex items-center gap-3 mt-1 text-xs text-slate-300 font-medium">
-                <span v-if="selectedClient.taxId" class="px-2.5 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 font-bold uppercase tracking-wider text-[10px]">
+                <span v-if="selectedClient.taxId" class="px-2.5 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-slate-300 font-bold uppercase tracking-wider text-[10px]">
                   {{ selectedClient.taxId }}
                 </span>
                 <span v-else class="text-slate-400 italic text-[11px]">Sem documento informado</span>
@@ -329,7 +329,7 @@ const stateMap: Record<string, { label: string; uf: string }> = {
               v-if="selectedClient.phone" 
               :href="selectedClient.isWhatsapp ? `https://wa.me/55${selectedClient.phone.replace(/\D/g, '')}` : `tel:${selectedClient.phone}`"
               target="_blank"
-              class="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[12px] bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-md shadow-emerald-900/30"
+              class="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[12px] bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all"
             >
               <img v-if="selectedClient.isWhatsapp" src="/images/icons/whatsapp-svg.svg" class="w-4 h-4" alt="WhatsApp" />
               <Phone v-else class="w-4 h-4" />
@@ -431,7 +431,7 @@ const stateMap: Record<string, { label: string; uf: string }> = {
         </div>
 
         <!-- Detalhes do Cadastro (E-mail, Telefone, Endereço, Observações) -->
-        <div class="bg-gray-50/60 dark:bg-gray-900/40 p-6 rounded-[12px] border-2 border-gray-100 dark:border-gray-800 space-y-4">
+        <div class="space-y-4">
           <h3 class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Dados Cadastrais</h3>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -474,21 +474,13 @@ const stateMap: Record<string, { label: string; uf: string }> = {
         <div class="space-y-3">
           <div class="flex items-center justify-between px-1">
             <h3 class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Últimos Orçamentos do Cliente</h3>
-            <NuxtLink 
-              v-if="selectedClient.email || selectedClient.name" 
-              :to="`/orcamentos?search=${encodeURIComponent(selectedClient.email || selectedClient.name)}`" 
-              class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-            >
-              Ver todos os orçamentos
-              <ExternalLink class="w-3 h-3" />
-            </NuxtLink>
           </div>
 
           <div v-if="loadingStats" class="space-y-2">
             <div v-for="i in 3" :key="i" class="h-12 bg-gray-100 dark:bg-gray-800 rounded-[12px] animate-pulse" />
           </div>
 
-          <div v-else-if="!clientStats?.recentProposals || clientStats.recentProposals.length === 0" class="p-6 text-center bg-gray-50 dark:bg-gray-900/40 rounded-[12px] border border-gray-100 dark:border-gray-800">
+          <div v-else-if="!clientStats?.recentProposals || clientStats.recentProposals.length === 0" class="p-6 text-center bg-gray-50 dark:bg-gray-900/40 rounded-[12px] border border-gray-100 dark:border-gray-800 ">
             <p class="text-xs font-bold text-gray-500">Nenhum orçamento emitido para este cliente ainda.</p>
           </div>
 
@@ -496,7 +488,7 @@ const stateMap: Record<string, { label: string; uf: string }> = {
             <div 
               v-for="p in clientStats.recentProposals" 
               :key="p._id"
-              class="flex items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-[12px] border border-gray-100 dark:border-gray-800 hover:border-blue-500/30 transition-all"
+              class="flex items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-[12px] border border-gray-100 dark:border-gray-800 hover:border-blue-500/30 transition-all h-max-[200px] overflow-auto"
             >
               <div class="flex items-center gap-3">
                 <div class="p-2 rounded-[12px] bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-black text-xs">
@@ -511,7 +503,7 @@ const stateMap: Record<string, { label: string; uf: string }> = {
               <div class="flex items-center gap-3">
                 <span 
                   :class="getStatusBadge(p.status).color"
-                  class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border"
+                  class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border"
                 >
                   {{ getStatusBadge(p.status).label }}
                 </span>
@@ -520,6 +512,18 @@ const stateMap: Record<string, { label: string; uf: string }> = {
                 </span>
               </div>
             </div>
+          </div>
+
+          <div class="flex items-center justify-end px-1">
+
+            <NuxtLink 
+              v-if="selectedClient.email || selectedClient.name" 
+              :to="`/orcamentos?search=${encodeURIComponent(selectedClient.email || selectedClient.name)}`" 
+              class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+            >
+              Ver todos os orçamentos
+              <ExternalLink class="w-3 h-3" />
+            </NuxtLink>
           </div>
         </div>
       </div>
@@ -579,7 +583,7 @@ const stateMap: Record<string, { label: string; uf: string }> = {
           </div>
         </div>
 
-        <div class="bg-gray-50/50 dark:bg-gray-900/60 p-8 rounded-[2.5rem] border-2 border-gray-100 dark:border-gray-800 space-y-6">
+        <div class="bg-gray-50/50 dark:bg-gray-900/60 p-6 rounded-[12px] border border-gray-100 dark:border-gray-800 space-y-6">
           <div class="flex items-center justify-between px-1">
             <h3 class="text-[10px] font-black text-gray-400 dark:text-gray-400 uppercase tracking-[0.2em]">Endereço de Cobrança</h3>
             <div v-if="isSearchingZip" class="flex items-center gap-2 text-[10px] font-black text-blue-600 dark:text-blue-400 animate-pulse uppercase tracking-widest">

@@ -48,6 +48,7 @@ export function coerceCatalogRow(row: Record<string, any>): Record<string, any> 
 export const BULK_BATCH_LIMIT = 25
 
 export function assertValidBatchSize(rows: unknown[]): void {
+  console.log({"SIZE": rows.length, "BULK_BATCH_LIMIT": BULK_BATCH_LIMIT})
   if (!Array.isArray(rows) || rows.length === 0) {
     throw createError({ statusCode: 400, statusMessage: 'Lote de importação vazio.' })
   }

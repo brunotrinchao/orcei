@@ -32,6 +32,5 @@ export const CatalogService = {
     if (!trimmed) return false
     const existing = await CatalogItem.findOne({ profileId, sku: trimmed }).select('_id')
     return !!existing
-  }
+  },
 }
-

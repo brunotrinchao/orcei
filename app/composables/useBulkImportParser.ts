@@ -1,7 +1,7 @@
 import Papa from 'papaparse'
 
 export const MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024
-export const MAX_ROWS = 1000
+export const MAX_ROWS = 500
 export const BATCH_SIZE = 25
 
 export function validateImportFile(file: File): string | null {

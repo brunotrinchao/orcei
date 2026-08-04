@@ -101,7 +101,7 @@ async function processImport() {
 </script>
 
 <template>
-  <BaseDialog :open="open" @update:open="(v) => v ? emit('update:open', true) : close()" :title="title" size="lg">
+  <BaseDialog :open="open" @update:open="(v) => v ? emit('update:open', true) : close()" :title="title" size="xl">
     <div v-if="step === 'idle'" class="space-y-4">
       <label class="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-[0.75rem] p-10 cursor-pointer">
         <UploadCloud class="w-8 h-8 text-gray-400" />
@@ -114,15 +114,15 @@ async function processImport() {
     <div v-else-if="step === 'preview'" class="space-y-4">
       <p class="text-sm font-bold text-gray-700 dark:text-gray-300">{{ rows.length }} registro(s) encontrado(s)</p>
       <div class="overflow-x-auto max-h-64 border border-gray-100 dark:border-gray-800 rounded-[0.75rem]">
-        <table class="w-full text-sm">
+        <table class="w-full text-sm  whitespace-nowrap">
           <thead>
             <tr>
-              <th v-for="key in Object.keys(rows[0] || {})" :key="key" class="text-left px-3 py-2 font-black uppercase text-xs">{{ key }}</th>
+              <th v-for="key in Object.keys(rows[0] || {})" :key="key" class="text-left px-3 py-2 font-black uppercase text-xs whitespace-nowrap">{{ key }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(row, i) in rows" :key="i" class="border-t border-gray-100 dark:border-gray-800">
-              <td v-for="key in Object.keys(row)" :key="key" class="px-3 py-2">{{ row[key] }}</td>
+              <td v-for="key in Object.keys(row)" :key="key" class="px-3 py-2 whitespace-nowrap">{{ row[key] }}</td>
             </tr>
           </tbody>
         </table>

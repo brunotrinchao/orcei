@@ -8,13 +8,21 @@ import { ptBR } from 'date-fns/locale'
 import type { ProposalDTO } from '../../../../types'
 
 const { creditLabel } = useCreditCosts()
+const route = useRoute()
+const router = useRouter()
 
-const searchQuery = ref('')
+const searchQuery = ref((route.query.search || route.query.email || '') as string)
 const filterStatus = ref('')
 const filterStartDate = ref('')
 const filterEndDate = ref('')
 const filterPendingChat = ref(false)
 const itemsPerPage = 10
+
+watch(() => route.query.search || route.query.email, (newSearch) => {
+  if (newSearch !== undefined && String(newSearch) !== searchQuery.value) {
+    searchQuery.value = String(newSearch)
+  }
+})
 
 const hasFilters = computed(() => {
   return !!(searchQuery.value || filterStatus.value || filterStartDate.value || filterEndDate.value || filterPendingChat.value)
@@ -107,8 +115,6 @@ onMounted(() => {
 })
 
 // Observa mudanças na query para abrir o modal de nova proposta, mesmo que o usuário já esteja na página
-const route = useRoute()
-const router = useRouter()
 watch(() => route.query.new, (isNew) => {
   if (isNew === 'true') {
     isAIWizardOpen.value = true

@@ -10,13 +10,14 @@ defineProps<{
 defineEmits<{
   (e: 'edit'): void
   (e: 'delete'): void
+  (e: 'view'): void
 }>()
 </script>
 
 <template>
   <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-4">
     <div class="flex flex-col">
-      <span class="font-black text-lg text-gray-900 dark:text-gray-50">{{ client.name }}</span>
+      <span class="font-black text-lg text-gray-900 dark:text-gray-50 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transition-colors" @click="$emit('view')">{{ client.name }}</span>
       <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">{{ client.taxId || 'Sem documento' }}</span>
     </div>
 

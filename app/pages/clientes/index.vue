@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
-import { Search, Plus, Pencil, Trash2, RefreshCcw, MapPin, Mail, Phone, ExternalLink, MoreVertical, Upload } from 'lucide-vue-next'
+import { Search, Plus, Pencil, Trash2, RefreshCcw, MapPin, Mail, Phone, ExternalLink, MoreVertical, Upload, FileText, CheckCircle2, XCircle, Clock, TrendingUp, DollarSign, User, Building2 } from 'lucide-vue-next'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
 import type { ClientDTO } from '../../../../types'
 
@@ -32,6 +32,8 @@ const showInfo = ref(false)
 const { validate, reset: resetValidation } = useFormValidation()
 watch(showForm, (open) => { if (!open) resetValidation() })
 const selectedClient = ref<ClientDTO | null>(null)
+const clientStats = ref<any>(null)
+const loadingStats = ref(false)
 
 const form = ref({
   name: '',
@@ -53,10 +55,55 @@ const form = ref({
 const isSubmitting = ref(false)
 const isSearchingZip = ref(false)
 
-function openInfoModal(client: ClientDTO) {
+async function openInfoModal(client: ClientDTO) {
   selectedClient.value = client
   showInfo.value = true
+  loadingStats.value = true
+  clientStats.value = null
+  try {
+    const data: any = await $fetch(`/api/clients/${client._id}/stats`)
+    clientStats.value = data
+  } catch (e) {
+    console.error('Erro ao carregar estatísticas do cliente:', e)
+  } finally {
+    loadingStats.value = false
+  }
 }
+
+function formatCurrency(value: number = 0) {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+}
+
+function getStatusBadge(status: string) {
+  switch (status) {
+    case 'accepted':
+      return { label: 'Aprovado', color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' }
+    case 'expired':
+      return { label: 'Recusado', color: 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400 border-rose-200 dark:border-rose-800' }
+    case 'draft':
+      return { label: 'Rascunho', color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400 border-gray-200 dark:border-gray-700' }
+    default:
+      return { label: 'Em Aberto', color: 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200 dark:border-amber-800' }
+  }
+}
+
+const formattedAddress = computed(() => {
+  if (!selectedClient.value?.address) return null
+  const addr = selectedClient.value.address
+  const parts = []
+  if (addr.street) {
+    let line = addr.street
+    if (addr.number) line += `, ${addr.number}`
+    parts.push(line)
+  }
+  if (addr.neighborhood) parts.push(addr.neighborhood)
+  if (addr.city || addr.state) {
+    const loc = [addr.city, addr.state].filter(Boolean).join(' - ')
+    parts.push(loc)
+  }
+  if (addr.zip) parts.push(`CEP: ${addr.zip}`)
+  return parts.length > 0 ? parts.join(' • ') : null
+})
 
 function openModal(client: ClientDTO | null = null) {
   if (client) {
@@ -244,12 +291,250 @@ const stateMap: Record<string, { label: string; uf: string }> = {
       </template>
     </PageHeader>
 
-     <!-- Modal de Info -->
+     <!-- Modal de Info do Cliente -->
     <BaseDialog 
       v-model:open="showInfo" 
-      title="'Novo Cliente'" 
-      size="lg"
+      :title="`Perfil do Cliente: ${selectedClient?.name || ''}`" 
+      size="xl"
     >
+      <div v-if="selectedClient" class="space-y-6 py-2">
+        <!-- Header do Cliente: Avatar + Nome + Documento + Botões Rápidos -->
+        <div class="bg-gradient-to-br from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 text-white p-6 rounded-[12px] shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-[12px] bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-blue-500/20 shrink-0">
+              {{ selectedClient.name?.substring(0, 2).toUpperCase() }}
+            </div>
+            <div>
+              <h2 class="text-xl font-black tracking-tight text-white">{{ selectedClient.name }}</h2>
+              <div class="flex items-center gap-3 mt-1 text-xs text-slate-300 font-medium">
+                <span v-if="selectedClient.taxId" class="px-2.5 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 font-bold uppercase tracking-wider text-[10px]">
+                  {{ selectedClient.taxId }}
+                </span>
+                <span v-else class="text-slate-400 italic text-[11px]">Sem documento informado</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ações Rápidas -->
+          <div class="flex items-center gap-2 w-full md:w-auto shrink-0">
+            <a 
+              v-if="selectedClient.email" 
+              :href="`mailto:${selectedClient.email}`"
+              class="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[12px] bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition-all border border-slate-700"
+            >
+              <Mail class="w-4 h-4 text-blue-400" />
+              E-mail
+            </a>
+            <a 
+              v-if="selectedClient.phone" 
+              :href="selectedClient.isWhatsapp ? `https://wa.me/55${selectedClient.phone.replace(/\D/g, '')}` : `tel:${selectedClient.phone}`"
+              target="_blank"
+              class="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[12px] bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-md shadow-emerald-900/30"
+            >
+              <img v-if="selectedClient.isWhatsapp" src="/images/icons/whatsapp-svg.svg" class="w-4 h-4" alt="WhatsApp" />
+              <Phone v-else class="w-4 h-4" />
+              {{ selectedClient.isWhatsapp ? 'WhatsApp' : 'Ligar' }}
+            </a>
+          </div>
+        </div>
+
+        <!-- Cards de Métricas Comerciais -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <!-- Total Orçamentos -->
+          <div class="p-5 rounded-[12px] bg-gray-50 dark:bg-gray-900/60 border-2 border-gray-100 dark:border-gray-800 space-y-1">
+            <div class="flex items-center justify-between text-gray-400 dark:text-gray-500">
+              <span class="text-[10px] font-black uppercase tracking-wider">Total Orçamentos</span>
+              <FileText class="w-4 h-4 text-blue-500" />
+            </div>
+            <div v-if="loadingStats" class="h-7 bg-gray-200 dark:bg-gray-800 rounded animate-pulse w-12" />
+            <p v-else class="text-2xl font-black text-gray-900 dark:text-gray-100">
+              {{ clientStats?.stats?.totalProposals || 0 }}
+            </p>
+            <p class="text-[11px] text-gray-500 dark:text-gray-400 font-medium">Histórico cadastrado</p>
+          </div>
+
+          <!-- Fechados / Aprovados -->
+          <div class="p-5 rounded-[12px] bg-emerald-50/60 dark:bg-emerald-950/30 border-2 border-emerald-100 dark:border-emerald-900/50 space-y-1">
+            <div class="flex items-center justify-between text-emerald-600 dark:text-emerald-400">
+              <span class="text-[10px] font-black uppercase tracking-wider">Fechados</span>
+              <CheckCircle2 class="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div v-if="loadingStats" class="h-7 bg-emerald-200/50 dark:bg-emerald-900/40 rounded animate-pulse w-24" />
+            <p v-else class="text-xl font-black text-emerald-700 dark:text-emerald-300">
+              {{ formatCurrency(clientStats?.stats?.acceptedTotalValue) }}
+            </p>
+            <p class="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">
+              {{ clientStats?.stats?.acceptedCount || 0 }} {{ (clientStats?.stats?.acceptedCount === 1) ? 'orçamento' : 'orçamentos' }}
+            </p>
+          </div>
+
+          <!-- Em Aberto -->
+          <div class="p-5 rounded-[12px] bg-amber-50/60 dark:bg-amber-950/30 border-2 border-amber-100 dark:border-amber-900/50 space-y-1">
+            <div class="flex items-center justify-between text-amber-600 dark:text-amber-400">
+              <span class="text-[10px] font-black uppercase tracking-wider">Em Aberto</span>
+              <Clock class="w-4 h-4 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div v-if="loadingStats" class="h-7 bg-amber-200/50 dark:bg-amber-900/40 rounded animate-pulse w-24" />
+            <p v-else class="text-xl font-black text-amber-700 dark:text-amber-300">
+              {{ formatCurrency(clientStats?.stats?.pendingTotalValue) }}
+            </p>
+            <p class="text-[11px] text-amber-600 dark:text-amber-400 font-bold">
+              {{ clientStats?.stats?.pendingCount || 0 }} {{ (clientStats?.stats?.pendingCount === 1) ? 'aguardando' : 'aguardando' }}
+            </p>
+          </div>
+
+          <!-- Recusados / Expirados -->
+          <div class="p-5 rounded-[12px] bg-rose-50/60 dark:bg-rose-950/30 border-2 border-rose-100 dark:border-rose-900/50 space-y-1">
+            <div class="flex items-center justify-between text-rose-600 dark:text-rose-400">
+              <span class="text-[10px] font-black uppercase tracking-wider">Recusados</span>
+              <XCircle class="w-4 h-4 text-rose-600 dark:text-rose-400" />
+            </div>
+            <div v-if="loadingStats" class="h-7 bg-rose-200/50 dark:bg-rose-900/40 rounded animate-pulse w-24" />
+            <p v-else class="text-xl font-black text-rose-700 dark:text-rose-300">
+              {{ formatCurrency(clientStats?.stats?.expiredTotalValue) }}
+            </p>
+            <p class="text-[11px] text-rose-600 dark:text-rose-400 font-bold">
+              {{ clientStats?.stats?.expiredCount || 0 }} {{ (clientStats?.stats?.expiredCount === 1) ? 'recusado' : 'recusados' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Indicadores Comerciais Adicionais (Taxa de Conversão & Ticket Médio) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 rounded-[12px] bg-gray-50/60 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="p-2.5 rounded-[12px] bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
+                <TrendingUp class="w-5 h-5" />
+              </div>
+              <div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 font-bold">Taxa de Conversão</p>
+                <p class="text-lg font-black text-gray-900 dark:text-gray-100">
+                  {{ clientStats?.stats?.conversionRate || 0 }}% das propostas fechadas
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-[12px] bg-gray-50/60 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="p-2.5 rounded-[12px] bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">
+                <DollarSign class="w-5 h-5" />
+              </div>
+              <div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 font-bold">Ticket Médio Fechado</p>
+                <p class="text-lg font-black text-gray-900 dark:text-gray-100">
+                  {{ formatCurrency(clientStats?.stats?.avgTicket) }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detalhes do Cadastro (E-mail, Telefone, Endereço, Observações) -->
+        <div class="bg-gray-50/60 dark:bg-gray-900/40 p-6 rounded-[12px] border-2 border-gray-100 dark:border-gray-800 space-y-4">
+          <h3 class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Dados Cadastrais</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex items-center gap-3 p-3 bg-white dark:bg-gray-900 rounded-[12px] border border-gray-100 dark:border-gray-800">
+              <Mail class="w-5 h-5 text-gray-400 shrink-0" />
+              <div class="min-w-0">
+                <p class="text-[10px] font-bold text-gray-400 uppercase">E-mail</p>
+                <p class="text-xs font-bold text-gray-800 dark:text-gray-200 truncate">{{ selectedClient.email || 'Não informado' }}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3 p-3 bg-white dark:bg-gray-900 rounded-[12px] border border-gray-100 dark:border-gray-800">
+              <Phone class="w-5 h-5 text-gray-400 shrink-0" />
+              <div class="min-w-0">
+                <p class="text-[10px] font-bold text-gray-400 uppercase">Telefone / Celular</p>
+                <p class="text-xs font-bold text-gray-800 dark:text-gray-200">
+                  {{ selectedClient.phone ? formatPhone(selectedClient.phone) : 'Não informado' }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Endereço -->
+          <div v-if="formattedAddress" class="flex items-start gap-3 p-3 bg-white dark:bg-gray-900 rounded-[12px] border border-gray-100 dark:border-gray-800">
+            <MapPin class="w-5 h-5 text-gray-400 shrink-0 mt-0.5" />
+            <div>
+              <p class="text-[10px] font-bold text-gray-400 uppercase">Endereço de Cobrança</p>
+              <p class="text-xs font-bold text-gray-800 dark:text-gray-200">{{ formattedAddress }}</p>
+            </div>
+          </div>
+
+          <!-- Notas Internas -->
+          <div v-if="selectedClient.notes" class="p-4 bg-white dark:bg-gray-900 rounded-[12px] border border-gray-100 dark:border-gray-800 space-y-1">
+            <p class="text-[10px] font-bold text-gray-400 uppercase">Notas Internas</p>
+            <p class="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-line">{{ selectedClient.notes }}</p>
+          </div>
+        </div>
+
+        <!-- Tabela de Orçamentos Recentes -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between px-1">
+            <h3 class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Últimos Orçamentos do Cliente</h3>
+            <NuxtLink 
+              v-if="selectedClient.email || selectedClient.name" 
+              :to="`/orcamentos?search=${encodeURIComponent(selectedClient.email || selectedClient.name)}`" 
+              class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+            >
+              Ver todos os orçamentos
+              <ExternalLink class="w-3 h-3" />
+            </NuxtLink>
+          </div>
+
+          <div v-if="loadingStats" class="space-y-2">
+            <div v-for="i in 3" :key="i" class="h-12 bg-gray-100 dark:bg-gray-800 rounded-[12px] animate-pulse" />
+          </div>
+
+          <div v-else-if="!clientStats?.recentProposals || clientStats.recentProposals.length === 0" class="p-6 text-center bg-gray-50 dark:bg-gray-900/40 rounded-[12px] border border-gray-100 dark:border-gray-800">
+            <p class="text-xs font-bold text-gray-500">Nenhum orçamento emitido para este cliente ainda.</p>
+          </div>
+
+          <div v-else class="space-y-2">
+            <div 
+              v-for="p in clientStats.recentProposals" 
+              :key="p._id"
+              class="flex items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-[12px] border border-gray-100 dark:border-gray-800 hover:border-blue-500/30 transition-all"
+            >
+              <div class="flex items-center gap-3">
+                <div class="p-2 rounded-[12px] bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-black text-xs">
+                  #{{ p.sequenceNumber || p.code }}
+                </div>
+                <div>
+                  <p class="text-xs font-bold text-gray-900 dark:text-gray-100 truncate max-w-[200px] md:max-w-[300px]">{{ p.title }}</p>
+                  <p class="text-[10px] text-gray-400 font-medium">{{ new Date(p.createdAt).toLocaleDateString('pt-BR') }}</p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <span 
+                  :class="getStatusBadge(p.status).color"
+                  class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border"
+                >
+                  {{ getStatusBadge(p.status).label }}
+                </span>
+                <span class="text-xs font-black text-gray-900 dark:text-gray-100">
+                  {{ formatCurrency(p.total) }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="flex items-center justify-between w-full">
+          <BaseButton type="button" variant="outline" @click="showInfo = false">
+            Fechar
+          </BaseButton>
+          <BaseButton type="button" @click="showInfo = false; openModal(selectedClient)">
+            <Pencil class="w-4 h-4 mr-2" />
+            Editar Cliente
+          </BaseButton>
+        </div>
+      </template>
     </BaseDialog>
 
     <!-- Modal de Formulário -->
@@ -396,7 +681,7 @@ const stateMap: Record<string, { label: string; uf: string }> = {
       <template #item="{ item: client }">
         <tr class="hover:bg-gray-50/30 dark:hover:bg-gray-800/20 transition-all group">
           <td class="px-8 py-8">
-            <div class="flex flex-col">
+            <div class="flex flex-col cursor-pointer">
               <span class="font-black text-lg text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" @click.prevent="openInfoModal(client)">{{ client.name }}</span>
               <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">{{ client.taxId || 'Sem documento' }}</span>
             </div>
@@ -505,6 +790,7 @@ const stateMap: Record<string, { label: string; uf: string }> = {
           :key="client._id"
           :client="client"
           :format-phone="formatPhone"
+          @view="openInfoModal(client)"
           @edit="openModal(client)"
           @delete="deleteClient(client._id)"
         />

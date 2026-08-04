@@ -294,7 +294,7 @@ const stateMap: Record<string, { label: string; uf: string }> = {
      <!-- Modal de Info do Cliente -->
     <BaseDialog 
       v-model:open="showInfo" 
-      :title="`Perfil do Cliente: ${selectedClient?.name || ''}`" 
+      :title="selectedClient?.name || ''" 
       size="xl"
     >
       <div v-if="selectedClient" class="space-y-6 py-2">

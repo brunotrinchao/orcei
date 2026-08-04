@@ -28,6 +28,7 @@ useIntersectionObserver(mobileSentinelRef, ([entry]) => {
 }, { threshold: 0.1 })
 
 const showForm = ref(false)
+const showInfo = ref(false)
 const { validate, reset: resetValidation } = useFormValidation()
 watch(showForm, (open) => { if (!open) resetValidation() })
 const selectedClient = ref<ClientDTO | null>(null)
@@ -51,6 +52,11 @@ const form = ref({
 
 const isSubmitting = ref(false)
 const isSearchingZip = ref(false)
+
+function openInfoModal(client: ClientDTO) {
+  selectedClient.value = client
+  showInfo.value = true
+}
 
 function openModal(client: ClientDTO | null = null) {
   if (client) {
@@ -169,6 +175,36 @@ const formatPhone = (phone: string) => {
   }
   return phone
 }
+
+const stateMap: Record<string, { label: string; uf: string }> = {
+  ac: { label: 'Acre', uf: 'AC' },
+  al: { label: 'Alagoas', uf: 'AL' },
+  ap: { label: 'Amapá', uf: 'AP' },
+  am: { label: 'Amazonas', uf: 'AM' },
+  ba: { label: 'Bahia', uf: 'BA' },
+  ce: { label: 'Ceará', uf: 'CE' },
+  df: { label: 'Distrito Federal', uf: 'DF' },
+  es: { label: 'Espírito Santo', uf: 'ES' },
+  go: { label: 'Goiás', uf: 'GO' },
+  ma: { label: 'Maranhão', uf: 'MA' },
+  mt: { label: 'Mato Grosso', uf: 'MT' },
+  ms: { label: 'Mato Grosso do Sul', uf: 'MS' },
+  mg: { label: 'Minas Gerais', uf: 'MG' },
+  pa: { label: 'Pará', uf: 'PA' },
+  pb: { label: 'Paraíba', uf: 'PB' },
+  pr: { label: 'Paraná', uf: 'PR' },
+  pe: { label: 'Pernambuco', uf: 'PE' },
+  pi: { label: 'Piauí', uf: 'PI' },
+  rj: { label: 'Rio de Janeiro', uf: 'RJ' },
+  rn: { label: 'Rio Grande do Norte', uf: 'RN' },
+  rs: { label: 'Rio Grande do Sul', uf: 'RS' },
+  ro: { label: 'Rondônia', uf: 'RO' },
+  rr: { label: 'Roraima', uf: 'RR' },
+  sc: { label: 'Santa Catarina', uf: 'SC' },
+  sp: { label: 'São Paulo', uf: 'SP' },
+  se: { label: 'Sergipe', uf: 'SE' },
+  to: { label: 'Tocantins', uf: 'TO' }
+};
 </script>
 
 <template>
@@ -208,6 +244,14 @@ const formatPhone = (phone: string) => {
       </template>
     </PageHeader>
 
+     <!-- Modal de Info -->
+    <BaseDialog 
+      v-model:open="showInfo" 
+      title="'Novo Cliente'" 
+      size="lg"
+    >
+    </BaseDialog>
+
     <!-- Modal de Formulário -->
     <BaseDialog 
       v-model:open="showForm" 
@@ -240,7 +284,7 @@ const formatPhone = (phone: string) => {
           <div class="space-y-3">
             <BaseInput
               v-model="form.phone"
-              label="Telefone / Celular (informe e-mail ou telefone)"
+              label="Telefone / Celular"
               placeholder="(00) 00000-0000"
               mask="phone"
             />
@@ -300,10 +344,17 @@ const formatPhone = (phone: string) => {
               label="Cidade"
               placeholder="Ex: São Paulo"
             />
-            <BaseInput
+             <BaseSelect
               v-model="form.address.state"
-              label="Estado"
               placeholder="Ex: SP"
+              label="Estado"
+              :options="[
+                { label: 'Selecione o Estado', value: '__EMPTY__' },
+                ...Object.entries(stateMap).map(([value, info]: any) => ({
+                  label: info.label,
+                  value: value.toUpperCase()
+                }))
+              ]"
             />
           </div>
         </div>
@@ -346,7 +397,7 @@ const formatPhone = (phone: string) => {
         <tr class="hover:bg-gray-50/30 dark:hover:bg-gray-800/20 transition-all group">
           <td class="px-8 py-8">
             <div class="flex flex-col">
-              <span class="font-black text-lg text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ client.name }}</span>
+              <span class="font-black text-lg text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" @click.prevent="openInfoModal(client)">{{ client.name }}</span>
               <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">{{ client.taxId || 'Sem documento' }}</span>
             </div>
           </td>

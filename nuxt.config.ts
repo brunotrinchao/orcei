@@ -223,6 +223,9 @@ export default defineNuxtConfig({
 
   nitro: {
     preset: 'vercel',
+    exports: {
+      hidePoweredBy: true
+    },
     routeRules: {
       '/**': {
         headers: {
@@ -230,7 +233,20 @@ export default defineNuxtConfig({
           'X-Content-Type-Options': 'nosniff',
           'Referrer-Policy': 'strict-origin-when-cross-origin',
           'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-          'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload'
+          'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+          'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://cdn.jsdelivr.net https://*.googletagmanager.com https://*.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://res.cloudinary.com https://*.cloudinary.com https://*.gstatic.com https://*.googleusercontent.com https://*.google.com https://*.gravatar.com; connect-src 'self' https://*.stripe.com https://*.sentry.io wss://*.pusher.com https://*.pusher.com https://res.cloudinary.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self' https://js.stripe.com; frame-ancestors 'self'; object-src 'none'; base-uri 'self';"
+        }
+      },
+      '/api/_auth/**': {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, private, proxy-revalidate',
+          'Vary': 'Cookie, Authorization'
+        }
+      },
+      '/api/auth/**': {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, private, proxy-revalidate',
+          'Vary': 'Cookie, Authorization'
         }
       }
     }

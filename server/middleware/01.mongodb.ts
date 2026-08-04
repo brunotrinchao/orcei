@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
     console.error(`[Middleware DB] Erro crítico: Banco offline (${mongoose.connection.readyState}) após 10s. Verifique Whitelist IP Atlas.`)
     throw createError({
       statusCode: 503,
-      statusMessage: 'Database connection not established. Please check MongoDB Atlas IP whitelist.',
+      statusMessage: 'Serviço temporariamente indisponível.',
       fatal: false
     })
   }

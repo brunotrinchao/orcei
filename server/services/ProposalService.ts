@@ -439,6 +439,33 @@ export const ProposalService = {
       } catch (notifErr) {
         console.error(`[ProposalService] Erro ao criar notificação de proposta aceita:`, notifErr)
       }
+
+      // Automação: Enviar documento para assinatura eletrônica de forma automática via fila (Assinafy)
+      if (updated.client?.name && updated.client?.email && updated.signature?.status !== 'signed' && updated.signature?.status !== 'pending') {
+        try {
+          const profileIdStr = typeof profile === 'object' ? profile._id.toString() : profile.toString()
+          updated.signature = {
+            provider: 'assinafy',
+            documentId: updated.signature?.documentId || null,
+            status: 'pending',
+            signingUrl: updated.signature?.signingUrl || null,
+            signedAt: null,
+            signedFileUrl: null,
+            rejectionReason: null,
+            requestedAt: new Date()
+          }
+          await updated.save()
+
+          await QueueService.publish('REQUEST_DIGITAL_SIGNATURE', {
+            proposalId: updated._id.toString(),
+            profileId: profileIdStr
+          })
+          await this.logHistory(updated._id, 'signature_requested', 'system', { status: 'queued', trigger: 'auto_on_acceptance' })
+          console.log(`[ProposalService] Envio automático de assinatura agendado via fila para proposta aceita: ${updated.code}`)
+        } catch (sigErr) {
+          console.error(`[ProposalService] Erro ao agendar envio automático de assinatura para ${updated.code}:`, sigErr)
+        }
+      }
     }
 
     return updated

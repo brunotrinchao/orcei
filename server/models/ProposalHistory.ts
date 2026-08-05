@@ -2,7 +2,7 @@ import { Schema, model } from 'mongoose'
 
 const proposalHistorySchema = new Schema({
   proposalId: { type: Schema.Types.ObjectId, ref: 'Proposal', required: true },
-  type: { type: String, enum: ['system', 'email'], required: true },
+  type: { type: String, enum: ['system', 'email', 'signature'], required: true },
   action: { 
     type: String, 
     enum: [
@@ -22,7 +22,11 @@ const proposalHistorySchema = new Schema({
       'delayed',
       'failed',
       'suppressed',
-      'google_sync'
+      'google_sync',
+      'signature_requested',
+      'uploaded',
+      'signed',
+      'rejected'
     ], 
     required: true 
   },

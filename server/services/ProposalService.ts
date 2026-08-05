@@ -26,7 +26,7 @@ export const ProposalService = {
     return await Proposal.findOne({ slug }).populate('profileId', 'name avatar brandConfig address company contact email userId')
   },
 
-  async logHistory(proposalId: any, action: string, type: 'system' | 'email' = 'system', details?: any) {
+  async logHistory(proposalId: any, action: string, type: 'system' | 'email' | 'signature' = 'system', details?: any) {
     try {
       await ProposalHistory.create({
         proposalId,

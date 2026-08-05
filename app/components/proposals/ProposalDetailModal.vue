@@ -267,10 +267,7 @@ const paymentTermsText = computed(() => {
                 variante="ghost"
                 size="sm"
                 :class="[
-                  'w-full sm:w-auto inline-flex items-center px-3 py-2 rounded-[0.50rem] text-xs font-bold transition-all border',
-                  canOpenPublicLink
-                    ? 'bg-white/10 hover:bg-white/20 text-white border-white/20 cursor-pointer'
-                    : 'bg-white/5 text-gray-500 border-white/10 cursor-not-allowed opacity-60',
+                  'w-full sm:w-auto inline-flex items-center px-3 py-2 rounded-[0.50rem] text-xs font-bold transition-all border'
                 ]"
                 :title="
                   canOpenPublicLink
@@ -287,10 +284,7 @@ const paymentTermsText = computed(() => {
                 variante="ghost"
                 size="sm"
                 :class="[
-                  'w-full sm:w-auto inline-flex items-center px-3 py-2 rounded-[0.50rem] text-xs font-bold transition-all border',
-                  canOpenPublicLink
-                    ? 'bg-white/10 hover:bg-white/20 text-white border-white/20 cursor-pointer'
-                    : 'bg-white/5 text-gray-500 border-white/10 cursor-not-allowed opacity-60',
+                  'w-full sm:w-auto inline-flex items-center px-3 py-2 rounded-[0.50rem] text-xs font-bold transition-all border'
                 ]"
                 :title="
                   canOpenPublicLink
@@ -363,18 +357,18 @@ const paymentTermsText = computed(() => {
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <!-- Valor Total -->
         <div
-          class="p-4 rounded-[0.75rem] bg-green-50 dark:bg-green-900/60 border border-green-200 dark:border-green-800 space-y-1"
+          class="p-4 rounded-[0.75rem] bg-gray-50 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 space-y-1"
         >
           <div
-            class="flex items-center justify-between text-green-400 dark:text-green-500"
+            class="flex items-center justify-between text-gray-400 dark:text-gray-500"
           >
             <span class="text-[10px] font-black uppercase tracking-wider"
               >Valor Total</span
             >
-            <DollarSign class="w-4 h-4 text-emerald-500" />
+            <DollarSign class="w-4 h-4 text-gray-500" />
           </div>
           <p
-            class="text-xl font-black text-green-900 dark:text-green-100 truncate"
+            class="text-xl font-black text-gray-900 dark:text-gray-100 truncate"
           >
             {{ formatCurrency(calculatedTotal) }}
           </p>
@@ -384,7 +378,7 @@ const paymentTermsText = computed(() => {
           >
             Desc: {{ formatCurrency(calculatedDiscount) }}
           </p>
-          <p v-else class="text-[10px] text-green-400 font-medium truncate">
+          <p v-else class="text-[10px] text-gray-400 font-medium truncate">
             Sem desconto aplicado
           </p>
         </div>
@@ -399,7 +393,7 @@ const paymentTermsText = computed(() => {
             <span class="text-[10px] font-black uppercase tracking-wider"
               >Criado em</span
             >
-            <Calendar class="w-4 h-4 text-blue-500" />
+            <Calendar class="w-4 h-4 text-gray-500" />
           </div>
           <p
             class="text-sm font-black text-gray-900 dark:text-gray-100 truncate"
@@ -490,7 +484,7 @@ const paymentTermsText = computed(() => {
 
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
           <div
-            class="space-y-1 p-3 rounded-[0.50rem] bg-white dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700"
+            class="space-y-1 p-3 rounded-[0.50rem] bg-gray-200 dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700"
           >
             <span
               class="text-[10px] font-black text-gray-400 uppercase tracking-wider block"
@@ -502,14 +496,14 @@ const paymentTermsText = computed(() => {
           </div>
 
           <div
-            class="space-y-1 p-3 rounded-[0.50rem] bg-white dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700"
+            class="space-y-1 p-3 rounded-[0.50rem] bg-gray-200 dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700"
           >
             <span
               class="text-[10px] font-black text-gray-400 uppercase tracking-wider block"
               >Desconto</span
             >
             <span
-              class="font-black text-emerald-600 dark:text-emerald-400 text-sm"
+              class="font-black text-gray-900 dark:text-emerald-400 text-sm"
             >
               {{
                 calculatedDiscount > 0
@@ -520,13 +514,13 @@ const paymentTermsText = computed(() => {
           </div>
 
           <div
-            class="space-y-1 p-3 rounded-[0.50rem] bg-white dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700"
+            class="space-y-1 p-3 rounded-[0.50rem] bg-gray-200 dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700"
           >
             <span
               class="text-[10px] font-black text-gray-400 uppercase tracking-wider block"
               >Acréscimos / Taxas</span
             >
-            <span class="font-black text-amber-600 dark:text-amber-400 text-sm">
+            <span class="font-black text-gray-900 dark:text-amber-400 text-sm">
               {{
                 calculatedAdditional > 0
                   ? `+ ${formatCurrency(calculatedAdditional)}`

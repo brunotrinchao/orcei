@@ -28,12 +28,14 @@ export default defineEventHandler(async (event) => {
     ''
   ).toString().trim().toLowerCase()
 
-  const documentData = payload.data || payload.document || payload
+  const documentData = payload.object || payload.data || payload.document || payload
   const documentId =
-    documentData?.id ||
+    (payload.object && payload.object.id) ||
+    (payload.data && payload.data.id) ||
+    (payload.document && payload.document.id) ||
     documentData?.document_id ||
     payload.document_id ||
-    payload.id
+    (typeof payload.id === 'string' ? payload.id : null)
 
   const externalId =
     documentData?.external_id ||
@@ -52,6 +54,19 @@ export default defineEventHandler(async (event) => {
   }
   if (!proposal && externalId) {
     proposal = await Proposal.findById(externalId)
+  }
+
+  // Fallback 3: Tenta localizar pelo código da proposta contido no nome do arquivo (ex: "orcamento_-ORC-2026-004.pdf")
+  if (!proposal && documentData?.name) {
+    const match = documentData.name.match(/ORC-\d{4}-\d{3,}/i)
+    if (match) {
+      const code = `#${match[0].toUpperCase()}`
+      proposal = await Proposal.findOne({ code })
+      if (proposal && documentId) {
+        proposal.signature = proposal.signature || {}
+        proposal.signature.documentId = documentId
+      }
+    }
   }
 
   if (!proposal) {

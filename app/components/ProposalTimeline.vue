@@ -85,7 +85,11 @@ const getActionLabel = (action: string) => {
     'delayed': 'Entrega atrasada',
     'failed': 'Falha no envio',
     'suppressed': 'Envio suprimido (Lista de rejeição)',
-    'google_sync': 'Sincronizado com Google'
+    'google_sync': 'Sincronizado com Google',
+    'signature_requested': 'Solicitação de assinatura enviada',
+    'uploaded': 'Documento gerado no Assinafy',
+    'signed': 'Documento assinado digitalmente',
+    'rejected': 'Assinatura recusada pelo cliente'
   }
   return labels[action] || action
 }
@@ -107,7 +111,11 @@ const getActionIcon = (action: string) => {
     'delayed': Clock,
     'failed': AlertCircle,
     'suppressed': XCircle,
-    'google_sync': RefreshCcw
+    'google_sync': RefreshCcw,
+    'signature_requested': Clock,
+    'uploaded': FileText,
+    'signed': CheckCheck,
+    'rejected': XCircle
   }
   return icons[action] || AlertCircle
 }
@@ -129,7 +137,11 @@ const getActionColor = (action: string) => {
     'delayed': 'text-yellow-500 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950/40',
     'failed': 'text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-950/60',
     'suppressed': 'text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-800',
-    'google_sync': 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40'
+    'google_sync': 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40',
+    'signature_requested': 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40',
+    'uploaded': 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40',
+    'signed': 'text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60',
+    'rejected': 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-950/60'
   }
   return colors[action] || 'text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800'
 }

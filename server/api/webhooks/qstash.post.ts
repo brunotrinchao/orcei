@@ -279,38 +279,56 @@ async function handleProposalAccepted(payload: any) {
 async function handleSendEmailProposal(payload: any) {
   const { clientEmail, clientName, url, profileName, proposalId } = payload
   console.log(`[Job] Enviando e-mail de proposta para: ${clientEmail}`)
-  
-  const emailRes = await sendProposalEmail(clientEmail, clientName, url, profileName)
 
-  if (proposalId) {
-    const proposal = await Proposal.findById(proposalId)
-    if (proposal) {
-      if (emailRes) {
-        await Proposal.findByIdAndUpdate(proposalId, { lastEmailId: emailRes.id })
+  try {
+    const emailRes = await sendProposalEmail(clientEmail, clientName, url, profileName)
+
+    if (proposalId) {
+      const proposal = await Proposal.findById(proposalId)
+      if (proposal) {
+        const updateFields: any = {}
+        if (['draft', 'created'].includes(proposal.status)) {
+          updateFields.status = 'sent'
+        }
+        if (emailRes?.id) {
+          updateFields.lastEmailId = emailRes.id
+        }
+        if (Object.keys(updateFields).length > 0) {
+          await Proposal.findByIdAndUpdate(proposalId, updateFields)
+        }
+
+        await ProposalService.logHistory(proposal._id, 'sent', 'email', { emailId: emailRes?.id, status: 'sent' })
+
+        try {
+          await NotificationService.createNotification({
+            profileId: proposal.profileId.toString(),
+            type: 'proposal_sent',
+            title: 'E-mail de Orçamento Enviado',
+            summary: `Proposta #${proposal.code} enviada com sucesso para ${clientEmail}.`,
+            details: {
+              proposalId: proposal._id.toString(),
+              code: proposal.code,
+              title: proposal.title,
+              clientName,
+              clientEmail,
+              url,
+              sentAt: new Date().toISOString()
+            },
+            metadata: {
+              proposalId: proposal._id.toString(),
+              code: proposal.code
+            }
+          })
+        } catch (notifErr) {
+          console.error(`[QStash Webhook] Erro ao criar notificação de e-mail enviado:`, notifErr)
+        }
       }
-      try {
-        await NotificationService.createNotification({
-          profileId: proposal.profileId.toString(),
-          type: 'proposal_sent',
-          title: 'E-mail de Orçamento Enviado',
-          summary: `Proposta #${proposal.code} enviada com sucesso para ${clientEmail}.`,
-          details: {
-            proposalId: proposal._id.toString(),
-            code: proposal.code,
-            title: proposal.title,
-            clientName,
-            clientEmail,
-            url,
-            sentAt: new Date().toISOString()
-          },
-          metadata: {
-            proposalId: proposal._id.toString(),
-            code: proposal.code
-          }
-        })
-      } catch (notifErr) {
-        console.error(`[QStash Webhook] Erro ao criar notificação de e-mail enviado:`, notifErr)
-      }
+    }
+  } catch (err: any) {
+    console.error(`[QStash Webhook] Falha ao enviar e-mail de proposta (${proposalId}):`, err)
+    if (proposalId) {
+      await Proposal.findByIdAndUpdate(proposalId, { status: 'failed' })
+      await ProposalService.logHistory(proposalId, 'failed', 'email', { error: err.message || err })
     }
   }
 }

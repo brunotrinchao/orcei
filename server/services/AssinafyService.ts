@@ -130,7 +130,7 @@ export const AssinafyService = {
         throw new Error(`Falha ao registrar documento no Assinafy: ${JSON.stringify(docResponse)}`)
       }
 
-      // 3. Criar Signatário (POST /v1/accounts/{accountId}/signers)
+      // 3. Criar ou Obter Signatário Existente (POST /v1/accounts/{accountId}/signers)
       let rawPhone = proposal.client?.phone ? proposal.client.phone.replace(/\D/g, '') : ''
       if (rawPhone && !rawPhone.startsWith('55')) {
         rawPhone = `55${rawPhone}`
@@ -142,19 +142,55 @@ export const AssinafyService = {
         whatsapp_phone_number: rawPhone ? `+${rawPhone}` : undefined
       }
 
-      const signerResponse: any = await $fetch(`${baseUrl}/accounts/${accountId}/signers`, {
-        method: 'POST',
-        headers: {
-          ...this.getAuthHeaders(),
-          'Content-Type': 'application/json'
-        },
-        body: signerPayload
-      })
+      let signerId: string | null = null
 
-      const signerData = signerResponse?.data || signerResponse
-      const signerId = signerData?.id
+      try {
+        const signerResponse: any = await $fetch(`${baseUrl}/accounts/${accountId}/signers`, {
+          method: 'POST',
+          headers: {
+            ...this.getAuthHeaders(),
+            'Content-Type': 'application/json'
+          },
+          body: signerPayload
+        })
+
+        const signerData = signerResponse?.data || signerResponse
+        signerId = signerData?.id
+      } catch (signerErr: any) {
+        const errObj = signerErr?.data || signerErr?.response?._data || {}
+        const errMsg = String(errObj?.message || signerErr?.message || '')
+
+        // Se o signatário já existe para este e-mail na conta Assinafy, busca e reaproveita o ID existente
+        if (errMsg.toLowerCase().includes('já existe') || signerErr?.status === 400 || errObj?.status === 400) {
+          console.log('[AssinafyService] Signatário já cadastrado com este e-mail. Buscando ID existente...')
+          try {
+            const listResponse: any = await $fetch(`${baseUrl}/accounts/${accountId}/signers`, {
+              method: 'GET',
+              headers: this.getAuthHeaders()
+            })
+            const signersList: any[] = Array.isArray(listResponse?.data)
+              ? listResponse.data
+              : (Array.isArray(listResponse) ? listResponse : (listResponse?.items || []))
+
+            const targetEmail = (proposal.client?.email || '').toLowerCase().trim()
+            const existingSigner = signersList.find((s: any) => (s.email || '').toLowerCase().trim() === targetEmail) || signersList[0]
+
+            if (existingSigner?.id) {
+              signerId = existingSigner.id
+              console.log(`[AssinafyService] Signatário existente reaproveitado com sucesso: ${signerId}`)
+            }
+          } catch (listErr) {
+            console.error('[AssinafyService] Falha ao consultar lista de signatários existentes:', listErr)
+          }
+        }
+
+        if (!signerId) {
+          throw signerErr
+        }
+      }
+
       if (!signerId) {
-        throw new Error(`Falha ao registrar signatário no Assinafy: ${JSON.stringify(signerResponse)}`)
+        throw new Error('Falha ao obter ID do signatário no Assinafy.')
       }
 
       // 4. Solicitar Assinatura (POST /v1/documents/{documentId}/assignments)

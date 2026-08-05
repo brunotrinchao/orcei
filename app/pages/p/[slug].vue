@@ -381,7 +381,7 @@ const statusMap: any = {
 
           <div class="bg-gray-50 border border-gray-100 rounded-[0.75rem] p-5">
             <div class="flex items-center gap-2 mb-2">
-              <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">Proposta Elaborada para</span>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Proposta Elaborada para</span>
             </div>
             <p class="font-black text-black text-base leading-tight mb-4">{{ proposal.client?.name }}</p>
             <div class="flex gap-4 text-[10px] text-slate-400 font-bold">
@@ -400,40 +400,6 @@ const statusMap: any = {
             </div>
           </div>
 
-          <!-- Banner de Assinatura Eletrônica (se ativa ou concluída) -->
-          <div v-if="proposal.signature && proposal.signature.status !== 'none'" class="mt-6 p-4 rounded-[0.75rem] border bg-gradient-to-r transition-all"
-            :class="proposal.signature.status === 'signed' ? 'from-emerald-50 to-teal-50 border-emerald-200 text-emerald-950' : 'from-indigo-50 to-blue-50 border-indigo-200 text-indigo-950'"
-          >
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div class="flex items-center gap-3">
-                <div :class="proposal.signature.status === 'signed' ? 'bg-emerald-600 text-white' : 'bg-indigo-600 text-white'" class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm font-black text-sm">
-                  ✓
-                </div>
-                <div>
-                  <h4 class="font-black text-sm tracking-tight">
-                    {{ proposal.signature.status === 'signed' ? 'Proposta Assinada Digitalmente' : 'Assinatura Eletrônica Pendente' }}
-                  </h4>
-                  <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-                    {{ proposal.signature.status === 'signed' 
-                      ? 'Este documento possui validade jurídica respaldada pela MP 2.200-2/2001 e Lei 14.063/2020.' 
-                      : 'Por favor, assine este documento para oficializar o aceite do orçamento.' }}
-                  </p>
-                </div>
-              </div>
-
-              <a 
-                v-if="proposal.signature.status === 'pending' && proposal.signature.signingUrl" 
-                :href="proposal.signature.signingUrl"
-                target="_blank"
-                class="inline-flex items-center justify-center px-4 py-2 rounded-[0.50rem] bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs uppercase tracking-wider transition-all shadow-md shrink-0 w-full sm:w-auto"
-              >
-                Assinar Proposta Agora 🖊️
-              </a>
-              <span v-else-if="proposal.signature.status === 'signed'" class="text-xs font-black text-emerald-700 uppercase tracking-wider bg-emerald-100 px-3 py-1 rounded-full">
-                Assinado com Sucesso
-              </span>
-            </div>
-          </div>
 
           <div class="bg-gray-50 border border-gray-100 rounded-[0.75rem] p-5">
             <div class="flex items-center gap-2 mb-2">
@@ -470,6 +436,42 @@ const statusMap: any = {
               </p>
           </div>
         </div>
+
+
+          <!-- Banner de Assinatura Eletrônica (se ativa ou concluída) -->
+          <div v-if="proposal.signature && proposal.signature.status !== 'none'" class="mt-6 p-4 rounded-[0.75rem] border bg-gradient-to-r transition-all"
+            :class="proposal.signature.status === 'signed' ? 'from-emerald-50 to-teal-50 border-emerald-200 text-emerald-950' : 'from-indigo-50 to-blue-50 border-indigo-200 text-indigo-950'"
+          >
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div :class="proposal.signature.status === 'signed' ? 'bg-emerald-600 text-white' : 'bg-indigo-600 text-white'" class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm font-black text-sm">
+                  ✓
+                </div>
+                <div>
+                  <h4 class="font-black text-sm tracking-tight">
+                    {{ proposal.signature.status === 'signed' ? 'Proposta Assinada Digitalmente' : 'Assinatura Eletrônica Pendente' }}
+                  </h4>
+                  <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                    {{ proposal.signature.status === 'signed' 
+                      ? 'Este documento possui validade jurídica respaldada pela MP 2.200-2/2001 e Lei 14.063/2020.' 
+                      : `Um e-mail será enviado para ${proposal.client.email} .` }}
+                  </p>
+                </div>
+              </div>
+
+              <a 
+                v-if="proposal.signature.status === 'pending' && proposal.signature.signingUrl" 
+                :href="proposal.signature.signingUrl"
+                target="_blank"
+                class="inline-flex items-center justify-center px-4 py-2 rounded-[0.50rem] bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs uppercase tracking-wider transition-all shadow-md shrink-0 w-full sm:w-auto"
+              >
+                Assinar Proposta Agora 🖊️
+              </a>
+              <span v-else-if="proposal.signature.status === 'signed'" class="text-xs font-black text-emerald-700 uppercase tracking-wider bg-emerald-100 px-3 py-1 rounded-full">
+                Assinado com Sucesso
+              </span>
+            </div>
+          </div>
       </div>
     </section>
 

@@ -337,31 +337,40 @@ const statusMap: any = {
   draft: { label: 'Rascunho', color: 'bg-gray-100 text-gray-800' },
   created: { label: 'Criado', color: 'bg-blue-50 text-blue-700' },
   sent: { label: 'Enviado', color: 'bg-blue-100 text-blue-800' },
-  delivered: { label: 'Entregue', color: 'bg-green-100 text-green-800' },
+  delivered: { label: 'Entregue', color: 'bg-emerald-100 text-emerald-800' },
   opened: { label: 'Aberto', color: 'bg-sky-100 text-sky-800' },
   clicked: { label: 'Clicado', color: 'bg-orange-100 text-orange-800' },
   pending: { label: 'Pendente', color: 'bg-yellow-100 text-yellow-800' },
-  accepted: { label: 'Aceito', color: 'bg-green-600 text-white' },
+  accepted: { label: 'Aceito', color: 'bg-emerald-600 text-white' },
   expired: { label: 'Expirado', color: 'bg-red-100 text-red-800' },
   bounced: { label: 'Erro Envio', color: 'bg-red-600 text-white' },
-  viewed: { label: 'Visualizado', color: 'bg-indigo-100 text-indigo-800' }
+  failed: { label: 'Erro Envio', color: 'bg-red-600 text-white' },
+  viewed: { label: 'Visualizado', color: 'bg-indigo-100 text-indigo-800' },
+  rejected: { label: 'Rejeitado', color: 'bg-red-700 text-white' }
 }
 
-const getStatusVariant = (status: string): 'default' | 'success' | 'warning' | 'error' | 'info' => {
-  const map: Record<string, any> = {
-    draft: 'default',
-    created: 'info',
-    sent: 'info',
-    delivered: 'success',
-    viewed: 'info',
-    opened: 'info',
-    clicked: 'warning',
-    pending: 'warning',
-    accepted: 'success',
-    expired: 'error',
-    bounced: 'error'
+const getStatusVariant = (proposal: ProposalDTO | string): 'default' | 'success' | 'warning' | 'error' | 'info' => {
+  const statusStr = typeof proposal === 'string' ? proposal : proposal.status
+  const sigStatus = typeof proposal === 'object' ? proposal.signature?.status : null
+
+  if (sigStatus === 'signed' || statusStr === 'accepted') return 'success'
+  if (sigStatus === 'pending') return 'warning'
+  if (['expired', 'bounced', 'failed', 'rejected'].includes(statusStr)) return 'error'
+  if (['sent', 'delivered', 'viewed', 'opened', 'created'].includes(statusStr)) return 'info'
+  if (statusStr === 'clicked' || statusStr === 'pending') return 'warning'
+  return 'default'
+}
+
+function getProposalStatusLabel(proposal: ProposalDTO) {
+  if (proposal.status === 'accepted') {
+    if (proposal.signature?.status === 'signed') return 'Aceito & Assinado'
+    if (proposal.signature?.status === 'pending') return 'Aguardando Assinatura'
+    return 'Aceito'
   }
-  return map[status] || 'default'
+  if (proposal.status === 'rejected') return 'Rejeitado'
+  if (proposal.status === 'failed' || proposal.status === 'bounced') return 'Erro no Envio'
+  const item = statusMap[proposal.status]
+  return item?.label || proposal.status
 }
 
 const formatDate = (date: string) => {
@@ -685,8 +694,8 @@ async function saveContract() {
           v-for="proposal in proposals"
           :key="proposal._id"
           :proposal="proposal"
-          :status-variant="getStatusVariant(proposal.status)"
-          :status-label="statusMap[proposal.status]?.label"
+          :status-variant="getStatusVariant(proposal)"
+          :status-label="getProposalStatusLabel(proposal)"
           :is-resending="isResending === proposal._id"
           @open-info="openProposalInfo(proposal)"
           @open-chat="openChat(proposal)"

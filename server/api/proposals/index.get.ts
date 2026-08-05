@@ -27,6 +27,7 @@ export default defineEventHandler(async (event) => {
     query.$or = [
       { title: { $regex: safeSearch, $options: 'i' } },
       { 'client.name': { $regex: safeSearch, $options: 'i' } },
+      { 'client.email': { $regex: safeSearch, $options: 'i' } },
       { code: { $regex: safeSearch, $options: 'i' } }
     ]
   }

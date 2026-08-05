@@ -2,7 +2,7 @@
 import { Loader2 } from 'lucide-vue-next'
 
 interface Props {
-  variant?: 'solid' | 'outline' | 'ghost' | 'primary' | 'secondary' | 'danger' | 'ia'
+  variant?: 'solid' | 'outline' | 'ghost' | 'primary' | 'secondary' | 'danger' | 'ia' | 'whatsapp'
   size?: 'sm' | 'md' | 'lg' | 'icon' | 'icon-sm'
   type?: 'button' | 'submit' | 'reset'
   iconOnly?: boolean
@@ -36,6 +36,7 @@ const NuxtLink = resolveComponent('NuxtLink')
       variant === 'secondary' ? 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white' : '',
       variant === 'ghost' ? 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white' : '',
       variant === 'ia' ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-black tracking-wider shadow-lg shadow-violet-500/20 active:scale-98 transition-all' : '',
+      variant === 'whatsapp' ? 'bg-emerald-600 text-white hover:bg-emerald-200 dark:hover:bg-emerald-700 hover:text-white-900 dark:hover:text-white' : '',
       size === 'sm' && !iconOnly ? 'px-4 py-2 text-[10px]' : '',
       size === 'md' && !iconOnly ? 'px-8 py-4 text-xs' : '',
       size === 'lg' && !iconOnly ? 'px-12 py-5 text-sm' : '',

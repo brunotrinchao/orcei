@@ -1,6 +1,6 @@
 <script setup lang="ts">
 interface Props {
-  variant?: 'default' | 'success' | 'warning' | 'error' | 'info'
+  variant?: 'default' | 'success' | 'warning' | 'error' | 'info' | 'ia'
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -12,7 +12,9 @@ const variants = {
   success: 'bg-emerald-50 dark:bg-green-900/30 text-emerald-800 dark:text-green-400 border border-emerald-200 dark:border-green-800/50',
   warning: 'bg-amber-50 dark:bg-yellow-900/30 text-amber-800 dark:text-yellow-400 border border-amber-200 dark:border-yellow-800/50',
   error: 'bg-rose-50 dark:bg-red-900/30 text-rose-800 dark:text-red-400 border border-rose-200 dark:border-red-800/50',
-  info: 'bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50'
+  info: 'bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50',
+  ia: 'bg-violet-900/50 dark:bg-violet-900/30 text-violet-800 dark:text-violet-400 border border-violet-700/50 dark:border-violet-800/50',
+  price: 'bg-indigo-900/50 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400 border border-indigo-700/50 dark:border-indigo-800/50'
 }
 </script>
 

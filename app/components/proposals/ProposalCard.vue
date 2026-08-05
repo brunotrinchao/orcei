@@ -12,6 +12,7 @@ const props = defineProps<{
 }>()
 
 defineEmits<{
+  (e: 'open-info'): void
   (e: 'open-chat'): void
   (e: 'send-whatsapp'): void
   (e: 'open-history'): void
@@ -58,7 +59,7 @@ function canShowWhatsappButton(status: string) {
 </script>
 
 <template>
-  <div class="rounded-[0.75rem] border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-4">
+  <div @click="$emit('open-info')" class="rounded-[0.75rem] border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-4 cursor-pointer hover:border-gray-300 dark:hover:border-gray-700 transition-all">
     <!-- topo: ref + badge -->
     <div class="flex items-center justify-between mb-2">
       <span class="text-xs font-bold text-gray-400">REF: {{ proposal.code }}</span>
@@ -88,7 +89,7 @@ function canShowWhatsappButton(status: string) {
       <div class="flex items-center gap-1">
         <button
           v-if="canShowChatButton(proposal.status)"
-          @click="$emit('open-chat')"
+          @click.stop="$emit('open-chat')"
           class="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-[0.50rem] transition-all relative"
           title="Chat e Interações"
           aria-label="Abrir chat do orçamento"
@@ -103,7 +104,7 @@ function canShowWhatsappButton(status: string) {
         </button>
         <button
           v-if="proposal.client.phone && canShowWhatsappButton(proposal.status)"
-          @click="$emit('send-whatsapp')"
+          @click.stop="$emit('send-whatsapp')"
           class="p-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-[0.50rem] transition-all"
           title="Enviar via WhatsApp"
           aria-label="Enviar via WhatsApp"
@@ -115,6 +116,7 @@ function canShowWhatsappButton(status: string) {
       <DropdownMenuRoot>
         <DropdownMenuTrigger as-child>
           <button
+            @click.stop
             class="p-2 text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[0.75rem] transition-all"
             title="Mais ações"
             aria-label="Mais ações do orçamento"

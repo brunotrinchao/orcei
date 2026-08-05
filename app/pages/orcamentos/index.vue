@@ -18,6 +18,14 @@ const filterEndDate = ref('')
 const filterPendingChat = ref(false)
 const itemsPerPage = 10
 
+const showProposalInfo = ref(false)
+const selectedProposalInfo = ref<ProposalDTO | null>(null)
+
+function openProposalInfo(proposal: ProposalDTO) {
+  selectedProposalInfo.value = proposal
+  showProposalInfo.value = true
+}
+
 watch(() => route.query.search || route.query.email, (newSearch) => {
   if (newSearch !== undefined && String(newSearch) !== searchQuery.value) {
     searchQuery.value = String(newSearch)
@@ -519,7 +527,7 @@ async function saveContract() {
       </template>
 
       <template #item="{ item: proposal }">
-        <tr class="hover:bg-gray-50/30 dark:hover:bg-gray-800/20 transition-all group">
+        <tr @click="openProposalInfo(proposal)" class="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-all group cursor-pointer">
           <td class="px-8 py-6">
             <div class="flex items-center gap-3">
               <div class="flex flex-col">
@@ -548,7 +556,7 @@ async function saveContract() {
             <div class="flex justify-end items-center gap-1">
               <button
                 v-if="canShowChatButton(proposal.status)"
-                @click="openChat(proposal)"
+                @click.stop="openChat(proposal)"
                 class="p-2.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-2xl transition-all relative"
                 title="Chat e Interações"
                 aria-label="Abrir chat do orçamento"
@@ -563,7 +571,7 @@ async function saveContract() {
               </button>
               <button
                 v-if="proposal.client.phone && canShowWhatsappButton(proposal.status)"
-                @click="sendWhatsapp(proposal)"
+                @click.stop="sendWhatsapp(proposal)"
                 class="p-2.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-[0.75rem] transition-all"
                 title="Enviar via WhatsApp"
                 aria-label="Enviar via WhatsApp"
@@ -573,6 +581,7 @@ async function saveContract() {
               <DropdownMenuRoot>
                 <DropdownMenuTrigger as-child>
                   <button
+                    @click.stop
                     class="p-2.5 text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[0.75rem] transition-all"
                     title="Mais ações"
                     aria-label="Mais ações do orçamento"
@@ -679,6 +688,7 @@ async function saveContract() {
           :status-variant="getStatusVariant(proposal.status)"
           :status-label="statusMap[proposal.status]?.label"
           :is-resending="isResending === proposal._id"
+          @open-info="openProposalInfo(proposal)"
           @open-chat="openChat(proposal)"
           @send-whatsapp="sendWhatsapp(proposal)"
           @open-history="openHistory(proposal)"
@@ -691,6 +701,13 @@ async function saveContract() {
         <div v-if="loadingMore" class="py-4 text-center text-sm text-gray-400 font-bold">Carregando...</div>
       </template>
     </div>
+
+    <!-- Modal de Informações Detalhadas do Orçamento -->
+    <ProposalDetailModal
+      v-model:open="showProposalInfo"
+      :proposal="selectedProposalInfo"
+      @edit="p => { showProposalInfo = false; openModal(p) }"
+    />
 
     <!-- Modal de Orçamento -->
     <BaseDialog

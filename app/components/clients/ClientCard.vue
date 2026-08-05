@@ -15,7 +15,7 @@ defineEmits<{
 </script>
 
 <template>
-  <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-4 cursor-pointer hover:border-gray-300 dark:hover:border-gray-700 transition-all group" @click="$emit('view')">
+  <div class="rounded-[0.75rem] border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-4 cursor-pointer hover:border-gray-300 dark:hover:border-gray-700 transition-all group" @click="$emit('view')">
     <div class="flex flex-col">
       <span class="font-black text-lg text-gray-900 dark:text-gray-50 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ client.name }}</span>
       <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">{{ client.taxId || 'Sem documento' }}</span>

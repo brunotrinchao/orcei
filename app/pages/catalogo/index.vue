@@ -136,7 +136,7 @@ function clearFilters() {
         <tr class="hover:bg-gray-50/30 dark:hover:bg-gray-800/20 transition-all group">
           <td class="px-8 py-8">
             <div class="flex items-center gap-6">
-              <div class="w-16 h-16 rounded-[0.75rem] border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
+              <div class="w-16 h-16 rounded-[0.50rem] border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
                 <img v-if="item.imageUrl" :src="item.imageUrl" class="w-full h-full object-cover" loading="lazy">
                 <div v-else class="text-gray-400">
                   <component :is="getIcon(item.icon || 'Package')" class="w-8 h-8" />

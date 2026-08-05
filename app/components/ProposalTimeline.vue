@@ -12,7 +12,8 @@ import {
   AlertCircle,
   Clock,
   Inbox,
-  RefreshCcw
+  RefreshCcw,
+  FileText
 } from 'lucide-vue-next'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'

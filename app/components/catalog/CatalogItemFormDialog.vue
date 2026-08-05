@@ -17,6 +17,8 @@ const { notify } = useAlerts()
 const { creditLabel } = useCreditCosts()
 const { Cropper, showCropper, rawImage, cropperRef, onFileChange, resetCropper } = useCropper()
 
+const isPhotoType = ref(false)
+
 const showForm = computed({
   get: () => props.open,
   set: (val) => emit('update:open', val)
@@ -118,6 +120,15 @@ watch(() => props.open, (isOpen) => {
   }
 })
 
+const { 
+  isCreditConfirmOpen, 
+  confirmTitle, 
+  confirmDescription, 
+  executeWithCreditCheck, 
+  handleCreditConfirm, 
+  handleCreditCancel 
+} = useConfirmCreditAction()
+
 async function suggestWithAI() {
   if (!form.value.name.trim()) {
     notify('Aviso', 'Digite o nome do item antes de pedir sugestão à IA.')
@@ -201,7 +212,7 @@ async function saveItem() {
         <p class="text-xs font-bold text-gray-500 dark:text-gray-400">
           Arraste e redimensione a imagem para o enquadramento ideal (1:1).
         </p>
-        <div class="bg-gray-100 dark:bg-gray-950 rounded-3xl overflow-hidden min-h-[380px] border border-gray-200 dark:border-gray-800">
+        <div class="bg-gray-100 dark:bg-gray-950 rounded-[0.75rem]] overflow-hidden min-h-[380px] border border-gray-200 dark:border-gray-800">
           <Cropper
             ref="cropperRef"
             :src="rawImage"
@@ -236,19 +247,19 @@ async function saveItem() {
                   <div class="flex bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl w-[120px]">
                     <button 
                       type="button"
-                      @click="form.imageUrl = ''"
-                      :class="[!form.imageUrl ? 'bg-white dark:bg-gray-950 shadow-sm text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-400 dark:text-gray-500']"
+                      @click="isPhotoType = false; form.imageUrl = ''"
+                      :class="[!isPhotoType ? 'bg-white dark:bg-gray-950 shadow-sm text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-400 dark:text-gray-500']"
                       class="flex-1 px-2 py-1 rounded-lg text-[9px] font-black uppercase transition-all"
                     >
                       Ícone
                     </button>
                     <button 
                       type="button"
+                      @click="isPhotoType = true"
                       class="relative flex-1 px-2 py-1 rounded-lg text-[9px] font-black uppercase transition-all overflow-hidden"
-                      :class="[form.imageUrl ? 'bg-white dark:bg-gray-950 shadow-sm text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-400 dark:text-gray-500']"
+                      :class="[isPhotoType ? 'bg-white dark:bg-gray-950 shadow-sm text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-400 dark:text-gray-500']"
                     >
                       Foto
-                      <input type="file" accept="image/*" @change="onFileChange" class="absolute inset-0 opacity-0 cursor-pointer">
                     </button>
                   </div>
                 </div>
@@ -268,8 +279,26 @@ async function saveItem() {
                 </div>
                 
                 <!-- Seletor de Ícones Padronizado -->
-                <div v-else class="w-full animate-in fade-in zoom-in-95 duration-200">
+                <div v-if="!isPhotoType" class="w-full animate-in fade-in zoom-in-95 duration-200">
                   <BaseIconSelect v-model="form.icon" />
+                </div>
+
+                <div v-if="isPhotoType" class="transition-all animate-fadeIn">
+                  <label 
+                    class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl cursor-pointer bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-900 transition-all relative group"
+                  >
+                    <div class="flex flex-col items-center justify-center pt-5 pb-6 px-4 text-center">
+                      <!-- Ícone de upload -->
+                      <svg class="w-8 h-8 mb-2 text-gray-400 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                      <p class="mb-1 text-xs text-gray-500 dark:text-gray-400">
+                        <span class="font-bold text-blue-600 dark:text-blue-400">Clique para enviar</span> ou arraste e solte
+                      </p>
+                      <p class="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider">PNG ou JPG</p>
+                    </div>
+                    <input type="file" accept="image/*" @change="onFileChange" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
+                  </label>
                 </div>
               </div>
 
@@ -277,7 +306,7 @@ async function saveItem() {
               <div class="space-y-4">
                 <BaseSelect 
                   v-model="form.type" 
-                  label="Tipo de Item *" 
+                  label="Tipo de Item" 
                   :options="typeOptions" 
                   :icon="Layers"
                   required
@@ -294,7 +323,7 @@ async function saveItem() {
             <!-- Nome Comercial do Item -->
             <BaseInput 
               v-model="form.name" 
-              label="Nome Comercial do Item *" 
+              label="Nome Comercial do Item" 
               placeholder="Ex: Desenvolvimento de Website Institucional" 
               required 
             />
@@ -313,7 +342,7 @@ async function saveItem() {
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <BaseInput 
                 v-model="form.price" 
-                label="Preço Base (R$) *" 
+                label="Preço Base (R$)" 
                 mask="currency"
                 required 
               />

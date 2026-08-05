@@ -25,7 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const borderClass = computed(() => {
-  return props.noBorder ? '' : 'p-6 md:p-8 border border-gray-200 dark:border-gray-800'
+  return props.noBorder ? '' : 'p-6 md:p-8 border border-slate-200 dark:border-gray-800'
 })
 </script>
 
@@ -33,7 +33,7 @@ const borderClass = computed(() => {
   <section
     :id="id"
     :data-tour="dataTour"
-    class="bg-white dark:bg-gray-900 rounded-[0.75rem] shadow-sm scroll-mt-8 transition-colors"
+    class="bg-white dark:bg-gray-900 rounded-[0.75rem] shadow-sm shadow-slate-200/50 dark:shadow-none scroll-mt-8 transition-colors"
     :class="borderClass"
   >
     <!-- Header da Seção -->
@@ -72,7 +72,7 @@ const borderClass = computed(() => {
     </div>
 
     <!-- Rodapé (opcional) -->
-    <div v-if="$slots.footer" class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
+    <div v-if="$slots.footer" class="mt-8 pt-6 border-t border-slate-200 dark:border-gray-800">
       <slot name="footer" />
     </div>
   </section>

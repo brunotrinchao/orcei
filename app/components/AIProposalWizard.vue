@@ -177,7 +177,7 @@ function removeItem(idx: number) {
       
       <!-- Slide-over Premium Lateral -->
       <DialogContent 
-        class="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-xl bg-white/80 dark:bg-slate-900/80 border-l border-white/20 dark:border-slate-800/50 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.15)] flex flex-col ease-out-back dialog-content"
+        class="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-xl bg-white dark:bg-slate-900/80 border-l border-white/20 dark:border-slate-800/50 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.15)] flex flex-col ease-out-back dialog-content"
       >
         <!-- Glowing Background Aura (Efeito de Respiração IA) -->
         <div class="absolute -top-40 -left-40 w-96 h-96 bg-gradient-to-tr from-violet-500/20 via-fuchsia-500/10 to-transparent rounded-full blur-3xl pointer-events-none animate-pulse duration-[8000ms]" />
@@ -186,7 +186,7 @@ function removeItem(idx: number) {
         <!-- Header do Slide-over -->
         <div class="relative px-6 py-5 border-b border-gray-100 dark:border-slate-800/80 flex items-center justify-between z-10">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-violet-600 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
+            <div class="w-10 h-10 rounded-[0.75rem] bg-gradient-to-tr from-violet-600 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
               <Sparkles class="w-5 h-5 text-white animate-pulse" />
             </div>
             <div>
@@ -197,7 +197,7 @@ function removeItem(idx: number) {
             </div>
           </div>
           
-          <DialogClose type="button" @click="close" class="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer">
+          <DialogClose type="button" @click="close" class="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-[0.75rem] hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer">
             <X class="w-5 h-5" />
           </DialogClose>
         </div>
@@ -207,7 +207,7 @@ function removeItem(idx: number) {
           
           <!-- STEP 1: PROMPT -->
           <div v-if="step === 'prompt'" class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
-            <div class="p-6 bg-gradient-to-br from-violet-50 to-fuchsia-50/50 dark:from-violet-950/20 dark:to-fuchsia-950/10 border border-violet-100/50 dark:border-violet-900/30 rounded-3xl space-y-3">
+            <div class="p-6 bg-gradient-to-br from-violet-50 to-fuchsia-50/50 dark:from-violet-950/20 dark:to-fuchsia-950/10 border border-violet-100/50 dark:border-violet-900/30 rounded-[0.75rem] space-y-3">
               <div class="flex items-center gap-2 text-violet-700 dark:text-violet-300">
                 <Sparkles class="w-5 h-5 shrink-0" />
                 <span class="text-xs font-black uppercase tracking-wider">Criação Instantânea</span>
@@ -218,15 +218,13 @@ function removeItem(idx: number) {
             </div>
 
             <div class="relative group">
-              <!-- Borda com Gradiente Glowing Neon -->
-              <div class="absolute -inset-0.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-[2rem] blur opacity-15 group-focus-within:opacity-30 transition duration-300" />
               
               <textarea
                 v-model="promptText"
                 rows="6"
                 aria-label="Descrição do serviço para a IA gerar a proposta"
                 placeholder="Ex: Landing Page Premium com alta conversão, incluindo Copywriting estratégico e protótipo UI/UX responsivo em Figma..."
-                class="relative w-full px-6 py-5 bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] focus:ring-0 focus:border-slate-200 dark:focus:border-slate-700 transition-all outline-none font-bold text-slate-800 dark:text-slate-200 placeholder:text-slate-300 dark:placeholder:text-slate-700 shadow-sm resize-none"
+                class="relative w-full px-6 py-5 bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800/80 rounded-[0.75rem] focus:ring-0 focus:border-slate-200 dark:focus:border-slate-700 transition-all outline-none font-bold text-slate-800 dark:text-slate-200 placeholder:text-slate-300 dark:placeholder:text-slate-700 resize-none"
                 @keydown.enter.ctrl="handleGenerateRequest"
               ></textarea>
             </div>
@@ -236,7 +234,7 @@ function removeItem(idx: number) {
               <button 
                 @click="handleGenerateRequest" 
                 :disabled="!promptText"
-                class="px-6 py-3 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-violet-500/20 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center gap-2"
+                class="px-6 py-3 rounded-[0.75rem] bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-violet-500/20 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center gap-2"
               >
                 {{ creditLabel('proposalSuggest', 'Analisar com IA') }}
                 <ArrowRight class="w-4 h-4" />

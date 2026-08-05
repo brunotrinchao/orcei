@@ -313,7 +313,7 @@ function formatRelativeTime(minutesAgo: number) {
 
       <!-- KPI Cards -->
       <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-        <div v-for="i in 4" :key="i" class="bg-white p-4 md:p-8 rounded-[0.75rem] border border-gray-100 shadow-sm space-y-3">
+        <div v-for="i in 4" :key="i" class="bg-white dark:bg-gray-900 p-4 md:p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-3">
           <div class="flex justify-between items-start">
             <BaseSkeleton width="2.75rem" height="2.75rem" borderRadius="0.75rem" />
             <BaseSkeleton width="4rem" height="1.2rem" borderRadius="0.5rem" customClass="hidden md:block" />
@@ -330,41 +330,41 @@ function formatRelativeTime(minutesAgo: number) {
       <section class="bg-slate-900 p-8 rounded-[0.75rem] border border-slate-800">
         <div class="flex flex-col lg:flex-row gap-8">
           <div class="space-y-6 flex-1">
-            <BaseSkeleton width="12rem" height="1.5rem" borderRadius="9999px" customClass="bg-slate-700" />
+            <BaseSkeleton width="12rem" height="1.5rem" borderRadius="9999px" />
             <div class="space-y-2">
-              <BaseSkeleton width="80%" height="2rem" customClass="bg-slate-700" />
-              <BaseSkeleton width="55%" height="2rem" customClass="bg-slate-700" />
+              <BaseSkeleton width="80%" height="2rem" />
+              <BaseSkeleton width="55%" height="2rem" />
             </div>
-            <BaseSkeleton width="90%" height="0.85rem" customClass="bg-slate-700" />
+            <BaseSkeleton width="90%" height="0.85rem" />
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="space-y-2">
-                <BaseSkeleton width="100%" height="0.65rem" customClass="bg-slate-700" />
-                <BaseSkeleton width="100%" height="0.5rem" borderRadius="9999px" customClass="bg-slate-700" />
+                <BaseSkeleton width="100%" height="0.65rem" />
+                <BaseSkeleton width="100%" height="0.5rem" borderRadius="9999px" />
               </div>
               <div class="space-y-2">
-                <BaseSkeleton width="100%" height="0.65rem" customClass="bg-slate-700" />
-                <BaseSkeleton width="100%" height="0.5rem" borderRadius="9999px" customClass="bg-slate-700" />
+                <BaseSkeleton width="100%" height="0.65rem" />
+                <BaseSkeleton width="100%" height="0.5rem" borderRadius="9999px" />
               </div>
             </div>
           </div>
           <div class="bg-slate-950/40 p-6 rounded-[0.75rem] border border-slate-800 lg:w-80 shrink-0 space-y-4">
-            <BaseSkeleton width="100%" height="4rem" borderRadius="1rem" customClass="bg-slate-700" />
-            <BaseSkeleton width="100%" height="3rem" borderRadius="1rem" customClass="bg-slate-700" />
-            <BaseSkeleton width="50%" height="0.65rem" borderRadius="9999px" customClass="bg-slate-700 mx-auto" />
+            <BaseSkeleton width="100%" height="4rem" borderRadius="1rem" />
+            <BaseSkeleton width="100%" height="3rem" borderRadius="1rem" />
+            <BaseSkeleton width="50%" height="0.65rem" borderRadius="9999px" customClass="mx-auto" />
           </div>
         </div>
       </section>
 
       <!-- Funil + Follow-ups -->
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div class="lg:col-span-2 bg-white p-8 rounded-[0.75rem] border border-gray-100 shadow-sm space-y-6">
+        <div class="lg:col-span-2 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
           <BaseSkeleton width="10rem" height="1rem" />
           <div class="space-y-4">
             <BaseSkeleton v-for="j in 3" :key="j" width="100%" height="2.5rem" borderRadius="0.75rem" />
           </div>
           <BaseSkeleton width="100%" height="5.5rem" borderRadius="1.5rem" />
         </div>
-        <div class="lg:col-span-1 bg-white p-8 rounded-[0.75rem] border border-gray-100 shadow-sm space-y-6">
+        <div class="lg:col-span-1 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
           <BaseSkeleton width="8rem" height="1rem" />
           <div class="space-y-4">
             <BaseSkeleton v-for="j in 3" :key="j" width="100%" height="5.5rem" borderRadius="1.5rem" />
@@ -374,11 +374,11 @@ function formatRelativeTime(minutesAgo: number) {
 
       <!-- Gráficos -->
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div class="lg:col-span-2 bg-white p-8 rounded-[0.75rem] border border-gray-100 shadow-sm space-y-6">
+        <div class="lg:col-span-2 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
           <BaseSkeleton width="12rem" height="1rem" />
           <BaseSkeleton width="100%" height="20rem" borderRadius="1rem" />
         </div>
-        <div class="lg:col-span-1 bg-white p-8 rounded-[0.75rem] border border-gray-100 shadow-sm space-y-6 flex flex-col items-center">
+        <div class="lg:col-span-1 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6 flex flex-col items-center">
           <BaseSkeleton width="10rem" height="1rem" customClass="self-start" />
           <BaseSkeleton width="14rem" height="14rem" borderRadius="9999px" customClass="mt-4" />
         </div>
@@ -386,13 +386,13 @@ function formatRelativeTime(minutesAgo: number) {
 
       <!-- Tracking + Top Clientes -->
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div class="lg:col-span-2 bg-white p-8 rounded-[0.75rem] border border-gray-100 shadow-sm space-y-6">
+        <div class="lg:col-span-2 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
           <BaseSkeleton width="14rem" height="1rem" />
           <div class="space-y-3">
             <BaseSkeleton v-for="j in 5" :key="j" width="100%" height="2.25rem" borderRadius="0.5rem" />
           </div>
         </div>
-        <div class="lg:col-span-1 bg-white p-8 rounded-[0.75rem] border border-gray-100 shadow-sm space-y-6">
+        <div class="lg:col-span-1 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
           <BaseSkeleton width="8rem" height="1rem" />
           <div class="space-y-3">
             <BaseSkeleton v-for="j in 5" :key="j" width="100%" height="3.5rem" borderRadius="1rem" />
@@ -409,70 +409,70 @@ function formatRelativeTime(minutesAgo: number) {
       <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         
         <!-- Receita Confirmada -->
-        <div class="bg-white dark:bg-gray-900 p-4 md:p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
+        <div class="bg-white dark:bg-gray-900 p-4 md:p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm shadow-slate-200/50 dark:shadow-none hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
           <div class="flex flex-col md:flex-row justify-between w-auto md:w-full items-center md:items-start mb-0 md:mb-4">
             <div class="w-10 h-10 md:w-12 md:h-12 bg-green-50 dark:bg-green-950/30 text-green-600 dark:text-green-400 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-colors">
               <DollarSign class="w-5 h-5 md:w-6 md:h-6" />
             </div>
-            <span class="hidden md:inline-block text-[9px] font-black text-green-500 dark:text-green-400 uppercase tracking-widest bg-green-50 dark:bg-green-950/30 px-2.5 py-1 rounded-lg">Faturado</span>
+            <span class="hidden md:inline-block text-[9px] font-black text-green-600 dark:text-green-400 uppercase tracking-widest bg-green-50 dark:bg-green-950/30 px-2.5 py-1 rounded-lg border border-green-200 dark:border-green-800/50">Faturado</span>
           </div>
           <div class="flex-1 min-w-0">
-            <p class="text-[8px] md:text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-0 md:mb-1 truncate">Faturamento</p>
+            <p class="text-[8px] md:text-[9px] font-black text-slate-500 dark:text-gray-500 uppercase tracking-widest mb-0 md:mb-1 truncate">Faturamento</p>
             <h3 class="text-base md:text-3xl font-black text-gray-900 dark:text-white tracking-tight truncate">
               R$ {{ (stats.totalRevenue ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) }}
             </h3>
-            <p class="hidden md:block text-[10px] text-gray-400 dark:text-gray-500 mt-1 font-semibold truncate">{{ stats.acceptedCount }} orçamentos convertidos</p>
+            <p class="hidden md:block text-[10px] text-slate-500 dark:text-gray-500 mt-1 font-semibold truncate">{{ stats.acceptedCount }} orçamentos convertidos</p>
           </div>
         </div>
 
         <!-- Conversão Geral -->
-        <div class="bg-white dark:bg-gray-900 p-4 md:p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
+        <div class="bg-white dark:bg-gray-900 p-4 md:p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm shadow-slate-200/50 dark:shadow-none hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
           <div class="flex flex-col md:flex-row justify-between w-auto md:w-full items-center md:items-start mb-0 md:mb-4">
             <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
               <TrendingUp class="w-5 h-5 md:w-6 md:h-6" />
             </div>
-            <span class="hidden md:inline-block text-[9px] font-black text-blue-500 dark:text-blue-400 uppercase tracking-widest bg-blue-50 dark:bg-blue-950/30 px-2.5 py-1 rounded-lg">Sucesso</span>
+            <span class="hidden md:inline-block text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest bg-blue-50 dark:bg-blue-950/30 px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-800/50">Sucesso</span>
           </div>
           <div class="flex-1 min-w-0">
-            <p class="text-[8px] md:text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-0 md:mb-1 truncate">Conversão</p>
+            <p class="text-[8px] md:text-[9px] font-black text-slate-500 dark:text-gray-500 uppercase tracking-widest mb-0 md:mb-1 truncate">Conversão</p>
             <h3 class="text-base md:text-3xl font-black text-gray-900 dark:text-white tracking-tight truncate">
               {{ Math.round(stats.approvalRate ?? 0) }}%
             </h3>
-            <p class="hidden md:block text-[10px] text-gray-400 dark:text-gray-500 mt-1 font-semibold truncate">{{ stats.proposalsCount }} orçamentos totais</p>
+            <p class="hidden md:block text-[10px] text-slate-500 dark:text-gray-500 mt-1 font-semibold truncate">{{ stats.proposalsCount }} orçamentos totais</p>
           </div>
         </div>
 
         <!-- TMA (Tempo Médio de Atendimento/Fechamento) -->
-        <div class="bg-white dark:bg-gray-900 p-4 md:p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
+        <div class="bg-white dark:bg-gray-900 p-4 md:p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm shadow-slate-200/50 dark:shadow-none hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
           <div class="flex flex-col md:flex-row justify-between w-auto md:w-full items-center md:items-start mb-0 md:mb-4">
             <div class="w-10 h-10 md:w-12 md:h-12 bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
               <Clock class="w-5 h-5 md:w-6 md:h-6" />
             </div>
-            <span class="hidden md:inline-block text-[9px] font-black text-purple-500 dark:text-purple-400 uppercase tracking-widest bg-purple-50 dark:bg-purple-950/30 px-2.5 py-1 rounded-lg">Agilidade</span>
+            <span class="hidden md:inline-block text-[9px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest bg-purple-50 dark:bg-purple-950/30 px-2.5 py-1 rounded-lg border border-purple-200 dark:border-purple-800/50">Agilidade</span>
           </div>
           <div class="flex-1 min-w-0">
-            <p class="text-[8px] md:text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-0 md:mb-1 truncate">TMA</p>
+            <p class="text-[8px] md:text-[9px] font-black text-slate-500 dark:text-gray-500 uppercase tracking-widest mb-0 md:mb-1 truncate">TMA</p>
             <h3 class="text-base md:text-3xl font-black text-gray-900 dark:text-white tracking-tight truncate">
               {{ stats.tmaHours > 24 ? `${Math.round(stats.tmaHours / 24)}d` : `${Math.round(stats.tmaHours || 0)}h` }}
             </h3>
-            <p class="hidden md:block text-[10px] text-gray-400 dark:text-gray-500 mt-1 font-semibold truncate">tempo médio p/ aceite</p>
+            <p class="hidden md:block text-[10px] text-slate-500 dark:text-gray-500 mt-1 font-semibold truncate">tempo médio p/ aceite</p>
           </div>
         </div>
 
         <!-- SLA Comercial (Fechados em < 48h) -->
-        <div class="bg-white dark:bg-gray-900 p-4 md:p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
+        <div class="bg-white dark:bg-gray-900 p-4 md:p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm shadow-slate-200/50 dark:shadow-none hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
           <div class="flex flex-col md:flex-row justify-between w-auto md:w-full items-center md:items-start mb-0 md:mb-4">
             <div class="w-10 h-10 md:w-12 md:h-12 bg-orange-50 dark:bg-orange-950/30 text-orange-600 dark:text-orange-400 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-colors">
               <ShieldCheck class="w-5 h-5 md:w-6 md:h-6" />
             </div>
-            <span class="hidden md:inline-block text-[9px] font-black text-orange-500 dark:text-orange-400 uppercase tracking-widest bg-orange-50 dark:bg-orange-950/30 px-2.5 py-1 rounded-lg">Meta</span>
+            <span class="hidden md:inline-block text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest bg-orange-50 dark:bg-orange-950/30 px-2.5 py-1 rounded-lg border border-orange-200 dark:border-orange-800/50">Meta</span>
           </div>
           <div class="flex-1 min-w-0">
-            <p class="text-[8px] md:text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-0 md:mb-1 truncate">SLA 48h</p>
+            <p class="text-[8px] md:text-[9px] font-black text-slate-500 dark:text-gray-500 uppercase tracking-widest mb-0 md:mb-1 truncate">SLA 48h</p>
             <h3 class="text-base md:text-3xl font-black text-gray-900 dark:text-white tracking-tight truncate">
               {{ Math.round(stats.slaRate ?? 0) }}%
             </h3>
-            <p class="hidden md:block text-[10px] text-gray-400 dark:text-gray-500 mt-1 font-semibold truncate">fechados na meta</p>
+            <p class="hidden md:block text-[10px] text-slate-500 dark:text-gray-500 mt-1 font-semibold truncate">fechados na meta</p>
           </div>
         </div>
 

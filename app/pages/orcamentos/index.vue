@@ -441,13 +441,10 @@ async function saveContract() {
   <div class="space-y-10 relative">
     <PageHeader title="Seus Orçamentos" subtitle="Acompanhe e gerencie seus orçamentos comerciais.">
       <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-        <button 
-          @click="isAIWizardOpen = true" 
-          class="px-6 py-3 rounded-[0.75rem] bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-violet-500/20 active:scale-98 transition-all flex items-center justify-center gap-2 self-stretch sm:self-auto"
-        >
-          <Sparkles class="w-4 h-4 text-white animate-pulse" />
-          Criar com IA
-        </button>
+         <BaseButton @click="isAIWizardOpen = true" class="shadow-2xl shadow-gray-200" variant="ia">
+          <Sparkles class="w-4 h-4 mr-2 text-white animate-pulse" />
+         Criar com IA
+        </BaseButton>
         <BaseButton data-tour="orcamentos-novo-btn" @click="openModal()" class="shadow-2xl shadow-gray-200">
           <Plus class="w-5 h-5 mr-2" />
           Novo Orçamento
@@ -461,7 +458,7 @@ async function saveContract() {
               v-model="searchQuery"
               type="text"
               placeholder="Buscar por título, cliente ou código..."
-              class="w-full h-[52px] pl-12 pr-5 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-[0.75rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-sm"
+              class="w-full h-[52px] pl-12 pr-5 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-800 rounded-[0.75rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-xs"
             >
             <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
               <Search class="w-5 h-5" />
@@ -489,9 +486,11 @@ async function saveContract() {
             />
           </div>
 
-          <div class="flex items-center gap-3 px-5 h-[52px] bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-[0.75rem] hover:border-gray-200 dark:hover:border-gray-700 transition-all group cursor-pointer shadow-sm shrink-0">
-            <BaseCheckbox v-model="filterPendingChat" id="pending-chat" />
-            <label for="pending-chat" class="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest cursor-pointer group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors whitespace-nowrap">
+          <div class="flex items-center gap-3 px-5 h-[52px] bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-700 transition-all group cursor-pointer shadow-xs shrink-0 rounded-[0.75rem]">
+            <!-- Adicionado 'shrink-0' no checkbox para evitar que ele deforme -->
+            <BaseCheckbox v-model="filterPendingChat" id="pending-chat" class="shrink-0" />
+            
+            <label for="pending-chat" class="text-xs font-black text-slate-700 dark:text-gray-400 uppercase tracking-widest cursor-pointer group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors whitespace-nowrap select-none">
               Chat Pendente
             </label>
           </div>

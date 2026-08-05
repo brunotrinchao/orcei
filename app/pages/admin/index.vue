@@ -148,7 +148,7 @@ function formatLogTime(isoString: string) {
 
     <!-- Loading State -->
     <div v-if="pending" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div v-for="i in 4" :key="i" class="h-36 bg-gray-100 animate-pulse rounded-[0.75rem]"></div>
+      <BaseSkeleton v-for="i in 4" :key="i" height="9rem" borderRadius="0.75rem" />
     </div>
 
     <template v-else-if="stats">

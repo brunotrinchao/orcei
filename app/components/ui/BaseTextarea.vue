@@ -34,10 +34,10 @@ const displayError = computed(() => props.error || (showRequiredError.value ? 'C
 <template>
   <div class="space-y-2">
     <div v-if="label || maxLength" class="flex justify-between items-center ml-1">
-      <label v-if="label" :for="inputId" class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest">
+      <label v-if="label" :for="inputId" class="block text-xs font-black text-slate-700 dark:text-gray-400 uppercase tracking-widest">
         {{ label }} <span v-if="required" class="text-red-500">*</span>
       </label>
-      <span v-if="maxLength" class="text-[10px] font-bold text-gray-400 dark:text-gray-500">
+      <span v-if="maxLength" class="text-[10px] font-bold text-gray-500 dark:text-gray-500">
         {{ safeValue.length }}/{{ maxLength }}
       </span>
     </div>
@@ -56,8 +56,8 @@ const displayError = computed(() => props.error || (showRequiredError.value ? 'C
       :readonly="readonly"
       :required="required"
       :class="[
-        'w-full p-4 bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:focus:border-blue-500 transition-all outline-none font-bold text-gray-900 dark:text-gray-50 placeholder:text-gray-400 dark:placeholder:text-gray-500 disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:cursor-not-allowed resize-y',
-        displayError ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500/20' : ''
+        'w-full p-4 bg-white dark:bg-gray-950 border-2 border-gray-300 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 dark:focus:border-blue-500 transition-all outline-none font-bold text-gray-900 dark:text-gray-50 placeholder:text-gray-400 dark:placeholder:text-gray-500 disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:cursor-not-allowed resize-y shadow-xs',
+        displayError ? 'border-red-500 dark:border-red-500/50 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500/20' : ''
       ]"
     />
     <span class="block min-h-[14px] text-[10px] font-bold text-red-500 ml-1 uppercase leading-[14px]">{{ displayError }}</span>

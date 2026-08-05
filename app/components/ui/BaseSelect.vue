@@ -50,13 +50,13 @@ const displayError = computed(() => props.error || (showRequiredError.value ? 'C
 
 <template>
   <div class="space-y-2">
-    <label v-if="label" :id="`label-${id}`" class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">
+    <label v-if="label" :id="`label-${id}`" class="block text-xs font-black text-slate-700 dark:text-gray-400 uppercase tracking-widest ml-1">
       {{ label }} <span v-if="required" class="text-red-500">*</span>
     </label>
 
     <div class="relative flex items-center w-full">
       <!-- Ícone na esquerda se fornecido -->
-      <div v-if="icon || $slots.icon" class="absolute left-4 z-10 flex items-center gap-1.5 text-gray-400 dark:text-gray-500 pointer-events-none">
+      <div v-if="icon || $slots.icon" class="absolute left-4 z-10 flex items-center gap-1.5 text-slate-500 dark:text-gray-500 pointer-events-none">
         <slot name="icon">
           <component :is="icon" v-if="icon" class="w-4 h-4" />
         </slot>
@@ -67,20 +67,20 @@ const displayError = computed(() => props.error || (showRequiredError.value ? 'C
           ref="triggerRef"
           :aria-labelledby="label ? `label-${id}` : undefined"
           :class="[
-            'inline-flex items-center justify-between w-full h-[56px] bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 rounded-[0.75rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-50 group disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:cursor-not-allowed shadow-sm',
+            'inline-flex items-center justify-between w-full h-[56px] bg-white dark:bg-gray-950 border-2 border-gray-300 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-700 rounded-[0.75rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 dark:focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-50 group disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:cursor-not-allowed shadow-xs',
             icon || $slots.icon ? 'pl-12 pr-5' : 'px-5',
-            displayError ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500/20' : ''
+            displayError ? 'border-red-500 dark:border-red-500/50 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500/20' : ''
           ]"
         >
           <SelectValue :placeholder="placeholder || 'Selecione...'" />
           <SelectIcon>
-            <ChevronDown class="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-white transition-colors" />
+            <ChevronDown class="w-4 h-4 text-gray-500 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-white transition-colors" />
           </SelectIcon>
         </SelectTrigger>
 
         <SelectPortal>
           <SelectContent
-            class="z-[9999] min-w-[var(--radix-select-trigger-width)] bg-white dark:bg-gray-900 rounded-[0.75rem] border-2 border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+            class="z-[9999] min-w-[var(--radix-select-trigger-width)] bg-white dark:bg-gray-900 rounded-[0.75rem] border-2 border-gray-300 dark:border-gray-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
             position="popper"
             :side-offset="8"
             :avoid-collisions="true"
@@ -118,8 +118,9 @@ const displayError = computed(() => props.error || (showRequiredError.value ? 'C
       </SelectRoot>
     </div>
 
-    <span class="block min-h-[14px] text-[10px] font-bold text-red-500 ml-1 uppercase leading-[14px]">
+   <span class="block min-h-[14px] text-[10px] font-bold text-red-500 ml-1 uppercase leading-[14px]"
+    :class="displayError ? 'block' : 'hidden'">
       {{ displayError }}
-    </span>
+</span>
   </div>
 </template>

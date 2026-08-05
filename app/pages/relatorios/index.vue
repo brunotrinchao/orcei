@@ -144,10 +144,12 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
 <template>
   <div class="space-y-10 relative">
     <PageHeader title="Meus Relatórios IA" subtitle="Analises estratégicas geradas pela inteligência artificial.">
-      <BaseButton data-tour="relatorios-gerar-btn" @click="isReportDrawerOpen = true" variant="primary" class="cursor-pointer">
-        <Sparkles class="w-4 h-4 mr-2" />
-        Gerar Novo Relatório
-      </BaseButton>
+      <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+        <BaseButton @click="isReportDrawerOpen = true" class="shadow-2xl shadow-gray-200" variant="ia">
+          <Sparkles class="w-4 h-4 mr-2 text-white animate-pulse" />
+          Gerar Novo Relatório
+        </BaseButton>
+      </div>
 
       <template #filters>
         <BaseFilters :active-filters-count="activeFiltersCount" @clear="clearFilters">
@@ -156,7 +158,7 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
               v-model="searchQuery"
               type="text"
               placeholder="Buscar no conteúdo do relatório..."
-              class="w-full h-[52px] pl-12 pr-5 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-[0.75rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-sm"
+              class="w-full h-[52px] pl-12 pr-5 bg-white dark:bg-gray-900 border-2  border-gray-300 dark:border-gray-800  rounded-[0.75rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-sm"
             >
             <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
               <Search class="w-5 h-5" />

@@ -274,45 +274,48 @@ const statusMap: any = {
 
 <template>
   <!-- Loading state with Skeleton -->
-  <div v-if="pending || (!proposal && !error)" class="min-h-screen bg-gray-50 flex flex-col">
+  <div v-if="pending || (!proposal && !error)" class="min-h-screen bg-gray-50 dark:bg-slate-950 flex flex-col">
     <!-- Header Skeleton -->
-    <header class="bg-white border-b border-gray-200 h-16 flex items-center px-5 sm:px-8 shrink-0">
+    <header class="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 h-16 flex items-center px-5 sm:px-8 shrink-0">
       <div class="max-w-6xl mx-auto w-full flex justify-between items-center">
-        <div class="w-32 h-8 bg-gray-200 animate-pulse rounded-lg"></div>
-        <div class="w-20 h-6 bg-gray-200 animate-pulse rounded-full"></div>
+        <BaseSkeleton width="8rem" height="2rem" borderRadius="0.5rem" />
+        <BaseSkeleton width="5rem" height="1.5rem" borderRadius="9999px" />
       </div>
     </header>
 
     <!-- Hero Skeleton -->
-    <div class="bg-gray-900 py-16 sm:py-24 px-5 sm:px-8">
+    <div class="bg-slate-900 py-16 sm:py-24 px-5 sm:px-8 border-b border-slate-800">
       <div class="max-w-6xl mx-auto space-y-8">
-        <div class="w-40 h-4 bg-blue-500/20 animate-pulse rounded"></div>
-        <div class="w-3/4 h-12 bg-white/10 animate-pulse rounded-xl"></div>
-        <div class="w-1/2 h-6 bg-white/10 animate-pulse rounded-lg"></div>
+        <BaseSkeleton width="10rem" height="1rem" />
+        <BaseSkeleton width="75%" height="3rem" borderRadius="0.75rem" />
+        <BaseSkeleton width="50%" height="1.5rem" borderRadius="0.5rem" />
         
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6 mt-12">
-          <div v-for="i in 3" :key="i" class="h-24 bg-white/5 border border-white/10 animate-pulse rounded-[0.75rem]"></div>
+          <div v-for="i in 3" :key="i" class="h-24 bg-slate-850/50 border border-slate-800 rounded-[0.75rem] p-4 flex flex-col justify-between">
+            <BaseSkeleton width="60%" height="0.8rem" />
+            <BaseSkeleton width="80%" height="1.5rem" />
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Content Skeleton -->
     <main class="max-w-6xl mx-auto px-5 sm:px-8 py-12 space-y-10 flex-1">
-      <div class="bg-white rounded-[0.75rem] border border-gray-100 p-8 space-y-8">
-        <div class="w-48 h-4 bg-gray-100 animate-pulse rounded"></div>
-        <div v-for="i in 3" :key="i" class="flex gap-6 border-b border-gray-50 pb-8 last:border-0 last:pb-0">
-          <div class="w-10 h-10 bg-gray-100 animate-pulse rounded-xl"></div>
+      <div class="bg-white dark:bg-slate-900 rounded-[0.75rem] border border-slate-200 dark:border-slate-800 p-8 space-y-8 shadow-sm">
+        <BaseSkeleton width="12rem" height="1rem" />
+        <div v-for="i in 3" :key="i" class="flex gap-6 border-b border-slate-100 dark:border-slate-800 pb-8 last:border-0 last:pb-0">
+          <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="0.75rem" />
           <div class="flex-1 space-y-3">
-            <div class="w-1/3 h-5 bg-gray-200 animate-pulse rounded"></div>
-            <div class="w-full h-3 bg-gray-100 animate-pulse rounded"></div>
+            <BaseSkeleton width="35%" height="1.25rem" />
+            <BaseSkeleton width="90%" height="0.85rem" />
           </div>
-          <div class="w-24 h-8 bg-gray-200 animate-pulse rounded-lg"></div>
+          <BaseSkeleton width="6rem" height="2rem" borderRadius="0.5rem" />
         </div>
       </div>
 
       <!-- Fallback indicator -->
       <div class="flex justify-center py-4">
-        <Loader2 class="w-6 h-6 text-gray-300 animate-spin" />
+        <Loader2 class="w-6 h-6 text-gray-400 dark:text-gray-600 animate-spin" />
       </div>
     </main>
   </div>

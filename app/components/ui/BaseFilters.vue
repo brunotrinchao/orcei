@@ -22,7 +22,7 @@ const isDrawerOpen = ref(false)
       <button 
         v-if="activeFiltersCount && activeFiltersCount > 0" 
         @click="$emit('clear')" 
-        class="h-[52px] px-4 flex items-center justify-center gap-2 text-xs font-black text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 hover:border-red-200 dark:hover:border-red-900/50 hover:bg-red-50/50 dark:hover:bg-red-950/30 rounded-[0.75rem] uppercase tracking-widest transition-all shadow-sm active:scale-95 shrink-0"
+        class="h-[52px] px-4 flex items-center justify-center gap-2 text-xs font-black text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-800 hover:border-red-200 dark:hover:border-red-900/50 hover:bg-red-50/50 dark:hover:bg-red-950/30 rounded-[0.75rem] uppercase tracking-widest transition-all shadow-sm active:scale-95 shrink-0"
       >
         <X class="w-4 h-4" /> Limpar Filtros
       </button>

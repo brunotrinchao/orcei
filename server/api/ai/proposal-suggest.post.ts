@@ -16,9 +16,15 @@ export default defineEventHandler(async (event) => {
   // Rate Limit: 5 requests per 1 minute for AI
   await checkRateLimit(event, { max: 5, windowMs: 60 * 1000, keyPrefix: 'ai-proposal' })
 
+  const config = useRuntimeConfig(event)
+  const maxPrompt = Number(config.aiMaxProposalWizardPrompt || config.public?.aiMaxProposalWizardPrompt) || 1500
+
   const { prompt } = await readBody(event)
-  if (!prompt) {
+  if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
     throw createError({ statusCode: 400, statusMessage: 'Prompt é obrigatório' })
+  }
+  if (prompt.length > maxPrompt) {
+    throw createError({ statusCode: 400, statusMessage: `O texto ultrapassou o limite máximo de ${maxPrompt} caracteres.` })
   }
 
   const isAdmin = (session.user as any).role === 'admin'

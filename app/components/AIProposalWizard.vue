@@ -50,9 +50,14 @@ const {
   handleCreditConfirm, 
   handleCreditCancel 
 } = useConfirmCreditAction()
+const config = useRuntimeConfig()
+const maxPromptLength = computed(() => Number(config.public.aiMaxProposalWizardPrompt) || 1500)
 
 function handleGenerateRequest() {
   if (!promptText.value) return notify('Aviso', 'Digite o que você precisa no orçamento.')
+  if (promptText.value.length > maxPromptLength.value) {
+    return notify('Aviso', `O texto ultrapassou o limite máximo de ${maxPromptLength.value} caracteres.`)
+  }
   executeWithCreditCheck('proposalSuggest', () => generate(), {
     title: 'Gerar Orçamento com IA',
     customDescription: 'A análise e criação do orçamento por IA consumirá créditos do seu saldo. Deseja continuar?'
@@ -217,23 +222,32 @@ function removeItem(idx: number) {
               </p>
             </div>
 
-            <div class="relative group">
-              
+            <div class="relative group space-y-2">
+              <div class="flex justify-between items-center px-1">
+                <span class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Descrição do Serviço</span>
+              </div>
+
               <textarea
                 v-model="promptText"
                 rows="6"
+                :maxlength="maxPromptLength"
                 aria-label="Descrição do serviço para a IA gerar a proposta"
                 placeholder="Ex: Landing Page Premium com alta conversão, incluindo Copywriting estratégico e protótipo UI/UX responsivo em Figma..."
-                class="relative w-full px-6 py-5 bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800/80 rounded-[0.75rem] focus:ring-0 focus:border-slate-200 dark:focus:border-slate-700 transition-all outline-none font-bold text-slate-800 dark:text-slate-200 placeholder:text-slate-300 dark:placeholder:text-slate-700 resize-none"
+                class="relative w-full px-6 py-5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 rounded-[0.75rem] focus:ring-0 focus:border-slate-300 dark:focus:border-slate-700 transition-all outline-none font-bold text-slate-800 dark:text-slate-200 placeholder:text-slate-300 dark:placeholder:text-slate-700 resize-none"
                 @keydown.enter.ctrl="handleGenerateRequest"
               ></textarea>
+
+
+                <span class="block text-[10px] font-bold  text-right" :class="promptText.length >= maxPromptLength ? 'text-red-500 dark:text-red-400 font-black' : 'text-slate-500 dark:text-slate-400'">
+                  {{ promptText.length }}/{{ maxPromptLength }}
+                </span>
             </div>
             
             <div class="flex justify-between items-center pt-2">
               <span class="hidden sm:inline text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest">Pressione Ctrl + Enter para gerar</span>
               <button 
                 @click="handleGenerateRequest" 
-                :disabled="!promptText"
+                :disabled="!promptText || promptText.length > maxPromptLength"
                 class="px-6 py-3 rounded-[0.75rem] bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-violet-500/20 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center gap-2"
               >
                 {{ creditLabel('proposalSuggest', 'Analisar com IA') }}

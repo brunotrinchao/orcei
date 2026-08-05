@@ -120,6 +120,10 @@ watch(() => props.open, (isOpen) => {
   }
 })
 
+const config = useRuntimeConfig()
+const maxCatalogSuggestName = computed(() => Number(config.public.aiMaxCatalogSuggestName) || 150)
+const maxCatalogSuggestContext = computed(() => Number(config.public.aiMaxCatalogSuggestContext) || 1000)
+
 const { 
   isCreditConfirmOpen, 
   confirmTitle, 
@@ -132,6 +136,14 @@ const {
 async function suggestWithAI() {
   if (!form.value.name.trim()) {
     notify('Aviso', 'Digite o nome do item antes de pedir sugestão à IA.')
+    return
+  }
+  if (form.value.name.length > maxCatalogSuggestName.value) {
+    notify('Aviso', `O nome do item ultrapassou o limite máximo de ${maxCatalogSuggestName.value} caracteres.`)
+    return
+  }
+  if (form.value.description && form.value.description.length > maxCatalogSuggestContext.value) {
+    notify('Aviso', `A descrição/contexto ultrapassou o limite máximo de ${maxCatalogSuggestContext.value} caracteres.`)
     return
   }
 
@@ -266,7 +278,7 @@ async function saveItem() {
 
                 <!-- Preview de Imagem Enviada -->
                 <div v-if="form.imageUrl" class="relative group w-full h-[200px] bg-gray-50 dark:bg-gray-950 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-800 overflow-hidden flex items-center justify-center animate-in fade-in zoom-in-95 duration-200 shadow-sm">
-                  <img :src="form.imageUrl" class="w-full h-full object-cover" loading="lazy">
+                  <BaseImage :src="form.imageUrl" alt="Preview da Imagem" container-class="w-full h-full" img-class="w-full h-full object-cover" />
                   <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     <label class="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center bg-white dark:bg-gray-800 rounded-xl text-gray-900 dark:text-white cursor-pointer hover:scale-105 transition-transform shadow-md">
                       <Pencil class="w-4 h-4" />
@@ -325,6 +337,7 @@ async function saveItem() {
               v-model="form.name" 
               label="Nome Comercial do Item" 
               placeholder="Ex: Desenvolvimento de Website Institucional" 
+              :maxLength="maxCatalogSuggestName"
               required 
             />
           </div>
@@ -364,7 +377,7 @@ async function saveItem() {
                   variant="ghost"
                   size="sm"
                   @click="suggestWithAI"
-                  :disabled="isSuggesting || !form.name.trim()"
+                  :disabled="isSuggesting || !form.name.trim() || form.name.length > maxCatalogSuggestName"
                   class="text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/40 font-black text-[10px] uppercase tracking-wider"
                 >
                   <Loader2 v-if="isSuggesting" class="w-3.5 h-3.5 animate-spin mr-1" />
@@ -375,6 +388,7 @@ async function saveItem() {
               <BaseTextarea 
                 v-model="form.description" 
                 :rows="4" 
+                :maxLength="maxCatalogSuggestContext"
                 placeholder="Descreva em detalhes o que está incluído neste produto ou serviço..."
               />
             </div>

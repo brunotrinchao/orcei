@@ -37,9 +37,15 @@ export default defineEventHandler(async (event) => {
     }
   })
 
+  const config = useRuntimeConfig(event)
+  const maxExtractLength = Number(config.aiMaxClientExtractRawText || config.public?.aiMaxClientExtractRawText) || 2000
+
   const { text } = body as any
-  if (!text) {
+  if (!text || typeof text !== 'string' || !text.trim()) {
     throw createError({ statusCode: 400, statusMessage: 'Texto do lead é obrigatório' })
+  }
+  if (text.length > maxExtractLength) {
+    throw createError({ statusCode: 400, statusMessage: `O texto ultrapassou o limite máximo de ${maxExtractLength} caracteres.` })
   }
 
   try {

@@ -154,9 +154,15 @@ const {
   handleCreditCancel 
 } = useConfirmCreditAction()
 
+const config = useRuntimeConfig()
+const maxGenerateItemDescriptionLength = computed(() => Number(config.public.aiMaxGenerateItemDescription) || 500)
+
 async function generateDescription({ index, isUpsell }: { index: number, isUpsell: boolean }) {
   const item = isUpsell ? form.value.upsellItems[index] : form.value.items[index]
   if (!item.name) return notify('Aviso', 'O item precisa de um nome para gerar a descrição.')
+  if (item.name.length > maxGenerateItemDescriptionLength.value) {
+    return notify('Aviso', `O nome do item ultrapassou o limite máximo de ${maxGenerateItemDescriptionLength.value} caracteres.`)
+  }
   
   executeWithCreditCheck('generate', async () => {
     isGenerating.value = true
@@ -167,8 +173,8 @@ async function generateDescription({ index, isUpsell }: { index: number, isUpsel
         body: { prompt }
       })
       item.description = data.text
-    } catch (e) {
-      notify('Erro', 'Erro ao gerar descrição')
+    } catch (e: any) {
+      notify('Erro', e.data?.statusMessage || 'Erro ao gerar descrição')
     } finally {
       isGenerating.value = false
     }

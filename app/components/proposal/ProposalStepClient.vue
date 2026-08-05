@@ -116,7 +116,8 @@ function onClientSelect(clientId: string | undefined) {
 // Extrator de Leads com IA
 const isAIExtractOpen = ref(false)
 const rawLeadText = ref('')
-const isExtracting = ref(false)
+const config = useRuntimeConfig()
+const maxClientExtractLength = computed(() => Number(config.public.aiMaxClientExtractRawText) || 2000)
 const { notify } = useAlerts()
 const { 
   isCreditConfirmOpen, 
@@ -129,6 +130,9 @@ const {
 
 async function extractClient() {
   if (!rawLeadText.value.trim()) return
+  if (rawLeadText.value.length > maxClientExtractLength.value) {
+    return notify('Aviso', `O texto ultrapassou o limite máximo de ${maxClientExtractLength.value} caracteres.`)
+  }
 
   executeWithCreditCheck('clientExtract', async () => {
     isExtracting.value = true
@@ -205,14 +209,15 @@ async function extractClient() {
           <BaseTextarea
             v-model="rawLeadText"
             :rows="4"
-            placeholder="Ex: Oi, sou o João Silva. Preciso de uma proposta comercial. Meu e-mail é [EMAIL_ADDRESS] e WhatsApp (11) 98888-7777..."
+            :maxLength="maxClientExtractLength"
+            placeholder="Ex: Oi, sou o João Silva. Preciso de uma proposta comercial. Meu e-mail é cliente@email.com e WhatsApp (11) 98888-7777..."
           />
           
           <div class="flex justify-end">
             <BaseButton 
               type="button" 
               @click="extractClient" 
-              :disabled="!rawLeadText.trim() || isExtracting"
+              :disabled="!rawLeadText.trim() || rawLeadText.length > maxClientExtractLength || isExtracting"
               class="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white"
             >
               <Loader2 v-if="isExtracting" class="w-4 h-4 animate-spin mr-2" />

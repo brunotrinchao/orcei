@@ -137,7 +137,7 @@ function clearFilters() {
           <td class="px-8 py-8">
             <div class="flex items-center gap-6">
               <div class="w-16 h-16 rounded-[0.50rem] border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
-                <img v-if="item.imageUrl" :src="item.imageUrl" class="w-full h-full object-cover" loading="lazy">
+                <BaseImage v-if="item.imageUrl" :src="item.imageUrl" :alt="item.name" container-class="w-full h-full" img-class="w-full h-full object-cover" />
                 <div v-else class="text-gray-400">
                   <component :is="getIcon(item.icon || 'Package')" class="w-8 h-8" />
                 </div>

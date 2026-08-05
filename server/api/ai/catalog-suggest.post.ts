@@ -39,9 +39,19 @@ export default defineEventHandler(async (event) => {
     }
   })
 
+  const config = useRuntimeConfig(event)
+  const maxNameLength = Number(config.aiMaxCatalogSuggestName || config.public?.aiMaxCatalogSuggestName) || 150
+  const maxContextLength = Number(config.aiMaxCatalogSuggestContext || config.public?.aiMaxCatalogSuggestContext) || 1000
+
   const { name, type, context } = body as any
-  if (!name) {
+  if (!name || typeof name !== 'string' || !name.trim()) {
     throw createError({ statusCode: 400, statusMessage: 'Nome é obrigatório' })
+  }
+  if (name.length > maxNameLength) {
+    throw createError({ statusCode: 400, statusMessage: `O nome ultrapassou o limite máximo de ${maxNameLength} caracteres.` })
+  }
+  if (context && typeof context === 'string' && context.length > maxContextLength) {
+    throw createError({ statusCode: 400, statusMessage: `A descrição/contexto ultrapassou o limite máximo de ${maxContextLength} caracteres.` })
   }
 
   // Buscar itens similares no MongoDB (todos os perfis = referência de mercado)

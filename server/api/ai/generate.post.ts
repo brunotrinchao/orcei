@@ -38,9 +38,15 @@ export default defineEventHandler(async (event) => {
     }
   })
 
+  const config = useRuntimeConfig(event)
+  const maxGenerateLength = Number(config.aiMaxGenerateItemDescription || config.public?.aiMaxGenerateItemDescription) || 500
+
   const { prompt } = body as any
-  if (!prompt) {
+  if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
     throw createError({ statusCode: 400, statusMessage: 'Prompt é obrigatório' })
+  }
+  if (prompt.length > maxGenerateLength + 100) {
+    throw createError({ statusCode: 400, statusMessage: `O texto ultrapassou o limite máximo de ${maxGenerateLength} caracteres.` })
   }
 
   try {

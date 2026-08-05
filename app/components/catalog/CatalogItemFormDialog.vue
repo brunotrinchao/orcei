@@ -265,7 +265,7 @@ async function saveItem() {
                 </div>
 
                 <!-- Preview de Imagem Enviada -->
-                <div v-if="form.imageUrl" class="relative group w-full h-[56px] bg-gray-50 dark:bg-gray-950 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-800 overflow-hidden flex items-center justify-center animate-in fade-in zoom-in-95 duration-200 shadow-sm">
+                <div v-if="form.imageUrl" class="relative group w-full h-[200px] bg-gray-50 dark:bg-gray-950 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-800 overflow-hidden flex items-center justify-center animate-in fade-in zoom-in-95 duration-200 shadow-sm">
                   <img :src="form.imageUrl" class="w-full h-full object-cover" loading="lazy">
                   <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     <label class="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center bg-white dark:bg-gray-800 rounded-xl text-gray-900 dark:text-white cursor-pointer hover:scale-105 transition-transform shadow-md">
@@ -283,7 +283,7 @@ async function saveItem() {
                   <BaseIconSelect v-model="form.icon" />
                 </div>
 
-                <div v-if="isPhotoType" class="transition-all animate-fadeIn">
+                <div v-if="isPhotoType & form.imageUrl == ''" class="transition-all animate-fadeIn">
                   <label 
                     class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl cursor-pointer bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-900 transition-all relative group"
                   >

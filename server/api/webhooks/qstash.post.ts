@@ -21,6 +21,7 @@ import {
   sendPlanCancellationEmail,
   sendCartRecoveryEmail
 } from '../../utils/email'
+import { AssinafyService } from '../../services/AssinafyService'
 import { uploadToCloudinary } from '../../utils/cloudinary'
 import { sanitizeError } from '../../utils/error-handler'
 
@@ -77,6 +78,10 @@ export default defineEventHandler(async (event) => {
 
   try {
     switch (action) {
+      case 'REQUEST_DIGITAL_SIGNATURE':
+        await handleRequestDigitalSignature(body)
+        break
+
       case 'PROPOSAL_ACCEPTED':
         await handleProposalAccepted(body)
         break
@@ -338,4 +343,55 @@ async function handleSendEmailCartRecovery(payload: any) {
   const { userEmail, checkoutUrl } = payload
   console.log(`[Job] Enviando e-mail de recuperação de carrinho para: ${userEmail}`)
   await sendCartRecoveryEmail(userEmail, checkoutUrl)
+}
+
+async function handleRequestDigitalSignature(payload: any) {
+  const { proposalId, profileId } = payload
+  console.log(`[Job] Processando solicitação de assinatura digital para o orçamento: ${proposalId}`)
+
+  const proposal = await Proposal.findById(proposalId)
+  if (!proposal) throw new Error(`Orçamento ${proposalId} não encontrado para assinatura`)
+
+  const profile = await Profile.findById(profileId)
+  if (!profile) throw new Error(`Perfil ${profileId} não encontrado`)
+
+  const result = await AssinafyService.createAndSendDocument({
+    proposal: proposal.toObject(),
+    profile: profile.toObject()
+  })
+
+  proposal.signature = {
+    provider: 'assinafy',
+    documentId: result.documentId,
+    status: 'pending',
+    signingUrl: result.signingUrl,
+    signedAt: null,
+    signedFileUrl: null,
+    rejectionReason: null,
+    requestedAt: new Date()
+  }
+
+  await proposal.save()
+
+  try {
+    const profileIdStr = typeof profile === 'object' ? profile._id.toString() : profile.toString()
+    await NotificationService.createNotification({
+      profileId: profileIdStr,
+      type: 'signature_requested',
+      title: 'Assinatura Digital Solicitada',
+      summary: `Documento de assinatura gerado e enviado com sucesso para ${proposal.client?.email || 'o cliente'} (Proposta #${proposal.code}).`,
+      details: {
+        proposalId: proposal._id.toString(),
+        code: proposal.code,
+        documentId: result.documentId,
+        signingUrl: result.signingUrl
+      },
+      metadata: {
+        proposalId: proposal._id.toString(),
+        code: proposal.code
+      }
+    })
+  } catch (notifErr) {
+    console.error(`[QStash Webhook] Erro ao criar notificação de assinatura solicitada:`, notifErr)
+  }
 }

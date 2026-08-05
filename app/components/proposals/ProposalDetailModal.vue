@@ -18,6 +18,8 @@ import {
   Lock,
   CheckCircle2,
   AlertCircle,
+  CheckCheck,
+  Clock,
 } from "lucide-vue-next";
 import type { ProposalDTO } from "../../../types";
 
@@ -233,9 +235,9 @@ async function requestDigitalSignature() {
   isRequestingSignature.value = true;
   try {
     const res: any = await $fetch(`/api/proposals/${props.proposal._id}/signature`, { method: "POST" });
-    notify("Sucesso", "Solicitação de assinatura eletrônica iniciada com sucesso!");
-    if (res.signingUrl && typeof window !== "undefined") {
-      window.open(res.signingUrl, "_blank");
+    notify("Sucesso", "Solicitação de assinatura eletrônica enviada para a fila! O status agora é 'Aguardando assinatura'.");
+    if (props.proposal) {
+      props.proposal.signature = res.signature || { provider: "assinafy", status: "pending" };
     }
   } catch (err: any) {
     notify("Erro", err.data?.statusMessage || "Erro ao solicitar assinatura eletrônica.");
@@ -320,14 +322,35 @@ async function requestDigitalSignature() {
             <BaseButton
               type="button"
               @click="requestDigitalSignature"
-              :disabled="isRequestingSignature"
-              variant="outline"
+              :disabled="isRequestingSignature || proposal.signature?.status === 'pending' || proposal.signature?.status === 'signed'"
+              variant="solid"
               size="sm"
-              class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-[0.50rem] bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black uppercase tracking-wider transition-all cursor-pointer border-none"
-              title="Solicitar Assinatura Eletrônica Transparente via Assinafy"
+              :class="[
+                'w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-[0.50rem] text-xs font-black uppercase tracking-wider transition-all border-none',
+                proposal.signature?.status === 'signed'
+                  ? 'bg-emerald-600 text-white cursor-not-allowed opacity-90'
+                  : (proposal.signature?.status === 'pending' || isRequestingSignature)
+                    ? 'bg-amber-600 text-white cursor-not-allowed opacity-90'
+                    : 'bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer'
+              ]"
+              :title="
+                proposal.signature?.status === 'signed'
+                  ? 'Documento assinado digitalmente'
+                  : (proposal.signature?.status === 'pending'
+                    ? 'Aguardando assinatura do cliente'
+                    : 'Solicitar Assinatura Eletrônica Transparente via Assinafy')
+              "
             >
-              <FileText class="w-4 h-4 mr-1" />
-              {{ isRequestingSignature ? 'Solicitando...' : (proposal.signature?.status === 'signed' ? 'Assinado Digitalmente' : 'Assinatura Digital') }}
+              <CheckCheck v-if="proposal.signature?.status === 'signed'" class="w-4 h-4 mr-1" />
+              <Clock v-else-if="proposal.signature?.status === 'pending' || isRequestingSignature" class="w-4 h-4 mr-1" />
+              <FileText v-else class="w-4 h-4 mr-1" />
+              {{ 
+                proposal.signature?.status === 'signed'
+                  ? 'Documento assinado'
+                  : ((proposal.signature?.status === 'pending' || isRequestingSignature)
+                    ? 'Aguardando assinatura'
+                    : 'Assinatura Digital')
+              }}
             </BaseButton>
             <BaseButton
               type="button"

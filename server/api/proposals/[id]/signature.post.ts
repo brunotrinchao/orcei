@@ -1,6 +1,6 @@
 import { ProfileService } from '../../../services/ProfileService'
 import { ProposalService } from '../../../services/ProposalService'
-import { AssinafyService } from '../../../services/AssinafyService'
+import { QueueService } from '../../../services/QueueService'
 import { AuditService } from '../../../services/AuditService'
 
 export default defineEventHandler(async (event) => {
@@ -28,52 +28,52 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'O cliente precisa ter nome e e-mail cadastrados para assinar digitalmente.' })
   }
 
-  try {
-    // Solicita a criação do documento e assinatura via Assinafy (transparente)
-    const result = await AssinafyService.createAndSendDocument({
-      proposal: proposal.toObject(),
-      profile: profile.toObject()
-    })
+  // Atualiza os dados de assinatura da proposta para status "pending" (Aguardando assinatura)
+  proposal.signature = {
+    provider: 'assinafy',
+    documentId: proposal.signature?.documentId || null,
+    status: 'pending',
+    signingUrl: proposal.signature?.signingUrl || null,
+    signedAt: null,
+    signedFileUrl: null,
+    rejectionReason: null,
+    requestedAt: new Date()
+  }
 
-    // Atualiza os dados de assinatura da proposta
-    proposal.signature = {
-      provider: 'assinafy',
-      documentId: result.documentId,
-      status: 'pending',
-      signingUrl: result.signingUrl,
-      signedAt: null,
-      signedFileUrl: null,
-      rejectionReason: null
-    }
+  // Se o orçamento estava em rascunho, avança o status para enviado
+  if (proposal.status === 'draft') {
+    proposal.status = 'sent'
+  }
 
-    // Se o orçamento estava em rascunho, avança o status para enviado
-    if (proposal.status === 'draft') {
-      proposal.status = 'sent'
-    }
+  await proposal.save()
 
-    await proposal.save()
-
-    // Registra log de auditoria
-    await AuditService.log({
+  // Agendar solicitação de assinatura assincronamente via Fila (QStash)
+  const runPromise = Promise.all([
+    QueueService.publish('REQUEST_DIGITAL_SIGNATURE', {
+      proposalId: proposal._id?.toString(),
+      profileId: profile._id?.toString()
+    }),
+    ProposalService.logHistory(proposal._id, 'signature_requested', 'system', { status: 'queued' }),
+    AuditService.log({
       adminId: (session.user as any).id,
       adminName: profile.name,
       action: 'REQUEST_DIGITAL_SIGNATURE',
       targetId: proposal._id?.toString(),
       targetType: 'Proposal',
-      details: { documentId: result.documentId, clientEmail: proposal.client.email }
+      details: { clientEmail: proposal.client.email }
     })
+  ])
 
-    return {
-      success: true,
-      message: 'Solicitação de assinatura eletrônica iniciada com sucesso!',
-      signature: proposal.signature,
-      signingUrl: result.signingUrl
-    }
-  } catch (error: any) {
-    console.error('[Signature.post] Erro ao solicitar assinatura:', error)
-    throw createError({
-      statusCode: 500,
-      statusMessage: error.message || 'Falha ao comunicar com o serviço de assinatura eletrônica'
-    })
+  if (typeof event?.waitUntil === 'function') {
+    event.waitUntil(runPromise)
+  } else {
+    await runPromise
+  }
+
+  return {
+    success: true,
+    queued: true,
+    message: 'Solicitação de assinatura eletrônica agendada com sucesso!',
+    signature: proposal.signature
   }
 })

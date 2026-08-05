@@ -401,24 +401,6 @@ export const ProposalService = {
       // Se possuir data de execução, cria evento na agenda da aplicação se ainda não existir
       await this.ensureApplicationCalendarEvent(updated, profile)
 
-      // Enviar e-mail de confirmação ao cliente com o PDF do orçamento em anexo
-      if (updated.client?.email) {
-        try {
-          const pdfBuffer = await generateProposalPdfBuffer(updated, profile)
-          await sendProposalAcceptedEmail(
-            updated.client.email,
-            updated.client.name,
-            updated.code,
-            updated.title || updated.code,
-            profile?.name || 'Profissional',
-            pdfBuffer
-          )
-          await this.logHistory(updated._id, ProposalStatus.ACCEPTED, 'email', { status: 'sent_with_pdf' })
-        } catch (emailErr) {
-          console.error(`[ProposalService] Erro ao enviar e-mail com PDF do orçamento aceito ${updated.code}:`, emailErr)
-        }
-      }
-
       // Agendar Automação Google via Fila
       if (profile?.googleIntegration?.refreshToken) {
         try {

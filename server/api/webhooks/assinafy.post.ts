@@ -1,5 +1,6 @@
 import { Proposal } from '../../models/Proposal'
 import { ProposalHistory } from '../../models/ProposalHistory'
+import { NotificationService } from '../../services/NotificationService'
 
 export default defineEventHandler(async (event) => {
   setResponseStatus(event, 200)
@@ -16,10 +17,29 @@ export default defineEventHandler(async (event) => {
     return { received: true, note: 'Payload vazio' }
   }
 
-  const eventType = payload.event || payload.type || payload.action
+  console.log('[Assinafy Webhook] Evento recebido:', JSON.stringify(payload))
+
+  const eventType = (
+    payload.event ||
+    payload.type ||
+    payload.action ||
+    payload.event_type ||
+    payload.name ||
+    ''
+  ).toString().trim().toLowerCase()
+
   const documentData = payload.data || payload.document || payload
-  const documentId = documentData?.id || documentData?.document_id || payload.document_id
-  const externalId = documentData?.external_id || payload.external_id
+  const documentId =
+    documentData?.id ||
+    documentData?.document_id ||
+    payload.document_id ||
+    payload.id
+
+  const externalId =
+    documentData?.external_id ||
+    payload.external_id ||
+    documentData?.metadata?.proposalId ||
+    payload.metadata?.proposalId
 
   if (!documentId && !externalId) {
     return { received: true, note: 'ID de documento não informado no payload' }
@@ -39,15 +59,101 @@ export default defineEventHandler(async (event) => {
     return { received: true, note: 'Orçamento não localizado' }
   }
 
-  const action = (eventType || '').toLowerCase()
+  /**
+   * Ciclo de Vida do Webhook Assinafy:
+   * 1. document_uploaded: Documento criado/enviado para o Assinafy
+   * 2. signer_viewed_document: Signatário visualizou o documento de assinatura
+   * 3. signer_signed_document: Signatário assinou o documento
+   * 4. user_rejected_document: Signatário recusou assinar o documento
+   */
 
-  if (action.includes('signed') || action === 'document.signed' || action === 'completed') {
+  // --- 1. DOCUMENT UPLOADED ---
+  if (
+    eventType === 'document_uploaded' ||
+    eventType === 'document.uploaded' ||
+    eventType === 'document_created' ||
+    eventType === 'document.created' ||
+    eventType.includes('uploaded')
+  ) {
+    if (proposal.signature) {
+      proposal.signature.status = 'pending'
+      if (documentId) {
+        proposal.signature.documentId = documentId
+      }
+      if (documentData?.signing_url || documentData?.url) {
+        proposal.signature.signingUrl = documentData.signing_url || documentData.url
+      }
+    }
+
+    await proposal.save()
+
+    await ProposalHistory.create({
+      proposalId: proposal._id,
+      type: 'signature',
+      action: 'uploaded',
+      details: {
+        provider: 'assinafy',
+        documentId: documentId || proposal.signature?.documentId,
+        event: 'document_uploaded'
+      },
+      timestamp: new Date()
+    })
+
+    return { received: true, event: 'document_uploaded', status: 'pending' }
+  }
+
+  // --- 2. SIGNER VIEWED DOCUMENT ---
+  if (
+    eventType === 'signer_viewed_document' ||
+    eventType === 'signer.viewed_document' ||
+    eventType === 'document_viewed' ||
+    eventType === 'document.viewed' ||
+    eventType === 'signer_viewed' ||
+    eventType.includes('viewed')
+  ) {
+    if (proposal.status === 'sent') {
+      proposal.status = 'viewed'
+      await proposal.save()
+    }
+
+    await ProposalHistory.create({
+      proposalId: proposal._id,
+      type: 'signature',
+      action: 'viewed',
+      details: {
+        provider: 'assinafy',
+        documentId: documentId || proposal.signature?.documentId,
+        event: 'signer_viewed_document'
+      },
+      timestamp: new Date()
+    })
+
+    return { received: true, event: 'signer_viewed_document', status: proposal.status }
+  }
+
+  // --- 3. SIGNER SIGNED DOCUMENT ---
+  if (
+    eventType === 'signer_signed_document' ||
+    eventType === 'signer.signed_document' ||
+    eventType === 'document_signed' ||
+    eventType === 'document.signed' ||
+    eventType === 'signer_signed' ||
+    eventType.includes('signed') ||
+    eventType === 'completed'
+  ) {
+    proposal.signature = proposal.signature || {}
     proposal.signature.status = 'signed'
     proposal.signature.signedAt = new Date()
     proposal.status = 'accepted'
 
-    if (documentData?.download_url || documentData?.pdf_url) {
-      proposal.signature.signedFileUrl = documentData.download_url || documentData.pdf_url
+    const downloadUrl =
+      documentData?.download_url ||
+      documentData?.pdf_url ||
+      documentData?.signed_file_url ||
+      payload.download_url
+
+    if (downloadUrl) {
+      proposal.signature.signedFileUrl = downloadUrl
     }
 
     await proposal.save()
@@ -59,15 +165,57 @@ export default defineEventHandler(async (event) => {
       details: {
         provider: 'assinafy',
         documentId: documentId || proposal.signature.documentId,
-        signedAt: new Date()
-      }
+        signedAt: new Date(),
+        event: 'signer_signed_document'
+      },
+      timestamp: new Date()
     })
 
-    return { received: true, status: 'signed' }
+    // Enviar notificação para o prestador de serviço
+    try {
+      const profileIdStr = typeof proposal.profileId === 'object' ? proposal.profileId._id.toString() : proposal.profileId.toString()
+      const clientName = proposal.client?.name || 'Cliente'
+      await NotificationService.createNotification({
+        profileId: profileIdStr,
+        type: 'proposal_accepted',
+        title: 'Documento Assinado Digitalmente!',
+        summary: `O cliente ${clientName} assinou a proposta #${proposal.code} via Assinafy.`,
+        details: {
+          proposalId: proposal._id.toString(),
+          code: proposal.code,
+          title: proposal.title,
+          clientName,
+          signedAt: new Date().toISOString()
+        },
+        metadata: {
+          proposalId: proposal._id.toString(),
+          code: proposal.code
+        }
+      })
+    } catch (notifErr) {
+      console.error('[Assinafy Webhook] Erro ao enviar notificação de documento assinado:', notifErr)
+    }
+
+    return { received: true, event: 'signer_signed_document', status: 'signed' }
   }
 
-  if (action.includes('rejected') || action === 'document.rejected') {
-    const reason = documentData?.rejection_reason || payload.reason || 'Recusado pelo signatário'
+  // --- 4. USER REJECTED DOCUMENT ---
+  if (
+    eventType === 'user_rejected_document' ||
+    eventType === 'user.rejected_document' ||
+    eventType === 'signer_rejected_document' ||
+    eventType === 'signer.rejected_document' ||
+    eventType === 'document_rejected' ||
+    eventType === 'document.rejected' ||
+    eventType.includes('rejected')
+  ) {
+    const reason =
+      documentData?.rejection_reason ||
+      payload.reason ||
+      payload.rejection_reason ||
+      'Recusado pelo signatário'
+
+    proposal.signature = proposal.signature || {}
     proposal.signature.status = 'rejected'
     proposal.signature.rejectionReason = reason
     proposal.status = 'rejected'
@@ -81,28 +229,40 @@ export default defineEventHandler(async (event) => {
       details: {
         provider: 'assinafy',
         documentId: documentId || proposal.signature.documentId,
-        reason
-      }
+        reason,
+        event: 'user_rejected_document'
+      },
+      timestamp: new Date()
     })
 
-    return { received: true, status: 'rejected' }
-  }
-
-  if (action.includes('viewed') || action === 'document.viewed') {
-    if (proposal.status === 'sent') {
-      proposal.status = 'viewed'
-      await proposal.save()
+    // Enviar notificação para o prestador de serviço
+    try {
+      const profileIdStr = typeof proposal.profileId === 'object' ? proposal.profileId._id.toString() : proposal.profileId.toString()
+      const clientName = proposal.client?.name || 'Cliente'
+      await NotificationService.createNotification({
+        profileId: profileIdStr,
+        type: 'proposal_rejected',
+        title: 'Assinatura Recusada pelo Cliente',
+        summary: `O cliente ${clientName} recusou a assinatura da proposta #${proposal.code}.`,
+        details: {
+          proposalId: proposal._id.toString(),
+          code: proposal.code,
+          title: proposal.title,
+          clientName,
+          reason,
+          rejectedAt: new Date().toISOString()
+        },
+        metadata: {
+          proposalId: proposal._id.toString(),
+          code: proposal.code
+        }
+      })
+    } catch (notifErr) {
+      console.error('[Assinafy Webhook] Erro ao enviar notificação de documento recusado:', notifErr)
     }
 
-    await ProposalHistory.create({
-      proposalId: proposal._id,
-      type: 'signature',
-      action: 'viewed',
-      details: { provider: 'assinafy', documentId }
-    })
-
-    return { received: true, status: 'viewed' }
+    return { received: true, event: 'user_rejected_document', status: 'rejected' }
   }
 
-  return { received: true, note: `Evento '${eventType}' processado sem alteração de status` }
+  return { received: true, note: `Evento '${eventType}' recebido e processado (sem alteração de status)` }
 })

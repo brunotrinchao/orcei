@@ -128,6 +128,8 @@ export default defineNuxtConfig({
     stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
     assinafyApiKey: process.env.ASSINAFY_API_KEY || '',
     assinafyEnvironment: process.env.ASSINAFY_ENV || 'sandbox',
+    assinafyBaseUrl: process.env.ASSINAFY_BASE_URL || 'https://api.assinafy.com.br/v1',
+    assinafyAccountId:process.env.ASSINAFY_ACCOUNT_ID || '',
     cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
     cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
     cloudinaryName: process.env.CLOUDINARY_NAME,

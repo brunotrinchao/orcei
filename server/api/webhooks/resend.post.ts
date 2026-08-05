@@ -45,7 +45,33 @@ export default defineEventHandler(async (event) => {
   }
 
   // Find proposal by lastEmailId
-  const proposal = await Proposal.findOne({ lastEmailId: emailId })
+  let proposal = await Proposal.findOne({ lastEmailId: emailId })
+
+  // Fallback: Se o webhook do Resend chegar antes de gravar o lastEmailId no banco ou o id falhar,
+  // localiza com precisão a ÚLTIMA proposta/orçamento enviado para o e-mail do cliente (ordenado pelo mais recente).
+  if (!proposal && data?.to) {
+    const recipientEmail = Array.isArray(data.to) ? data.to[0] : data.to
+    if (recipientEmail) {
+      // Prioriza a última proposta em status de envio ativo (não rascunho) ordenada por updatedAt/createdAt
+      proposal = await Proposal.findOne({
+        'client.email': recipientEmail,
+        status: { $ne: 'draft' }
+      }).sort({ updatedAt: -1, createdAt: -1 })
+
+      if (!proposal) {
+        proposal = await Proposal.findOne({
+          'client.email': recipientEmail
+        }).sort({ updatedAt: -1, createdAt: -1 })
+      }
+
+      if (proposal) {
+        proposal.lastEmailId = emailId
+        await proposal.save()
+        console.log(`[Resend Webhook] Proposta #${proposal.code} (última proposta enviada) vinculada ao emailId: ${emailId} via fallback de e-mail (${recipientEmail})`)
+      }
+    }
+  }
+
   if (!proposal) {
     console.log('[Resend Webhook] Proposal not found for emailId:', emailId)
     return { received: true, note: 'Proposal not found' }

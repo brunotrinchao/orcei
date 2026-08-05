@@ -248,7 +248,7 @@ async function saveItem() {
                     <button 
                       type="button"
                       @click="isPhotoType = false; form.imageUrl = ''"
-                      :class="[!isPhotoType ? 'bg-white dark:bg-gray-950 shadow-sm text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-400 dark:text-gray-500']"
+                      :class="[!isPhotoType && form.imageUrl == '' ? 'bg-white dark:bg-gray-950 shadow-sm text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-400 dark:text-gray-500']"
                       class="flex-1 px-2 py-1 rounded-lg text-[9px] font-black uppercase transition-all"
                     >
                       Ícone
@@ -257,7 +257,7 @@ async function saveItem() {
                       type="button"
                       @click="isPhotoType = true"
                       class="relative flex-1 px-2 py-1 rounded-lg text-[9px] font-black uppercase transition-all overflow-hidden"
-                      :class="[isPhotoType ? 'bg-white dark:bg-gray-950 shadow-sm text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-400 dark:text-gray-500']"
+                      :class="[isPhotoType || form.imageUrl ? 'bg-white dark:bg-gray-950 shadow-sm text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-400 dark:text-gray-500']"
                     >
                       Foto
                     </button>
@@ -279,11 +279,11 @@ async function saveItem() {
                 </div>
                 
                 <!-- Seletor de Ícones Padronizado -->
-                <div v-if="!isPhotoType" class="w-full animate-in fade-in zoom-in-95 duration-200">
+                <div v-if="!isPhotoType && !form.imageUrl" class="w-full animate-in fade-in zoom-in-95 duration-200">
                   <BaseIconSelect v-model="form.icon" />
                 </div>
 
-                <div v-if="isPhotoType & form.imageUrl == ''" class="transition-all animate-fadeIn">
+                <div v-if="isPhotoType && form.imageUrl == ''" class="transition-all animate-fadeIn">
                   <label 
                     class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl cursor-pointer bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-900 transition-all relative group"
                   >

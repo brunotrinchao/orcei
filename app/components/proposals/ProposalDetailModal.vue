@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import {
   FileText,
   DollarSign,
@@ -221,6 +221,28 @@ const paymentTermsText = computed(() => {
   }
   return "Conforme orçamento";
 });
+
+const isRequestingSignature = ref(false);
+
+async function requestDigitalSignature() {
+  if (!props.proposal) return;
+  if (!props.proposal.client?.name || !props.proposal.client?.email) {
+    notify("Aviso", "O cliente precisa ter nome e e-mail cadastrados para solicitar a assinatura eletrônica.");
+    return;
+  }
+  isRequestingSignature.value = true;
+  try {
+    const res: any = await $fetch(`/api/proposals/${props.proposal._id}/signature`, { method: "POST" });
+    notify("Sucesso", "Solicitação de assinatura eletrônica iniciada com sucesso!");
+    if (res.signingUrl && typeof window !== "undefined") {
+      window.open(res.signingUrl, "_blank");
+    }
+  } catch (err: any) {
+    notify("Erro", err.data?.statusMessage || "Erro ao solicitar assinatura eletrônica.");
+  } finally {
+    isRequestingSignature.value = false;
+  }
+}
 </script>
 
 <template>
@@ -295,6 +317,18 @@ const paymentTermsText = computed(() => {
                 <ExternalLink class="w-4 h-4 mr-1.5" /> Abrir Link
               </BaseButton>
             </div>
+            <BaseButton
+              type="button"
+              @click="requestDigitalSignature"
+              :disabled="isRequestingSignature"
+              variant="outline"
+              size="sm"
+              class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-[0.50rem] bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black uppercase tracking-wider transition-all cursor-pointer border-none"
+              title="Solicitar Assinatura Eletrônica Transparente via Assinafy"
+            >
+              <FileText class="w-4 h-4 mr-1" />
+              {{ isRequestingSignature ? 'Solicitando...' : (proposal.signature?.status === 'signed' ? 'Assinado Digitalmente' : 'Assinatura Digital') }}
+            </BaseButton>
             <BaseButton
               type="button"
               v-if="proposal.client?.phone"

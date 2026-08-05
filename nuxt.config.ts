@@ -126,6 +126,8 @@ export default defineNuxtConfig({
     deepseekModel: process.env.DEEPSEEK_MODEL || 'deepseek-chat',
     stripeSecretKey: process.env.STRIPE_SECRET_KEY,
     stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+    assinafyApiKey: process.env.ASSINAFY_API_KEY || '',
+    assinafyEnvironment: process.env.ASSINAFY_ENV || 'sandbox',
     cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
     cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
     cloudinaryName: process.env.CLOUDINARY_NAME,

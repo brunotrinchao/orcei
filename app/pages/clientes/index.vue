@@ -566,6 +566,7 @@ const stateMap: Record<string, { label: string; uf: string }> = {
             type="email"
             label="E-mail"
             placeholder="cliente@email.com"
+            required 
           />
           <div class="space-y-3">
             <BaseInput

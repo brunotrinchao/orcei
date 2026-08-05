@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { 
   PlusCircle, 
   Send, 
@@ -27,6 +28,45 @@ interface HistoryItem {
 const props = defineProps<{
   history: HistoryItem[]
 }>()
+
+const filteredHistory = computed(() => {
+  if (!props.history || props.history.length === 0) return []
+
+  const result: HistoryItem[] = []
+
+  for (const currentItem of props.history) {
+    if (result.length === 0) {
+      result.push(currentItem)
+      continue
+    }
+
+    const previousItem = result[result.length - 1]
+
+    // Filtra eventos duplicados sequenciais do mesmo tipo e ação no mesmo dia e mesma hora
+    const isSameAction = currentItem.action === previousItem.action && currentItem.type === previousItem.type
+
+    if (isSameAction) {
+      const dCurr = new Date(currentItem.timestamp)
+      const dPrev = new Date(previousItem.timestamp)
+
+      const isSameDayAndHour =
+        !isNaN(dCurr.getTime()) &&
+        !isNaN(dPrev.getTime()) &&
+        dCurr.getFullYear() === dPrev.getFullYear() &&
+        dCurr.getMonth() === dPrev.getMonth() &&
+        dCurr.getDate() === dPrev.getDate() &&
+        dCurr.getHours() === dPrev.getHours()
+
+      if (isSameDayAndHour) {
+        continue
+      }
+    }
+
+    result.push(currentItem)
+  }
+
+  return result
+})
 
 const getActionLabel = (action: string) => {
   const labels: Record<string, string> = {
@@ -102,9 +142,9 @@ const formatDate = (date: string) => {
 <template>
   <div class="flow-root">
     <ul role="list" class="-mb-8">
-      <li v-for="(event, eventIdx) in history" :key="event._id">
+      <li v-for="(event, eventIdx) in filteredHistory" :key="event._id || eventIdx">
         <div class="relative pb-8">
-          <span v-if="eventIdx !== history.length - 1" class="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-800" aria-hidden="true" />
+          <span v-if="eventIdx !== filteredHistory.length - 1" class="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-800" aria-hidden="true" />
           <div class="relative flex space-x-3">
             <div>
               <span :class="[getActionColor(event.action), 'flex h-8 w-8 items-center justify-center rounded-full ring-8 ring-white dark:ring-gray-900']">

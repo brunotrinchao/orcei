@@ -55,7 +55,16 @@ const proposalSchema = new Schema({
   lastEmailId: String,
   aiAssisted: { type: Boolean, default: false },
   driveFileId: { type: String, default: null },
-  driveWebViewLink: { type: String, default: null }
+  driveWebViewLink: { type: String, default: null },
+  signature: {
+    provider: { type: String, default: 'assinafy' },
+    documentId: { type: String, default: null },
+    status: { type: String, enum: ['none', 'pending', 'signed', 'rejected', 'canceled'], default: 'none' },
+    signingUrl: { type: String, default: null },
+    signedAt: { type: Date, default: null },
+    signedFileUrl: { type: String, default: null },
+    rejectionReason: { type: String, default: null }
+  }
 }, { timestamps: true })
 
 proposalSchema.index({ profileId: 1 })

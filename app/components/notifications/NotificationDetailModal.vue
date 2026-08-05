@@ -25,7 +25,7 @@ const props = defineProps<{
   notification: INotificationItem | null
 }>()
 
-const emit = defineEmits(['update:open'])
+const emit = defineEmits(['update:open', 'close-all'])
 
 const router = useRouter()
 
@@ -47,27 +47,55 @@ function formatDate(dateStr?: string) {
 }
 
 function formatCurrency(val?: number) {
-  if (typeof val !== 'number') return 'R$ 0,00'
+  if (typeof val !== 'number' || isNaN(val)) return 'Não informado'
   return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
-function goToProposal(proposalId?: string) {
+function formatPaymentMethod(method?: string) {
+  if (!method) return 'A combinar'
+  const map: Record<string, string> = {
+    credit_card: 'Cartão de Crédito',
+    pix: 'PIX',
+    cash: 'À Vista',
+    bank_transfer: 'Transferência Bancária',
+    boleto: 'Boleto'
+  }
+  return map[method] || method
+}
+
+function goToProposal() {
   emit('update:open', false)
-  router.push('/orcamentos')
+  emit('close-all')
+  const notif = props.notification
+  const filterTerm =
+    notif?.details?.code ||
+    notif?.metadata?.code ||
+    notif?.details?.title ||
+    ''
+
+  if (filterTerm) {
+    const cleanTerm = filterTerm.replace('#', '')
+    router.push(`/orcamentos?search=${encodeURIComponent(cleanTerm)}`)
+  } else {
+    router.push('/orcamentos')
+  }
 }
 
 function goToReports() {
   emit('update:open', false)
+  emit('close-all')
   router.push('/relatorios')
 }
 
 function goToIntegrations() {
   emit('update:open', false)
+  emit('close-all')
   router.push('/configuracoes')
 }
 
 function goToUser() {
   emit('update:open', false)
+  emit('close-all')
   router.push('/admin/users')
 }
 
@@ -138,7 +166,7 @@ function downloadPdf(reportId?: string) {
           </div>
           <div class="space-y-1">
             <span class="text-gray-400 uppercase">Forma de Pagamento</span>
-            <p class="text-gray-900 dark:text-white font-black text-sm uppercase">{{ notification.details?.paymentMethod || 'A combinar' }}</p>
+            <p class="text-gray-900 dark:text-white font-black text-sm uppercase">{{ formatPaymentMethod(notification.details?.paymentMethod) }}</p>
           </div>
         </div>
       </div>
@@ -258,7 +286,7 @@ function downloadPdf(reportId?: string) {
         <BaseButton 
           v-if="notification?.type === 'proposal_accepted' || notification?.type === 'proposal_rejected'" 
           variant="primary" 
-          @click="goToProposal(notification.details?.proposalId)"
+          @click="goToProposal()"
         >
           <FileText class="w-4 h-4 mr-2" />
           Ver Orçamentos

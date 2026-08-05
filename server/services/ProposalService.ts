@@ -18,7 +18,32 @@ export const ProposalService = {
   },
 
   async getById(id: string, profileId: string) {
-    return await Proposal.findOne({ _id: id, profileId })
+    const proposal = await Proposal.findOne({ _id: id, profileId })
+    if (proposal && (proposal as any).signature?.documentId && (proposal as any).signature?.status !== 'signed') {
+      try {
+        const { AssinafyService } = await import('./AssinafyService')
+        const doc = await AssinafyService.getDocument((proposal as any).signature.documentId)
+        if (doc) {
+          const docStatus = (doc.status || '').toLowerCase()
+          const isSigned = docStatus === 'signed' || docStatus === 'completed' || doc.is_closed === true || (doc.assignment?.signers && doc.assignment.signers.length > 0 && doc.assignment.signers.every((s: any) => s.completed))
+          if (isSigned) {
+            proposal.signature = proposal.signature || {}
+            proposal.signature.status = 'signed'
+            proposal.signature.signedAt = proposal.signature.signedAt || new Date()
+            proposal.status = 'accepted'
+            const downloadUrl = doc.download_url || doc.pdf_url || doc.signed_file_url || (doc.artifacts && doc.artifacts.original)
+            if (downloadUrl) {
+              proposal.signature.signedFileUrl = downloadUrl
+            }
+            await proposal.save()
+            await this.logHistory(proposal._id, 'signed', 'signature', { provider: 'assinafy', documentId: proposal.signature.documentId, autoSynced: true })
+          }
+        }
+      } catch (err) {
+        console.warn('[ProposalService] Erro ao sincronizar status Assinafy em getById:', err)
+      }
+    }
+    return proposal
   },
 
   async getBySlug(slug: string) {

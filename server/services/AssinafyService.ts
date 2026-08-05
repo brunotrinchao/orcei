@@ -256,27 +256,105 @@ export const AssinafyService = {
   },
 
   /**
-   * Baixa o documento PDF assinado (GET /v1/documents/{documentId}/download/signed)
+   * Faz o download de um buffer de PDF tratando possíveis redirecionamentos (ex: S3/CloudFront)
+   */
+  async fetchPdfBufferWithAuth(url: string, headers: Record<string, string>): Promise<Buffer | null> {
+    try {
+      const res = await fetch(url, { method: 'GET', headers, redirect: 'manual' })
+
+      if (res.status >= 300 && res.status < 400) {
+        const location = res.headers.get('location')
+        if (location) {
+          const redirectRes = await fetch(location, { method: 'GET' })
+          if (redirectRes.ok) {
+            const arr = await redirectRes.arrayBuffer()
+            if (arr.byteLength > 0) return Buffer.from(arr)
+          }
+        }
+      }
+
+      if (res.ok) {
+        const arr = await res.arrayBuffer()
+        if (arr.byteLength > 0) return Buffer.from(arr)
+      }
+    } catch (e) {
+      console.warn(`[AssinafyService] Erro ao tentar baixar PDF de ${url}:`, e)
+    }
+
+    try {
+      const response: any = await $fetch(url, {
+        method: 'GET',
+        headers,
+        responseType: 'arrayBuffer'
+      })
+      if (response && (response.byteLength || response.length) > 0) {
+        return Buffer.from(response)
+      }
+    } catch (e2) {
+      // Ignorar fallback silenciosamente
+    }
+
+    return null
+  },
+
+  /**
+   * Baixa ESTRITAMENTE o documento PDF assinado do Assinafy (tipo certificated)
    */
   async downloadSignedDocument(documentId: string): Promise<Buffer | null> {
     const apiKey = this.getApiKey()
     const baseUrl = this.getBaseUrl()
+    const accountId = this.getAccountId()
 
     if (!apiKey || documentId.startsWith('doc_assinafy_')) {
       return null
     }
 
-    try {
-      const response: any = await $fetch(`${baseUrl}/documents/${documentId}/download/signed`, {
-        method: 'GET',
-        headers: this.getAuthHeaders(),
-        responseType: 'arrayBuffer'
-      })
+    const headers = this.getAuthHeaders()
 
-      return Buffer.from(response)
-    } catch (error) {
-      console.error('[AssinafyService] Erro ao baixar PDF assinado:', error)
-      return null
+    // 1. Consulta o documento no Assinafy para obter a URL exata do artefato certificated / signed
+    try {
+      const doc = await this.getDocument(documentId)
+      const signedArtifactUrl =
+        doc?.artifacts?.certificated ||
+        doc?.artifacts?.signed ||
+        doc?.artifacts?.signed_pdf ||
+        doc?.signed_file_url
+
+      if (signedArtifactUrl) {
+        const buf = await this.fetchPdfBufferWithAuth(signedArtifactUrl, headers)
+        if (buf) {
+          console.log('[AssinafyService] PDF ASSINADO obtido com sucesso via URL do artefato:', signedArtifactUrl)
+          return buf
+        }
+      }
+    } catch (docErr) {
+      console.warn('[AssinafyService] Erro ao consultar documento:', docErr)
     }
+
+    // 2. Rota oficial Assinafy para documento assinado (/documents/{id}/download/certificated)
+    const certificatedBuf = await this.fetchPdfBufferWithAuth(`${baseUrl}/documents/${documentId}/download/certificated`, headers)
+    if (certificatedBuf) {
+      console.log('[AssinafyService] PDF ASSINADO obtido via /documents/download/certificated')
+      return certificatedBuf
+    }
+
+    // 3. Rota oficial Assinafy com accountId (/accounts/{accountId}/documents/{id}/download/certificated)
+    if (accountId) {
+      const accountCertificatedBuf = await this.fetchPdfBufferWithAuth(`${baseUrl}/accounts/${accountId}/documents/${documentId}/download/certificated`, headers)
+      if (accountCertificatedBuf) {
+        console.log('[AssinafyService] PDF ASSINADO obtido via /accounts/documents/download/certificated')
+        return accountCertificatedBuf
+      }
+    }
+
+    // 4. Rota alternativa (/documents/{id}/download/signed)
+    const directBuf = await this.fetchPdfBufferWithAuth(`${baseUrl}/documents/${documentId}/download/signed`, headers)
+    if (directBuf) {
+      console.log('[AssinafyService] PDF ASSINADO obtido via /documents/download/signed')
+      return directBuf
+    }
+
+    // NUNCA baixar o PDF original não assinado nesta rotina.
+    return null
   }
 }

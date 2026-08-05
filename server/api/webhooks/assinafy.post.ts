@@ -90,13 +90,14 @@ export default defineEventHandler(async (event) => {
     eventType === 'document.created' ||
     eventType.includes('uploaded')
   ) {
-    if (proposal.signature) {
+    if (proposal.signature && proposal.signature.status !== 'signed') {
       proposal.signature.status = 'pending'
       if (documentId) {
         proposal.signature.documentId = documentId
       }
-      if (documentData?.signing_url || documentData?.url) {
-        proposal.signature.signingUrl = documentData.signing_url || documentData.url
+      const signingUrl = documentData?.signing_url || documentData?.url || documentData?.assignment?.signing_urls?.[0]?.url
+      if (signingUrl) {
+        proposal.signature.signingUrl = signingUrl
       }
     }
 
@@ -200,6 +201,9 @@ export default defineEventHandler(async (event) => {
           code: proposal.code,
           title: proposal.title,
           clientName,
+          clientEmail: proposal.client?.email || '',
+          finalValue: proposal.totals?.final,
+          paymentMethod: proposal.paymentConfig?.method,
           signedAt: new Date().toISOString()
         },
         metadata: {

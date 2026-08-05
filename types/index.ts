@@ -133,6 +133,16 @@ export interface ProposalDTO {
   executionDate?: string | Date | null
   createdAt: string
   updatedAt: string
+  signature?: {
+    provider?: string
+    documentId?: string
+    status?: 'pending' | 'signed' | 'rejected'
+    signingUrl?: string
+    signedAt?: string | Date
+    signedFileUrl?: string
+    rejectionReason?: string
+    requestedAt?: string | Date
+  }
 }
 
 export interface ClientDTO {

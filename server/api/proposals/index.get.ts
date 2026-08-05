@@ -1,6 +1,7 @@
 import { ProfileService } from '../../services/ProfileService'
 import { Proposal } from '../../models/Proposal'
 import { ProposalMessage } from '../../models/ProposalMessage'
+import { ProposalHistory } from '../../models/ProposalHistory'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -33,7 +34,17 @@ export default defineEventHandler(async (event) => {
   }
 
   if (status && status !== '__EMPTY__') {
-    query.status = status
+    if (status === 'signed') {
+      query.status = 'accepted'
+      query['signature.status'] = 'signed'
+    } else if (status === 'pending_signature') {
+      query.status = 'accepted'
+      query['signature.status'] = 'pending'
+    } else if (status === 'failed') {
+      query.status = { $in: ['failed', 'bounced'] }
+    } else {
+      query.status = status
+    }
   }
 
   const dateQuery: any = {}
@@ -67,13 +78,26 @@ export default defineEventHandler(async (event) => {
     Proposal.countDocuments(query)
   ])
 
-  // Injetar status de mensagens de forma eficiente
+  // Injetar status de mensagens de forma eficiente, calcular visualizações e garantir consistência do status assinado
   const proposalsWithMessages = await Promise.all(items.map(async (p: any) => {
-    const [hasMessages, unreadCount] = await Promise.all([
+    if (p.signature?.status === 'signed' && p.status !== 'accepted') {
+      p.status = 'accepted'
+      await Proposal.updateOne({ _id: p._id }, { status: 'accepted' })
+    }
+
+    const [hasMessages, unreadCount, viewEvents] = await Promise.all([
       ProposalMessage.exists({ proposalId: p._id }),
-      ProposalMessage.countDocuments({ proposalId: p._id, sender: 'client', read: false })
+      ProposalMessage.countDocuments({ proposalId: p._id, sender: 'client', read: false }),
+      ProposalHistory.find({
+        proposalId: p._id,
+        action: { $in: ['viewed', 'opened', 'clicked', 'signer_viewed_document'] }
+      }).sort({ timestamp: -1 }).lean()
     ])
-    return { ...p, hasMessages: !!hasMessages, unreadMessages: unreadCount }
+
+    const viewsCount = viewEvents.length
+    const lastViewedAt = viewEvents.length > 0 ? viewEvents[0].timestamp : null
+
+    return { ...p, hasMessages: !!hasMessages, unreadMessages: unreadCount, viewsCount, lastViewedAt }
   }))
 
   return {

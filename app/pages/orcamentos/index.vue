@@ -21,9 +21,17 @@ const itemsPerPage = 10
 const showProposalInfo = ref(false)
 const selectedProposalInfo = ref<ProposalDTO | null>(null)
 
-function openProposalInfo(proposal: ProposalDTO) {
+async function openProposalInfo(proposal: ProposalDTO) {
   selectedProposalInfo.value = proposal
   showProposalInfo.value = true
+  try {
+    const res: any = await $fetch(`/api/proposals/${proposal._id}`)
+    if (res) {
+      selectedProposalInfo.value = res
+    }
+  } catch (err) {
+    console.error('[openProposalInfo] Erro ao carregar detalhes:', err)
+  }
 }
 
 watch(() => route.query.search || route.query.email, (newSearch) => {
@@ -338,14 +346,14 @@ const statusMap: any = {
   created: { label: 'Criado', color: 'bg-blue-50 text-blue-700' },
   sent: { label: 'Enviado', color: 'bg-blue-100 text-blue-800' },
   delivered: { label: 'Entregue', color: 'bg-emerald-100 text-emerald-800' },
+  viewed: { label: 'Visualizado', color: 'bg-indigo-100 text-indigo-800' },
   opened: { label: 'Aberto', color: 'bg-sky-100 text-sky-800' },
   clicked: { label: 'Clicado', color: 'bg-orange-100 text-orange-800' },
-  pending: { label: 'Pendente', color: 'bg-yellow-100 text-yellow-800' },
   accepted: { label: 'Aceito', color: 'bg-emerald-600 text-white' },
+  pending_signature: { label: 'Aguardando Assinatura', color: 'bg-amber-600 text-white' },
+  signed: { label: 'Aceito & Assinado', color: 'bg-emerald-700 text-white' },
   expired: { label: 'Expirado', color: 'bg-red-100 text-red-800' },
-  bounced: { label: 'Erro Envio', color: 'bg-red-600 text-white' },
   failed: { label: 'Erro Envio', color: 'bg-red-600 text-white' },
-  viewed: { label: 'Visualizado', color: 'bg-indigo-100 text-indigo-800' },
   rejected: { label: 'Rejeitado', color: 'bg-red-700 text-white' }
 }
 
@@ -362,11 +370,10 @@ const getStatusVariant = (proposal: ProposalDTO | string): 'default' | 'success'
 }
 
 function getProposalStatusLabel(proposal: ProposalDTO) {
-  if (proposal.status === 'accepted') {
-    if (proposal.signature?.status === 'signed') return 'Aceito & Assinado'
-    if (proposal.signature?.status === 'pending') return 'Aguardando Assinatura'
-    return 'Aceito'
-  }
+  if (!proposal) return ''
+  if (proposal.signature?.status === 'signed') return 'Aceito & Assinado'
+  if (proposal.signature?.status === 'pending') return 'Aguardando Assinatura'
+  if (proposal.status === 'accepted') return 'Aceito'
   if (proposal.status === 'rejected') return 'Rejeitado'
   if (proposal.status === 'failed' || proposal.status === 'bounced') return 'Erro no Envio'
   const item = statusMap[proposal.status]
@@ -554,8 +561,8 @@ async function saveContract() {
             {{ formatDate(proposal.createdAt) }}
           </td>
           <td class="px-8 py-6">
-            <BaseBadge :variant="getStatusVariant(proposal.status)">
-              {{ statusMap[proposal.status]?.label }}
+            <BaseBadge :variant="getStatusVariant(proposal)">
+              {{ getProposalStatusLabel(proposal) }}
             </BaseBadge>
           </td>
           <td class="px-8 py-6 text-right">
@@ -947,8 +954,8 @@ async function saveContract() {
             <h3 class="text-xl font-black text-gray-900 dark:text-gray-100 tracking-tight">{{ selectedProposal.title }}</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">{{ selectedProposal.client.name }} • {{ selectedProposal.code }}</p>
           </div>
-          <BaseBadge :variant="getStatusVariant(selectedProposal.status)">
-            {{ statusMap[selectedProposal.status]?.label }}
+          <BaseBadge :variant="getStatusVariant(selectedProposal)">
+            {{ getProposalStatusLabel(selectedProposal) }}
           </BaseBadge>
         </div>
 

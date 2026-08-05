@@ -53,8 +53,42 @@ const statusMap: Record<
 };
 
 const currentStatus = computed(() => {
-  if (!props.proposal?.status) return statusMap.draft;
+  if (!props.proposal) return statusMap.draft;
+  if (props.proposal.signature?.status === 'signed') {
+    return { label: 'Aceito & Assinado', variant: 'success' as const };
+  }
+  if (props.proposal.signature?.status === 'pending') {
+    return { label: 'Aguardando Assinatura', variant: 'warning' as const };
+  }
+  if (props.proposal.status === 'accepted') {
+    return { label: 'Aceito', variant: 'success' as const };
+  }
   return statusMap[props.proposal.status] || statusMap.draft;
+});
+
+const calculatedViewsCount = computed(() => {
+  if (typeof props.proposal?.viewsCount === "number" && props.proposal.viewsCount > 0) {
+    return props.proposal.viewsCount;
+  }
+  if (Array.isArray((props.proposal as any)?.history)) {
+    return (props.proposal as any).history.filter((h: any) =>
+      ["viewed", "opened", "clicked", "signer_viewed_document"].includes(h.action)
+    ).length;
+  }
+  return props.proposal?.viewsCount || 0;
+});
+
+const calculatedLastViewedAt = computed(() => {
+  if (props.proposal?.lastViewedAt) {
+    return props.proposal.lastViewedAt;
+  }
+  if (Array.isArray((props.proposal as any)?.history)) {
+    const viewEvents = (props.proposal as any).history.filter((h: any) =>
+      ["viewed", "opened", "clicked", "signer_viewed_document"].includes(h.action)
+    );
+    return viewEvents.length > 0 ? viewEvents[0].timestamp : null;
+  }
+  return null;
 });
 
 // O link só pode estar habilitado se NÃO for rascunho nem recusado (já enviado ao cliente)
@@ -338,7 +372,7 @@ async function requestDigitalSignature() {
                   ? 'Documento assinado digitalmente'
                   : (proposal.signature?.status === 'pending'
                     ? 'Aguardando assinatura do cliente'
-                    : 'Solicitar Assinatura Eletrônica Transparente via Assinafy')
+                    : 'Enviar documento para assinatura no Assinafy')
               "
             >
               <CheckCheck v-if="proposal.signature?.status === 'signed'" class="w-4 h-4 mr-1" />
@@ -349,7 +383,7 @@ async function requestDigitalSignature() {
                   ? 'Documento assinado'
                   : ((proposal.signature?.status === 'pending' || isRequestingSignature)
                     ? 'Aguardando assinatura'
-                    : 'Assinatura Digital')
+                    : 'Enviar para assinar')
               }}
             </BaseButton>
             <BaseButton
@@ -478,14 +512,14 @@ async function requestDigitalSignature() {
             <Eye class="w-4 h-4 text-amber-500" />
           </div>
           <p class="text-xl font-black text-amber-900 dark:text-amber-200">
-            {{ (proposal as any).viewsCount || 0 }}x
+            {{ calculatedViewsCount }}x
           </p>
           <p
             class="text-[10px] text-amber-700 dark:text-amber-300 font-bold truncate"
           >
             {{
-              (proposal as any).lastViewedAt
-                ? `Última: ${formatDate((proposal as any).lastViewedAt)}`
+              calculatedLastViewedAt
+                ? `Última: ${formatDate(calculatedLastViewedAt)}`
                 : "Nunca visualizado"
             }}
           </p>
@@ -748,7 +782,7 @@ async function requestDigitalSignature() {
     </div>
 
     <template #footer>
-      <div class="flex justify-end w-full">
+      <div class="flex justify-end w-full" v-if="proposal && proposal.status !== 'accepted' && proposal.signature?.status !== 'signed'">
         <BaseButton type="button" @click="emit('edit', proposal)">
           <Pencil class="w-4 h-4 mr-2" />
           Editar Proposta

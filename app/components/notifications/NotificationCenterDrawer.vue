@@ -251,5 +251,6 @@ function timeAgo(dateStr: string) {
   <NotificationDetailModal
     v-model:open="isDetailModalOpen"
     :notification="selectedNotification"
+    @close-all="emit('update:open', false)"
   />
 </template>

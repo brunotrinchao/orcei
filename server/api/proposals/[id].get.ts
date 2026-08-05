@@ -15,8 +15,15 @@ export default defineEventHandler(async (event) => {
 
   const history = await ProposalService.getHistory(proposal._id as any)
 
+  // Calcula o total de visualizações e a data da última visualização a partir do histórico
+  const viewEvents = history.filter((h: any) => ['viewed', 'opened', 'clicked'].includes(h.action))
+  const viewsCount = viewEvents.length
+  const lastViewedAt = viewEvents.length > 0 ? viewEvents[0].timestamp : null
+
   return {
     ...proposal.toObject(),
+    viewsCount,
+    lastViewedAt,
     history
   }
 })

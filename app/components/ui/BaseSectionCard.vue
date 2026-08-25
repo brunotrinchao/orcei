@@ -25,7 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const borderClass = computed(() => {
-  return props.noBorder ? '' : 'p-6 md:p-8 border border-slate-200 dark:border-gray-800'
+  return props.noBorder ? 'p-3 md:p-4' : 'p-6 md:p-8 border border-slate-200 dark:border-gray-800'
 })
 </script>
 
@@ -37,8 +37,8 @@ const borderClass = computed(() => {
     :class="borderClass"
   >
     <!-- Header da Seção -->
-    <div v-if="title || icon || $slots.icon || $slots['header-actions']" class="flex items-center justify-between gap-4 mb-6">
-      <div class="flex items-center gap-3">
+    <div v-if="title || icon || $slots.icon || $slots['header-actions']" class="flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 sm:gap-4 mb-6">
+      <div class="flex items-center gap-3 w-full sm:w-auto min-w-0">
         <slot name="icon">
           <div
             v-if="icon"
@@ -50,18 +50,18 @@ const borderClass = computed(() => {
             <component :is="icon" :class="['w-5 h-5', iconColorClass]" />
           </div>
         </slot>
-        <div v-if="title || subtitle">
-          <h2 v-if="title" class="text-xl font-black text-gray-900 dark:text-gray-50 uppercase tracking-tight">
+        <div v-if="title || subtitle" class="w-full flex-1 min-w-0">
+          <h2 v-if="title" class="w-full text-xl font-black text-gray-900 dark:text-gray-50 uppercase tracking-tight">
             {{ title }}
           </h2>
-          <p v-if="subtitle" class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">
+          <p v-if="subtitle" class="w-full text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">
             {{ subtitle }}
           </p>
         </div>
       </div>
 
       <!-- Ações do Cabeçalho (opcional) -->
-      <div v-if="$slots['header-actions']" class="shrink-0 flex items-center gap-2">
+      <div v-if="$slots['header-actions']" class="w-full sm:w-auto shrink-0 flex items-center gap-2">
         <slot name="header-actions" />
       </div>
     </div>

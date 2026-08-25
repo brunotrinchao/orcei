@@ -129,7 +129,7 @@ const selectOption = (option: Option) => {
           v-if="isOpen && !disabled"
           class="absolute z-50 w-full mt-2 bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl rounded-[0.75rem] border-2 border-gray-200 dark:border-gray-700 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-gray-900/20 overflow-hidden"
         >
-          <div class="max-h-[300px] overflow-y-auto p-2 space-y-1">
+          <div class="max-h-[300px] overflow-y-auto p-2 space-y-1 sm:w-full">
             <div v-if="internalSearch.length < 2" class="px-6 py-8 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] text-center">
               Digite pelo menos 2 caracteres...
             </div>
@@ -147,9 +147,9 @@ const selectOption = (option: Option) => {
                     : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                 ]"
               >
-                <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mr-3 group-hover:scale-110 transition-transform"
+                <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mr-3 group-hover:scale-110 transition-transform sm:block hidden"
                      :class="modelValue === option.value ? 'bg-blue-100/50 dark:bg-blue-900/50' : 'bg-gray-100/50 dark:bg-gray-700/50'">
-                  <span class="font-black text-xs uppercase"
+                  <span class="font-black text-xs uppercase "
                         :class="modelValue === option.value ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'">
                     {{ option.label.charAt(0) }}
                   </span>

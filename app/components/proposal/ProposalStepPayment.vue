@@ -10,7 +10,7 @@ const props = defineProps<{
 
 <template>
   <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-    <div class="space-y-2">
+    <div class="space-y-2 px-3">
       <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight">Condições e Finalização</h3>
       <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Configure como o cliente pagará e receba o resumo financeiro.</p>
     </div>

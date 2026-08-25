@@ -123,13 +123,13 @@ function isItemSelected(item: any) {
 
 <template>
   <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-5">
-    <div class="space-y-2">
+    <div class="space-y-2 px-3">
       <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight">Serviços e Valores</h3>
       <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Defina o escopo obrigatório e adicione pacotes opcionais (upsell).</p>
     </div>
 
     <!-- Smart Catalog Search -->
-    <div class="relative z-20">
+    <div class="relative z-20  px-3">
       <div class="flex items-center gap-3">
         <div class="flex-1">
           <BaseCombobox 
@@ -144,13 +144,13 @@ function isItemSelected(item: any) {
         </div>
         <BaseButton type="button" variant="secondary" @click="showCatalogItemFormDialog = true" class="shrink-0 h-[56px] px-6 rounded-[0.75rem]">
           <Plus class="w-5 h-5 mr-2" />
-          Novo
+          <span class="hidden sm:block">Novo</span>
         </BaseButton>
       </div>
     </div>
 
     <!-- Escopo Principal -->
-    <BaseSectionCard :title="`Itens Obrigatórios (${form.items.length})`">
+    <BaseSectionCard :title="`Itens Obrigatórios (${form.items.length})`" :noBorder="true">
       <div
         v-if="form.items.length === 0"
         class="p-8 border-2 border-dashed rounded-[0.75rem] text-center font-medium transition-colors"
@@ -167,8 +167,8 @@ function isItemSelected(item: any) {
           class="bg-white dark:bg-gray-900 rounded-[0.75rem] border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 shadow-sm overflow-hidden transition-all group"
         >
           <!-- Cabecalho Compacto (Sempre visível) -->
-          <div class="p-4 flex items-center gap-4">
-            <div class="flex-1 flex items-center gap-3 min-w-0">
+          <div class="p-4 sm:flex items-center gap-4">
+            <div class="flex-1 flex items-center gap-3 min-w-0 w-full">
               <GripVertical class="w-5 h-5 text-gray-300 dark:text-gray-600 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block shrink-0" />
               <template v-if="!item.catalogItemId">
                 <input
@@ -179,8 +179,12 @@ function isItemSelected(item: any) {
                 >
               </template>
               <template v-else>
-                <span class="flex-1 text-sm sm:text-base font-black text-gray-900 dark:text-gray-50 p-1 truncate">{{ item.name }}</span>
+                <span class="flex-1 text-sm sm:text-base font-black text-gray-900 dark:text-gray-50 p-1 truncate ">{{ item.name }}</span>
               </template>
+              <BaseButton variant="ghost" size="icon-sm" @click="toggleItemExpansion(idx)" type="button" aria-label="Editar Descrição" class="sm:hidden block">
+                <ChevronUp v-if="expandedItemIdx === idx" class="w-4 h-4" />
+                <ChevronDown v-else class="w-4 h-4" />
+              </BaseButton>
             </div>
 
             <div class="flex items-center gap-3 sm:gap-6 shrink-0">
@@ -200,7 +204,7 @@ function isItemSelected(item: any) {
 
             <!-- Ações -->
             <div class="flex items-center gap-1 shrink-0 ml-2">
-              <BaseButton variant="ghost" size="icon-sm" @click="toggleItemExpansion(idx)" type="button" aria-label="Editar Descrição">
+              <BaseButton variant="ghost" size="icon-sm" @click="toggleItemExpansion(idx)" type="button" aria-label="Editar Descrição" class="hidden sm:block">
                 <ChevronUp v-if="expandedItemIdx === idx" class="w-4 h-4" />
                 <ChevronDown v-else class="w-4 h-4" />
               </BaseButton>

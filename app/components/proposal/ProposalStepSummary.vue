@@ -114,7 +114,7 @@ const getScoreColor = (val: number) => {
 
 <template>
   <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
-    <div class="space-y-2">
+    <div class="space-y-2 px-3">
       <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight">Resumo do Orçamento</h3>
       <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Revise todos os detalhes antes de salvar ou enviar para o cliente.</p>
     </div>

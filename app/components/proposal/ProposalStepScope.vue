@@ -142,10 +142,21 @@ function isItemSelected(item: any) {
             @update:model-value="onCatalogItemSelect"
           />
         </div>
-        <BaseButton type="button" variant="secondary" @click="showCatalogItemFormDialog = true" class="shrink-0 h-[56px] px-6 rounded-[0.75rem]">
+        <!-- <BaseButton type="button" variant="secondary" @click="showCatalogItemFormDialog = true" class="shrink-0 h-[56px] px-6 rounded-[0.75rem]">
           <Plus class="w-5 h-5 mr-2" />
           <span class="hidden sm:block">Novo</span>
-        </BaseButton>
+        </BaseButton> -->
+        <BaseButton
+                type="button"
+                variant="outline"
+                title="Cadastrar novo produto/serviço"
+                aria-label="Cadastrar novo produto/serviço"
+                style="height: 3.5rem; width: 3.5rem; padding: 0;"
+                class="flex items-center justify-center"
+                @click="showCatalogItemFormDialog = true"
+              >
+                <Plus class="w-4 h-4" />
+              </BaseButton>
       </div>
     </div>
 

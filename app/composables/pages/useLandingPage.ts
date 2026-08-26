@@ -1,14 +1,6 @@
 import { computed, watchEffect } from 'vue'
 
 export function useLandingPage() {
-  const { loggedIn } = useUserSession()
-
-  watchEffect(() => {
-    if (loggedIn.value) {
-      navigateTo('/dashboard')
-    }
-  })
-
   const { data: systemInfo } = useFetch<any>('/api/system/status', { key: 'system-status' })
 
   const landing = computed(() => systemInfo.value?.landingPage || {

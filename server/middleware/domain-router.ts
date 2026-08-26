@@ -23,8 +23,8 @@ export default defineEventHandler((event) => {
     return
   }
 
-  const rawHost = getHeader(event, 'host') || ''
-  const host = rawHost.split(':')[0].toLowerCase().replace(/^www\./, '')
+  const rawHost = getHeader(event, 'x-forwarded-host') || getHeader(event, 'host') || ''
+  const host = rawHost.split(',')[0].split(':')[0].trim().toLowerCase().replace(/^www\./, '')
 
   // Ignorar desenvolvimento local (localhost) e URLs temporárias de preview da Vercel
   if (!host || host === 'localhost' || host === '127.0.0.1' || host.endsWith('.vercel.app')) {

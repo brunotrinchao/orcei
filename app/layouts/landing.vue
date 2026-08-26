@@ -1,6 +1,11 @@
 <script setup lang="ts">
-const { loggedIn } = useUserSession()
+const { loggedIn, user } = useUserSession()
 const { getAppUrl } = useAppUrl()
+
+const { data: profile } = useFetch<any>('/api/profile', {
+  key: 'profile',
+  lazy: true
+})
 
 const { data: systemInfo } = useFetch<any>('/api/system/status', {
   key: 'system-status'
@@ -25,7 +30,33 @@ const { data: systemInfo } = useFetch<any>('/api/system/status', {
         </div>
 
         <div class="flex items-center gap-4">
+          <template v-if="loggedIn">
+            <NuxtLink
+              :href="getAppUrl('/dashboard')"
+              external
+              target="_self"
+              class="flex items-center gap-3 bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 p-1.5 pr-5 rounded-full transition-all duration-300 group shadow-lg shadow-black/20 hover:scale-[1.02]"
+            >
+              <!-- Avatar Foto ou Inicial -->
+              <div class="w-9 h-9 rounded-full overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-sm border border-blue-400/30 flex-shrink-0 shadow-inner">
+                <img
+                  v-if="(user as any)?.avatar || profile?.avatar || profile?.logoUrl"
+                  :src="(user as any)?.avatar || profile?.avatar || profile?.logoUrl"
+                  :alt="(user as any)?.name || profile?.name || 'Avatar'"
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                />
+                <span v-else>
+                  {{ ((user as any)?.name || (user as any)?.email || profile?.name || 'U')[0].toUpperCase() }}
+                </span>
+              </div>
+              <span class="text-xs font-bold text-white group-hover:text-blue-400 transition-colors">
+                Ir para o App
+              </span>
+            </NuxtLink>
+          </template>
           <NuxtLink
+            v-else
             :href="getAppUrl('/auth/login')"
             external
             target="_self"

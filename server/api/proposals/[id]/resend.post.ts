@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Cliente sem e-mail cadastrado' })
   }
 
-  const domain = process.env.PUBLIC_PROPOSAL_URL || process.env.PUBLIC_URL || 'https://orceifacil.com.br'
+  const domain = process.env.PUBLIC_PROPOSAL_URL || process.env.PUBLIC_URL || 'https://orcamento.orceifacil.com.br'
   const proposalUrl = `${domain}/p/${proposal.slug}?t=${proposal.token}`
   
   const runPromise = Promise.all([

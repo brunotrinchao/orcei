@@ -171,7 +171,7 @@ export const ProposalService = {
 
         if (data.sendMethod !== SendMethod.MANUAL) {
           if (profile && data.client?.email) {
-            const domain = process.env.PUBLIC_PROPOSAL_URL || process.env.PUBLIC_URL || 'https://orceifacil.com.br'
+            const domain = process.env.PUBLIC_PROPOSAL_URL || process.env.PUBLIC_URL || 'https://orcamento.orceifacil.com.br'
             const proposalUrl = `${domain}/p/${slug}?t=${token}`
             await QueueService.publish('SEND_EMAIL_PROPOSAL', {
               clientEmail: data.client.email,
@@ -257,7 +257,7 @@ export const ProposalService = {
             ? await Profile.findById(profileId).session(session) 
             : await Profile.findById(profileId)
           if (profile && data.client?.email) {
-            const domain = process.env.PUBLIC_PROPOSAL_URL || process.env.PUBLIC_URL || 'https://orceifacil.com.br'
+            const domain = process.env.PUBLIC_PROPOSAL_URL || process.env.PUBLIC_URL || 'https://orcamento.orceifacil.com.br'
             const proposalUrl = `${domain}/p/${oldProposal.slug}?t=${oldProposal.token}`
             await QueueService.publish('SEND_EMAIL_PROPOSAL', {
               clientEmail: data.client.email,

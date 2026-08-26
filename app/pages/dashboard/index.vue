@@ -75,7 +75,7 @@ const {
     </header>
 
     <!-- Loading State Geral -->
-    <template v-if="status === 'pending' && !stats">
+    <template v-if="status === 'pending' || !stats">
 
       <!-- KPI Cards -->
       <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">

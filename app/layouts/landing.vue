@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { loggedIn } = useUserSession()
+const { getAppUrl } = useAppUrl()
 
 const { data: systemInfo } = useFetch<any>('/api/system/status', {
   key: 'system-status'
@@ -25,7 +26,9 @@ const { data: systemInfo } = useFetch<any>('/api/system/status', {
 
         <div class="flex items-center gap-4">
           <NuxtLink
-            to="/auth/login"
+            :href="getAppUrl('/auth/login')"
+            external
+            target="_self"
             class="bg-white hover:bg-slate-100 text-slate-950 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 shadow-lg shadow-white/5 hover:scale-[1.02]"
           >
             Entrar

@@ -3,6 +3,7 @@ import { Check, Sparkles } from 'lucide-vue-next'
 
 // Mesma fonte de dados usada em /planos (SaaS) - só o layout muda aqui
 const { packages } = useCreditPackages()
+const { getAppUrl } = useAppUrl()
 </script>
 
 <template>
@@ -67,7 +68,9 @@ const { packages } = useCreditPackages()
           </div>
 
           <NuxtLink
-            to="/auth/login"
+            :href="getAppUrl('/auth/login')"
+            external
+            target="_self"
             :class="[
               'w-full text-center py-4 font-bold text-sm rounded-2xl transition duration-300',
               pack.highlight

@@ -6,6 +6,8 @@ defineProps<{
   subtitle: string
   appName?: string
 }>()
+
+const { getAppUrl } = useAppUrl()
 </script>
 
 <template>
@@ -37,7 +39,9 @@ defineProps<{
       <!-- CTAs de Alta Conversão -->
       <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
         <NuxtLink
-          to="/auth/login"
+          :href="getAppUrl('/auth/login')"
+          external
+          target="_self"
           class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 hover:from-blue-500 hover:to-indigo-500 text-white px-10 py-4.5 rounded-2xl font-bold text-lg transition-all duration-300 shadow-[0_0_30px_-5px_rgba(37,99,235,0.4)] hover:shadow-[0_0_35px_rgba(79,70,229,0.5)] hover:-translate-y-0.5 group"
         >
           Criar meu primeiro orçamento grátis

@@ -1,0 +1,67 @@
+/* SetupWizardModal Dedicated Styles & Smooth Transitions */
+.setup-wizard-container {
+  min-height: 100vh;
+}
+
+/* Transição de Fase Principal (Boas-Vindas <-> Etapas <-> Processamento) */
+.wizard-phase-enter-active {
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.wizard-phase-leave-active {
+  transition: opacity 0.25s cubic-bezier(0.7, 0, 0.84, 0), transform 0.25s cubic-bezier(0.7, 0, 0.84, 0);
+}
+.wizard-phase-enter-from {
+  opacity: 0;
+  transform: scale(0.97) translateY(12px);
+}
+.wizard-phase-leave-to {
+  opacity: 0;
+  transform: scale(0.97) translateY(-12px);
+}
+
+/* Transição Direcional para o Próximo Passo (Forward) */
+.wizard-slide-next-enter-active {
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.wizard-slide-next-leave-active {
+  transition: opacity 0.2s cubic-bezier(0.7, 0, 0.84, 0), transform 0.2s cubic-bezier(0.7, 0, 0.84, 0);
+}
+.wizard-slide-next-enter-from {
+  opacity: 0;
+  transform: translateX(36px);
+}
+.wizard-slide-next-leave-to {
+  opacity: 0;
+  transform: translateX(-36px);
+}
+
+/* Transição Direcional para o Passo Anterior (Backward) */
+.wizard-slide-prev-enter-active {
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.wizard-slide-prev-leave-active {
+  transition: opacity 0.2s cubic-bezier(0.7, 0, 0.84, 0), transform 0.2s cubic-bezier(0.7, 0, 0.84, 0);
+}
+.wizard-slide-prev-enter-from {
+  opacity: 0;
+  transform: translateX(-36px);
+}
+.wizard-slide-prev-leave-to {
+  opacity: 0;
+  transform: translateX(36px);
+}
+
+/* Efeito de Micro-animações e Botões Foco */
+.wizard-step-card {
+  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+
+.wizard-btn-transition {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.wizard-btn-transition:hover {
+  transform: translateY(-1px);
+}
+.wizard-btn-transition:active {
+  transform: translateY(0) scale(0.98);
+}

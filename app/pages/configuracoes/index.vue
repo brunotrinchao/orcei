@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { SwatchBook, MapPin, Briefcase, FileText, Phone, RefreshCcw, Shield, Globe, ShieldCheck, Lock, CheckCircle2, Wand2, Upload } from 'lucide-vue-next'
 import type { ProfileDTO } from '../../../types'
-import SettingsVisual from '../../components/settings/SettingsVisual.vue'
-import SettingsCompany from '../../components/settings/SettingsCompany.vue'
-import SettingsAddress from '../../components/settings/SettingsAddress.vue'
-import SettingsContact from '../../components/settings/SettingsContact.vue'
-import SettingsTemplates from '../../components/settings/SettingsTemplates.vue'
-import SettingsBulkImport from '../../components/settings/SettingsBulkImport.vue'
+import SettingsVisual from '../../components/settings/SettingsVisual/index.vue'
+import SettingsCompany from '../../components/settings/SettingsCompany/index.vue'
+import SettingsAddress from '../../components/settings/SettingsAddress/index.vue'
+import SettingsContact from '../../components/settings/SettingsContact/index.vue'
+import SettingsTemplates from '../../components/settings/SettingsTemplates/index.vue'
+import SettingsBulkImport from '../../components/settings/SettingsBulkImport/index.vue'
 
 const { notify } = useAlerts()
 const { data: profile, refresh } = useFetch<ProfileDTO>('/api/profile', { key: 'profile' })

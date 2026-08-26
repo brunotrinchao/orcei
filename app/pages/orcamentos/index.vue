@@ -464,14 +464,14 @@ async function saveContract() {
 <template>
   <div class="space-y-10 relative">
     <PageHeader title="Seus Orçamentos" subtitle="Acompanhe e gerencie seus orçamentos comerciais.">
-      <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+      <div class="flex flex-row gap-3 w-full sm:w-auto">
          <BaseButton @click="isAIWizardOpen = true" class="shadow-2xl shadow-gray-200" variant="ia">
           <Sparkles class="w-4 h-4 mr-2 text-white animate-pulse" />
          Criar com IA
         </BaseButton>
         <BaseButton data-tour="orcamentos-novo-btn" @click="openModal()" class="shadow-2xl shadow-gray-200">
-          <Plus class="w-5 h-5 mr-2" />
-          Novo Orçamento
+          <Plus class="w-5 h-5 mr-0 sm:mr-2" />
+          <span class="hidden sm:inline">Novo Orçamento</span>
         </BaseButton>
       </div>
 

@@ -28,7 +28,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     }
   }
 
-  const privateRoutes = ['/dashboard', '/clientes', '/catalogo', '/orcamentos', '/agenda', '/relatorios', '/planos', '/configuracoes']
+  const privateRoutes = ['/dashboard', '/clientes', '/catalogo', '/orcamentos', '/agenda', '/relatorios', '/planos', '/configuracoes', '/onboarding']
   const isPrivateRoute = privateRoutes.some(route => to.path === route || to.path.startsWith(route + '/'))
 
   // Se não estiver logado e tentar acessar uma rota privada ou admin, manda pro login
@@ -36,13 +36,39 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return navigateTo('/auth/login')
   }
 
-  // Se já estiver logado e tentar acessar login/register, manda pro dashboard
-  if (loggedIn.value && to.path.startsWith('/auth')) {
-    return navigateTo('/dashboard')
-  }
+  // Se já estiver logado:
+  if (loggedIn.value) {
+    // Redireciona de auth/login para dashboard se logado
+    if (to.path.startsWith('/auth')) {
+      return navigateTo('/dashboard')
+    }
 
-  // Proteção de rotas admin
-  if (to.path.startsWith('/admin') && user.value?.role !== 'admin') {
-    return navigateTo('/dashboard')
+    // Proteção de rotas admin
+    if (to.path.startsWith('/admin') && user.value?.role !== 'admin') {
+      return navigateTo('/dashboard')
+    }
+
+    // Verificação obrigatória do Wizard de Onboarding:
+    // Busca os dados do perfil (ou usa o cache do Nuxt)
+    const { data: profile } = useNuxtData<any>('profile')
+    let userProfile = profile.value
+
+    if (!userProfile && import.meta.client) {
+      try {
+        userProfile = await $fetch('/api/profile')
+      } catch (e) {}
+    }
+
+    const isWizardCompleted = !!userProfile?.setupWizardCompleted
+
+    // Se o wizard NÃO foi concluído e tentar acessar qualquer outra rota:
+    if (userProfile && !isWizardCompleted && to.path !== '/onboarding' && !to.path.startsWith('/_')) {
+      return navigateTo('/onboarding')
+    }
+
+    // Se o wizard JÁ FOI concluído e tentar acessar /onboarding:
+    if (userProfile && isWizardCompleted && to.path === '/onboarding') {
+      return navigateTo('/dashboard')
+    }
   }
 })

@@ -4,7 +4,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 const { mockProfile, mockStripeEvent, mockSubscriptionsRetrieve, mockConstructEvent, mockQueuePublish } = vi.hoisted(() => {
   const mockProfile = {
     findOneAndUpdate: vi.fn(),
-    findOne: vi.fn()
+    findOne: vi.fn(),
+    find: vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        lean: vi.fn().mockResolvedValue([])
+      })
+    })
   }
   const mockStripeEvent = {
     create: vi.fn(),
@@ -217,6 +222,7 @@ describe('Stripe Webhook Integration', () => {
 
     mockStripeEvent.create.mockResolvedValue({} as any)
     mockProfile.findOneAndUpdate.mockResolvedValue({
+      _id: 'prof_client123',
       email: 'cliente@orcei.com',
       name: 'Cliente Avulsos',
       creditsBalance: 15

@@ -65,7 +65,7 @@ const emit = defineEmits(['update:open', 'confirm', 'cancel'])
               <BaseButton 
                 type="button"
                 variant="ghost"
-                size="sm"
+                size="md"
                 @click="emit('update:open', false); emit('cancel')"
               >
                 {{ cancelText }}
@@ -76,7 +76,7 @@ const emit = defineEmits(['update:open', 'confirm', 'cancel'])
               <BaseButton 
                 type="button"
                 :variant="variant === 'destructive' ? 'danger' : 'solid'"
-                size="sm"
+                size="md"
                 @click="emit('update:open', false); emit('confirm')"
               >
                 {{ actionText }}

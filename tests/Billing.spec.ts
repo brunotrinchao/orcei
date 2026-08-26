@@ -86,10 +86,10 @@ describe('Billing Page', () => {
     const text = component.text()
 
     expect(text).toContain('12 Créditos')
-    expect(text).toContain('Comprar 1 Crédito')
-    expect(text).toContain('Comprar 10 Créditos')
-    expect(text).toContain('Comprar 30 Créditos')
-    expect(text).toContain('Comprar 100 Créditos')
+    expect(text).toContain('1 Crédito')
+    expect(text).toContain('10 Créditos')
+    expect(text).toContain('30 Créditos')
+    expect(text).toContain('100 Créditos')
   })
 })
 

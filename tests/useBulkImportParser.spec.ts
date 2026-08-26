@@ -55,7 +55,7 @@ describe('chunkRows', () => {
     expect(chunkRows([], 25)).toEqual([])
   })
 
-  it('MAX_ROWS é 1000', () => {
-    expect(MAX_ROWS).toBe(1000)
+  it('MAX_ROWS é 500', () => {
+    expect(MAX_ROWS).toBe(500)
   })
 })

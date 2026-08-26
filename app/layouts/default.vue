@@ -556,7 +556,6 @@ onUnmounted(() => {
       </div>
     </footer>
 
-    <OnboardingController v-if="loggedIn" />
     <NotificationCenterDrawer v-model:open="isDrawerOpen" />
   </div>
 </template>

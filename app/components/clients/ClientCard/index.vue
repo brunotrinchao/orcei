@@ -1,0 +1,50 @@
+<script setup lang="ts">
+import type { ClientDTO } from '../../../../types'
+import { useClientCard } from './index'
+
+defineProps<{
+  client: ClientDTO
+  formatPhone: (phone: string) => string
+}>()
+
+defineEmits<{
+  (e: 'edit'): void
+  (e: 'delete'): void
+  (e: 'view'): void
+}>()
+
+const { Pencil, Trash2 } = useClientCard()
+</script>
+
+<template>
+  <div class="client-card-container rounded-[0.75rem] border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-4 cursor-pointer hover:border-gray-300 dark:hover:border-gray-700 transition-all group" @click="$emit('view')">
+    <div class="flex flex-col">
+      <span class="font-black text-lg text-gray-900 dark:text-gray-50 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ client.name }}</span>
+      <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">{{ client.taxId || 'Sem documento' }}</span>
+    </div>
+
+    <div class="mt-3 space-y-1">
+      <span class="text-sm font-bold text-gray-600 dark:text-gray-300 block">{{ client.email }}</span>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-black text-gray-400 dark:text-gray-500">{{ formatPhone(client.phone) }}</span>
+        <img v-if="client.isWhatsapp" :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5" alt="WhatsApp" loading="lazy" />
+      </div>
+    </div>
+
+    <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
+      <span class="text-[10px] font-black text-gray-900 dark:text-gray-100 uppercase tracking-widest">{{ client.address?.city || '-' }} - {{ client.address?.state || '-' }}</span>
+      <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest block mt-1">{{ client.address?.street }}, {{ client.address?.number }}</span>
+    </div>
+
+    <div class="flex items-center justify-end gap-1 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800" @click.stop>
+      <BaseButton variant="ghost" size="icon-sm" @click.stop="$emit('edit')" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" aria-label="Editar cliente" title="Editar">
+        <Pencil class="w-4 h-4" />
+      </BaseButton>
+      <BaseButton variant="ghost" size="icon-sm" @click.stop="$emit('delete')" class="text-gray-400 hover:text-red-600 dark:hover:text-red-400" aria-label="Excluir cliente" title="Excluir">
+        <Trash2 class="w-4 h-4" />
+      </BaseButton>
+    </div>
+  </div>
+</template>
+
+<style scoped src="./index.css"></style>

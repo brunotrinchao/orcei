@@ -184,7 +184,7 @@ export default defineEventHandler(async (event) => {
               creditsAdded: creditsToAdd,
               newBalance: updated.creditsBalance
             },
-            metadata: { profileId: updated._id.toString() }
+            metadata: { profileId: updated._id ? updated._id.toString() : profileId }
           }))
         }
       }

@@ -37,6 +37,8 @@ vi.mock('../server/models/Proposal', () => ({
 }))
 
 vi.mock('../server/services/GoogleService', () => ({
+  hasGoogleScope: vi.fn().mockReturnValue(true),
+  GOOGLE_SCOPES: { DRIVE: 'drive', CALENDAR: 'calendar' },
   GoogleService: {
     getAuthClient: vi.fn(),
     ensureFolder: vi.fn(),

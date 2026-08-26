@@ -1,7 +1,0 @@
-{
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"/home/brunotrinchao/.claude/squeez/bin/squeez wrap 'grep -rn \\\"insertMany\\\\|bulkWrite\\\\|BulkImport\\\\|csvImport\\\\|importCsv\\\\|CsvImport\\\" server app --include=\\\"*.ts\\\" --include=\\\"*.vue\\\" |...",
-  "error": "Exit code 1",
-  "timestamp": "2026-08-03T16:18:20.513Z",
-  "retry_count": 3
-}

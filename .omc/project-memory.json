@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1785933997734,
+  "lastScanned": 1787666872177,
   "projectRoot": "/home/brunotrinchao/Documentos/Bruno/Orcei",
   "techStack": {
     "languages": [
@@ -101,7 +101,7 @@
       "path": "app",
       "purpose": "Application code",
       "fileCount": 1,
-      "lastAccessed": 1785933997715,
+      "lastAccessed": 1787666872161,
       "keyFiles": [
         "app.vue"
       ]
@@ -110,7 +110,7 @@
       "path": "docs",
       "purpose": "Documentation",
       "fileCount": 7,
-      "lastAccessed": 1785933997716,
+      "lastAccessed": 1787666872162,
       "keyFiles": [
         "analise-concorrente-propoz.md",
         "auditoria-juridico-po-2026-07.md",
@@ -123,7 +123,7 @@
       "path": "playwright-report",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1785933997723,
+      "lastAccessed": 1787666872170,
       "keyFiles": [
         "index.html"
       ]
@@ -132,14 +132,14 @@
       "path": "resources",
       "purpose": null,
       "fileCount": 0,
-      "lastAccessed": 1785933997725,
+      "lastAccessed": 1787666872171,
       "keyFiles": []
     },
     "scripts": {
       "path": "scripts",
       "purpose": "Build/utility scripts",
       "fileCount": 18,
-      "lastAccessed": 1785933997728,
+      "lastAccessed": 1787666872173,
       "keyFiles": [
         "check-db.mjs",
         "check-messages.mjs",
@@ -152,21 +152,21 @@
       "path": "server",
       "purpose": null,
       "fileCount": 0,
-      "lastAccessed": 1785933997728,
+      "lastAccessed": 1787666872174,
       "keyFiles": []
     },
     "test-results": {
       "path": "test-results",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1785933997728,
+      "lastAccessed": 1787666872174,
       "keyFiles": []
     },
     "tests": {
       "path": "tests",
       "purpose": "Test files",
       "fileCount": 23,
-      "lastAccessed": 1785933997729,
+      "lastAccessed": 1787666872174,
       "keyFiles": [
         "AIGuardrails.spec.ts",
         "AIService.spec.ts",
@@ -179,7 +179,7 @@
       "path": "types",
       "purpose": "Type definitions",
       "fileCount": 4,
-      "lastAccessed": 1785933997729,
+      "lastAccessed": 1787666872175,
       "keyFiles": [
         "auth.d.ts",
         "enums.ts",
@@ -191,14 +191,14 @@
       "path": "app/assets",
       "purpose": "Static assets",
       "fileCount": 0,
-      "lastAccessed": 1785933997729,
+      "lastAccessed": 1787666872175,
       "keyFiles": []
     },
     "app/components": {
       "path": "app/components",
       "purpose": "UI components",
       "fileCount": 4,
-      "lastAccessed": 1785933997730,
+      "lastAccessed": 1787666872175,
       "keyFiles": [
         "AIProposalWizard.vue",
         "ProposalForm.vue",
@@ -209,7 +209,7 @@
       "path": "app/middleware",
       "purpose": "Middleware",
       "fileCount": 1,
-      "lastAccessed": 1785933997730,
+      "lastAccessed": 1787666872175,
       "keyFiles": [
         "auth.global.ts"
       ]
@@ -218,7 +218,7 @@
       "path": "app/pages",
       "purpose": "Page components",
       "fileCount": 4,
-      "lastAccessed": 1785933997730,
+      "lastAccessed": 1787666872175,
       "keyFiles": [
         "index.vue",
         "maintenance.vue",
@@ -229,7 +229,7 @@
       "path": "app/public",
       "purpose": "Public files",
       "fileCount": 2,
-      "lastAccessed": 1785933997730,
+      "lastAccessed": 1787666872175,
       "keyFiles": [
         "favicon.ico",
         "robots.txt"
@@ -239,7 +239,7 @@
       "path": "server/api",
       "purpose": "API routes",
       "fileCount": 1,
-      "lastAccessed": 1785933997732,
+      "lastAccessed": 1787666872176,
       "keyFiles": [
         "test.get.ts"
       ]
@@ -248,7 +248,7 @@
       "path": "server/middleware",
       "purpose": "Middleware",
       "fileCount": 1,
-      "lastAccessed": 1785933997733,
+      "lastAccessed": 1787666872176,
       "keyFiles": [
         "01.mongodb.ts"
       ]
@@ -257,7 +257,7 @@
       "path": "server/models",
       "purpose": "Data models",
       "fileCount": 15,
-      "lastAccessed": 1785933997733,
+      "lastAccessed": 1787666872177,
       "keyFiles": [
         "AiUsageLog.ts",
         "AuditLog.ts",
@@ -268,7 +268,7 @@
       "path": "server/routes",
       "purpose": "Route handlers",
       "fileCount": 1,
-      "lastAccessed": 1785933997734,
+      "lastAccessed": 1787666872177,
       "keyFiles": [
         "sitemap.xml.ts"
       ]
@@ -276,19 +276,19 @@
     "server/services": {
       "path": "server/services",
       "purpose": "Business logic services",
-      "fileCount": 13,
-      "lastAccessed": 1785933997734,
+      "fileCount": 14,
+      "lastAccessed": 1787666872177,
       "keyFiles": [
         "AIService.ts",
-        "AuditService.ts",
-        "BulkImportService.ts"
+        "AssinafyService.ts",
+        "AuditService.ts"
       ]
     },
     "server/utils": {
       "path": "server/utils",
       "purpose": "Utility functions",
       "fileCount": 19,
-      "lastAccessed": 1785933997734,
+      "lastAccessed": 1787666872177,
       "keyFiles": [
         "aiGuardrails.ts",
         "aiPricing.ts",

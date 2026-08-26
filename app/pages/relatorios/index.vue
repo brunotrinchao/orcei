@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { FileText, Download, Eye, Search, Calendar, RefreshCcw, Trash2, AlertTriangle, MoreVertical, Sparkles } from 'lucide-vue-next'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
-import GenerateReportDrawer from '~/components/reports/GenerateReportDrawer.vue'
+import GenerateReportDrawer from '~/components/reports/GenerateReportDrawer/index.vue'
 import ConfirmCreditDialog from '~/components/ui/ConfirmCreditDialog.vue'
-import PaywallExpressModal from '~/components/ui/PaywallExpressModal.vue'
+import PaywallExpressModal from '~/components/ui/PaywallExpressModal/index.vue'
 
 const searchQuery = ref('')
 const startDate = ref('')

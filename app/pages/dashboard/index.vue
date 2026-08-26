@@ -5,278 +5,44 @@ import {
   Calendar, Award, Zap, ShieldCheck, Share2, MessageSquare, AlertCircle, Coins,
   UserPlus, Wand2, BookOpen, ReceiptText
 } from 'lucide-vue-next'
-import { Line, Doughnut } from 'vue-chartjs'
-import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement, ArcElement } from 'chart.js'
-import GenerateReportDrawer from '~/components/reports/GenerateReportDrawer.vue'
+import GenerateReportDrawer from '~/components/reports/GenerateReportDrawer/index.vue'
+import { useDashboardPage } from '~/composables/pages/useDashboardPage'
 
-ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement, ArcElement)
-
-const period = ref('last_30_days')
-const { loggedIn, user } = useUserSession()
-const { openSetupWizard } = useOnboarding()
-const { notify } = useAlerts()
-const { isDark } = useDarkMode()
-const { getCost, creditLabel } = useCreditCosts()
-const config = useRuntimeConfig()
-const publicProposalUrl = config.public.publicProposalUrl || ''
-
-const { data: profile } = useLazyFetch<any>('/api/profile', { key: 'profile' })
-const isCostTableModalOpen = ref(false)
-
-function costText(action: string): string {
-  const cost = getCost(action)
-  return cost === 0 ? 'Grátis' : `${cost} ${cost === 1 ? 'crédito' : 'créditos'}`
-}
-
-const actionCostsList = computed(() => [
-  {
-    key: 'proposalSend',
-    name: 'Envio de Proposta Comercial',
-    description: 'Notificação por e-mail e disponibilização de link público rastreável com notificações em tempo real',
-    icon: FileText,
-    badge: 'Comercial',
-    badgeColor: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border-blue-100 dark:border-blue-900/40'
-  },
-  {
-    key: 'proposalSuggest',
-    name: 'Assistente de Orçamentos IA',
-    description: 'Criação assistida de propostas comerciais completas e personalizadas a partir de texto livre',
-    icon: Sparkles,
-    badge: 'Inteligência Artificial',
-    badgeColor: 'bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400 border-violet-100 dark:border-violet-900/40'
-  },
-  {
-    key: 'clientExtract',
-    name: 'Extração de Leads / Clientes',
-    description: 'Identificação e cadastro automático de dados de contatos a partir de mensagens brutas de clientes',
-    icon: UserPlus,
-    badge: 'Inteligência Artificial',
-    badgeColor: 'bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400 border-violet-100 dark:border-violet-900/40'
-  },
-  {
-    key: 'generate',
-    name: 'Gerador de Descrições de Itens',
-    description: 'Redação profissional de escopos e descrições técnicas detalhadas para produtos ou serviços',
-    icon: Wand2,
-    badge: 'Inteligência Artificial',
-    badgeColor: 'bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400 border-violet-100 dark:border-violet-900/40'
-  },
-  {
-    key: 'catalogSuggest',
-    name: 'Sugestão para Catálogo por IA',
-    description: 'Enriquecimento de itens e sugestão inteligente de precificação para seu catálogo de serviços',
-    icon: BookOpen,
-    badge: 'Inteligência Artificial',
-    badgeColor: 'bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400 border-violet-100 dark:border-violet-900/40'
-  },
-  {
-    key: 'analyzeReport',
-    name: 'Relatório Estratégico de IA',
-    description: 'Análise avançada de métricas do funil comercial, projeções de receita e recomendações acionáveis',
-    icon: ReceiptText,
-    badge: 'Análise Estratégica',
-    badgeColor: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/40'
-  }
-])
-
-const fetchQuery = computed(() => {
-  const now = new Date()
-  let start = new Date()
-  
-  if (period.value === 'last_7_days') start.setDate(now.getDate() - 7)
-  else if (period.value === 'last_30_days') start.setDate(now.getDate() - 30)
-  else if (period.value === 'last_90_days') start.setDate(now.getDate() - 90)
-  else if (period.value === 'year') start = new Date(now.getFullYear(), 0, 1)
-  else return {}
-
-  return {
-    start: start.toISOString(),
-    end: now.toISOString()
-  }
-})
-
-const { data: stats, refresh, status } = useLazyFetch<any>('/api/dashboard/stats', {
-  key: 'dashboard-stats',
-  query: fetchQuery,
-  watch: [period]
-})
-
-// Status Distribution Chart (Safira Theme)
-const statusChartData = computed(() => {
-  if (!stats.value?.statusDistribution) return { labels: [], datasets: [] }
-  
-  const labels = Object.keys(stats.value.statusDistribution)
-  const data = Object.values(stats.value.statusDistribution) as number[]
-  
-  return {
-    labels,
-    datasets: [{
-      data,
-      backgroundColor: ['#6366F1', '#10B981', '#3B82F6', '#EF4444', '#6B7280'],
-      borderWidth: 0,
-      hoverOffset: 4
-    }]
-  }
-})
-
-// Revenue Evolution Chart (Gradient Sapphire Area)
-const revenueChartData = computed(() => {
-  if (!stats.value?.revenueHistory) return { labels: [], datasets: [] }
-
-  return {
-    labels: stats.value.revenueHistory.map((h: any) => h.date),
-    datasets: [{
-      label: 'Faturamento R$',
-      data: stats.value.revenueHistory.map((h: any) => h.amount),
-      borderColor: '#3B82F6',
-      backgroundColor: 'rgba(59, 130, 246, 0.1)',
-      fill: true,
-      tension: 0.4,
-      pointRadius: 4,
-      pointBackgroundColor: '#3B82F6',
-      pointBorderWidth: 2,
-      pointBorderColor: '#ffffff'
-    }]
-  }
-})
-
-const chartOptions = computed(() => {
-  const textColor = isDark.value ? '#9CA3AF' : '#4B5563'
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'bottom' as const,
-        labels: {
-          usePointStyle: true,
-          font: { weight: 'bold' as const, size: 10 },
-          color: textColor
-        }
-      }
-    }
-  }
-})
-
-const lineChartOptions = computed(() => {
-  const textColor = isDark.value ? '#9CA3AF' : '#4B5563'
-  const gridColor = isDark.value ? '#1e293b' : '#F1F5F9' // slate-800 no dark, slate-100 no light
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      x: {
-        grid: {
-          color: gridColor
-        },
-        ticks: {
-          color: textColor,
-          font: { weight: 'bold', size: 9 }
-        }
-      },
-      y: {
-        grid: {
-          color: gridColor
-        },
-        ticks: {
-          color: textColor,
-          font: { weight: 'bold', size: 9 }
-        }
-      }
-    },
-    plugins: {
-      legend: {
-        display: false
-      }
-    }
-  }
-})
-
-const aiReport = ref<string | null>(null)
-const isAnalyzing = ref(false)
-const isPaywallOpen = ref(false)
-const paywallReason = ref('')
-const isReportDrawerOpen = ref(false)
-
-async function confirmAndGenerateReport(payload?: { period?: string }) {
-  if (payload?.period && payload.period !== period.value) {
-    period.value = payload.period
-  }
-  executeWithCreditCheck('analyzeReport', async () => {
-    isAnalyzing.value = true
-    try {
-      const query: any = { ...fetchQuery.value, background: 'true' }
-      const res: any = await $fetch('/api/ai/analyze', { query })
-      notify('Relatório em Segundo Plano', res.message || 'Seu relatório estratégico está sendo gerado em segundo plano. Assim que estiver pronto, você será notificado na Central!')
-      isReportDrawerOpen.value = false
-    } catch (e: any) {
-      if (e.statusCode === 402) {
-        paywallReason.value = 'gerar relatório estratégico de IA'
-        isPaywallOpen.value = true
-      } else if (e.statusCode === 429) {
-        notify('Limite Atingido', 'Você fez muitas requisições seguidas. Tente novamente em um minuto.')
-      } else if (e.statusCode === 400) {
-        notify('Orçamento aprovado necessário', e.data?.statusMessage || 'É necessário ter pelo menos 1 orçamento aprovado para gerar um relatório estratégico.')
-      } else {
-        notify('Erro', e.data?.statusMessage || 'Erro ao gerar relatório estratégico')
-      }
-    } finally {
-      isAnalyzing.value = false
-    }
-  }, { title: 'Gerar Relatório Estratégico com IA' })
-}
-
-const periodLabels: Record<string, string> = {
-  last_7_days: 'Últimos 7 dias',
-  last_30_days: 'Últimos 30 dias',
-  last_90_days: 'Últimos 90 dias',
-  year: 'Este Ano',
-  all: 'Todo o período'
-}
-const periodLabel = computed(() => periodLabels[period.value] || 'Todo o período')
-
-const { 
-  isCreditConfirmOpen, 
-  confirmTitle, 
-  confirmDescription, 
-  executeWithCreditCheck, 
-  handleCreditConfirm, 
-  handleCreditCancel 
-} = useConfirmCreditAction()
-
-async function generateAIReport() {
-  executeWithCreditCheck('analyzeReport', async () => {
-    isAnalyzing.value = true
-    try {
-      // Relatório usa o mesmo filtro de período selecionado no dashboard
-      const data: any = await $fetch('/api/ai/analyze', { query: fetchQuery.value })
-      aiReport.value = data.text
-      refresh()
-    } catch (e: any) {
-      if (e.statusCode === 402) {
-        paywallReason.value = 'gerar relatório estratégico de IA'
-        isPaywallOpen.value = true
-      } else if (e.statusCode === 429) {
-        notify('Limite Atingido', 'Você fez muitas requisições seguidas. Tente novamente em um minuto.')
-      } else if (e.statusCode === 400) {
-        notify('Orçamento aprovado necessário', e.data?.statusMessage || 'É necessário ter pelo menos 1 orçamento aprovado para gerar um relatório estratégico.')
-      } else {
-        notify('Erro', e.data?.statusMessage || 'Erro ao gerar relatório estratégico')
-      }
-    } finally {
-      isAnalyzing.value = false
-    }
-  }, { title: 'Gerar Relatório Estratégico com IA' })
-}
-
-
-// Auxiliar de formato de data relativa
-function formatRelativeTime(minutesAgo: number) {
-  if (minutesAgo < 60) return `há ${minutesAgo} min`
-  const hours = Math.floor(minutesAgo / 60)
-  if (hours < 24) return `há ${hours}h`
-  return `há ${Math.floor(hours / 24)} dias`
-}
+const {
+  period,
+  loggedIn,
+  user,
+  profile,
+  stats,
+  status,
+  periodLabel,
+  statusChartData,
+  revenueChartData,
+  chartOptions,
+  lineChartOptions,
+  aiReport,
+  isAnalyzing,
+  isPaywallOpen,
+  paywallReason,
+  isReportDrawerOpen,
+  isCostTableModalOpen,
+  actionCostsList,
+  costText,
+  getCost,
+  creditLabel,
+  publicProposalUrl,
+  isCreditConfirmOpen,
+  confirmTitle,
+  confirmDescription,
+  confirmAndGenerateReport,
+  generateAIReport,
+  handleCreditConfirm,
+  handleCreditCancel,
+  formatRelativeTime,
+  openSetupWizard,
+  Line,
+  Doughnut
+} = useDashboardPage()
 </script>
 
 <template>
@@ -289,7 +55,7 @@ function formatRelativeTime(minutesAgo: number) {
         <p class="text-gray-500 dark:text-gray-400 font-medium">Acompanhe suas conversões, produtividade IA e receitas acumuladas.</p>
       </div>
 
-      <div v-if="stats && stats.proposalsCount > 0" data-tour="dashboard-period-filter" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide bg-gray-100/80 dark:bg-gray-800 p-1.5 rounded-[0.75rem] border border-gray-200/50 dark:border-gray-700 md:w-auto w-full">
+      <div v-if="stats" data-tour="dashboard-period-filter" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide bg-gray-100/80 dark:bg-gray-800 p-1.5 rounded-[0.75rem] border border-gray-200/50 dark:border-gray-700 md:w-auto w-full">
         <button 
           v-for="p in [
             { label: '7D', value: 'last_7_days' },
@@ -403,15 +169,14 @@ function formatRelativeTime(minutesAgo: number) {
     </template>
 
     <template v-else-if="stats">
-      <template v-if="stats.proposalsCount > 0">
 
       <!-- Seção Principal de Métricas Claves -->
       <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         
         <!-- Receita Confirmada -->
-        <div class="bg-white dark:bg-gray-900 p-4 md:p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm shadow-slate-200/50 dark:shadow-none hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
+        <div class="bg-white dark:bg-gray-900 p-4 md:p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm shadow-slate-200/50 dark:shadow-none group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
           <div class="flex flex-col md:flex-row justify-between w-auto md:w-full items-center md:items-start mb-0 md:mb-4">
-            <div class="w-10 h-10 md:w-12 md:h-12 bg-green-50 dark:bg-green-950/30 text-green-600 dark:text-green-400 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-colors">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-green-50 dark:bg-green-950/30 text-green-600 dark:text-green-400 rounded-xl md:rounded-2xl flex items-center justify-center transition-colors">
               <DollarSign class="w-5 h-5 md:w-6 md:h-6" />
             </div>
             <span class="hidden md:inline-block text-[9px] font-black text-green-600 dark:text-green-400 uppercase tracking-widest bg-green-50 dark:bg-green-950/30 px-2.5 py-1 rounded-lg border border-green-200 dark:border-green-800/50">Faturado</span>
@@ -426,9 +191,9 @@ function formatRelativeTime(minutesAgo: number) {
         </div>
 
         <!-- Conversão Geral -->
-        <div class="bg-white dark:bg-gray-900 p-4 md:p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm shadow-slate-200/50 dark:shadow-none hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
+        <div class="bg-white dark:bg-gray-900 p-4 md:p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm shadow-slate-200/50 dark:shadow-none group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
           <div class="flex flex-col md:flex-row justify-between w-auto md:w-full items-center md:items-start mb-0 md:mb-4">
-            <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 rounded-xl md:rounded-2xl flex items-center justify-center transition-colors">
               <TrendingUp class="w-5 h-5 md:w-6 md:h-6" />
             </div>
             <span class="hidden md:inline-block text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest bg-blue-50 dark:bg-blue-950/30 px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-800/50">Sucesso</span>
@@ -443,9 +208,9 @@ function formatRelativeTime(minutesAgo: number) {
         </div>
 
         <!-- TMA (Tempo Médio de Atendimento/Fechamento) -->
-        <div class="bg-white dark:bg-gray-900 p-4 md:p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm shadow-slate-200/50 dark:shadow-none hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
+        <div class="bg-white dark:bg-gray-900 p-4 md:p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm shadow-slate-200/50 dark:shadow-none group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
           <div class="flex flex-col md:flex-row justify-between w-auto md:w-full items-center md:items-start mb-0 md:mb-4">
-            <div class="w-10 h-10 md:w-12 md:h-12 bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 rounded-xl md:rounded-2xl flex items-center justify-center transition-colors">
               <Clock class="w-5 h-5 md:w-6 md:h-6" />
             </div>
             <span class="hidden md:inline-block text-[9px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest bg-purple-50 dark:bg-purple-950/30 px-2.5 py-1 rounded-lg border border-purple-200 dark:border-purple-800/50">Agilidade</span>
@@ -460,9 +225,9 @@ function formatRelativeTime(minutesAgo: number) {
         </div>
 
         <!-- SLA Comercial (Fechados em < 48h) -->
-        <div class="bg-white dark:bg-gray-900 p-4 md:p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm shadow-slate-200/50 dark:shadow-none hover:shadow-xl hover:scale-[1.02] transition-all group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
+        <div class="bg-white dark:bg-gray-900 p-4 md:p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm shadow-slate-200/50 dark:shadow-none group flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
           <div class="flex flex-col md:flex-row justify-between w-auto md:w-full items-center md:items-start mb-0 md:mb-4">
-            <div class="w-10 h-10 md:w-12 md:h-12 bg-orange-50 dark:bg-orange-950/30 text-orange-600 dark:text-orange-400 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-colors">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-orange-50 dark:bg-orange-950/30 text-orange-600 dark:text-orange-400 rounded-xl md:rounded-2xl flex items-center justify-center transition-colors">
               <ShieldCheck class="w-5 h-5 md:w-6 md:h-6" />
             </div>
             <span class="hidden md:inline-block text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest bg-orange-50 dark:bg-orange-950/30 px-2.5 py-1 rounded-lg border border-orange-200 dark:border-orange-800/50">Meta</span>
@@ -825,73 +590,6 @@ function formatRelativeTime(minutesAgo: number) {
 
       </section>
 
-      </template>
-      <template v-else>
-        <!-- Onboarding: conta sem nenhum orçamento ainda -->
-        <section class="flex flex-col items-center justify-center py-12 px-4">
-          <div class="max-w-3xl w-full space-y-8">
-            <div class="text-center space-y-2">
-              <h2 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Vamos começar!</h2>
-              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Siga os passos abaixo para criar seu primeiro orçamento.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <!-- Passo 1 -->
-              <div class="bg-white dark:bg-gray-900 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 p-6 flex flex-col gap-4">
-                <div class="w-12 h-12 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center">
-                  <UserPlus class="w-6 h-6" />
-                </div>
-                <div class="flex-1 space-y-1">
-                  <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-tight">Cadastre seu primeiro cliente</h3>
-                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Adicione os dados de quem receberá o orçamento.</p>
-                </div>
-                <NuxtLink to="/clientes">
-                  <BaseButton variant="secondary" class="w-full">Ir para Clientes</BaseButton>
-                </NuxtLink>
-              </div>
-
-              <!-- Passo 2 -->
-              <div class="bg-white dark:bg-gray-900 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 p-6 flex flex-col gap-4">
-                <div class="w-12 h-12 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center">
-                  <BookOpen class="w-6 h-6" />
-                </div>
-                <div class="flex-1 space-y-1">
-                  <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-tight">Adicione um serviço ao catálogo</h3>
-                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Defina os serviços que você oferece e seus preços.</p>
-                </div>
-                <NuxtLink to="/catalogo">
-                  <BaseButton variant="secondary" class="w-full">Ir para Catálogo</BaseButton>
-                </NuxtLink>
-              </div>
-
-              <!-- Passo 3 -->
-              <div class="bg-white dark:bg-gray-900 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 p-6 flex flex-col gap-4">
-                <div class="w-12 h-12 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center">
-                  <FileText class="w-6 h-6" />
-                </div>
-                <div class="flex-1 space-y-1">
-                  <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-tight">Crie seu primeiro orçamento</h3>
-                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Monte e envie seu primeiro orçamento para um cliente.</p>
-                </div>
-                <NuxtLink to="/orcamentos?new=true">
-                  <BaseButton variant="primary" class="w-full">Criar Orçamento</BaseButton>
-                </NuxtLink>
-              </div>
-            </div>
-
-            <div class="text-center">
-              <button
-                type="button"
-                class="text-xs font-bold text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 underline underline-offset-2 transition-colors"
-                @click="openSetupWizard"
-              >
-                Refazer configuração inicial (empresa, endereço, contatos, visual, integrações)
-              </button>
-            </div>
-          </div>
-        </section>
-      </template>
-
     </template>
 
     <!-- Modal do Relatório IA -->
@@ -987,12 +685,4 @@ function formatRelativeTime(minutesAgo: number) {
   </div>
 </template>
 
-<style scoped>
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-</style>
+<style scoped src="./index.css"></style>

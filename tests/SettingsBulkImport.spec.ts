@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import SettingsBulkImport from '../app/components/settings/SettingsBulkImport.vue'
+import SettingsBulkImport from '../app/components/settings/SettingsBulkImport/index.vue'
 
 describe('SettingsBulkImport', () => {
   it('renderiza cards de Clientes e Catálogo com link de modelo CSV', async () => {

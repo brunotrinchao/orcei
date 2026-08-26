@@ -1,0 +1,4 @@
+/* WizardWelcomeStep Dedicated Styles */
+.wizard-welcome-preview {
+  backdrop-filter: blur(4px);
+}

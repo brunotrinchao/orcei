@@ -12,6 +12,7 @@ export function useOnboarding() {
 
   function openSetupWizard() {
     isSetupWizardOpen.value = true
+    navigateTo('/onboarding')
   }
 
   async function completeTour(tourId: TourId) {

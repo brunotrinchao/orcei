@@ -16,7 +16,7 @@ defineProps<{
         <slot />
       </div>
     </header>
-    <div v-if="$slots.filters" class="w-full">
+    <div v-if="$slots.filters" class="w-auto md:w-full">
       <slot name="filters" />
     </div>
   </div>

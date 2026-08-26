@@ -386,14 +386,15 @@ const linkedProposal = computed(() => {
       </form>
 
       <template #footer>
-        <button
+        <!-- <button
           v-if="selectedEvent"
           type="button"
           @click="deleteEvent"
           class="mr-auto flex items-center gap-2 text-xs font-black text-red-500 hover:text-red-700 dark:hover:text-red-400 uppercase tracking-widest transition-colors"
         >
           <Trash2 class="w-4 h-4" /> Excluir
-        </button>
+        </button> -->
+        <BaseButton v-if="selectedEvent" type="button" variant="danger" @click="deleteEvent">Excluir</BaseButton>
         <BaseButton type="button" variant="secondary" @click="isModalOpen = false">Cancelar</BaseButton>
         <BaseButton type="button" :disabled="isSubmitting" :loading="isSubmitting" @click="saveEvent">
           {{ selectedEvent ? 'Salvar Alterações' : 'Criar Compromisso' }}

@@ -20,8 +20,8 @@ import {
   CheckCheck,
   Clock
 } from "lucide-vue-next"
-import type { ProposalDTO } from "~/types"
-import { ProposalSignatureStatus } from "~/types/enums"
+import type { ProposalDTO } from "../../../../types"
+import { ProposalSignatureStatus } from "../../../../types/enums"
 
 export function useProposalDetailModal(
   props: { open: boolean; proposal: ProposalDTO | null },

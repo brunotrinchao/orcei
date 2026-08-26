@@ -297,7 +297,7 @@ const {
       </div>
 
       <div class="w-full flex grid md:grid-cols-12 grid-cols-1 gap-4">
-        <div class="sm:w-full col-span-7">
+        <div class="sm:w-full md:col-span-7">
           <!-- ─── DADOS DO CLIENTE VINCULADO ───────────────────────────────── -->
           <div
             class="p-5 rounded-[0.75rem] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 space-y-3 mb-4"
@@ -446,7 +446,7 @@ const {
             </div>
           </div>
         </div>
-        <div class="sm:w-full col-span-5">
+        <div class="sm:w-full md:col-span-5">
           <!-- ─── RESUMO FINANCEIRO & PAGAMENTO ────────────────────────── -->
           <div
             class="p-5 rounded-[0.75rem] bg-gradient-to-br from-slate-50 to-indigo-50/30 dark:from-gray-900 dark:to-indigo-950/20 border border-gray-200 dark:border-gray-800 space-y-4"

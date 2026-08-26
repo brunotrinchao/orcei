@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { loggedIn, user } = useUserSession()
-const { getAppUrl } = useAppUrl()
+const { getAppUrl, isExternalUrl } = useAppUrl()
 
 const { data: profile } = useFetch<any>('/api/profile', {
   key: 'profile',
@@ -33,7 +33,7 @@ const { data: systemInfo } = useFetch<any>('/api/system/status', {
           <template v-if="loggedIn">
             <NuxtLink
               :href="getAppUrl('/dashboard')"
-              external
+              :external="isExternalUrl()"
               target="_self"
               class="flex items-center gap-3 bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 p-1.5 pr-5 rounded-full transition-all duration-300 group shadow-lg shadow-black/20 hover:scale-[1.02]"
             >
@@ -58,7 +58,7 @@ const { data: systemInfo } = useFetch<any>('/api/system/status', {
           <NuxtLink
             v-else
             :href="getAppUrl('/auth/login')"
-            external
+            :external="isExternalUrl()"
             target="_self"
             class="bg-white hover:bg-slate-100 text-slate-950 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 shadow-lg shadow-white/5 hover:scale-[1.02]"
           >

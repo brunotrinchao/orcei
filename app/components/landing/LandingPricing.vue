@@ -3,7 +3,7 @@ import { Check, Sparkles } from 'lucide-vue-next'
 
 // Mesma fonte de dados usada em /planos (SaaS) - só o layout muda aqui
 const { packages } = useCreditPackages()
-const { getAppUrl } = useAppUrl()
+const { getAppUrl, isExternalUrl } = useAppUrl()
 </script>
 
 <template>
@@ -69,7 +69,7 @@ const { getAppUrl } = useAppUrl()
 
           <NuxtLink
             :href="getAppUrl('/auth/login')"
-            external
+            :external="isExternalUrl()"
             target="_self"
             :class="[
               'w-full text-center py-4 font-bold text-sm rounded-2xl transition duration-300',

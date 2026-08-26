@@ -5,7 +5,7 @@ defineProps<{
   appName?: string
 }>()
 
-const { getAppUrl } = useAppUrl()
+const { getAppUrl, isExternalUrl } = useAppUrl()
 </script>
 
 <template>
@@ -30,7 +30,7 @@ const { getAppUrl } = useAppUrl()
       <div class="inline-flex flex-col items-center gap-3">
         <NuxtLink
           :href="getAppUrl('/auth/login')"
-          external
+          :external="isExternalUrl()"
           target="_self"
           class="inline-flex items-center gap-2.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 hover:from-blue-500 hover:to-indigo-500 text-white px-10 py-4.5 rounded-2xl font-black text-lg transition duration-300 shadow-[0_4px_25px_-5px_rgba(37,99,235,0.4)] hover:shadow-[0_4px_30px_rgba(79,70,229,0.5)] hover:-translate-y-0.5 group"
         >

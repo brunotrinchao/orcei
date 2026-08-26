@@ -1,6 +1,6 @@
-/* SetupWizardModal Dedicated Styles & Smooth Transitions */
 .setup-wizard-container {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
 }
 
 /* Transição de Fase Principal (Boas-Vindas <-> Etapas <-> Processamento) */

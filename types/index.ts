@@ -54,6 +54,7 @@ export interface ProfileDTO {
   cancelAtPeriodEnd?: boolean
   stripePriceId?: string | null
   defaultValidityDays: number
+  defaultAcceptCreditCard?: boolean
   defaultInstallments: number
   defaultCashDiscount: number
   defaultContractTemplate: string
@@ -124,6 +125,7 @@ export interface ProposalDTO {
   }
   paymentConfig: {
     method: PaymentMethod
+    acceptCreditCard?: boolean
     installments: number
     cashDiscount: number
   }

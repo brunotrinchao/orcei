@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { SwatchBook, MapPin, Briefcase, FileText, Phone, RefreshCcw, Shield, Globe, ShieldCheck, Lock, CheckCircle2, Wand2, Upload } from 'lucide-vue-next'
-import type { ProfileDTO } from '../../../types'
+import { useConfiguracoesPage } from '~/composables/pages/useConfiguracoesPage'
 import SettingsVisual from '../../components/settings/SettingsVisual/index.vue'
 import SettingsCompany from '../../components/settings/SettingsCompany/index.vue'
 import SettingsAddress from '../../components/settings/SettingsAddress/index.vue'
@@ -8,231 +7,44 @@ import SettingsContact from '../../components/settings/SettingsContact/index.vue
 import SettingsTemplates from '../../components/settings/SettingsTemplates/index.vue'
 import SettingsBulkImport from '../../components/settings/SettingsBulkImport/index.vue'
 
-const { notify } = useAlerts()
-const { data: profile, refresh } = useFetch<ProfileDTO>('/api/profile', { key: 'profile' })
-const { openSetupWizard } = useOnboarding()
-const { public: publicConfig } = useRuntimeConfig()
-const integrationGoogleDriveCalendarStatus = publicConfig.integrationGoogleDriveCalendarStatus
-
-const localProfile = ref<ProfileDTO | null>(null)
-
-watch(profile, (val) => {
-  if (!val) return
-  const clone: ProfileDTO = JSON.parse(JSON.stringify(val))
-  if (!clone.address) {
-    clone.address = { street: '', number: '', neighborhood: '', city: '', state: '', zip: '' }
-  }
-  if (!clone.company) {
-    clone.company = { taxId: '', legalName: '', tradeName: '' }
-  }
-  if (!clone.contact) {
-    clone.contact = { phones: [{ number: '', isWhatsapp: true }], social: { instagram: '', youtube: '', facebook: '', twitter: '' } }
-  }
-  if (!clone.contact.social) {
-    clone.contact.social = { instagram: '', youtube: '', facebook: '', twitter: '' }
-  } else {
-    clone.contact.social.facebook ??= ''
-    clone.contact.social.twitter ??= ''
-  }
-  localProfile.value = clone
-}, { immediate: true })
-
-const isSaving = ref(false)
-
-// Escopos Google tratados de forma independente: Calendar e Drive podem ser
-// conectados separadamente (Drive é o único obrigatório pro fluxo de PDF).
-const GOOGLE_CALENDAR_SCOPE = 'https://www.googleapis.com/auth/calendar.events'
-const GOOGLE_DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file'
-
-function hasGoogleScope(scope: string) {
-  return !!localProfile.value?.googleIntegration?.refreshToken
-    && !!localProfile.value?.googleIntegration?.grantedScopes?.includes(scope)
-}
-
-const isDisconnecting = ref(false)
-const isConnecting = ref(false)
-const { connect } = useGoogleConnect()
-
-async function handleConnect(feature: 'drive' | 'calendar') {
-  isConnecting.value = true
-  try {
-    const ok = await connect(feature)
-    if (ok) {
-      await refresh()
-      notify('Sucesso', 'Integração conectada com sucesso.')
-    }
-  } finally {
-    isConnecting.value = false
-  }
-}
-
-async function disconnectGoogle() {
-  isDisconnecting.value = true
-  try {
-    await $fetch('/api/integrations/google/disconnect', { method: 'POST' })
-    await refresh()
-    notify('Integração desconectada', 'Sua conta Google foi desconectada com sucesso.')
-  } catch (e: any) {
-    notify('Erro ao desconectar', e?.data?.statusMessage || 'Não foi possível desconectar sua conta Google.')
-  } finally {
-    isDisconnecting.value = false
-  }
-}
-
-const { validate } = useFormValidation()
-
-async function updateProfile() {
-  if (!localProfile.value) return
-  if (!validate()) return
-
-  isSaving.value = true
-  try {
-    await $fetch('/api/profile', { method: 'PUT', body: localProfile.value })
-    notify('Sucesso', 'Configurações salvas com sucesso!')
-    refresh()
-  } catch {
-    notify('Erro', 'Ocorreu uma falha ao salvar as configurações.')
-  } finally {
-    isSaving.value = false
-  }
-}
-
-// Navegação lateral
-const sections = [
-  { id: 'visual',   label: 'Visual',   icon: SwatchBook },
-  { id: 'empresa',  label: 'Empresa',  icon: Briefcase },
-  { id: 'endereco', label: 'Endereço', icon: MapPin },
-  { id: 'contato',  label: 'Contato',  icon: Phone },
-  { id: 'integracoes', label: 'Integrações', icon: Globe },
-  { id: 'multiplos-cadastros', label: 'Múltiplos Cadastros', icon: Upload },
-  { id: 'negocio',  label: 'Negócio',  icon: RefreshCcw },
-  { id: 'modelos',  label: 'Modelos',  icon: FileText },
-  { id: 'privacidade', label: 'Privacidade', icon: Shield },
-]
-
-const isExporting = ref(false)
-const isDeleting = ref(false)
-const { confirm: confirmAlert } = useAlerts()
-
-async function exportData() {
-  isExporting.value = true
-  try {
-    const res: any = await $fetch('/api/profile/backup', { method: 'POST' })
-    notify('Sucesso', res.message || 'Backup enviado para seu e-mail.')
-  } catch (e: any) {
-    notify('Erro', e.data?.statusMessage || 'Erro ao processar backup.')
-  } finally {
-    isExporting.value = false
-  }
-}
-
-const isResetting = ref(false)
-
-async function resetData() {
-  if (!localProfile.value) return
-  const email = localProfile.value.email
-
-  confirmAlert({
-    title: 'Resetar Dados da Conta',
-    description: 'Esta ação é IRREVERSÍVEL. Todos os seus Clientes, Catálogo, Orçamentos e Relatórios serão apagados permanentemente. Sua conta, plano e créditos NÃO serão afetados.',
-    variant: 'destructive',
-    actionText: 'Continuar',
-    onConfirm: () => {
-      // Segunda confirmação (dupla checagem, mesmo padrão de deleteAccount)
-      confirmAlert({
-        title: 'Tem Certeza?',
-        description: 'Todos os Clientes, Catálogo, Orçamentos e Relatórios serão perdidos para sempre. Confirmar reset?',
-        variant: 'destructive',
-        actionText: 'Sim, resetar tudo',
-        onConfirm: async () => {
-          isResetting.value = true
-          try {
-            await $fetch('/api/profile/reset-data', {
-              method: 'POST',
-              body: { confirm: email }
-            })
-            notify('Sucesso', 'Seus dados foram resetados com sucesso.')
-            setTimeout(() => window.location.reload(), 1500)
-          } catch (e: any) {
-            notify('Erro', e.data?.statusMessage || 'Erro ao resetar dados.')
-          } finally {
-            isResetting.value = false
-          }
-        }
-      })
-    }
-  })
-}
-
-async function deleteAccount() {
-  if (!localProfile.value) return
-
-  // 1. Validar se tem plano ativo
-  const hasActiveSub = 
-    localProfile.value.subscriptionPlan !== 'free' && 
-    ['active', 'trialing', 'past_due'].includes(localProfile.value.subscriptionStatus || '')
-
-  if (hasActiveSub) {
-    return notify(
-      'Ação Necessária', 
-      'Você possui uma assinatura ativa. Por favor, cancele seu plano na aba "Assinatura" antes de excluir sua conta.'
-    )
-  }
-
-  // 2. Diálogo de Confirmação com opção de Backup
-  confirmAlert({
-    title: 'Encerrar Conta',
-    description: `Seus dados (clientes, orçamentos e agenda) serão deletados permanentemente. Seus ${localProfile.value.creditsBalance} créditos restantes ficarão salvos para quando você desejar voltar. \n\nDeseja realizar um backup antes de sair?`,
-    variant: 'destructive',
-    actionText: 'Fazer Backup e Excluir',
-    cancelText: 'Apenas Excluir Minha Conta',
-    onConfirm: async () => {
-      // Flow A: Backup + Delete
-      isDeleting.value = true
-      try {
-        await $fetch('/api/profile/backup', { method: 'POST' })
-        await $fetch('/api/profile', { method: 'DELETE' })
-        notify('Até logo', 'Backup enviado e conta excluída. Redirecionando...')
-        setTimeout(() => window.location.href = '/', 2000)
-      } catch (e: any) {
-        notify('Erro', e.data?.statusMessage || 'Erro ao processar exclusão.')
-      } finally {
-        isDeleting.value = false
-      }
-    },
-    onCancel: async () => {
-      // Flow B: Just Delete (Re-confirmar para segurança)
-      confirmAlert({
-        title: 'Tem Certeza?',
-        description: 'Você escolheu excluir a conta SEM backup. Todos os seus dados serão perdidos. Confirmar exclusão?',
-        variant: 'destructive',
-        actionText: 'Sim, deletar tudo',
-        onConfirm: async () => {
-          isDeleting.value = true
-          try {
-            await $fetch('/api/profile', { method: 'DELETE' })
-            notify('Até logo', 'Conta excluída. Redirecionando...')
-            setTimeout(() => window.location.href = '/', 2000)
-          } catch (e: any) {
-            notify('Erro', e.data?.statusMessage || 'Erro ao excluir conta.')
-          } finally {
-            isDeleting.value = false
-          }
-        }
-      })
-    }
-  })
-}
-
-const route = useRoute()
-const initialSection = typeof route.query.section === 'string' && sections.some(s => s.id === route.query.section)
-  ? route.query.section
-  : 'visual'
-const activeSection = ref(initialSection)
-
-function selectSection(id: string) {
-  activeSection.value = id
-}
+const {
+  profile,
+  refresh,
+  openSetupWizard,
+  integrationGoogleDriveCalendarStatus,
+  localProfile,
+  isSaving,
+  GOOGLE_CALENDAR_SCOPE,
+  GOOGLE_DRIVE_SCOPE,
+  hasGoogleScope,
+  isDisconnecting,
+  isConnecting,
+  handleConnect,
+  disconnectGoogle,
+  updateProfile,
+  sections,
+  isExporting,
+  isDeleting,
+  exportData,
+  isResetting,
+  resetData,
+  deleteAccount,
+  activeSection,
+  selectSection,
+  SwatchBook,
+  MapPin,
+  Briefcase,
+  FileText,
+  Phone,
+  RefreshCcw,
+  Shield,
+  Globe,
+  ShieldCheck,
+  Lock,
+  CheckCircle2,
+  Wand2,
+  Upload,
+} = useConfiguracoesPage()
 </script>
 
 <template>
@@ -493,25 +305,44 @@ function selectSection(id: string) {
                 icon-bg-class="bg-emerald-50 dark:bg-emerald-950/50" 
                 icon-color-class="text-emerald-600 dark:text-emerald-400"
               >
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  <BaseInput
-                    v-model.number="localProfile.defaultValidityDays"
-                    label="Validade Padrão"
-                    type="number"
-                    suffix="dias"
-                  />
-                  <BaseInput
-                    v-model.number="localProfile.defaultInstallments"
-                    label="Parcelamento (Cartão)"
-                    type="number"
-                    suffix="x"
-                  />
-                  <BaseInput
-                    v-model.number="localProfile.defaultCashDiscount"
-                    label="Desconto (À Vista)"
-                    type="number"
-                    suffix="%"
-                  />
+                <div class="space-y-6">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <BaseInput
+                      v-model.number="localProfile.defaultValidityDays"
+                      label="Validade Padrão"
+                      type="number"
+                      suffix="dias"
+                    />
+                    <BaseInput
+                      v-model.number="localProfile.defaultCashDiscount"
+                      label="Desconto (À Vista)"
+                      type="number"
+                      suffix="%"
+                    />
+                  </div>
+
+                  <!-- Opção de Aceitar Cartão de Crédito -->
+                  <div class="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 space-y-4">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <label class="text-xs font-bold text-gray-900 dark:text-white block">Aceitar Cartão de Crédito</label>
+                        <p class="text-[11px] text-gray-500">Habilita a opção de pagamento via cartão de crédito por padrão em novas propostas</p>
+                      </div>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" v-model="localProfile.defaultAcceptCreditCard" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-emerald-600"></div>
+                      </label>
+                    </div>
+
+                    <div v-if="localProfile.defaultAcceptCreditCard" class="pt-3 border-t border-gray-200 dark:border-gray-800 max-w-xs">
+                      <BaseInput
+                        v-model.number="localProfile.defaultInstallments"
+                        label="Parcelamento Máximo (Cartão)"
+                        type="number"
+                        suffix="x"
+                      />
+                    </div>
+                  </div>
                 </div>
               </BaseSectionCard>
 

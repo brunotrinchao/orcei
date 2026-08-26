@@ -1,25 +1,17 @@
 <script setup lang="ts">
-import { Phone, MessageCircle, CheckCircle2, Download, ExternalLink, MapPin, X, Loader2, AlertCircle, PencilLine, ThumbsDown, Eye, FileText, CreditCard, Banknote, Clock, Shield, Mail, Send, Check, CheckCheck, Instagram, Youtube, Facebook, Twitter } from 'lucide-vue-next'
-import { isToday, isYesterday, format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
-import type { ProposalDTO } from '../../../types'
+import { usePublicProposalPage } from '~/composables/pages/usePublicProposalPage'
 
 definePageMeta({
   layout: 'blank'
 })
 
-// Token de acesso (?t=) fica na query string: evita repasse via header Referer
-// caso a página tenha links externos, e reduz exposição em logs de proxy/CDN.
 useHead({
   meta: [{ name: 'referrer', content: 'no-referrer' }]
 })
 
-const { notify, confirm: confirmAlert } = useAlerts()
-const { hasConsent } = useCookieConsent()
 const route = useRoute()
 const config = useRuntimeConfig()
 
-// Redirecionamento SSR para forçar o subdomínio de orçamentos (orcamento.orceifacil.com.br)
 if (import.meta.server) {
   const headers = useRequestHeaders()
   const host = headers.host
@@ -33,243 +25,67 @@ if (import.meta.server) {
   }
 }
 
-const { t: token, preview } = route.query
-const isPreview = computed(() => preview === 'true')
-const { data: proposal, refresh, error, pending } = useLazyFetch<ProposalDTO>(`/api/proposals/public/${route.params.slug}`, {
-  query: computed(() => ({ 
-    t: token, 
-    preview: preview,
-    consent: hasConsent.value ? 'accepted' : 'declined'
-  }))
-})
-
-const isAccepting = ref(false)
-const isTermsOpen = ref(false)
-const isChatModalOpen = ref(false)
-
-const selectedMethod = ref<'cash' | 'credit_card'>('cash')
-const selectedUpsells = ref<string[]>([])
-const actionType = ref<'decline' | 'request_changes'>('decline')
-const actionNotes = ref('')
-const isActionModalOpen = ref(false)
-const isSubmittingAction = ref(false)
-
 const {
+  proposal,
+  pending,
+  error,
+  refresh,
+  isPreview,
+  isAccepting,
+  isAcceptConfirmModalOpen,
+  isTermsOpen,
+  isChatModalOpen,
+  selectedMethod,
+  selectedUpsells,
+  actionType,
+  actionNotes,
+  isActionModalOpen,
+  isSubmittingAction,
   messages,
   newMessage,
   isSendingMessage,
   groupedMessages,
   loadMessages,
   sendMessage,
-  markAsRead,
-  connectPusher
-} = useProposalChat({
-  role: 'client',
-  slug: route.params.slug as string,
-  token: token as string
-})
-
-const chatMessagesRef = ref<HTMLElement | null>(null)
-
-function scrollToBottom() {
-  nextTick(() => {
-    if (chatMessagesRef.value) {
-      chatMessagesRef.value.scrollTop = chatMessagesRef.value.scrollHeight
-    }
-  })
-}
-
-// Mark messages as read and load when opening modal
-watch(isChatModalOpen, async (val) => {
-  if (val) {
-    scrollToBottom()
-    await loadMessages()
-    if (proposal.value?.unreadMessages > 0) {
-      await markAsRead()
-      proposal.value.unreadMessages = 0
-    }
-  }
-})
-
-// Watch chat modal open to scroll
-watch(isChatModalOpen, (val) => {
-  if (val) {
-    scrollToBottom()
-  }
-})
-
-// Watch messages to scroll
-watch(messages, () => {
-  if (isChatModalOpen.value) {
-    scrollToBottom()
-  }
-}, { deep: true })
-
-watch(proposal, (newProposal) => {
-  if (newProposal) {
-    connectPusher(newProposal._id)
-  }
-}, { immediate: true })
-
-const formatMessageTime = (date: any) => {
-  return format(new Date(date), 'HH:mm')
-}
-
-const selectedUpsellList = computed(() => {
-  if (!proposal.value?.upsellItems) return []
-  return proposal.value.upsellItems.filter(item => selectedUpsells.value.includes(item._id!))
-})
-
-const activeUpsellTotal = computed(() => {
-  return selectedUpsellList.value.reduce((acc, item) => acc + (item.price * item.quantity), 0)
-})
-
-const computedTotals = computed(() => {
-  if (!proposal.value) return { subtotal: 0, discount: 0, additional: 0, final: 0 }
-  const subtotalBase = proposal.value.totals.subtotal + activeUpsellTotal.value
-  const additional = proposal.value.totals.additional || 0
-  const discount = proposal.value.totals.discount || 0
-  const base = subtotalBase + additional - discount
-  
-  let final = base
-  if (selectedMethod.value === 'cash') {
-    final = base * (1 - (proposal.value.paymentConfig.cashDiscount / 100))
-  }
-  
-  return {
-    subtotal: subtotalBase,
-    discount,
-    additional,
-    final
-  }
-})
-
-const finalTotal = computed(() => computedTotals.value.final)
-
-async function handleAccept() {
-  if (isPreview.value) return
-  isAccepting.value = true
-  try {
-    await $fetch(`/api/proposals/public/accept`, {
-      method: 'POST',
-      body: { 
-        slug: route.params.slug,
-        token: token,
-        paymentMethod: selectedMethod.value,
-        selectedUpsells: selectedUpsells.value
-      }
-    })
-    await refresh()
-    notify('Sucesso', 'Orçamento aceito com sucesso!')
-  } catch (e: any) {
-    notify('Erro', e.data?.statusMessage || 'Erro ao aceitar orçamento')
-  } finally {
-    isAccepting.value = false
-  }
-}
-
-function openActionModal(type: 'decline' | 'request_changes') {
-  if (isPreview.value) return
-  
-  if (type === 'request_changes') {
-    isChatModalOpen.value = true
-    return
-  }
-
-  actionType.value = type
-  actionNotes.value = ''
-  isActionModalOpen.value = true
-}
-
-async function handleAction() {
-  if (isPreview.value) return
-  if (!actionNotes.value) return notify('Aviso', 'Por favor, escreva uma mensagem.')
-  
-  isSubmittingAction.value = true
-  try {
-    await $fetch(`/api/proposals/public/action`, {
-      method: 'POST',
-      body: {
-        slug: route.params.slug,
-        token: token,
-        type: actionType.value,
-        notes: actionNotes.value
-      }
-    })
-    isActionModalOpen.value = false
-    notify('Sucesso', actionType.value === 'decline' ? 'Orçamento recusado.' : 'Solicitação de alteração enviada!')
-    await refresh()
-  } catch (e) {
-    notify('Erro', 'Erro ao processar ação')
-  } finally {
-    isSubmittingAction.value = false
-  }
-}
-
-const formatDate = (date: any, format: any) => {
-  if (!date) return 'Sem validade'
-
-  const newFormat = format || {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  }
-  const d = new Date(date)
-  if (isNaN(d.getTime())) return 'Sem validade'
-  return d.toLocaleDateString('pt-BR', newFormat)
-}
-
-// Retorna o número de WhatsApp do perfil (campo phones[])
-const profileWhatsapp = computed(() => {
-  const phones = (proposal.value?.profileId as any)?.contact?.phones
-  if (!phones?.length) return null
-  const wa = phones.find((p: any) => p?.isWhatsapp)
-  return (wa || phones[0])?.number || null
-})
-
-const { data: systemInfo } = useFetch<any>('/api/system/status', { key: 'system-status' })
-
-// Links das redes sociais do profissional (contact.social), exibidos no rodapé
-const social = computed(() => (proposal.value?.profileId as any)?.contact?.social || {})
-
-const socialLinks = computed(() => {
-  const s = social.value
-  const links: { key: string; url: string; icon: any; hoverClass: string }[] = []
-  if (s.instagram) {
-    links.push({ key: 'instagram', url: `https://instagram.com/${s.instagram.replace('@', '')}`, icon: Instagram, hoverClass: 'hover:text-pink-400' })
-  }
-  if (s.facebook) {
-    links.push({ key: 'facebook', url: `https://facebook.com/${s.facebook.replace('@', '')}`, icon: Facebook, hoverClass: 'hover:text-blue-400' })
-  }
-  if (s.twitter) {
-    links.push({ key: 'twitter', url: `https://x.com/${s.twitter.replace('@', '')}`, icon: Twitter, hoverClass: 'hover:text-gray-300' })
-  }
-  if (s.youtube) {
-    links.push({ key: 'youtube', url: `https://youtube.com/${s.youtube.replace('@', '')}`, icon: Youtube, hoverClass: 'hover:text-red-400' })
-  }
-  return links
-})
-
-const statusMap: any = {
-  draft:      { label: 'Rascunho',   variant: 'default' },
-  created:    { label: 'Enviado',    variant: 'info' },
-  sent:       { label: 'Enviado',    variant: 'info' },
-  delivered:  { label: 'Entregue',   variant: 'info' },
-  opened:     { label: 'Aberto',     variant: 'info' },
-  clicked:    { label: 'Visualizado', variant: 'info' },
-  viewed:     { label: 'Visualizado', variant: 'info' },
-  pending:    { label: 'Pendente',   variant: 'warning' },
-  scheduled:  { label: 'Agendado',   variant: 'info' },
-  received:   { label: 'Recebido',   variant: 'info' },
-  bounced:    { label: 'Enviado',    variant: 'info' },
-  delayed:    { label: 'Enviado',    variant: 'info' },
-  failed:     { label: 'Enviado',    variant: 'info' },
-  suppressed: { label: 'Enviado',    variant: 'info' },
-  accepted:   { label: 'Aceito',     variant: 'success' },
-  expired:    { label: 'Expirado',   variant: 'error' },
-  declined:   { label: 'Recusado',   variant: 'error' },
-  changes_requested: { label: 'Revisão Solicitada', variant: 'warning' }
-}
+  chatMessagesRef,
+  formatMessageTime,
+  computedTotals,
+  finalTotal,
+  openAcceptModal,
+  handleAccept,
+  openActionModal,
+  handleAction,
+  formatDate,
+  profileWhatsapp,
+  systemInfo,
+  socialLinks,
+  statusMap,
+  isExpired,
+  whatsappRenewMessage,
+  whatsappRenewLink,
+  Phone,
+  MessageCircle,
+  CheckCircle2,
+  Download,
+  ExternalLink,
+  MapPin,
+  X,
+  Loader2,
+  AlertCircle,
+  PencilLine,
+  ThumbsDown,
+  Eye,
+  FileText,
+  CreditCard,
+  Banknote,
+  Clock,
+  Shield,
+  Mail,
+  Send,
+  Check,
+  CheckCheck,
+  FileSignature,
+} = usePublicProposalPage()
 </script>
 
 <template>
@@ -360,8 +176,8 @@ const statusMap: any = {
           <span class="hidden sm:block text-[10px] font-bold text-gray-600 uppercase tracking-[0.2em]">
             {{ proposal.code }}
           </span>
-          <BaseBadge :variant="statusMap[proposal.status]?.variant || 'info'">
-            {{ statusMap[proposal.status]?.label || proposal.status }}
+          <BaseBadge :variant="isExpired ? 'error' : (statusMap[proposal.status]?.variant || 'info')">
+            {{ isExpired ? 'Expirado' : (statusMap[proposal.status]?.label || proposal.status) }}
           </BaseBadge>
         </div>
       </div>
@@ -439,7 +255,7 @@ const statusMap: any = {
 
 
           <!-- Banner de Assinatura Eletrônica (se ativa ou concluída) -->
-          <div v-if="proposal.signature && proposal.signature.status !== 'none'" class="mt-6 p-4 rounded-[0.75rem] border bg-gradient-to-r transition-all"
+          <div v-if="proposal.signature && proposal.signature.status !== 'none' && !isExpired" class="mt-6 p-4 rounded-[0.75rem] border bg-gradient-to-r transition-all"
             :class="proposal.signature.status === 'signed' ? 'from-emerald-50 to-teal-50 border-emerald-200 text-emerald-950' : 'from-indigo-50 to-blue-50 border-indigo-200 text-indigo-950'"
           >
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -478,6 +294,35 @@ const statusMap: any = {
     <!-- ─── MAIN CONTENT ───────────────────────────────────────────── -->
     <main class="max-w-6xl mx-auto px-5 sm:px-8 py-12 sm:py-16 space-y-10 pb-40">
 
+      <!-- ── EXPIRATION BANNER ───────────────────────────────────── -->
+      <div v-if="isExpired" class="p-6 rounded-2xl border-2 border-red-300 bg-red-50 text-red-950 dark:bg-red-950/40 dark:border-red-900/60 dark:text-red-100 shadow-md">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-red-600 text-white flex items-center justify-center shrink-0 shadow-lg font-black">
+              <AlertCircle class="w-6 h-6" />
+            </div>
+            <div>
+              <h4 class="font-black text-base tracking-tight text-red-900 dark:text-red-200">
+                Esta proposta expirou e não é mais válida!
+              </h4>
+              <p class="text-xs text-red-700 dark:text-red-300 mt-1">
+                A data de validade venceu em <strong>{{ formatDate(proposal.expiresAt) }}</strong>. Todos os campos foram desativados. Entre em contato com o prestador para solicitar a renovação.
+              </p>
+            </div>
+          </div>
+
+          <a
+            v-if="profileWhatsapp"
+            :href="whatsappRenewLink"
+            target="_blank"
+            class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-600/20 shrink-0 w-full sm:w-auto text-center cursor-pointer"
+          >
+            <MessageCircle class="w-4 h-4" />
+            Solicitar Renovação no WhatsApp 💬
+          </a>
+        </div>
+      </div>
+
       <!-- ── ITEMS TABLE ─────────────────────────────────────────── -->
       <ProposalClientScope
         :items="proposal.items"
@@ -485,12 +330,12 @@ const statusMap: any = {
         v-model:selected-upsells="selectedUpsells"
         :totals="computedTotals"
         :final-total="finalTotal"
-        :is-accepted="proposal.status === 'accepted'"
+        :is-accepted="proposal.status === 'accepted' || isExpired"
       />
 
       <!-- ── PAYMENT OPTIONS ─────────────────────────────────────── -->
       <ProposalClientPayment
-        v-if="!['accepted', 'expired'].includes(proposal.status)"
+        v-if="!['accepted', 'expired'].includes(proposal.status) && !isExpired"
         v-model="selectedMethod"
         :payment-config="proposal.paymentConfig"
         :totals="computedTotals"
@@ -498,27 +343,53 @@ const statusMap: any = {
 
       <!-- ── CONTRACT (collapsible) ──────────────────────────────── -->
       <ProposalClientContract
-        v-if="proposal.contractText"
+        v-if="proposal.contractText && !isExpired"
         :contract-text="proposal.contractText"
       />
 
       <!-- ── DECISION PANEL ──────────────────────────────────────── -->
       <section class="relative overflow-hidden rounded-[0.75rem] bg-gray-900 shadow-md">
-        <!-- Accepted overlay -->
+        <!-- Accepted overlay - somente se a proposta estiver aceita E totalmente assinada -->
         <Transition name="accepted-overlay">
           <div
-            v-if="proposal.status === 'accepted'"
+            v-if="proposal.status === 'accepted' && proposal.signature?.status === 'signed'"
             class="absolute inset-0 bg-green-600 flex flex-col items-center justify-center gap-4 z-10"
           >
             <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">
               <CheckCircle2 class="w-10 h-10 text-white" />
             </div>
-            <h2 class="text-3xl font-black text-white uppercase tracking-tight text-center px-4">Proposta Aceita!</h2>
+            <h2 class="text-3xl font-black text-white uppercase tracking-tight text-center px-4">Proposta Aceita & Assinada!</h2>
             <p class="text-green-200 font-bold text-sm uppercase tracking-widest">Obrigado pela confiança</p>
           </div>
         </Transition>
 
-        <div class="relative z-0 p-8 sm:p-12">
+        <div class="relative z-0 p-8 sm:p-12 space-y-6">
+          <!-- Card de aviso se a proposta foi aceita mas a assinatura digital está pendente -->
+          <div
+            v-if="proposal.status === 'accepted' && proposal.signature?.status !== 'signed'"
+            class="p-6 rounded-2xl bg-gradient-to-r from-indigo-900/80 to-blue-900/80 border border-indigo-500/30 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg"
+          >
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-md font-black">
+                <FileSignature class="w-6 h-6" />
+              </div>
+              <div>
+                <h3 class="text-base font-black text-white">Proposta Aceita — Assinatura Pendente</h3>
+                <p class="text-xs text-indigo-200 mt-0.5">
+                  Enviamos o link de assinatura para <strong>{{ proposal.client?.email }}</strong>. Você também pode assinar agora no botão ao lado.
+                </p>
+              </div>
+            </div>
+            <a
+              v-if="proposal.signature?.signingUrl"
+              :href="proposal.signature.signingUrl"
+              target="_blank"
+              class="px-6 py-3 rounded-xl bg-indigo-500 hover:bg-indigo-400 active:bg-indigo-600 text-white font-black text-xs uppercase tracking-wider transition-all shadow-md shrink-0 w-full sm:w-auto text-center"
+            >
+              Assinar Proposta Agora 🖊️
+            </a>
+          </div>
+
           <!-- Contact row -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <a
@@ -550,8 +421,6 @@ const statusMap: any = {
               </div>
             </a>
           </div>
-
-          
         </div>
       </section>
 
@@ -594,72 +463,154 @@ const statusMap: any = {
       </footer>
     </main>
 
-    <!-- ─── BARRA DE DECISÃO FIXA (todas as resoluções) ───────────────
-         Antes existiam 2 barras divergentes: painel embutido só-desktop
-         (sem sticky, exigia rolar até o fim) e barra fixa só-mobile (sem
-         valor/total visível). Unificadas numa só: total + método + 3 ações
-         sempre visíveis, em qualquer tela, sem precisar rolar pra decidir. -->
+    <!-- ─── BARRA DE DECISÃO FIXA (todas as resoluções) ─────────────── -->
     <div
-      v-if="!['draft', 'accepted', 'expired'].includes(proposal.status)"
+      v-if="!['draft', 'expired'].includes(proposal.status)"
       class="fixed bottom-0 inset-x-0 z-50 bg-gray-900/95 backdrop-blur-xl border-t border-white/10 pb-safe"
     >
       <div class="max-w-6xl mx-auto px-5 sm:px-8 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-8">
-        <!-- Total display -->
-        <div>
-          <p class="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Total do Investimento</p>
-          <div class="flex items-baseline gap-3">
-            <span v-if="selectedMethod === 'cash' && proposal.paymentConfig.cashDiscount > 0" class="text-xs font-bold text-gray-500 line-through decoration-red-500/50">
-              R$ {{ (computedTotals.subtotal + (computedTotals.additional || 0) - (computedTotals.discount || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
-            </span>
-            <p class="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              R$ {{ finalTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
+        
+        <!-- Caso 0: Proposta Expirada / Vencida -->
+        <template v-if="isExpired">
+          <div>
+            <p class="text-[9px] sm:text-[10px] font-black text-red-400 uppercase tracking-[0.2em] mb-1">Status da Proposta</p>
+            <p class="text-xl sm:text-2xl font-black text-white tracking-tight">
+              Proposta Expirada ⚠️
+            </p>
+            <p class="mt-1 text-[10px] font-medium text-gray-400">
+              Venceu em <strong class="text-red-300">{{ formatDate(proposal.expiresAt) }}</strong>. Todas as ações foram desativadas.
             </p>
           </div>
-          <p class="mt-1 text-[10px] font-black text-[#6B84FF] uppercase tracking-widest">
-            {{ selectedMethod === 'cash'
-            ? (proposal.paymentConfig.cashDiscount > 0 ? `À Vista — ${proposal.paymentConfig.cashDiscount}% OFF` : 'À Vista')
-            : (proposal.paymentConfig.installments > 1 ? `Cartão — ${proposal.paymentConfig.installments}x sem juros` : 'À Vista no Cartão') }}
-          </p>
-        </div>
 
-        <!-- Action buttons -->
-        <template v-if="!isPreview">
-          <div class="flex items-center gap-2 sm:gap-3">
-            <button
-              @click="openActionModal('decline')"
-              class="px-3 sm:px-7 py-3 sm:py-4 rounded-[0.75rem] text-xs font-black uppercase tracking-widest border-2 border-transparent text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all outline-none focus-visible:ring-2 focus-visible:ring-red-500"
-              title="Recusar Proposta"
+          <div class="flex items-center gap-3">
+            <a
+              v-if="profileWhatsapp"
+              :href="whatsappRenewLink"
+              target="_blank"
+              class="flex-1 sm:flex-none px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 rounded-[0.75rem] text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              <ThumbsDown class="w-4 h-4 sm:hidden" />
-              <span class="hidden sm:inline">Recusar Proposta</span>
-            </button>
-            <button
-              @click="isChatModalOpen = true"
-              class="relative px-3 sm:px-7 py-3 sm:py-4 rounded-[0.75rem] text-xs font-black uppercase tracking-widest border-2 border-white/10 text-gray-300 hover:bg-white/10 transition-all outline-none focus-visible:ring-2 focus-visible:ring-white"
-              title="Chat com o Profissional"
+              <MessageCircle class="w-4 h-4" />
+              Solicitar Renovação no WhatsApp 💬
+            </a>
+            <span v-else class="text-xs font-bold text-red-400">Proposta Vencida</span>
+          </div>
+        </template>
+
+        <!-- Caso 1: Proposta Aceita mas Assinatura Pendente -->
+        <template v-else-if="proposal.status === 'accepted' && proposal.signature?.status !== 'signed'">
+          <div>
+            <p class="text-[9px] sm:text-[10px] font-black text-amber-400 uppercase tracking-[0.2em] mb-1">Status: Proposta Aceita</p>
+            <p class="text-xl sm:text-2xl font-black text-white tracking-tight">
+              Assinatura Digital Pendente 🖊️
+            </p>
+            <p class="mt-1 text-[10px] font-medium text-gray-400">
+              Enviamos o e-mail de assinatura para <strong class="text-gray-200">{{ proposal.client?.email }}</strong>
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <a
+              v-if="proposal.signature?.signingUrl"
+              :href="proposal.signature.signingUrl"
+              target="_blank"
+              class="flex-1 sm:flex-none px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 rounded-[0.75rem] text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              <MessageCircle class="w-4 h-4 sm:hidden" />
-              <span class="hidden sm:inline">Chat com o Profissional</span>
-              <span
-                v-if="proposal.unreadMessages > 0"
-                class="absolute -top-2 -right-2 flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-red-500 text-[9px] sm:text-[10px] font-black text-white ring-4 ring-gray-900 animate-pulse"
-              >
-                {{ proposal.unreadMessages }}
-              </span>
-            </button>
+              <FileSignature class="w-4 h-4" />
+              Assinar Proposta Agora 🖊️
+            </a>
             <button
-              @click="handleAccept"
-              :disabled="isAccepting"
-              class="flex-1 sm:flex-none px-5 sm:px-9 py-3 sm:py-4 bg-[#3147F6] hover:bg-blue-600 rounded-[0.75rem] text-xs font-black uppercase tracking-widest text-white shadow-md shadow-[#3147F6]/20 transition-all flex items-center justify-center gap-2 disabled:opacity-60 outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2"
+              v-else
+              @click="refresh()"
+              class="flex-1 sm:flex-none px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 rounded-[0.75rem] text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Loader2 v-if="isAccepting" class="w-4 h-4 animate-spin" />
-              {{ isAccepting ? 'Processando...' : 'Aceitar Proposta' }}
+              <FileSignature class="w-4 h-4" />
+              Assinar Proposta Agora 🖊️
             </button>
           </div>
         </template>
-        <div v-else class="px-5 py-3 rounded-[0.75rem] text-xs font-black uppercase tracking-widest bg-white/5 text-gray-500 border border-white/10 text-center">
-          Modo Visualização
-        </div>
+
+        <!-- Caso 2: Proposta Aceita E Já Assinada -->
+        <template v-else-if="proposal.status === 'accepted' && proposal.signature?.status === 'signed'">
+          <div>
+            <p class="text-[9px] sm:text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em] mb-1">Status do Contrato</p>
+            <p class="text-xl sm:text-2xl font-black text-white tracking-tight">
+              Proposta Aceita e Assinada Digitalmente ✓
+            </p>
+            <p class="mt-1 text-[10px] font-medium text-gray-400">
+              Documento juridicamente válido respaldado pela legislação digital.
+            </p>
+          </div>
+          <div v-if="proposal.signature?.signedFileUrl">
+            <a
+              :href="proposal.signature.signedFileUrl"
+              target="_blank"
+              class="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 rounded-[0.75rem] text-xs font-black uppercase tracking-widest text-white transition-all inline-flex items-center gap-2 cursor-pointer"
+            >
+              <Download class="w-4 h-4" />
+              Baixar Contrato Assinado
+            </a>
+          </div>
+        </template>
+
+        <!-- Caso 3: Proposta Aberta (Aguardando Aceite) -->
+        <template v-else>
+          <!-- Total display -->
+          <div>
+            <p class="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Total do Investimento</p>
+            <div class="flex items-baseline gap-3">
+              <span v-if="selectedMethod === 'cash' && proposal.paymentConfig.cashDiscount > 0" class="text-xs font-bold text-gray-500 line-through decoration-red-500/50">
+                R$ {{ (computedTotals.subtotal + (computedTotals.additional || 0) - (computedTotals.discount || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
+              </span>
+              <p class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                R$ {{ finalTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
+              </p>
+            </div>
+            <p class="mt-1 text-[10px] font-black text-[#6B84FF] uppercase tracking-widest">
+              {{ selectedMethod === 'cash'
+              ? (proposal.paymentConfig.cashDiscount > 0 ? `À Vista — ${proposal.paymentConfig.cashDiscount}% OFF` : 'À Vista')
+              : (proposal.paymentConfig.installments > 1 ? `Cartão — ${proposal.paymentConfig.installments}x sem juros` : 'À Vista no Cartão') }}
+            </p>
+          </div>
+
+          <!-- Action buttons -->
+          <template v-if="!isPreview">
+            <div class="flex items-center gap-2 sm:gap-3">
+              <button
+                @click="openActionModal('decline')"
+                class="px-3 sm:px-7 py-3 sm:py-4 rounded-[0.75rem] text-xs font-black uppercase tracking-widest border-2 border-transparent text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all outline-none focus-visible:ring-2 focus-visible:ring-red-500 cursor-pointer"
+                title="Recusar Proposta"
+              >
+                <ThumbsDown class="w-4 h-4 sm:hidden" />
+                <span class="hidden sm:inline">Recusar Proposta</span>
+              </button>
+              <button
+                @click="isChatModalOpen = true"
+                class="relative px-3 sm:px-7 py-3 sm:py-4 rounded-[0.75rem] text-xs font-black uppercase tracking-widest border-2 border-white/10 text-gray-300 hover:bg-white/10 transition-all outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer"
+                title="Chat com o Profissional"
+              >
+                <MessageCircle class="w-4 h-4 sm:hidden" />
+                <span class="hidden sm:inline">Chat com o Profissional</span>
+                <span
+                  v-if="proposal.unreadMessages > 0"
+                  class="absolute -top-2 -right-2 flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-red-500 text-[9px] sm:text-[10px] font-black text-white ring-4 ring-gray-900 animate-pulse"
+                >
+                  {{ proposal.unreadMessages }}
+                </span>
+              </button>
+              <button
+                @click="openAcceptModal"
+                :disabled="isAccepting"
+                class="flex-1 sm:flex-none px-5 sm:px-9 py-3 sm:py-4 bg-[#3147F6] hover:bg-blue-600 rounded-[0.75rem] text-xs font-black uppercase tracking-widest text-white shadow-md shadow-[#3147F6]/20 transition-all flex items-center justify-center gap-2 disabled:opacity-60 outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2 cursor-pointer"
+              >
+                <Loader2 v-if="isAccepting" class="w-4 h-4 animate-spin" />
+                {{ isAccepting ? 'Processando...' : 'Aceitar Proposta' }}
+              </button>
+            </div>
+          </template>
+          <div v-else class="px-5 py-3 rounded-[0.75rem] text-xs font-black uppercase tracking-widest bg-white/5 text-gray-500 border border-white/10 text-center">
+            Modo Visualização
+          </div>
+        </template>
       </div>
     </div>
 
@@ -790,6 +741,70 @@ const statusMap: any = {
           >
             <Loader2 v-if="isSubmittingAction" class="w-4 h-4 animate-spin mr-2" />
             Recusar Proposta
+          </BaseButton>
+        </div>
+      </template>
+    </BaseDialog>
+
+    <!-- Confirm Accept & Sign Dialog -->
+    <BaseDialog v-model:open="isAcceptConfirmModalOpen" title="Aceitar Proposta & Assinar Contrato" size="md">
+      <div class="p-6 space-y-6">
+        <div class="flex items-center gap-4 p-4 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/60">
+          <div class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-md">
+            <FileSignature class="w-6 h-6" />
+          </div>
+          <div>
+            <h4 class="text-sm font-black text-gray-900 dark:text-white">Assinatura Digital do Contrato</h4>
+            <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+              Esta proposta possui contrato com validade jurídica respaldada pela MP 2.200-2/2001 e Lei 14.063/2020.
+            </p>
+          </div>
+        </div>
+
+        <div class="space-y-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+          <p>
+            Ao aceitar, o contrato digital será preparado. Um e-mail com o link para assinatura será enviado para:
+            <strong class="text-gray-900 dark:text-white font-bold block mt-1.5 p-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl text-center text-xs font-mono select-all">
+              {{ proposal?.client?.email }}
+            </strong>
+          </p>
+          <p>
+            Você pode optar por assinar a proposta imediatamente clicando em <strong>"Assinar Proposta Agora"</strong> ou confirmar para receber a cópia por e-mail.
+          </p>
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="flex flex-col sm:flex-row justify-end gap-2.5 px-6 pb-6">
+          <BaseButton
+            variant="outline"
+            :disabled="isAccepting"
+            @click="isAcceptConfirmModalOpen = false"
+            class="cursor-pointer"
+          >
+            Cancelar
+          </BaseButton>
+
+          <BaseButton
+            variant="outline"
+            :disabled="isAccepting"
+            @click="handleAccept(false)"
+            class="cursor-pointer"
+          >
+            <Loader2 v-if="isAccepting" class="w-4 h-4 animate-spin mr-1.5" />
+            <Mail v-else class="w-4 h-4 mr-1.5" />
+            Receber por E-mail
+          </BaseButton>
+
+          <BaseButton
+            variant="primary"
+            :disabled="isAccepting"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white font-black cursor-pointer shadow-md"
+            @click="handleAccept(true)"
+          >
+            <Loader2 v-if="isAccepting" class="w-4 h-4 animate-spin mr-1.5" />
+            <FileSignature v-else class="w-4 h-4 mr-1.5" />
+            Assinar Proposta Agora 🖊️
           </BaseButton>
         </div>
       </template>

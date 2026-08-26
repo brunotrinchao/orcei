@@ -53,6 +53,16 @@ export function useProposalForm(
 
   const selectedClientId = ref('')
 
+  function getInitialAcceptCreditCard(initialData?: any, profileData?: any): boolean {
+    if (initialData?.paymentConfig?.acceptCreditCard !== undefined) {
+      return Boolean(initialData.paymentConfig.acceptCreditCard)
+    }
+    if (initialData?._id) {
+      return initialData.paymentConfig?.method === PaymentMethod.CREDIT_CARD || (initialData.paymentConfig?.installments || 1) > 1
+    }
+    return profileData?.defaultAcceptCreditCard ?? false
+  }
+
   const form = ref({
     title: props.initialData?.title || '',
     status: props.initialData?.status || ProposalStatus.DRAFT,
@@ -73,6 +83,7 @@ export function useProposalForm(
     },
     paymentConfig: {
       method: props.initialData?.paymentConfig?.method || PaymentMethod.CASH,
+      acceptCreditCard: getInitialAcceptCreditCard(props.initialData, profile.value),
       installments: props.initialData?.paymentConfig?.installments || 1,
       cashDiscount: props.initialData?.paymentConfig?.cashDiscount || 0
     },
@@ -86,8 +97,20 @@ export function useProposalForm(
     if (profile.value && !props.initialData?._id) {
       if (!form.value.contractText) form.value.contractText = profile.value.defaultContractTemplate
       if (!form.value.termsAndConditions) form.value.termsAndConditions = profile.value.defaultTermsAndConditions
+      form.value.paymentConfig.acceptCreditCard = profile.value.defaultAcceptCreditCard ?? false
       form.value.paymentConfig.installments = profile.value.defaultInstallments || 1
       form.value.paymentConfig.cashDiscount = profile.value.defaultCashDiscount || 0
+    }
+  })
+
+  watch(() => form.value.paymentConfig.acceptCreditCard, (enabled) => {
+    if (!enabled) {
+      form.value.paymentConfig.method = PaymentMethod.CASH
+      form.value.paymentConfig.installments = 1
+    } else {
+      if (form.value.paymentConfig.installments < 1) {
+        form.value.paymentConfig.installments = profile.value?.defaultInstallments || 1
+      }
     }
   })
 
@@ -109,6 +132,7 @@ export function useProposalForm(
         },
         paymentConfig: {
           method: newVal.paymentConfig?.method || PaymentMethod.CASH,
+          acceptCreditCard: getInitialAcceptCreditCard(newVal, profile.value),
           installments: newVal.paymentConfig?.installments || 1,
           cashDiscount: newVal.paymentConfig?.cashDiscount || 0
         },
@@ -195,9 +219,14 @@ export function useProposalForm(
 
   async function submit(status: ProposalStatus = ProposalStatus.DRAFT) {
     if (!validateStep(1) || !validateStep(2)) return
-    
-    if (form.value.paymentConfig.installments < 1 || form.value.paymentConfig.installments > 12) {
-      return notify('Aviso', 'O número de parcelas deve ser entre 1 e 12')
+
+    if (!form.value.paymentConfig.acceptCreditCard) {
+      form.value.paymentConfig.method = PaymentMethod.CASH
+      form.value.paymentConfig.installments = 1
+    } else {
+      if (form.value.paymentConfig.installments < 1 || form.value.paymentConfig.installments > 12) {
+        return notify('Aviso', 'O número de parcelas deve ser entre 1 e 12')
+      }
     }
 
     if (form.value.paymentConfig.cashDiscount < 0 || form.value.paymentConfig.cashDiscount > 100) {

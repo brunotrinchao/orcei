@@ -126,4 +126,27 @@ describe('ProposalService Flows', () => {
       proposalId: 'prop-id'
     })
   })
+
+  it('should preserve acceptCreditCard in paymentConfig when creating a proposal', async () => {
+    vi.mocked(Counter.findOneAndUpdate).mockResolvedValue({ lastSequence: 2 })
+    vi.mocked(Profile.findById).mockResolvedValue({ _id: 'prof-id', name: 'Freelancer', creditsBalance: 10 })
+    vi.mocked(Proposal.create).mockImplementation(async (data: any) => ({ _id: 'prop-id-2', ...data }))
+
+    const data = {
+      profileId: 'prof-id',
+      status: ProposalStatus.DRAFT,
+      client: { name: 'Cliente Teste', email: 'card@test.com' },
+      items: [{ name: 'Serviço', price: 200, quantity: 1 }],
+      paymentConfig: {
+        method: PaymentMethod.CASH,
+        acceptCreditCard: false,
+        installments: 1,
+        cashDiscount: 5
+      }
+    }
+
+    const created = await ProposalService.create(data)
+
+    expect(created.paymentConfig.acceptCreditCard).toBe(false)
+  })
 })

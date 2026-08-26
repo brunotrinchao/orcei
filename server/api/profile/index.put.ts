@@ -17,6 +17,7 @@ export default defineEventHandler(async (event) => {
     company: body.company,
     contact: body.contact,
     defaultValidityDays: body.defaultValidityDays,
+    defaultAcceptCreditCard: body.defaultAcceptCreditCard,
     defaultInstallments: body.defaultInstallments,
     defaultCashDiscount: body.defaultCashDiscount,
     defaultContractTemplate: body.defaultContractTemplate,

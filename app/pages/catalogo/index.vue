@@ -1,73 +1,42 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useIntersectionObserver } from '@vueuse/core'
-import * as LucideIcons from 'lucide-vue-next'
-import { Plus, Search, Image, Pencil, Trash2, Sparkles, RefreshCcw, Package, ShoppingBag, HelpCircle, MoreVertical, Upload } from 'lucide-vue-next'
-import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
-import type { CatalogItemDTO } from '../../../../types'
+import { useCatalogoPage } from '~/composables/pages/useCatalogoPage'
 
-const { notify, confirm: confirmAlert } = useAlerts()
-
-const searchQuery = ref('')
-const itemsPerPage = 10
-const query = computed(() => ({ search: searchQuery.value }))
 const {
+  searchQuery,
   items,
-  total: totalItems,
+  totalItems,
   pending,
   loadingMore,
   hasMore,
   loadMore,
-  reset: refresh,
-} = useInfiniteList('/api/catalog', query, { itemsPerPage })
-
-const mobileSentinelRef = ref<HTMLElement | null>(null)
-useIntersectionObserver(mobileSentinelRef, ([entry]) => {
-  if (entry?.isIntersecting && hasMore.value && !loadingMore.value) {
-    loadMore()
-  }
-}, { threshold: 0.1 })
-
-const showForm = ref(false)
-const selectedItem = ref<CatalogItemDTO | null>(null)
-
-function openModal(item: CatalogItemDTO | null = null) {
-  selectedItem.value = item
-  showForm.value = true
-}
-
-function handleItemSaved() {
-  refresh()
-}
-
-async function deleteItem(id: string) {
-  confirmAlert({
-    title: 'Excluir Item',
-    description: 'Tem certeza que deseja excluir este item?',
-    variant: 'destructive',
-    actionText: 'Excluir',
-    onConfirm: async () => {
-      try {
-        await $fetch(`/api/catalog/${id}`, { method: 'DELETE' as any })
-        refresh()
-      } catch (e) {
-        notify('Erro', 'Erro ao excluir item')
-      }
-    }
-  })
-}
-
-function getIcon(name: string) {
-  return (LucideIcons as any)[name] || HelpCircle
-}
-
-const activeFiltersCount = computed(() => {
-  return searchQuery.value ? 1 : 0
-})
-
-function clearFilters() {
-  searchQuery.value = ''
-}
+  refresh,
+  mobileSentinelRef,
+  showForm,
+  selectedItem,
+  openModal,
+  handleItemSaved,
+  deleteItem,
+  getIcon,
+  activeFiltersCount,
+  clearFilters,
+  Plus,
+  Search,
+  Image,
+  Pencil,
+  Trash2,
+  Sparkles,
+  RefreshCcw,
+  Package,
+  ShoppingBag,
+  HelpCircle,
+  MoreVertical,
+  Upload,
+  DropdownMenuRoot,
+  DropdownMenuTrigger,
+  DropdownMenuPortal,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} = useCatalogoPage()
 </script>
 
 <template>

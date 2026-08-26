@@ -28,8 +28,28 @@ const { SendMethod, CreditCard } = useProposalStepPayment()
               />
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
-              <BaseInput v-model.number="form.paymentConfig.installments" label="Max. Parcelas" type="number" />
+            <!-- Opção de Cartão de Crédito -->
+            <div class="p-3.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 space-y-3">
+              <div 
+                class="flex items-center justify-between cursor-pointer select-none"
+                @click="form.paymentConfig.acceptCreditCard = !form.paymentConfig.acceptCreditCard"
+              >
+                <div>
+                  <label class="text-xs font-bold text-gray-900 dark:text-white block cursor-pointer">Aceitar Cartão de Crédito</label>
+                  <p class="text-[11px] text-gray-500">Permite pagamento parcelado no cartão de crédito</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer pointer-events-none">
+                  <input type="checkbox" :checked="Boolean(form.paymentConfig.acceptCreditCard)" class="sr-only peer">
+                  <div class="w-10 h-5.5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+
+              <div v-if="form.paymentConfig.acceptCreditCard" class="pt-2 border-t border-gray-200 dark:border-gray-800">
+                <BaseInput v-model.number="form.paymentConfig.installments" label="Max. Parcelas (Cartão)" type="number" />
+              </div>
+            </div>
+
+            <div class="space-y-3">
               <BaseInput v-model.number="form.paymentConfig.cashDiscount" label="Desc. À Vista (%)" type="number" />
             </div>
 

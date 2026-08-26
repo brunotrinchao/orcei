@@ -44,6 +44,7 @@ const proposalSchema = new Schema({
   },
   paymentConfig: {
     method: { type: String, enum: Object.values(PaymentMethod), default: PaymentMethod.CASH },
+    acceptCreditCard: { type: Boolean, default: false },
     installments: { type: Number, default: 1 },
     cashDiscount: { type: Number, default: 0 }
   },

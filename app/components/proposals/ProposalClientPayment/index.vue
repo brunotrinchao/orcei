@@ -29,7 +29,7 @@ const {
       <h2 class="text-[10px] font-bold text-gray-600 uppercase tracking-[0.25em]">Forma de Pagamento</h2>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5" role="radiogroup" aria-label="Opções de forma de pagamento">
+    <div :class="['grid gap-5', paymentConfig?.acceptCreditCard ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 max-w-xl']" role="radiogroup" aria-label="Opções de forma de pagamento">
       <!-- Cash option -->
       <button
         type="button"
@@ -37,7 +37,7 @@ const {
         :aria-checked="modelValue === 'cash'"
         @click="selectMethod('cash')"
         :class="[
-          'relative text-left rounded-[0.75rem] border-2 p-5 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2',
+          'relative text-left rounded-[0.75rem] border-2 p-5 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2 cursor-pointer',
           modelValue === 'cash'
             ? 'border-[#3147F6] bg-[#3147F6]/5 shadow-lg shadow-[#3147F6]/10'
             : 'border-gray-100 bg-white hover:border-blue-200 hover:shadow-md'
@@ -76,14 +76,15 @@ const {
         </div>
       </button>
 
-      <!-- Credit card option -->
+      <!-- Credit card option (somente se aceitar cartão) -->
       <button
+        v-if="paymentConfig?.acceptCreditCard"
         type="button"
         role="radio"
         :aria-checked="modelValue === 'credit_card'"
         @click="selectMethod('credit_card')"
         :class="[
-          'relative text-left rounded-[0.75rem] border-2 p-5 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2',
+          'relative text-left rounded-[0.75rem] border-2 p-5 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2 cursor-pointer',
           modelValue === 'credit_card'
             ? 'border-[#3147F6] bg-[#3147F6]/5 shadow-lg shadow-[#3147F6]/10'
             : 'border-gray-100 bg-white hover:border-blue-200 hover:shadow-md'

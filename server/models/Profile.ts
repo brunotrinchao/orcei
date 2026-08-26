@@ -56,6 +56,7 @@ const profileSchema = new Schema({
   cancelAtPeriodEnd: { type: Boolean, default: false },
   stripePriceId: { type: String, default: null },
   defaultValidityDays: { type: Number, default: 7 },
+  defaultAcceptCreditCard: { type: Boolean, default: false },
   defaultInstallments: { type: Number, default: 1 },
   defaultCashDiscount: { type: Number, default: 0 },
   defaultContractTemplate: { type: String, default: `<h2>CONTRATO DE PRESTAÇÃO DE SERVIÇOS</h2><p>

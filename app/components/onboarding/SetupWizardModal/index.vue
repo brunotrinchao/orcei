@@ -53,14 +53,14 @@ const {
     >
       <div
         v-if="open"
-        class="fixed inset-0 z-[100] bg-slate-50 dark:bg-gray-950 flex flex-col justify-between overflow-hidden setup-wizard-container"
+        class="fixed inset-0 z-[100] bg-slate-50 dark:bg-gray-950 flex flex-col justify-between overflow-hidden h-screen h-[100dvh] setup-wizard-container"
       >
         <Transition name="wizard-phase" mode="out-in">
           <!-- 0. Tela de Processamento / Carregamento Final -->
           <div
             v-if="isProcessing"
             key="processing"
-            class="flex-1 flex items-center justify-center p-4"
+            class="flex-1 min-h-0 overflow-y-auto flex items-center justify-center p-4"
           >
             <WizardProcessingStep
               :progress="processingProgress"
@@ -73,7 +73,7 @@ const {
           <div
             v-else-if="isWelcome"
             key="welcome"
-            class="flex-1 flex items-center justify-center p-4"
+            class="flex-1 min-h-0 overflow-y-auto flex items-center justify-center p-4"
           >
             <WizardWelcomeStep :user-name="userName" @start="startWizard" />
           </div>
@@ -82,18 +82,19 @@ const {
           <div
             v-else
             key="steps"
-            class="flex-1 flex flex-col justify-between overflow-hidden"
+            class="flex-1 min-h-0 flex flex-col justify-between overflow-hidden relative"
           >
             <!-- Barra Superior de Etapas -->
             <WizardStepHeader
               :steps="steps"
               :current-step="currentStep"
               @select-step="goToStep"
+              class="shrink-0"
             />
 
             <!-- Área Central de Conteúdo -->
             <main
-              class="flex-1 min-h-0 overflow-y-auto px-6 md:px-12 py-8 md:py-12"
+              class="flex-1 min-h-0 overflow-y-auto px-4 md:px-12 py-6 md:py-10 pb-28 md:pb-12"
             >
               <div class="max-w-2xl mx-auto space-y-8">
                 <Transition
@@ -331,12 +332,11 @@ const {
               </div>
             </main>
 
-            <!-- Barra de Rodapé Completa Spanning Full-Width -->
+            <!-- Barra de Rodapé Fixa no Rodapé -->
             <footer
-              class="w-full bg-white dark:bg-gray-900 border-t border-gray-200/80 dark:border-gray-800/80 px-6 md:px-12 py-4 flex items-center justify-between shadow-lg shrink-0 z-20"
+              class="w-full bg-white dark:bg-gray-900 border-t border-gray-200/80 dark:border-gray-800/80 px-4 md:px-12 py-3.5 md:py-4 flex items-center justify-between shadow-2xl shrink-0 z-30 pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))]"
             >
               <div>
-
                 <BaseButton
                   variant="ghost"
                   type="button"

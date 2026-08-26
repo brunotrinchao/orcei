@@ -21,6 +21,7 @@ import {
   Clock
 } from "lucide-vue-next"
 import type { ProposalDTO } from "~/types"
+import { ProposalSignatureStatus } from "~/types/enums"
 
 export function useProposalDetailModal(
   props: { open: boolean; proposal: ProposalDTO | null },
@@ -47,10 +48,10 @@ export function useProposalDetailModal(
 
   const currentStatus = computed(() => {
     if (!props.proposal) return statusMap.draft
-    if (props.proposal.signature?.status === 'signed') {
+    if (props.proposal.signature?.status === ProposalSignatureStatus.SIGNED) {
       return { label: 'Aceito & Assinado', variant: 'success' as const }
     }
-    if (props.proposal.signature?.status === 'pending') {
+    if (props.proposal.signature?.status === ProposalSignatureStatus.PENDING) {
       return { label: 'Aguardando Assinatura', variant: 'warning' as const }
     }
     if (props.proposal.status === 'accepted') {
@@ -292,6 +293,7 @@ export function useProposalDetailModal(
     paymentTermsText,
     isRequestingSignature,
     requestDigitalSignature,
+    ProposalSignatureStatus,
     FileText,
     DollarSign,
     Calendar,

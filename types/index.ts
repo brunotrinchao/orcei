@@ -2,10 +2,21 @@ import {
   SubscriptionPlan,
   SubscriptionStatus,
   ProposalStatus,
+  ProposalSignatureStatus,
   PaymentMethod,
   SendMethod,
   CatalogItemType
 } from './enums'
+
+export {
+  SubscriptionPlan,
+  SubscriptionStatus,
+  ProposalStatus,
+  ProposalSignatureStatus,
+  PaymentMethod,
+  SendMethod,
+  CatalogItemType
+}
 
 export interface BrandConfig {
   logoUrl?: string

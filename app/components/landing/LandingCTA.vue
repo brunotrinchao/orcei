@@ -9,7 +9,7 @@ const { getAppUrl, isExternalUrl } = useAppUrl()
 </script>
 
 <template>
-  <div class="bg-[#07111f] border border-[#0870f8]/20 rounded-3xl p-10 md:p-20 text-center mb-12 relative overflow-hidden shadow-2xl">
+  <div class="bg-[#07111f] p-10 md:p-20 text-center relative overflow-hidden shadow-2xl relative before:absolute before:inset-0 before:bg-[linear-gradient(#ffffff0a_1px,_#0000_1px),_linear-gradient(90deg,_#ffffff0a_1px,_#0000_1px)] before:bg-[size:48px_48px] before:[mask-image:linear-gradient(#000,_#0000_90%)] before:[-webkit-mask-image:linear-gradient(#000,_#0000_90%)]">
     <!-- Ambient glows -->
     <div class="absolute -top-24 -right-24 w-80 h-80 bg-[#0870f8]/15 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-[#0055c8]/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -19,7 +19,7 @@ const { getAppUrl, isExternalUrl } = useAppUrl()
         <Sparkles class="w-3.5 h-3.5 animate-pulse" />
         Comece hoje mesmo
       </span>
-      <h2 class="text-3xl md:text-5xl font-black text-white tracking-tight mb-6 leading-tight max-w-2xl mx-auto">
+      <h2 class="text-3xl md:text-7xl font-black text-white tracking-tight mb-6 leading-tight max-w-4xl mx-auto">
         Seu próximo orçamento pronto em 2 minutos.
       </h2>
       <p class="text-slate-300 max-w-lg mx-auto mb-10 leading-relaxed font-medium text-sm md:text-base">

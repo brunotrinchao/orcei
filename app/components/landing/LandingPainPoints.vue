@@ -30,12 +30,12 @@ const colorClasses: Record<string, { bg: string; text: string; border: string; h
 </script>
 
 <template>
-  <section class="mb-24 py-16 scroll-mt-20 relative bg-white">
+  <section class="py-16 scroll-mt-20 relative bg-white">
     <div class="max-w-7xl mx-auto px-4">
       <div class="text-center mb-16">
         <p class="text-xs font-black text-[#0870f8] uppercase tracking-widest mb-3">O Problema</p>
-        <h2 class="text-3xl md:text-5xl font-black text-[#0c1424] tracking-tight leading-tight">
-          Você perde horas montando orçamento<br class="hidden md:block"> que o cliente nem abre
+        <h2 class="text-3xl md:text-6xl font-bold text-[#0c1424] tracking-tight leading-[1.02]">
+          Você perde horas montando orçamento<br class="hidden md:block" /> <span class="text-[#0870f8]">que o cliente nem abre</span>
         </h2>
       </div>
 

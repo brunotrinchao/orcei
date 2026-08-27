@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { Sparkles, ArrowRight, Briefcase, Eye } from 'lucide-vue-next'
 
 defineProps<{
@@ -9,6 +10,13 @@ defineProps<{
 }>()
 
 const { getAppUrl, isExternalUrl } = useAppUrl()
+const videoRef = ref<HTMLVideoElement | null>(null)
+
+onMounted(() => {
+  if (videoRef.value) {
+    videoRef.value.play().catch(() => {})
+  }
+})
 </script>
 
 <template>
@@ -85,6 +93,7 @@ const { getAppUrl, isExternalUrl } = useAppUrl()
           <div class="relative bg-white overflow-hidden">
             <video
               v-if="videoUrl"
+              ref="videoRef"
               :src="videoUrl"
               autoplay
               loop
@@ -111,86 +120,6 @@ const { getAppUrl, isExternalUrl } = useAppUrl()
         </div>
       </div>
 
-      <!-- Hero Mockup 3D com Orbitais/Satélites e Hotspots -->
-      <div
-        class="relative mx-auto max-w-lg md:max-w-2xl xl:max-w-3xl 2xl:max-w-5xl perspective-[1600px] px-4 pt-4 mb-12 mt-20">
-        <!-- Aura brilhante por trás do Mockup -->
-        <div
-          class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-[#0870f8]/10 rounded-full blur-3xl pointer-events-none -z-10">
-        </div>
-
-        <!-- Container do Mockup com Rotação 3D -->
-        <div
-          class="product-mockup relative mx-auto rounded-2xl border border-[#dfe6f0] bg-white shadow-[0_20px_60px_-15px_rgba(8,112,248,0.15)] transition-all duration-700 ease-out hover:rotate-x-[3deg] hover:rotate-y-[0deg] hover:scale-[1.01]">
-          <picture>
-            <source media="(max-width: 1023px)" srcset="/images/landpage-banner-mobile.jpg">
-            <img src="/images/landpage-banner.jpg"
-              :alt="`${appName || 'Orcei Fácil'} — painel de orçamentos inteligência artificial`" width="1200"
-              height="675" decoding="async" fetchpriority="high" loading="lazy"
-              class="w-full h-auto rounded-2xl block border border-[#dfe6f0]" />
-          </picture>
-          <!-- Hotspot 1: IA de Redação (Pulsante) -->
-          <div class="group absolute top-[45%] left-[25%] z-20">
-            <span class="absolute inline-flex h-4 w-4 rounded-full bg-[#0870f8] opacity-75 animate-ping"></span>
-            <span class="relative inline-flex rounded-full h-4 w-4 bg-[#0870f8] cursor-pointer shadow-lg"></span>
-            <!-- Tooltip -->
-            <div
-              class="absolute bottom-6 left-1/2 -translate-x-1/2 w-64 p-3 bg-[#07111f] border border-[#0870f8]/30 backdrop-blur-md rounded-xl text-xs text-slate-200 shadow-2xl opacity-0 translate-y-2 pointer-events-none transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 text-left">
-              <div class="flex items-center gap-1.5 font-bold text-[#0870f8] mb-1">
-                <Sparkles class="w-3.5 h-3.5" />
-                Assistente Inteligente
-              </div>
-              <p class="leading-relaxed">Explique o serviço de forma simples e a nossa IA redige a descrição técnica
-                completa com formatação executiva.</p>
-            </div>
-          </div>
-
-          <!-- Hotspot 2: Acompanhamento de Proposta (Pulsante) -->
-          <div class="group absolute top-[68%] left-[72%] z-20">
-            <span class="absolute inline-flex h-4 w-4 rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
-            <span class="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 cursor-pointer shadow-lg"></span>
-            <!-- Tooltip -->
-            <div
-              class="absolute bottom-6 left-1/2 -translate-x-1/2 w-64 p-3 bg-[#07111f] border border-emerald-500/30 backdrop-blur-md rounded-xl text-xs text-slate-200 shadow-2xl opacity-0 translate-y-2 pointer-events-none transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 text-left">
-              <div class="flex items-center gap-1.5 font-bold text-emerald-400 mb-1">
-                <Eye class="w-3.5 h-3.5" />
-                Notificação de Leitura
-              </div>
-              <p class="leading-relaxed">Saiba exatamente quando seu cliente abriu o orçamento para fazer o contato e
-                fechar a venda na hora ideal.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- 🪐 ITENS FLUTUANTES (Orbitando lateralmente em telas desktop) -->
-
-        <!-- Satélite Esquerda: Catálogo (Esmeralda) -->
-        <div
-          class="absolute left-[-16%] xl:left-[-18%] 2xl:left-[-18%] top-[40%] hidden xl:flex items-center gap-3 p-4 bg-white/95 border border-[#dfe6f0] backdrop-blur-md rounded-2xl shadow-xl animate-float-slow z-20 w-60">
-          <div
-            class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 flex-shrink-0">
-            <Briefcase class="w-5 h-5" />
-          </div>
-          <div class="text-left overflow-hidden">
-            <p class="text-[9px] text-[#61708a] font-bold uppercase tracking-wider">Catálogo de Serviços</p>
-            <p class="text-xs font-black text-[#0c1424] truncate">Desenvolvimento Nuxt 3</p>
-            <p class="text-xs text-emerald-600 font-extrabold mt-0.5">R$ 4.500,00</p>
-          </div>
-        </div>
-
-        <!-- Satélite Direita: Notificação (Blue) -->
-        <div
-          class="absolute right-[-16%] xl:right-[-18%] 2xl:right-[-18%] top-[35%] hidden xl:flex items-center gap-3.5 p-4 bg-white/95 border border-[#dfe6f0] backdrop-blur-md rounded-2xl shadow-xl animate-float-medium z-20 w-60">
-          <div class="w-10 h-10 rounded-xl bg-[#e9f3ff] flex items-center justify-center text-[#0870f8] flex-shrink-0">
-            <Eye class="w-5 h-5 animate-pulse" />
-          </div>
-          <div class="text-left">
-            <p class="text-[9px] text-[#0870f8] font-black uppercase tracking-wider animate-pulse">Acompanhamento</p>
-            <p class="text-xs font-black text-[#0c1424]">Cliente visualizou o link</p>
-            <p class="text-[10px] text-[#61708a] mt-0.5">Visualizado agora mesmo</p>
-          </div>
-        </div>
-      </div>
 
       <!-- 📱 WIDGETS RESPONSIVOS (Telas menores) -->
       <div class="relative z-20 max-w-2xl mx-auto px-4 mt-12 xl:hidden">

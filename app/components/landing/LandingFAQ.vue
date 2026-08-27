@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ChevronDown, HelpCircle } from 'lucide-vue-next'
+import { Plus, Minus } from 'lucide-vue-next'
 
 interface FAQItem {
   question: string
@@ -52,56 +52,75 @@ function toggleItem(index: number) {
 </script>
 
 <template>
-  <section id="faq" class="mb-24 py-16 scroll-mt-20 relative bg-white" aria-labelledby="faq-title">
-    <div class="max-w-4xl mx-auto px-4">
-      <div class="text-center mb-16">
-        <p class="text-xs font-black text-[#0870f8] uppercase tracking-widest mb-3">Dúvidas Frequentes</p>
-        <h2 id="faq-title" class="text-3xl md:text-5xl font-black text-[#0c1424] tracking-tight">Perguntas Frequentes</h2>
-        <p class="text-[#61708a] max-w-xl mx-auto mt-4 font-medium text-sm md:text-base">
-          Tem alguma dúvida sobre o Orcei Fácil? Encontre respostas rápidas para as principais dúvidas.
-        </p>
-      </div>
+  <section id="faq" class="mb-24 py-20 scroll-mt-20 relative bg-white" aria-labelledby="faq-title">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        
+        <!-- Coluna da Esquerda (Cabeçalho Fixo / Destacado) -->
+        <div class="lg:col-span-5 lg:sticky lg:top-28 space-y-4">
+          <p class="text-xs font-black text-[#0870f8] uppercase tracking-widest">
+            DÚVIDAS FREQUENTES
+          </p>
 
-      <!-- Accordion Acessível (WAI-ARIA) -->
-      <div class="space-y-4" role="presentation">
-        <div 
-          v-for="(item, index) in faqItems" 
-          :key="index"
-          class="bg-[#f4f7fb] border border-[#dfe6f0] rounded-2xl overflow-hidden transition-all duration-300 shadow-sm"
-        >
-          <!-- Gatilho do Accordion -->
-          <button 
-            type="button"
-            class="flex w-full items-center justify-between p-6 text-left font-bold text-base md:text-lg text-[#0c1424] hover:bg-[#e9f3ff]/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0870f8] transition-all group"
-            :aria-expanded="item.isOpen ? 'true' : 'false'"
-            :aria-controls="`faq-content-${index}`"
-            :id="`faq-trigger-${index}`"
-            @click="toggleItem(index)"
-          >
-            <span class="flex items-center gap-3 pr-4">
-              <HelpCircle class="w-5 h-5 text-[#0870f8] flex-shrink-0" />
-              {{ item.question }}
-            </span>
-            <ChevronDown 
-              class="h-5 w-5 text-[#61708a] transition-transform duration-300 flex-shrink-0"
-              :class="{ 'rotate-180 text-[#0870f8]': item.isOpen }" 
-              aria-hidden="true" 
-            />
-          </button>
+          <h2 id="faq-title" class="text-4xl sm:text-5xl font-black text-[#0c1424] tracking-tight leading-[1.1]">
+            Antes de<br class="hidden sm:block" /> começar.
+          </h2>
 
-          <!-- Conteúdo do Accordion -->
-          <div 
-            :id="`faq-content-${index}`"
-            role="region"
-            :aria-labelledby="`faq-trigger-${index}`"
-            class="transition-all duration-300 ease-in-out overflow-hidden"
-            :class="item.isOpen ? 'max-h-[300px] border-t border-[#dfe6f0]' : 'max-h-0'"
+          <p class="text-[#61708a] font-medium leading-relaxed text-sm sm:text-base max-w-md pt-2">
+            O Orcei Fácil é uma plataforma completa de propostas e orçamentos com Inteligência Artificial. Ela acelera a criação comercial, mantém sua marca e facilita a aprovação do seu cliente.
+          </p>
+        </div>
+
+        <!-- Coluna da Direita (Lista Minimalista Accordion com Números) -->
+        <div class="lg:col-span-7 divide-y divide-[#dfe6f0] border-y border-[#dfe6f0]">
+          <div
+            v-for="(item, index) in faqItems"
+            :key="index"
+            class="py-6 transition-colors group"
           >
-            <div class="p-6 text-sm md:text-base text-[#61708a] leading-relaxed font-medium bg-white">
-              {{ item.answer }}
+            <!-- Botão Gatilho do Accordion -->
+            <button
+              type="button"
+              class="w-full flex items-center justify-between gap-4 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0870f8] rounded-lg cursor-pointer"
+              :aria-expanded="item.isOpen ? 'true' : 'false'"
+              :aria-controls="`faq-content-${index}`"
+              :id="`faq-trigger-${index}`"
+              @click="toggleItem(index)"
+            >
+              <div class="flex items-center gap-4 sm:gap-6 pr-4">
+                <!-- Número no formato 01, 02, ... -->
+                <span class="text-xs sm:text-sm font-bold font-mono text-[#61708a]/60 flex-shrink-0 w-6 sm:w-8">
+                  {{ String(index + 1).padStart(2, '0') }}
+                </span>
+                
+                <!-- Pergunta -->
+                <h3 class="font-bold text-base sm:text-lg text-[#0c1424] group-hover:text-[#0870f8] transition-colors leading-snug">
+                  {{ item.question }}
+                </h3>
+              </div>
+
+              <!-- Ícone de Mais (+) ou Menos (-) -->
+              <div class="flex-shrink-0 text-[#0870f8] transition-transform duration-200">
+                <Minus v-if="item.isOpen" class="w-5 h-5 stroke-[2.5]" />
+                <Plus v-else class="w-5 h-5 stroke-[2.5] text-[#0870f8]" />
+              </div>
+            </button>
+
+            <!-- Conteúdo da Resposta com transição suave -->
+            <div
+              :id="`faq-content-${index}`"
+              role="region"
+              :aria-labelledby="`faq-trigger-${index}`"
+              class="transition-all duration-300 ease-in-out overflow-hidden"
+              :class="item.isOpen ? 'max-h-[400px] pt-4 opacity-100' : 'max-h-0 opacity-0'"
+            >
+              <p class="pl-10 sm:pl-14 pr-4 text-sm sm:text-base text-[#61708a] font-medium leading-relaxed">
+                {{ item.answer }}
+              </p>
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </section>

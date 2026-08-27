@@ -102,7 +102,7 @@ onUnmounted(() => {
 <template>
   <div class="min-h-screen bg-slate-100/80 dark:bg-gray-950 pb-0 font-sans text-gray-900 dark:text-gray-50 antialiased">
     <!-- Desktop/Mobile Header -->
-    <header class="bg-white/90 dark:bg-gray-900/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200/90 dark:border-gray-800 shadow-sm shadow-slate-200/40 dark:shadow-none">
+    <header class="backdrop-blur-[18px] bg-white/90 dark:bg-gray-900/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200/90 dark:border-gray-800 shadow-sm shadow-slate-200/40 dark:shadow-none">
       <nav class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <div class="flex items-center gap-12">
           <NuxtLink :to="loggedIn ? '/dashboard' : '/'"><AppLogo size="sm" :light="isDark" /></NuxtLink>

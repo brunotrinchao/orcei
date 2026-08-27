@@ -7,7 +7,7 @@ import { FileEdit, Send, BadgeCheck } from 'lucide-vue-next'
     <div class="max-w-7xl mx-auto px-4 text-center">
       <div class="mb-16">
         <p class="text-xs font-black text-[#0870f8] uppercase tracking-widest mb-3">Fluxo Simplificado</p>
-        <h2 class="text-3xl md:text-5xl font-black text-[#0c1424] tracking-tight">Três passos. Nada mais.</h2>
+        <h2 class="text-3xl md:text-5xl font-black text-[#0c1424] tracking-tight">Três passos. <span class="text-[#0870f8]">Nada mais.</span></h2>
         <p class="text-[#61708a] max-w-xl mx-auto mt-4 font-medium text-sm md:text-base">
           Desenhado para ser intuitivo tanto para você quanto para o seu cliente final. Veja como é simples:
         </p>

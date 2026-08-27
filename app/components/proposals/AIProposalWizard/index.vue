@@ -277,7 +277,7 @@ const {
             <!-- Botões de Rodapé -->
             <div class="flex gap-3 pt-4">
               <button 
-                class="flex-1 px-5 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-950 font-black text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300 transition-colors"
+                class="flex-1 px-5 py-3 rounded-2xl border border-slate-800 hover:bg-slate-950 font-black text-xs uppercase tracking-wider ttext-slate-300 transition-colors"
                 @click="step = 'prompt'"
               >
                 Voltar

@@ -51,9 +51,9 @@ const activeFeatures = computed(() => {
         <p class="text-xs font-black text-[#0870f8] uppercase tracking-widest mb-3">
           Funcionalidades
         </p>
-        <h2 class="text-3xl md:text-5xl font-black text-[#0c1424] tracking-tight leading-tight">
+        <h2 class="text-3xl md:text-6xl font-black text-[#0c1424] tracking-tight leading-[1.02]">
           Tudo que você precisa,<br class="hidden md:block" />
-          em um só lugar.
+           <span class="text-[#0870f8]">em um só lugar.</span>
         </h2>
         <p class="text-[#61708a] max-w-xl mx-auto mt-4 font-medium text-sm md:text-base">
           Desenhado para simplificar sua rotina e transformar propostas

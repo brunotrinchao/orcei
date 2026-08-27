@@ -67,7 +67,7 @@ const {
     </div>
 
     <!-- Lado Direito: Painel Decorativo (Apenas Desktop) -->
-    <div class="hidden md:flex flex-1 relative overflow-hidden bg-slate-900">
+    <div class="hidden md:flex flex-1 relative overflow-hidden bg-slate-900 relative overflow-hidden shadow-2xl relative before:absolute before:inset-0 before:bg-[linear-gradient(#ffffff0a_1px,_#0000_1px),_linear-gradient(90deg,_#ffffff0a_1px,_#0000_1px)] before:bg-[size:48px_48px] before:[mask-image:linear-gradient(#000,_#0000_90%)] before:[-webkit-mask-image:linear-gradient(#000,_#0000_90%)]">
 
       <!-- Conteúdo Visual -->
       <div class="relative z-10 flex flex-col justify-center items-center w-full p-12 text-center">

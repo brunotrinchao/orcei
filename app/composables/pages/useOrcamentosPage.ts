@@ -1,4 +1,4 @@
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
 import { Plus, Search, Mail, Link as LinkIcon, Pencil, Share2, RefreshCcw, Loader2, FileText, ExternalLink, Eye, Download, CheckCircle2, MessageCircle, CreditCard, Banknote, History, Sparkles, Send, CheckCheck, X, ArrowLeft, ArrowRight, Trash2, MoreVertical, Check, Copy, Variable } from 'lucide-vue-next'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
@@ -250,22 +250,61 @@ export function useOrcamentosPage() {
     }
   }
 
-  function openModal(proposal: ProposalDTO | null = null, items: any[] | null = null, aiAssisted: boolean = false) {
+  function openModal(proposal: ProposalDTO | null = null, items: any[] | null = null, aiAssisted: boolean = false, prefilledClient: any = null) {
     selectedProposal.value = proposal
     prefilledItems.value = items
     isAiAssistedProposal.value = aiAssisted
     isModalOpen.value = true
+    if (prefilledClient) {
+      nextTick(() => {
+        if (proposalFormRef.value) {
+          proposalFormRef.value.setPrefilledClientAndStep(prefilledClient, 2)
+        }
+      })
+    }
   }
 
-  function onAIWizardSuccess(items: any[]) {
-    const formattedItems = items.map(item => ({
+  async function onAIWizardSuccess(payload: any) {
+    const items = Array.isArray(payload) ? payload : (payload.items || [])
+    const client = !Array.isArray(payload) ? payload.client : null
+
+    const formattedItems = items.map((item: any) => ({
       catalogItemId: item.id || item._id || undefined,
       name: item.name,
       description: item.description,
-      price: item.price,
-      quantity: 1
+      price: Number(item.price) || 0,
+      quantity: (item.quantity && Number(item.quantity) > 0) ? Number(item.quantity) : 1
     }))
-    openModal(null, formattedItems, true)
+
+    try {
+      const draftPayload: any = {
+        status: 'draft',
+        aiAssisted: true,
+        items: formattedItems,
+        client: {
+          name: client?.name || 'Cliente Sem Nome',
+          email: client?.email || 'cliente@exemplo.com',
+          phone: client?.phone || '',
+          address: client?.address || ''
+        }
+      }
+
+      if (client?._id || client?.id) {
+        draftPayload.clientId = client._id || client.id
+      }
+
+      const createdDraft: any = await $fetch('/api/proposals', {
+        method: 'POST',
+        body: draftPayload
+      })
+
+      await refresh()
+      notify('Rascunho Criado', 'O rascunho do orçamento foi gerado e aberto para edição!')
+      openModal(createdDraft, null, true)
+    } catch (err: any) {
+      console.error('[onAIWizardSuccess] Erro ao criar rascunho automático:', err)
+      openModal(null, formattedItems, true, client)
+    }
   }
 
   function downloadPdf(proposal: ProposalDTO) {

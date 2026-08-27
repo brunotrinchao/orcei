@@ -36,6 +36,7 @@ const {
   generateDescription,
   refreshCatalog,
   finalTotal,
+  setPrefilledClientAndStep,
   prevStep,
   nextStep,
   submit,
@@ -55,6 +56,7 @@ defineExpose({
   currentStep,
   prevStep,
   nextStep,
+  setPrefilledClientAndStep,
   totalSteps: steps.length,
   isEditingNonDraft: computed(() => props.isEditing && props.initialData?.status !== ProposalStatus.DRAFT),
   finalTotal

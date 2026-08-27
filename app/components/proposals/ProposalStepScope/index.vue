@@ -96,8 +96,7 @@ defineExpose({ validate: validateStep, reset })
         >
           <!-- Cabecalho Compacto (Sempre visível) -->
           <div class="p-4 sm:flex items-center gap-4">
-            <div class="flex-1 flex items-center gap-3 min-w-0 w-full sm:w-[60%]">
-              <GripVertical class="w-5 h-5 text-gray-300 dark:text-gray-600 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block shrink-0" />
+            <div class="flex-1 flex items-center gap-3 min-w-0 w-full sm:w-[30%]">
               <template v-if="!item.catalogItemId">
                 <input
                   v-model="item.name"
@@ -115,7 +114,7 @@ defineExpose({ validate: validateStep, reset })
               </BaseButton>
             </div>
 
-            <div class="flex items-center gap-3 sm:gap-6 shrink-0 w-full sm:flex-1 sm:justify-end mt-3 sm:mt-0">
+            <div class="flex items-center gap-3 sm:gap-6 shrink-0 w-full sm:w-[70%] sm:flex-1 sm:justify-end mt-3 sm:mt-0">
               <div class="flex items-center gap-2 w-[40%] sm:w-auto">
                 <BaseInput
                   v-model="item.quantity"
@@ -123,33 +122,34 @@ defineExpose({ validate: validateStep, reset })
                   label=""
                   placeholder=""
                   prefix="Qtd"
-                  class="w-full sm:w-25"
+                  class="w-full sm:w-auto"
                   required
+                  value="0"
                 />
               </div>
               <div class="flex items-center gap-2 w-[60%] sm:w-auto">
                 <BaseInput
                   v-model="item.price"
-                  type="number"
+                  mask="currency"
                   label=""
                   placeholder=""
                   prefix="R$"
-                  class="w-full sm:w-40"
+                  class="w-full"
                   required
                 />
               </div>
               
-              <div class="hidden md:block text-right min-w-[80px]">
+              <div class="hidden md:block text-right min-w-[90px]">
                 <span class="text-sm font-black text-gray-900 dark:text-gray-50">R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
               </div>
             </div>
 
             <!-- Ações -->
             <div class="flex items-center gap-1 shrink-0 ml-2 w-full sm:w-auto">
-              <BaseButton variant="ghost" size="icon-sm" @click="toggleItemExpansion(idx)" type="button" aria-label="Editar Descrição" class="hidden sm:block">
+              <!-- <BaseButton variant="ghost" size="icon-sm" @click="toggleItemExpansion(idx)" type="button" aria-label="Editar Descrição" class="hidden sm:block">
                 <ChevronUp v-if="expandedItemIdx === idx" class="w-4 h-4" />
                 <ChevronDown v-else class="w-4 h-4" />
-              </BaseButton>
+              </BaseButton> -->
               <BaseButton variant="ghost" size="icon-sm" @click="moveToUpsell(idx)" type="button" class="hidden sm:inline-flex text-blue-400 hover:text-blue-600 dark:hover:text-blue-300" aria-label="Mover para Opcionais">
                 <ArrowDown class="w-4 h-4" />
               </BaseButton>
@@ -161,13 +161,13 @@ defineExpose({ validate: validateStep, reset })
           </div>
 
           <!-- Área Expandida (Descrição) -->
-          <div v-show="expandedItemIdx === idx" class="px-4 pb-4 sm:pl-[4.5rem] bg-gray-50/50 dark:bg-gray-950/50 border-t border-gray-100 dark:border-gray-800">
+          <div v-show="true" class="px-4 pb-4 bg-gray-50/50 dark:bg-gray-950/50 border-t border-gray-100 dark:border-gray-800">
             <div class="pt-4 flex flex-col gap-3">
               <div class="relative">
                 <template v-if="!item.catalogItemId">
                   <textarea 
                     v-model="item.description" 
-                    rows="3" 
+                    rows="1" 
                     class="w-full text-sm font-medium text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-600 bg-transparent p-0 border-0 focus:ring-0 outline-none resize-none transition-all" 
                     placeholder="Descreva detalhadamente o que será entregue (visível para o cliente)..."
                   ></textarea>
@@ -202,8 +202,7 @@ defineExpose({ validate: validateStep, reset })
         >
           <!-- Cabecalho Compacto -->
           <div class="p-4 sm:flex items-center gap-4">
-            <div class="flex-1 flex items-center gap-3 min-w-0 w-full sm:w-[60%]">
-              <GripVertical class="w-5 h-5 text-blue-200 dark:text-blue-800 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block shrink-0" />
+            <div class="flex-1 flex items-center gap-3 min-w-0 w-full sm:w-[30%]">
               <template v-if="!item.catalogItemId">
                 <input
                   v-model="item.name"
@@ -229,18 +228,18 @@ defineExpose({ validate: validateStep, reset })
                   label=""
                   placeholder=""
                   prefix="Qtd"
-                  class="w-full sm:w-40"
+                  class="w-full"
                   required
                 />
               </div>
               <div class="flex items-center gap-2 w-[60%] sm:w-auto">
                 <BaseInput
                   v-model="item.price"
-                  type="number"
+                  mask="currency"
                   label=""
                   placeholder=""
                   prefix="R$"
-                  class="w-full sm:w-60"
+                  class="w-full"
                   required
                 />
               </div>
@@ -251,10 +250,10 @@ defineExpose({ validate: validateStep, reset })
             </div>
 
             <div class="flex items-center gap-1 shrink-0 ml-2 w-full sm:w-auto">
-              <BaseButton variant="ghost" size="icon-sm" @click="toggleItemExpansion(idx, true)" type="button" aria-label="Editar Descrição" class="hidden sm:block">
+              <!-- <BaseButton variant="ghost" size="icon-sm" @click="toggleItemExpansion(idx, true)" type="button" aria-label="Editar Descrição" class="hidden sm:block">
                 <ChevronUp v-if="expandedUpsellIdx === idx" class="w-4 h-4"/>
                 <ChevronDown v-else class="w-4 h-4" />
-              </BaseButton>
+              </BaseButton> -->
               <BaseButton variant="ghost" size="icon-sm" @click="moveToItems(idx)" type="button" class="hidden sm:inline-flex text-green-500 hover:text-green-600" aria-label="Tornar Obrigatório">
                 <Plus class="w-4 h-4" />
               </BaseButton>
@@ -265,13 +264,13 @@ defineExpose({ validate: validateStep, reset })
           </div>
 
           <!-- Área Expandida (Descrição) -->
-          <div v-show="expandedUpsellIdx === idx" class="px-4 pb-4 sm:pl-[4.5rem] bg-white/50 dark:bg-gray-950/40 border-t border-blue-100 dark:border-blue-900/40">
+          <div v-show="true" class="px-4 pb-4 bg-white/50 dark:bg-gray-950/40 border-t border-blue-100 dark:border-blue-900/40">
             <div class="pt-4 flex flex-col gap-3">
               <div class="relative">
                 <template v-if="!item.catalogItemId">
                   <textarea 
                     v-model="item.description" 
-                    rows="3" 
+                    rows="1" 
                     class="w-full text-sm font-medium text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-600 bg-transparent p-0 border-0 focus:ring-0 outline-none resize-none transition-all" 
                     placeholder="Por que o cliente deveria adquirir este pacote adicional?"
                   ></textarea>

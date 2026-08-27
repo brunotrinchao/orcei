@@ -273,7 +273,7 @@ Estrutura do JSON:
       return JSON.stringify(validated)
     } catch (e) {
       console.warn('[AIService] Resposta da proposta falhou no schema Zod (suggestProposalItems). Executando self-healing...', e)
-      const healPrompt = `Corrija a estrutura do JSON a seguir para ter "reasoning" (string) e "items" (array de objetos com name, price, quantity, unit, description). Retorne apenas o JSON:\n${jsonString}`
+      const healPrompt = `Corrija a estrutura do JSON a seguir para ter "reasoning" (string), "client" (objeto com name, email, phone, etc, ou null) e "items" (array de objetos com name, price, quantity, unit, description). Retorne apenas o JSON:\n${jsonString}`
       const healedRaw = await this._generateWithFallback(healPrompt, { maxTokens: 4096, meta })
       const healedJson = this._cleanJsonResponse(healedRaw, true)
       const validated = SuggestedProposalSchema.parse(JSON.parse(healedJson))
@@ -427,14 +427,16 @@ Estrutura do JSON:
 
   getPrompt(prompt: string, catalog: any[]) {
     return `
-      Você é um especialista em precificação para freelancers brasileiros.
-      Sua única função é decompor pedidos de clientes em itens de orçamento estruturados.
+      Você é um especialista em análise comercial e precificação para freelancers e prestadores de serviços brasileiros.
+      Sua função é analisar o texto recebido (que pode ser uma conversa de WhatsApp, e-mail, notas ou solicitação de orçamento) e:
+      1. Extrair TODOS os contatos de CLIENTES (se informados no texto): nome da pessoa/empresa, e-mail, telefone com DDD, endereço (rua, número, bairro, cidade, estado, cep), segmento ou observações. IMPORTANTE: Se houver mais de um contato no texto (ex: participantes de um e-mail ou conversa de grupo), retorne a lista de TODOS os contatos na chave "clients". Se houver apenas 1 contato, retorne a lista com 1 elemento. Se não houver nenhum contato claro, retorne um array vazio [].
+      2. Decompor as solicitações de SERVIÇOS/PRODUTOS em itens de orçamento estruturados, realizando matching semântico com o CATÁLOGO do profissional se disponível, ou sugerindo valores de mercado para novos itens.
 
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      PEDIDO DO USUARIO:
-      <pedido_usuario>
+      TEXTO FORNECIDO PELO USUARIO:
+      <texto_usuario>
       ${prompt}
-      </pedido_usuario>
+      </texto_usuario>
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -442,17 +444,44 @@ Estrutura do JSON:
       ${JSON.stringify(catalog, null, 2)}
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-      PROTOCOLO DE DECISÃO (siga esta ordem obrigatoriamente):
+      PROTOCOLO DE EXTRAÇÃO DE CLIENTES:
+      - Procure por nomes próprios, nomes de empresas, e-mails, telefones com DDD, CPF/CNPJ ou dados de localização no texto.
+      - Se encontrar mais de uma pessoa/empresa mencionada com contatos, crie um objeto para cada uma na lista "clients".
+      - Para cada cliente: preencha "name" (obrigatório se houver contato), "email" (extraia e-mail válido se houver), "phone" (apenas dígitos com DDD se houver).
+      - Se não identificar nenhum dado claro de cliente no texto, a chave "clients" deve ser [].
 
+      PROTOCOLO DE DECISÃO DE SERVIÇOS:
       PASSO 1 — MATCHING SEMÂNTICO DO CATÁLOGO
       Para cada entrega identificada no pedido, verifique se existe um item no catálogo
       cujo escopo seja equivalente ou sobreponível — mesmo que o nome seja diferente.
       Critério: "Este item do catálogo cobre a maior parte desta entrega?" → Se SIM, use-o.
       Ao reutilizar: copie name e price EXATAMENTE. Ajuste apenas quantity e description.
 
-      PASSO 2 — CRIAÇÃO DE ITENS AUSENTES
-      Somente para entregas sem cobertura no catálogo, crie novos itens.
-      Use os seguintes benchmarks de precificação para freelancers no Brasil (2024):
+      PASSO 2 — NOMENCLATURA E DESCRIÇÃO GENÉRICA E REUTILIZÁVEL (OBRIGATÓRIO PARA ITENS NOVOS OU SUGERIDOS)
+      - O nome do serviço ("name") deve ser SEMPRE GENÉRICO, PADRONIZADO E REUTILIZÁVEL para ser salvo e aproveitado em outros orçamentos futuros.
+      - A descrição do serviço ("description") deve ser IGUALMENTE GENÉRICA E PADRONIZADA, descrevendo a atividade técnica de forma profissional (ex: "Pintura de paredes e tetos").
+      - É ESTRITAMENTE PROIBIDO incluir nomes de clientes, locais específicos da conversa, endereços ou cômodos particulares nem no "name" nem na "description".
+      - EXEMPLOS ERRADOS (NUNCA USE):
+        ❌ name: "Pintura de dois cômodos (quarto de visitas e sala de estar da Dona Maria)"
+           description: "Pintar o quarto de visitas e a sala de estar da casa da Maria"
+        ❌ name: "Instalação de 3 tomadas na cozinha da Dona Maria"
+           description: "Instalar 3 tomadas na cozinha da casa do cliente"
+        ❌ name: "Desenvolvimento de site para a Padaria Silva"
+           description: "Criar o site da padaria da Silva"
+      - EXEMPLOS CORRETOS (SEMPRE USE):
+        ✅ name: "Pintura de Cômodo"
+           description: "Pintura de paredes e tetos"
+        ✅ name: "Instalação de Tomada"
+           description: "Instalação de ponto elétrico e passagem de fiação"
+        ✅ name: "Aplicação de Rejunte"
+           description: "Aplicação e acabamento de rejunte em pisos e revestimentos"
+        ✅ name: "Desenvolvimento de Website"
+           description: "Desenvolvimento de website institucional responsivo e otimizado"
+      - Regra fundamental: O campo "name" é o título genérico e o campo "description" é a descrição genérica e profissional do serviço. Quantidades específicas vão exclusivamente no campo "quantity". Dados do cliente vão na seção "clients".
+
+      PASSO 3 — CRIAÇÃO DE ITENS AUSENTES E BENCHMARKS
+      Somente para entregas sem cobertura no catálogo, crie novos itens respeitando a nomenclatura e descrição genéricas.
+      Use os seguintes benchmarks de precificação para freelancers no Brasil:
       - Desenvolvimento Web (por hora): R$ 80–200/h (júnior–sênior)
       - Design UI/UX (por hora): R$ 70–180/h
       - Redação/Copywriting (por página): R$ 80–300
@@ -460,15 +489,13 @@ Estrutura do JSON:
       - SEO (pacote mensal): R$ 800–3.000
       - Gestão de Tráfego (mensal): R$ 600–2.500
       - Identidade Visual (pacote): R$ 1.200–4.000
-      Posicione o preço no percentil 50 (mediana) do range, a menos que o pedido indique
-      complexidade alta (use percentil 75) ou baixa (use percentil 25).
 
-      PASSO 3 — QUALIDADE DAS DESCRIÇÕES
-      Cada description deve conter:
-      (a) O que será entregue (tangível)
-      (b) Uma característica técnica relevante ao pedido
+      PASSO 4 — QUALIDADE DAS DESCRIÇÕES
+      Cada description deve ser genérica, padronizada e profissional:
+      (a) O escopo geral da atividade técnica (ex: "Pintura de paredes e tetos")
+      (b) Uma característica técnica relevante
       (c) O benefício direto para o cliente
-      Máximo: 2 frases. Proibido: termos vagos como "completo", "profissional", "de qualidade".
+      Máximo: 2 frases. Proibido: incluir nomes de clientes, endereços, locais específicos da conversa, ou termos vagos como "completo", "profissional", "de qualidade".
 
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       FORMATO DE SAÍDA — OBRIGATÓRIO
@@ -478,19 +505,39 @@ Estrutura do JSON:
       O primeiro caractere da resposta deve ser { e o último deve ser }.
 
       {
-      "reasoning": "<string: 1-2 frases explicando as principais decisões de matching>",
-      "items": [
-        {
-          "source": "catalog" | "new",
-          "name": "<string>",
-          "description": "<string: máx. 2 frases seguindo o protocolo acima>",
-          "price": <number: valor unitário em BRL, sem símbolo>,
-          "unit": "H" | "UN" | "MÊS" | "PÁG",
-          "quantity": <number>,
-          "price_rationale": "<string: obrigatório apenas quando source = 'new', justificando o preço>"
-        }
-      ]
+        "reasoning": "<string: 1-2 frases explicando as principais decisões de matching>",
+        "clients": [
+          {
+            "name": "<string: nome da pessoa ou empresa>",
+            "email": "<string: e-mail ou null>",
+            "phone": "<string: telefone com DDD ou null>",
+            "taxId": "<string ou null>",
+            "segment": "<string ou null>",
+            "companySize": "<string ou null>",
+            "address": {
+              "street": "<string ou null>",
+              "number": "<string ou null>",
+              "neighborhood": "<string ou null>",
+              "city": "<string ou null>",
+              "state": "<string ou null>",
+              "zip": "<string ou null>"
+            },
+            "notes": "<string ou null>"
+          }
+        ],
+        "items": [
+          {
+            "source": "catalog" | "new",
+            "name": "<string>",
+            "description": "<string: máx. 2 frases seguindo o protocolo acima>",
+            "price": <number: valor unitário em BRL, sem símbolo>,
+            "unit": "H" | "UN" | "MÊS" | "PÁG",
+            "quantity": <number>,
+            "price_rationale": "<string: obrigatório apenas quando source = 'new', justificando o preço>"
+          }
+        ]
       }
     `
   }
 }
+

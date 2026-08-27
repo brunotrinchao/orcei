@@ -71,6 +71,85 @@ describe('BaseInput — sem máscara', () => {
     })
     expect(wrapper.find('input').element.value).toBe('')
   })
+
+  it('aplica background default (white)', async () => {
+    const wrapper = await mountSuspended(BaseInput, {
+      props: { modelValue: '' }
+    })
+    expect(wrapper.find('input').classes()).toContain('bg-white')
+  })
+
+  it('aplica background slate e contraste de texto', async () => {
+    const wrapper = await mountSuspended(BaseInput, {
+      props: { modelValue: '', background: 'slate' }
+    })
+    expect(wrapper.find('input').classes()).toContain('bg-slate-100')
+    expect(wrapper.find('input').classes()).toContain('text-slate-900')
+  })
+
+  it('aplica background blue e contraste de texto', async () => {
+    const wrapper = await mountSuspended(BaseInput, {
+      props: { modelValue: '', background: 'blue' }
+    })
+    expect(wrapper.find('input').classes()).toContain('bg-blue-50')
+    expect(wrapper.find('input').classes()).toContain('text-blue-950')
+  })
+
+  it('aplica background customizado com prefixo bg-', async () => {
+    const wrapper = await mountSuspended(BaseInput, {
+      props: { modelValue: '', background: 'bg-zinc-800' }
+    })
+    expect(wrapper.find('input').classes()).toContain('bg-zinc-800')
+  })
+
+  it('aplica tamanho default (md)', async () => {
+    const wrapper = await mountSuspended(BaseInput, {
+      props: { modelValue: '' }
+    })
+    expect(wrapper.find('input').classes()).toContain('py-3.5')
+  })
+
+  it('aplica tamanho xs', async () => {
+    const wrapper = await mountSuspended(BaseInput, {
+      props: { modelValue: '', size: 'xs' }
+    })
+    expect(wrapper.find('input').classes()).toContain('py-1.5')
+  })
+
+  it('aplica tamanho lg', async () => {
+    const wrapper = await mountSuspended(BaseInput, {
+      props: { modelValue: '', size: 'lg' }
+    })
+    expect(wrapper.find('input').classes()).toContain('py-4')
+  })
+
+  it('aplica tamanho 2xl', async () => {
+    const wrapper = await mountSuspended(BaseInput, {
+      props: { modelValue: '', size: '2xl' }
+    })
+    expect(wrapper.find('input').classes()).toContain('py-6')
+  })
+
+  it('aplica borda default (border-2)', async () => {
+    const wrapper = await mountSuspended(BaseInput, {
+      props: { modelValue: '' }
+    })
+    expect(wrapper.find('input').classes()).toContain('border-2')
+  })
+
+  it('aplica borda none / false', async () => {
+    const wrapper = await mountSuspended(BaseInput, {
+      props: { modelValue: '', border: 'none' }
+    })
+    expect(wrapper.find('input').classes()).toContain('border-0')
+  })
+
+  it('aplica borda violet', async () => {
+    const wrapper = await mountSuspended(BaseInput, {
+      props: { modelValue: '', border: 'violet' }
+    })
+    expect(wrapper.find('input').classes()).toContain('border-violet-300')
+  })
 })
 
 describe('BaseInput — evento accept (imask, dispara após formatar)', () => {
@@ -120,6 +199,14 @@ describe('BaseInput — evento accept (imask, dispara após formatar)', () => {
     })
     triggerAccept(wrapper.find('input').element, '1.500,00', '1500')
     expect(wrapper.emitted('update:modelValue')![0]).toEqual(['1.500,00'])
+  })
+
+  it('emite dinheiro em formato BRL (money)', async () => {
+    const wrapper = await mountSuspended(BaseInput, {
+      props: { modelValue: '', mask: 'money' }
+    })
+    triggerAccept(wrapper.find('input').element, 'R$ 1.500,00', '1500')
+    expect(wrapper.emitted('update:modelValue')![0]).toEqual(['R$ 1.500,00'])
   })
 
   it('emite documento como CPF', async () => {

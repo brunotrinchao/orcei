@@ -25,11 +25,17 @@ export function sanitizeAiInput(text: string, maxLength = 4000): string {
   // 1. Truncamento estrito por tamanho
   let sanitized = String(text).slice(0, maxLength)
 
+  sanitized = sanitized.replace(/<\/?[^>]+(>|$)/g, "");
+
+  sanitized = sanitized.replace(/\s+/g, ' ').trim();
+
   // 2. Remoção de caracteres de controle invisíveis/nulos (preserva \n, \r, \t)
   sanitized = sanitized.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '')
 
   // 3. Substituição de cercas de código markdown para evitar contaminação do parser JSON
   sanitized = sanitized.replace(/```/g, "'''")
+
+  sanitized = sanitized.replace(/[*_~#\-+=>|]/g, "");
 
   // 4. Detecção preventiva de Prompt Injection (normalizado sem acentos)
   const normalized = sanitized.normalize('NFD').replace(/[\u0300-\u036f]/g, '')

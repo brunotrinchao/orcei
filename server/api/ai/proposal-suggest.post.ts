@@ -82,9 +82,15 @@ export default defineEventHandler(async (event) => {
     // Mapear para o formato que o frontend (AIProposalWizard.vue) espera
     const hasNewItems = aiResult.items.some((i: any) => i.source === 'new')
 
+    const clientsList = Array.isArray(aiResult.clients) && aiResult.clients.length > 0
+      ? aiResult.clients
+      : (aiResult.client ? [aiResult.client] : [])
+
     return {
       type: hasNewItems ? 'suggested' : 'existing',
       reasoning: aiResult.reasoning,
+      clients: clientsList,
+      client: clientsList[0] || null,
       items: aiResult.items.map((item: any) => ({
         catalogItemId: item.source === 'catalog' ? item.id : undefined,
         name: item.name,

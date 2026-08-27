@@ -12,6 +12,15 @@ import { sendProposalAcceptedEmail } from '../utils/email'
 import { ProposalStatus, PaymentMethod, SendMethod, SubscriptionStatus } from '../../types/enums'
 import { getActionCost, chargeCredit } from '../utils/credits'
 
+function generateDraftHash(length = 5): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+  let result = ''
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return result
+}
+
 export const ProposalService = {
   async listByProfile(profileId: string) {
     return await Proposal.find({ profileId }).sort({ createdAt: -1 })
@@ -138,11 +147,21 @@ export const ProposalService = {
         }
       }
 
+      const isDraft = data.status === ProposalStatus.DRAFT || data.status === 'draft'
+      let finalTitle = data.title?.trim()
+      if (isDraft) {
+        if (!finalTitle || finalTitle === 'Novo Orçamento' || finalTitle.startsWith('Orçamento') || finalTitle === code) {
+          finalTitle = `#RAS-${currentYear}-${generateDraftHash(5)}`
+        }
+      } else if (!finalTitle) {
+        finalTitle = code
+      }
+
       let proposal: any
       if (session) {
         const [created] = await Proposal.create([{
           ...data,
-          title: data.title?.trim() || code,
+          title: finalTitle,
           slug,
           token,
           sequenceNumber,
@@ -154,7 +173,7 @@ export const ProposalService = {
       } else {
         proposal = await Proposal.create({
           ...data,
-          title: data.title?.trim() || code,
+          title: finalTitle,
           slug,
           token,
           sequenceNumber,

@@ -24,7 +24,7 @@ const { landing } = useLandingPage()
       :title="landing.heroTitle"
       :subtitle="landing.heroSubtitle"
       :app-name="landing.appName"
-      video-url="/videos/orceifacil-create-proposal.mp4"
+      video-url="/videos/orceifacil-create-proposal-ia.mp4"
     />
 
     <!-- 2. Barra de Estatísticas & Prova Social -->

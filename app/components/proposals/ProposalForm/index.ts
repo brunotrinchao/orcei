@@ -144,11 +144,28 @@ export function useProposalForm(
     }
   }, { deep: true })
 
+  function setPrefilledClientAndStep(clientData: any, targetStep: number = 2) {
+    if (clientData) {
+      if (clientData._id || clientData.id) {
+        selectedClientId.value = clientData._id || clientData.id
+      }
+      form.value.client = {
+        name: clientData.name || '',
+        email: clientData.email || '',
+        phone: clientData.phone || ''
+      }
+    }
+    if (targetStep) {
+      currentStep.value = targetStep
+    }
+  }
+
   watch(() => props.prefilledItems, (newVal) => {
     if (newVal && !props.initialData) {
       form.value.items = [...newVal]
+      currentStep.value = 2
     }
-  }, { deep: true })
+  }, { deep: true, immediate: true })
 
   const isGenerating = ref(false)
   const { 
@@ -258,6 +275,7 @@ export function useProposalForm(
     generateDescription,
     refreshCatalog,
     finalTotal,
+    setPrefilledClientAndStep,
     validateStep,
     nextStep,
     prevStep,

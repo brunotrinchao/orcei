@@ -50,7 +50,7 @@ const {
           @click="navigateTo('/configuracoes?section=multiplos-cadastros')"
         >
           <Upload class="w-4 h-4 mr-2" />
-          Importar em massa
+          Importar
         </BaseButton>
 
         <BaseButton data-tour="catalogo-novo-item-btn" @click="openModal()" class="w-full sm:w-auto shadow-2xl shadow-blue-100">

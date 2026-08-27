@@ -20,7 +20,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="relative pt-18 pb-20 md:pt-24 md:pb-24 px-4 overflow-hidden bg-white">
+  <section class="relative sm:mt-18 pt-20 pb-20 md:pt-24 md:pb-24 px-4 overflow-hidden bg-white">
     <div class="max-w-7xl mx-auto text-center relative z-10">
       <div class="relative">
         <!-- GLOW -->

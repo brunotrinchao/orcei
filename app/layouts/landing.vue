@@ -101,7 +101,7 @@ onUnmounted(() => {
                   {{ ((user as any)?.name || (user as any)?.email || profile?.name || 'U')[0].toUpperCase() }}
                 </span>
               </div>
-              <span class="text-xs font-bold text-[#0870f8] group-hover:text-white transition-colors">
+              <span class="text-xs font-bold text-[#0870f8] group-hover:text-white transition-colors sm:inline hidden">
                 Ir para o App
               </span>
             </NuxtLink>

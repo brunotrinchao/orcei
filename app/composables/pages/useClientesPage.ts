@@ -152,12 +152,12 @@ export function useClientesPage() {
 
     isSearchingZip.value = true
     try {
-      const data: any = await $fetch(`https://viacep.com.br/ws/${zip}/json/`)
-      if (!data.erro) {
-        form.value.address.street = data.logradouro
-        form.value.address.neighborhood = data.bairro
-        form.value.address.city = data.localidade
-        form.value.address.state = data.uf
+      const data: any = await $fetch(`/api/cep/${zip}`)
+      if (data) {
+        form.value.address.street = data.street || ''
+        form.value.address.neighborhood = data.neighborhood || ''
+        form.value.address.city = data.city || ''
+        form.value.address.state = data.state || ''
       }
     } catch (e) {
       console.error('Erro ao buscar CEP', e)

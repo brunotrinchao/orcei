@@ -30,15 +30,11 @@ const colorClasses: Record<string, { bg: string; text: string; border: string; h
 </script>
 
 <template>
-  <section class="mb-24 py-16 scroll-mt-20 relative bg-slate-950">
-    <div class="absolute inset-0 pointer-events-none -z-10">
-      <div class="absolute top-[10%] right-[10%] w-[400px] h-[250px] bg-gradient-to-r from-amber-500/5 via-rose-500/5 to-transparent blur-3xl"></div>
-    </div>
-
+  <section class="mb-24 py-16 scroll-mt-20 relative bg-white">
     <div class="max-w-7xl mx-auto px-4">
       <div class="text-center mb-16">
-        <p class="text-xs font-black text-rose-400 uppercase tracking-widest mb-3">O Problema</p>
-        <h2 class="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
+        <p class="text-xs font-black text-[#0870f8] uppercase tracking-widest mb-3">O Problema</p>
+        <h2 class="text-3xl md:text-5xl font-black text-[#0c1424] tracking-tight leading-tight">
           Você perde horas montando orçamento<br class="hidden md:block"> que o cliente nem abre
         </h2>
       </div>
@@ -47,22 +43,18 @@ const colorClasses: Record<string, { bg: string; text: string; border: string; h
         <div
           v-for="point in painPoints"
           :key="point.title"
-          :class="[
-            'p-8 bg-slate-900/40 border rounded-3xl transition-all duration-300 text-left',
-            colorClasses[point.color].border,
-            colorClasses[point.color].hoverBorder
-          ]"
+          class="p-8 bg-[#f4f7fb] border border-[#dfe6f0] hover:border-[#61708a]/40 rounded-3xl transition-all duration-300 text-left shadow-sm hover:shadow-md"
         >
           <div :class="['w-12 h-12 rounded-2xl flex items-center justify-center mb-6', colorClasses[point.color].bg, colorClasses[point.color].text]">
             <component :is="point.icon" class="w-6 h-6" />
           </div>
-          <h3 class="font-black text-lg mb-3 text-white">{{ point.title }}</h3>
-          <p class="text-slate-400 text-sm leading-relaxed font-medium">{{ point.description }}</p>
+          <h3 class="font-black text-lg mb-3 text-[#0c1424]">{{ point.title }}</h3>
+          <p class="text-[#61708a] text-sm leading-relaxed font-medium">{{ point.description }}</p>
         </div>
       </div>
 
-      <p class="text-center text-slate-500 text-sm font-medium mt-12 max-w-2xl mx-auto">
-        E enquanto você formata PDF, seu concorrente já mandou um link profissional pelo Orcei Fácil e fechou o projeto.
+      <p class="text-center text-[#61708a] text-sm font-medium mt-12 max-w-2xl mx-auto">
+        E enquanto você formata PDF, seu concorrente já mandou um link profissional pelo <span class="text-[#0870f8] font-bold">Orcei Fácil</span> e fechou o projeto.
       </p>
     </div>
   </section>

@@ -18,7 +18,7 @@ const { landing } = useLandingPage()
 </script>
 
 <template>
-  <main class="min-h-screen bg-slate-950 text-white selection:bg-blue-500/80 selection:text-white overflow-x-hidden">
+  <main class="landing-page-root selection:bg-[#e9f3ff] selection:text-[#0870f8]">
     <!-- 1. Hero Section Premium (Luxury Minimal & IA) -->
     <LandingHero
       :title="landing.heroTitle"
@@ -45,7 +45,7 @@ const { landing } = useLandingPage()
     <LandingPricing />
 
     <!-- 8. Depoimentos / Prova Social Qualitativa -->
-    <LandingTestimonials />
+    <!-- <LandingTestimonials /> -->
 
     <!-- 9. FAQ com Respostas de objeções WAI-ARIA -->
     <LandingFAQ />

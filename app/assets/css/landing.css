@@ -1,0 +1,20 @@
+:root {
+  --ink: #0c1424;
+  --muted: #61708a;
+  --line: #dfe6f0;
+  --soft: #f4f7fb;
+  --blue: #0870f8;
+  --blue-dark: #0055c8;
+  --blue-soft: #e9f3ff;
+  --navy: #07111f;
+  --ease-out-premium: cubic-bezier(.23, 1, .32, 1);
+  --ease-in-out-premium: cubic-bezier(.77, 0, .175, 1);
+}
+
+.landing-page-root {
+  min-height: 100vh;
+  color: var(--ink);
+  background: #ffffff;
+  overflow: hidden;
+  font-family: inherit;
+}

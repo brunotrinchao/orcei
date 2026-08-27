@@ -13,19 +13,19 @@ const { data: systemInfo } = useFetch<any>('/api/system/status', {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-950 font-sans text-slate-100 antialiased overflow-x-hidden">
-    <!-- Header Translúcido Escuro Premium (Luxury Minimal) -->
-    <header class="bg-slate-950/60 backdrop-blur-md sticky top-0 z-50 border-b border-slate-900/60">
+  <div class="landing-page-root font-sans antialiased">
+    <!-- Header Translúcido Escuro/Limpo Premium (Luxury Minimal) -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-[#dfe6f0]">
       <nav class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <div class="flex items-center gap-12">
-          <!-- Logo com versão original -->
+          <!-- Logo com versão adaptada -->
           <NuxtLink to="/">
-            <AppLogo size="sm" light class="hover:opacity-90 transition-opacity" />
+            <AppLogo size="sm" class="hover:opacity-90 transition-opacity" />
           </NuxtLink>
           <div class="hidden md:flex gap-8">
-            <a href="#features" class="text-sm font-semibold text-slate-400 hover:text-blue-400 transition-colors">Funcionalidades</a>
-            <a href="#como-funciona" class="text-sm font-semibold text-slate-400 hover:text-blue-400 transition-colors">Como Funciona</a>
-            <a href="#faq" class="text-sm font-semibold text-slate-400 hover:text-blue-400 transition-colors">FAQ</a>
+            <a href="#features" class="text-sm font-semibold text-[#61708a] hover:text-[#0870f8] transition-colors">Funcionalidades</a>
+            <a href="#como-funciona" class="text-sm font-semibold text-[#61708a] hover:text-[#0870f8] transition-colors">Como Funciona</a>
+            <a href="#faq" class="text-sm font-semibold text-[#61708a] hover:text-[#0870f8] transition-colors">FAQ</a>
           </div>
         </div>
 
@@ -35,10 +35,10 @@ const { data: systemInfo } = useFetch<any>('/api/system/status', {
               :href="getAppUrl('/dashboard')"
               :external="isExternalUrl()"
               target="_self"
-              class="flex items-center gap-3 bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 p-1.5 pr-5 rounded-full transition-all duration-300 group shadow-lg shadow-black/20 hover:scale-[1.02]"
+              class="flex items-center gap-3 bg-[#e9f3ff] hover:bg-[#0870f8] border border-[#0870f8]/30 p-1.5 pr-5 rounded-full transition-all duration-300 group shadow-sm hover:scale-[1.02]"
             >
               <!-- Avatar Foto ou Inicial -->
-              <div class="w-9 h-9 rounded-full overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-sm border border-blue-400/30 flex-shrink-0 shadow-inner">
+              <div class="w-9 h-9 rounded-full overflow-hidden bg-[#0870f8] flex items-center justify-center text-white font-black text-sm border border-[#0870f8]/30 flex-shrink-0 shadow-inner">
                 <img
                   v-if="(user as any)?.avatar || profile?.avatar || profile?.logoUrl"
                   :src="(user as any)?.avatar || profile?.avatar || profile?.logoUrl"
@@ -50,7 +50,7 @@ const { data: systemInfo } = useFetch<any>('/api/system/status', {
                   {{ ((user as any)?.name || (user as any)?.email || profile?.name || 'U')[0].toUpperCase() }}
                 </span>
               </div>
-              <span class="text-xs font-bold text-white group-hover:text-blue-400 transition-colors">
+              <span class="text-xs font-bold text-[#0870f8] group-hover:text-white transition-colors">
                 Ir para o App
               </span>
             </NuxtLink>
@@ -60,7 +60,7 @@ const { data: systemInfo } = useFetch<any>('/api/system/status', {
             :href="getAppUrl('/auth/login')"
             :external="isExternalUrl()"
             target="_self"
-            class="bg-white hover:bg-slate-100 text-slate-950 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 shadow-lg shadow-white/5 hover:scale-[1.02]"
+            class="bg-[#07111f] hover:bg-[#0c1424] text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 shadow-md hover:scale-[1.02]"
           >
             Entrar
           </NuxtLink>

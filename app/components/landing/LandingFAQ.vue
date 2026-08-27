@@ -52,12 +52,12 @@ function toggleItem(index: number) {
 </script>
 
 <template>
-  <section id="faq" class="mb-24 py-16 scroll-mt-20 relative bg-slate-950" aria-labelledby="faq-title">
+  <section id="faq" class="mb-24 py-16 scroll-mt-20 relative bg-white" aria-labelledby="faq-title">
     <div class="max-w-4xl mx-auto px-4">
       <div class="text-center mb-16">
-        <p class="text-xs font-black text-blue-400 uppercase tracking-widest mb-3">Dúvidas Frequentes</p>
-        <h2 id="faq-title" class="text-3xl md:text-5xl font-black text-white tracking-tight">Perguntas Frequentes</h2>
-        <p class="text-slate-400 max-w-xl mx-auto mt-4 font-medium text-sm md:text-base">
+        <p class="text-xs font-black text-[#0870f8] uppercase tracking-widest mb-3">Dúvidas Frequentes</p>
+        <h2 id="faq-title" class="text-3xl md:text-5xl font-black text-[#0c1424] tracking-tight">Perguntas Frequentes</h2>
+        <p class="text-[#61708a] max-w-xl mx-auto mt-4 font-medium text-sm md:text-base">
           Tem alguma dúvida sobre o Orcei Fácil? Encontre respostas rápidas para as principais dúvidas.
         </p>
       </div>
@@ -67,24 +67,24 @@ function toggleItem(index: number) {
         <div 
           v-for="(item, index) in faqItems" 
           :key="index"
-          class="bg-slate-900/40 border border-slate-800/80 hover:border-slate-800 rounded-2xl overflow-hidden transition-all duration-300"
+          class="bg-[#f4f7fb] border border-[#dfe6f0] rounded-2xl overflow-hidden transition-all duration-300 shadow-sm"
         >
           <!-- Gatilho do Accordion -->
           <button 
             type="button"
-            class="flex w-full items-center justify-between p-6 text-left font-bold text-base md:text-lg text-white hover:bg-slate-900/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/80 transition-all group"
+            class="flex w-full items-center justify-between p-6 text-left font-bold text-base md:text-lg text-[#0c1424] hover:bg-[#e9f3ff]/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0870f8] transition-all group"
             :aria-expanded="item.isOpen ? 'true' : 'false'"
             :aria-controls="`faq-content-${index}`"
             :id="`faq-trigger-${index}`"
             @click="toggleItem(index)"
           >
             <span class="flex items-center gap-3 pr-4">
-              <HelpCircle class="w-5 h-5 text-blue-400/80 flex-shrink-0" />
+              <HelpCircle class="w-5 h-5 text-[#0870f8] flex-shrink-0" />
               {{ item.question }}
             </span>
             <ChevronDown 
-              class="h-5 w-5 text-slate-500 transition-transform duration-300 flex-shrink-0"
-              :class="{ 'rotate-180 text-blue-400': item.isOpen }" 
+              class="h-5 w-5 text-[#61708a] transition-transform duration-300 flex-shrink-0"
+              :class="{ 'rotate-180 text-[#0870f8]': item.isOpen }" 
               aria-hidden="true" 
             />
           </button>
@@ -95,9 +95,9 @@ function toggleItem(index: number) {
             role="region"
             :aria-labelledby="`faq-trigger-${index}`"
             class="transition-all duration-300 ease-in-out overflow-hidden"
-            :class="item.isOpen ? 'max-h-[300px] border-t border-slate-800/50' : 'max-h-0'"
+            :class="item.isOpen ? 'max-h-[300px] border-t border-[#dfe6f0]' : 'max-h-0'"
           >
-            <div class="p-6 text-sm md:text-base text-slate-400 leading-relaxed font-medium bg-slate-900/10">
+            <div class="p-6 text-sm md:text-base text-[#61708a] leading-relaxed font-medium bg-white">
               {{ item.answer }}
             </div>
           </div>

@@ -29,6 +29,7 @@ const { localAddress, isSearchingCep, handleCepInput, MapPin } = useSettingsAddr
         mask="cep"
         placeholder="00000-000"
         :loading="isSearchingCep"
+        @update:model-value="handleCepInput"
         @input="handleCepInput"
       />
 

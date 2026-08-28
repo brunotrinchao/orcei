@@ -254,42 +254,42 @@ const {
                   >
                     <DropdownMenuItem
                       @click="openHistory(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-950/40 hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer outline-none transition-all"
                     >
-                      <History class="w-4 h-4 text-blue-500" />
+                      <History class="w-4 h-4  text-gray-500" />
                       Ver Histórico
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       @click="downloadPdf(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-950/40 hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer outline-none transition-all"
                     >
-                      <Download class="w-4 h-4 text-blue-500" />
+                      <Download class="w-4 h-4 text-gray-500" />
                       Baixar Orçamento
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       v-if="proposal.status !== 'draft' && proposal.status !== 'accepted'"
                       :disabled="isResending === proposal._id"
                       @click="resendEmail(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer outline-none transition-all disabled:opacity-50"
+                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-950/40 hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer outline-none transition-all disabled:opacity-50"
                     >
-                      <RefreshCcw v-if="isResending === proposal._id" class="w-4 h-4 animate-spin text-indigo-500" />
-                      <Mail v-else class="w-4 h-4 text-indigo-500" />
+                      <RefreshCcw v-if="isResending === proposal._id" class="w-4 h-4 animate-spin text-gray-500" />
+                      <Mail v-else class="w-4 h-4 text-gray-500" />
                       Reenviar E-mail
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       v-if="proposal.status !== 'accepted'"
                       @click="openModal(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:text-amber-600 dark:hover:text-amber-400 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-950/40 hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer outline-none transition-all"
                     >
-                      <Pencil class="w-4 h-4 text-amber-500" />
+                      <Pencil class="w-4 h-4 text-gray-500" />
                       Editar
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       v-if="proposal.status === 'pending'"
                       @click="openContractModal(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-sky-50 dark:hover:bg-sky-950/40 hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer outline-none transition-all"
+                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-950/40 hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer outline-none transition-all"
                     >
-                      <FileText class="w-4 h-4 text-sky-500" />
+                      <FileText class="w-4 h-4 text-gray-500" />
                       Editar Contrato
                     </DropdownMenuItem>
                     <DropdownMenuItem
@@ -408,7 +408,7 @@ const {
           :disabled="proposalFormRef?.isStepInvalid"
           @click.prevent="proposalFormRef.nextStep()"
         >
-          Próximo Passo
+          Próximo
           <ArrowRight class="w-4 h-4 ml-2" />
         </BaseButton>
 

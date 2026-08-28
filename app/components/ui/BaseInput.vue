@@ -219,7 +219,7 @@ const displayError = computed(() => props.error || (showRequiredError.value ? 'C
 
 <template>
   <div class="space-y-2">
-    <label v-if="label" :for="inputId" class="block text-xs font-black text-slate-700 dark:text-gray-400 uppercase tracking-widest ml-1">
+    <label v-if="label" :for="inputId" class="block text-xs font-semibold text-slate-700 dark:text-gray-400 tracking-wide ml-1">
       {{ label }} <span v-if="required" class="text-red-500">*</span>
     </label>
     <div class="relative flex items-center">
@@ -263,7 +263,7 @@ const displayError = computed(() => props.error || (showRequiredError.value ? 'C
       </div>
     </div>
     <!-- Altura sempre reservada (min-h) — aparecer/sumir o erro não desloca o layout -->
-    <span class="block min-h-[14px] text-[10px] font-bold text-red-500 ml-1 uppercase leading-[14px]"
+    <span class="block min-h-[14px] text-[10px] font-bold text-red-500 ml-1 leading-[14px]"
     :class="displayError ? 'block' : 'hidden'">{{ displayError }}</span>
   </div>
 </template>

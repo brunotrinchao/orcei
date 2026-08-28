@@ -461,8 +461,16 @@ const {
       </form>
 
       <template #footer>
+        <BaseButton
+          variant="secondary"
+          size="md"
+          @click="showForm = false"
+          :disabled="isSubmitting"
+        >
+          Cancelar
+        </BaseButton>
         <BaseButton type="button" :disabled="isSubmitting" :loading="isSubmitting" @click="saveClient">
-          {{ selectedClient ? 'Atualizar Dados' : 'Cadastrar Cliente' }}
+          {{ selectedClient ? 'Salvar' : 'Cadastrar' }}
         </BaseButton>
       </template>
     </BaseDialog>

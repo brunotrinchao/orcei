@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const responseText = await AIService.extractClientInfo(text, { profileId: profile._id.toString(), action: 'clientExtract' })
+    const responseText = await AIService.extractClientInfo(text, { profileId: profile._id.toString(), action: 'clientExtract', cost })
     if (!responseText) throw new Error('IA retornou resposta vazia')
 
     const cleanJson = responseText.replace(/```json|```/g, '').trim()

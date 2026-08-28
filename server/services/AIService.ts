@@ -4,7 +4,7 @@ import { estimateCostUsd } from '../utils/aiPricing'
 import { sanitizeAiInput } from '../utils/aiGuardrails'
 import { ClientInfoSchema, SuggestedProposalSchema } from '../utils/aiSchemas'
 
-export type AiUsageMeta = { profileId?: string; action?: string }
+export type AiUsageMeta = { profileId?: string; action?: string; cost?: number }
 
 type ProviderName = 'deepseek' | 'gemini' | 'cloudflare' | 'openrouter'
 
@@ -97,6 +97,11 @@ export const AIService = {
 
     for (const provider of PROVIDER_ORDER) {
       if (!this._isProviderEnabled(provider, config)) continue
+
+      if (provider === 'deepseek' && opts.meta?.cost === 0) {
+        console.log('[AIService] Operação gratuita (crédito = 0). Pulando provedor pago "deepseek".')
+        continue
+      }
 
       try {
         let text: string

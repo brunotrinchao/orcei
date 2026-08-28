@@ -549,7 +549,7 @@ function formatDateTime(iso: string | null) {
                 <BaseInput
                   v-model.number="localSettings.creditCosts.proposalSuggest"
                   type="number"
-                  label="Sugestão de Itens no Orçamento (IA)"
+                  :label="actionLabel('proposalSuggest')"
                 />
                 <p
                   class="text-[10px] text-gray-400 dark:text-gray-500 font-bold ml-1"
@@ -561,7 +561,7 @@ function formatDateTime(iso: string | null) {
                 <BaseInput
                   v-model.number="localSettings.creditCosts.catalogSuggest"
                   type="number"
-                  label="Sugestão de Item do Catálogo (IA)"
+                  :label="actionLabel('catalogSuggest')"
                 />
                 <p
                   class="text-[10px] text-gray-400 dark:text-gray-500 font-bold ml-1"
@@ -573,7 +573,7 @@ function formatDateTime(iso: string | null) {
                 <BaseInput
                   v-model.number="localSettings.creditCosts.clientExtract"
                   type="number"
-                  label="Extração de Dados de Lead (IA)"
+                  :label="actionLabel('clientExtract')"
                 />
                 <p
                   class="text-[10px] text-gray-400 dark:text-gray-500 font-bold ml-1"
@@ -585,7 +585,7 @@ function formatDateTime(iso: string | null) {
                 <BaseInput
                   v-model.number="localSettings.creditCosts.generate"
                   type="number"
-                  label="Geração de Texto Genérico (IA)"
+                  :label="actionLabel('generate')"
                 />
                 <p
                   class="text-[10px] text-gray-400 dark:text-gray-500 font-bold ml-1"
@@ -597,7 +597,7 @@ function formatDateTime(iso: string | null) {
                 <BaseInput
                   v-model.number="localSettings.creditCosts.analyzeReport"
                   type="number"
-                  label="Relatório Estratégico (IA)"
+                  :label="actionLabel('analyzeReport')"
                 />
                 <p
                   class="text-[10px] text-gray-400 dark:text-gray-500 font-bold ml-1"
@@ -609,7 +609,7 @@ function formatDateTime(iso: string | null) {
                 <BaseInput
                   v-model.number="localSettings.creditCosts.proposalSend"
                   type="number"
-                  label="Criar e Enviar Orçamento"
+                  :label="actionLabel('proposalSuggest')"
                 />
                 <p
                   class="text-[10px] text-gray-400 dark:text-gray-500 font-bold ml-1"

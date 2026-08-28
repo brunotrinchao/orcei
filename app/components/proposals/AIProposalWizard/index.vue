@@ -119,12 +119,9 @@ const {
             </div>
 
             <div class="relative group space-y-2">
-              <div class="flex justify-between items-center px-1">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Texto da Conversa ou
-                  Solicitação</span>
-              </div>
 
               <BaseTextarea v-model="promptText" :rows="9" :maxLength="maxPromptLength" :maxlength="maxPromptLength"
+                label="Texto da Conversa ou Solicitação"
                 aria-label="Texto da conversa ou solicitação para a IA extrair dados"
                 placeholder="Ex: Oi, sou o Carlos da Empresa Tecno, meu e-mail é carlos@tecno.com.br e WhatsApp (11) 99999-8888. Preciso de um orçamento de 1 site corporativo por R$ 2.500 e 1 logotipo por R$ 800..."
                 @keydown.enter.ctrl="handleGenerateRequest" background="slate" size="md" :border="false" />
@@ -393,8 +390,9 @@ const {
               </BaseButton>
 
               <BaseButton @click="handleGenerateRequest" variant="ia"
-                :disabled="!promptText || promptText.length > maxPromptLength">
-                {{ creditLabel('proposalSuggest', 'Analisar com IA') }}
+                :disabled="!promptText || promptText.length > maxPromptLength" :tooltip="creditLabel('proposalSuggest')">
+                <Sparkles class="w-3.5 h-3.5 mr-1"/>
+                Analisar com IA
               </BaseButton>
 
             </div>

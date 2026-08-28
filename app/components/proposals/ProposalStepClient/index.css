@@ -2,3 +2,18 @@
 .proposal-step-client-container {
   width: 100%;
 }
+
+.section-fade-slide-enter-active,
+.section-fade-slide-leave-active {
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.section-fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.99);
+}
+
+.section-fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(10px) scale(0.99);
+}

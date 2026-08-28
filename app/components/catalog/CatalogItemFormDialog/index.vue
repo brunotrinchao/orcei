@@ -52,7 +52,7 @@ const {
 <template>
   <BaseDialog
     v-model:open="showForm"
-    :title="itemToEdit ? 'Editar Item do Catálogo' : 'Novo Item do Catálogo'"
+    :title="itemToEdit ? 'Editar Item' : 'Novo Item'"
     size="lg"
   >
     <!-- Modal Modo Cortar Foto (Cropper Active) -->
@@ -102,19 +102,13 @@ const {
       class="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-300 py-2 catalog-item-form-dialog"
     >
       <!-- Seção 1: Identidade Visual e Classificação -->
-      <BaseSectionCard
-        title="Dados"
-        subtitle="Informe dos dados do seu produto ou serviço."
-        :icon="Package"
+      <BaseSectionCard noBorder
       >
         <div class="space-y-6">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
+          <div class="grid grid-cols-1 gap-4 items-start">
             <!-- Identidade Visual (Ícone vs Foto) -->
             <div class="space-y-2">
               <div class="flex items-center justify-between min-h-[20px]">
-                <label class="text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">
-                  Amostra Visual
-                </label>
                 <div class="flex bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl w-[120px]">
                   <button
                     type="button"
@@ -193,12 +187,11 @@ const {
             </div>
 
             <!-- Dados Principais -->
-            <div class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <BaseSelect
                 v-model="form.type"
                 label="Tipo de Item"
                 :options="typeOptions"
-                :icon="Layers"
                 required
               />
 
@@ -206,15 +199,13 @@ const {
                 v-model="form.name"
                 :label="`Nome do ${typeLabel}`"
                 placeholder="Ex: Consultoria Técnica ou Peça de Reposição"
-                :icon="Package"
                 required
               />
 
               <BaseInput
                 v-model="form.sku"
-                label="Código / SKU (Opcional)"
+                label="Código / SKU"
                 placeholder="Ex: SERV-001"
-                :icon="Tag"
               />
             </div>
           </div>
@@ -226,7 +217,7 @@ const {
               label="Preço / Valor Base (R$)"
               mask="currency"
               placeholder="0,00"
-              :icon="DollarSign"
+              prefix="R$"
               required
             />
 
@@ -246,22 +237,24 @@ const {
               </label>
 
               <!-- Botão com IA para Gerar Descrição -->
-              <button
-                type="button"
+               <BaseButton
+               type="button"
+               variant="ia"
+               :tooltip="creditLabel('catalogSuggest')"
+               size="xs"
                 @click="suggestWithAI"
-                :disabled="isSuggesting || !form.name.trim()"
-                class="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm disabled:opacity-50 transition-all cursor-pointer"
-              >
-                <Loader2 v-if="isSuggesting" class="w-3 h-3 animate-spin" />
-                <Sparkles v-else class="w-3 h-3" />
-                <span>{{ isSuggesting ? 'Gerando...' : 'Preencher com IA' }}</span>
-                <span class="text-[9px] opacity-80">({{ creditLabel('catalogSuggest') }})</span>
-              </button>
+                :disabled="isSuggesting"
+               >
+                <Loader2 v-if="isSuggesting" class="w-3 h-3 animate-spin mr-1" />
+                <Sparkles v-else class="w-3 h-3 mr-1" />
+                <span>{{ isSuggesting ? 'Gerando...' : 'Usar IA' }}</span>
+              </BaseButton>
             </div>
 
             <BaseTextarea
               v-model="form.description"
-              :rows="4"
+              :rows="3"
+              :maxLength="150"
               placeholder="Descreva em detalhes o escopo do serviço, garantia ou especificações..."
             />
           </div>
@@ -270,7 +263,7 @@ const {
     </form>
 
     <!-- Modal de Confirmação de Uso de Créditos IA -->
-    <BaseCreditConfirmModal
+    <ConfirmCreditDialog
       v-model:open="isCreditConfirmOpen"
       :title="confirmTitle"
       :description="confirmDescription"
@@ -284,18 +277,14 @@ const {
           variant="secondary"
           size="md"
           @click="showForm = false"
-          :disabled="isSubmitting"
+          :disabled="isSubmitting || isSuggesting"
         >
           Cancelar
         </BaseButton>
-        <BaseButton
-          type="submit"
-          form="catalog-form"
-          variant="primary"
-          size="md"
-          :loading="isSubmitting"
-        >
-          {{ itemToEdit ? 'Salvar Alterações' : 'Cadastrar Item' }}
+
+
+        <BaseButton type="button" :disabled="isSubmitting || isSuggesting" :loading="isSubmitting" @click="saveItem">
+          {{ itemToEdit ? 'Salvar' : 'Cadastrar' }}
         </BaseButton>
       </div>
     </template>

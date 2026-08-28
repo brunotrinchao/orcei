@@ -223,7 +223,7 @@ const displayError = computed(
       <label
         v-if="label"
         :for="inputId"
-        class="block text-xs font-black text-slate-700 dark:text-gray-400 uppercase tracking-widest"
+        class="block text-xs font-semibold text-slate-700 dark:text-gray-400 tracking-wide"
       >
         {{ label }} <span v-if="required" class="text-red-500">*</span>
       </label>
@@ -266,7 +266,7 @@ const displayError = computed(
       {{ safeValue.length }}/{{ effectiveMaxLength }}
     </span>
     <span
-      class="block min-h-[14px] text-[10px] font-bold text-red-500 ml-1 uppercase leading-[14px]"
+      class="block min-h-[14px] text-[10px] font-bold text-red-500 ml-1 leading-[14px]"
       >{{ displayError }}</span
     >
   </div>

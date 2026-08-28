@@ -126,7 +126,7 @@ Regras: price = número BRL baseado no mercado e exemplos acima; unit ∈ [UN,H,
 REGRA CRÍTICA: nunca inclua metragem, área (m²), quantidade, peso ou qualquer medida no description/nome — mesmo que os exemplos tenham, ignore esse padrão (medida é específica de cada cliente/projeto).`
 
   try {
-    const text = await AIService.generateDescription(prompt, 8192, { profileId: profile._id.toString(), action: 'catalogSuggest' })
+    const text = await AIService.generateDescription(prompt, 8192, { profileId: profile._id.toString(), action: 'catalogSuggest', cost })
     const raw = text.trim().replace(/```json|```/g, '').trim()
     const json = JSON.parse(raw)
 

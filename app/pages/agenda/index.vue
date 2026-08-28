@@ -84,7 +84,7 @@ const {
         <!-- Seleção de Orçamento Aceito / Qualquer Orçamento -->
         <div class="bg-gray-50/80 dark:bg-gray-800/50 p-4 rounded-[0.75rem] border border-gray-100 dark:border-gray-700/60 space-y-2">
           <div class="flex items-center justify-between">
-            <label class="text-xs font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+            <label class="text-xs font-semibold tracking-wide text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
               <CheckCircle2 class="w-4 h-4 text-emerald-500" /> Vincular Orçamento Aceito
             </label>
             <span v-if="form.proposalId" class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
@@ -149,7 +149,7 @@ const {
         <BaseButton v-if="selectedEvent" type="button" variant="danger" @click="deleteEvent">Excluir</BaseButton>
         <BaseButton type="button" variant="secondary" @click="isModalOpen = false">Cancelar</BaseButton>
         <BaseButton type="button" :disabled="isSubmitting" :loading="isSubmitting" @click="saveEvent">
-          {{ selectedEvent ? 'Salvar Alterações' : 'Criar Compromisso' }}
+          {{ selectedEvent ? 'Salvar' : 'Cadastrar' }}
         </BaseButton>
       </template>
     </BaseDialog>

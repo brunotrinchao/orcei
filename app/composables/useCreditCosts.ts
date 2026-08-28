@@ -9,7 +9,7 @@ export function useCreditCosts() {
   function creditLabel(action: string, prefix = ''): string {
     const cost = getCost(action)
     if (cost === 0) return prefix
-    return `${prefix} (${cost} ${cost === 1 ? 'Crédito' : 'Créditos'})`.trim()
+    return `${prefix} ${cost} ${cost === 1 ? 'Crédito' : 'Créditos'}`.trim()
   }
 
   return { costs, getCost, creditLabel }

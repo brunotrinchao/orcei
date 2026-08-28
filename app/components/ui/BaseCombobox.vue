@@ -96,7 +96,7 @@ const selectOption = (option: Option) => {
 
 <template>
   <div class="space-y-2" ref="containerRef">
-    <label v-if="label" class="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em] ml-2">
+    <label v-if="label" class="block text-xs font-semibold text-slate-700 dark:text-gray-400 tracking-wide ml-1">
       {{ label }}
     </label>
     

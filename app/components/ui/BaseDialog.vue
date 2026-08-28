@@ -91,7 +91,7 @@ onUnmounted(() => {
           <!-- Header fixo -->
           <div class="flex-shrink-0 flex items-start justify-between px-8 pt-8 pb-6 border-b border-slate-200 dark:border-gray-800">
             <div class="space-y-1">
-              <DialogTitle v-if="title" class="text-xl font-black text-gray-900 dark:text-gray-50 uppercase tracking-widest">
+              <DialogTitle v-if="title" class="text-xl font-black text-gray-900 dark:text-gray-50 ">
                 {{ title }}
               </DialogTitle>
               <!-- Always rendered: satisfies Radix aria requirement; visually hidden when no description -->

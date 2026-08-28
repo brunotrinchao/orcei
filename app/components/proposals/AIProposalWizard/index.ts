@@ -77,7 +77,7 @@ export function useAIProposalWizard(
     }
     executeWithCreditCheck('proposalSuggest', () => generate(), {
       title: 'Analisar com IA',
-      customDescription: 'A análise de cliente e orçamentos por IA consumirá créditos do seu saldo. Deseja continuar?'
+      customDescription: `A análise de cliente e orçamentos por IA consumirá ${creditLabel('proposalSuggest')} do seu saldo. Deseja continuar? `
     })
   }
 

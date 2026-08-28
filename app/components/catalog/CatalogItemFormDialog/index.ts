@@ -22,17 +22,19 @@ export function useCatalogItemFormDialog(
     name: '',
     description: '',
     price: 0 as any,
-    unit: 'UN',
+    unit: '',
     sku: '',
     imageUrl: '',
     icon: 'Package'
   })
 
+  const { validate, reset: resetValidation } = useFormValidation()
   const isSubmitting = ref(false)
   const isSuggesting = ref(false)
   const aiAssisted = ref(false)
 
   const unitOptions = [
+    { label: 'Selecione', value: '__EMPTY__' },
     { label: 'Unidade (UN)', value: 'UN' },
     { label: 'Hora (H)', value: 'H' },
     { label: 'Dia (DIA)', value: 'DIA' },
@@ -53,6 +55,7 @@ export function useCatalogItemFormDialog(
   })
 
   watch(() => props.open, (isOpen) => {
+    isCreditConfirmOpen.value = false
     if (isOpen) {
       if (props.itemToEdit) {
         form.value = {
@@ -172,6 +175,7 @@ export function useCatalogItemFormDialog(
   }
 
   async function saveItem() {
+    if (!validate()) return
     isSubmitting.value = true
     try {
       const method = props.itemToEdit ? 'PUT' : 'POST'

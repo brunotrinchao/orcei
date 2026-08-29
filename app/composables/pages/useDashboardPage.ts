@@ -86,9 +86,10 @@ export function useDashboardPage() {
     else if (period.value === 'last_30_days') start.setDate(now.getDate() - 30)
     else if (period.value === 'last_90_days') start.setDate(now.getDate() - 90)
     else if (period.value === 'year') start = new Date(now.getFullYear(), 0, 1)
-    else return {}
+    else return { period: period.value }
 
     return {
+      period: period.value,
       start: start.toISOString(),
       end: now.toISOString()
     }
@@ -167,6 +168,8 @@ export function useDashboardPage() {
           ticks: { color: textColor, font: { weight: 'bold', size: 9 } }
         },
         y: {
+          min: 0,
+          beginAtZero: true,
           grid: { color: gridColor },
           ticks: { color: textColor, font: { weight: 'bold', size: 9 } }
         }
@@ -224,7 +227,7 @@ export function useDashboardPage() {
     last_7_days: 'Últimos 7 dias',
     last_30_days: 'Últimos 30 dias',
     last_90_days: 'Últimos 90 dias',
-    year: 'Este Ano',
+    year: 'Este ano',
     all: 'Todo o período'
   }
   const periodLabel = computed(() => periodLabels[period.value] || 'Todo o período')

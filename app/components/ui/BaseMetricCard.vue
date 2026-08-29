@@ -111,7 +111,7 @@ const computedColorStyle = computed(() => {
 
   <!-- Metric Card Content -->
   <div v-else
-    class="bg-white dark:bg-gray-900 p-4 md:p-5 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm shadow-slate-200/50 dark:shadow-none flex flex-col transition-all hover:border-gray-300 dark:hover:border-gray-700">
+    class="bg-white dark:bg-gray-900 p-4 md:p-5 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm shadow-slate-200/50 dark:shadow-none flex flex-col transition-all">
     <div class="group flex flex-row md:flex-col items-center md:items-start justify-between md:justify-start gap-3 md:gap-0">
       <div class="flex flex-row justify-between w-auto md:w-full items-center md:items-start mb-0 md:mb-4 shrink-0">
         <div class="flex items-center md:items-start flex-1 min-w-0">

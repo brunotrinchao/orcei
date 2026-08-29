@@ -162,7 +162,7 @@ onUnmounted(() => {
             <NuxtLink 
               v-if="user?.role === 'admin'"
               to="/admin" 
-              class="hidden md:flex w-10 h-10 rounded-[0.75rem] items-center justify-center bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-600 dark:text-red-400 shadow-sm hover:ring-4 ring-red-500/5 dark:ring-red-950/20 transition-all"
+              class="hidden md:flex w-10 h-10 rounded-[0.75rem] items-center justify-center  text-red-600 dark:text-red-400 hover:ring-4 ring-red-500/5 dark:ring-red-950/20 transition-all"
               title="Painel de Administração"
               aria-label="Acessar Painel de Administração"
             >
@@ -175,14 +175,14 @@ onUnmounted(() => {
             <!-- Central de Notificações (Sino com Badge) -->
             <button
               @click="openNotificationCenter"
-              class="relative w-10 h-10 rounded-[0.75rem] items-center justify-center bg-white dark:bg-gray-900/60 hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 border border-slate-200 dark:border-slate-800/80 shadow-sm hover:ring-4 ring-slate-100 dark:ring-gray-800/50 transition-all flex cursor-pointer"
+              class="relative w-10 h-10 rounded-[0.75rem] items-center justify-center text-gray-600 dark:text-gray-400 hover:ring-4 ring-slate-100 dark:ring-gray-800/50 transition-all flex cursor-pointer"
               aria-label="Abrir Central de Notificações"
               title="Central de Notificações"
             >
               <Bell class="w-4.5 h-4.5 text-slate-700 dark:text-slate-300" />
               <span 
                 v-if="unreadCount > 0" 
-                class="absolute -top-1 -right-1 min-w-[20px] h-5 px-1.5 flex items-center justify-center bg-blue-600 text-white text-[10px] font-black rounded-full border-2 border-white dark:border-slate-950 animate-pulse"
+                class="absolute -top-1 -right-1 min-w-[20px] h-5 px-1.5 flex items-center justify-center bg-blue-600 text-white text-[10px] font-black rounded-full border-2 border-white dark:border-slate-950"
               >
                 {{ unreadCount > 99 ? '99+' : unreadCount }}
               </span>

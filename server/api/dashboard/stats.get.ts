@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
   const expiredCount = proposals.filter(p => ['expired', 'declined'].includes(p.status)).length
   const otherCount = proposalsCount - acceptedCount - pendingCount - expiredCount
 
-  const totalRevenue = acceptedProposals.reduce((acc, p) => acc + (p.totals?.final || 0), 0)
+  const totalRevenue = Math.max(0, acceptedProposals.reduce((acc, p) => acc + Math.max(0, p.totals?.final || 0), 0))
   const ticketMedia = acceptedCount > 0 ? totalRevenue / acceptedCount : 0
   const approvalRate = proposalsCount > 0 ? (acceptedCount / proposalsCount) * 100 : 0
 
@@ -134,20 +134,94 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-  // Revenue History (últimos 30 dias ou período)
-  const revenueHistoryMap = acceptedProposals.reduce((acc: any, p) => {
-    const date = new Date(p.createdAt).toLocaleDateString('pt-BR')
-    acc[date] = (acc[date] || 0) + (p.totals?.final || 0)
-    return acc
-  }, {})
+  // 6. Revenue History com agrupamento por granularidade:
+  // - 7D ou 30D: por dia (ex: 29/08)
+  // - 90D ou ano: por mês (ex: Ago/26)
+  // - total (all): por ano (ex: 2026)
+  const periodParam = ((getQuery(event).period as string) || 'last_30_days')
+  const isByDay = periodParam === 'last_7_days' || periodParam === 'last_30_days'
+  const isByMonth = periodParam === 'last_90_days' || periodParam === 'year'
+  const isByYear = periodParam === 'all'
 
-  const revenueHistory = Object.entries(revenueHistoryMap)
-    .map(([date, amount]) => ({ date, amount }))
-    .sort((a, b) => {
-      const dateA = new Date(a.date.split('/').reverse().join('-')).getTime()
-      const dateB = new Date(b.date.split('/').reverse().join('-')).getTime()
-      return dateA - dateB
+  const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+  let revenueHistory: { date: string; amount: number }[] = []
+
+  if (isByDay) {
+    const map: Record<string, number> = {}
+    const startDate = start ? new Date(start as string) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+    const endDate = end ? new Date(end as string) : new Date()
+
+    const current = new Date(startDate)
+    current.setHours(0, 0, 0, 0)
+    const endMidnight = new Date(endDate)
+    endMidnight.setHours(23, 59, 59, 999)
+
+    while (current <= endMidnight) {
+      const dayKey = `${String(current.getDate()).padStart(2, '0')}/${String(current.getMonth() + 1).padStart(2, '0')}`
+      map[dayKey] = 0
+      current.setDate(current.getDate() + 1)
+    }
+
+    acceptedProposals.forEach(p => {
+      const d = new Date(p.createdAt)
+      const dayKey = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`
+      const val = Math.max(0, p.totals?.final || 0)
+      if (map[dayKey] !== undefined) {
+        map[dayKey] += val
+      } else {
+        map[dayKey] = val
+      }
     })
+
+    revenueHistory = Object.entries(map).map(([date, amount]) => ({ date, amount: Math.max(0, amount) }))
+  } else if (isByMonth) {
+    const map: Record<string, { label: string; amount: number; sortKey: string }> = {}
+
+    if (periodParam === 'year') {
+      const currentYear = new Date().getFullYear()
+      const currentMonth = new Date().getMonth()
+      for (let m = 0; m <= currentMonth; m++) {
+        const sortKey = `${currentYear}-${String(m + 1).padStart(2, '0')}`
+        const label = `${monthNames[m]}/${String(currentYear).slice(2)}`
+        map[sortKey] = { label, amount: 0, sortKey }
+      }
+    }
+
+    acceptedProposals.forEach(p => {
+      const d = new Date(p.createdAt)
+      const sortKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      const label = `${monthNames[d.getMonth()]}/${String(d.getFullYear()).slice(2)}`
+      const val = Math.max(0, p.totals?.final || 0)
+      if (!map[sortKey]) {
+        map[sortKey] = { label, amount: 0, sortKey }
+      }
+      map[sortKey].amount += val
+    })
+
+    revenueHistory = Object.values(map)
+      .sort((a, b) => a.sortKey.localeCompare(b.sortKey))
+      .map(item => ({ date: item.label, amount: Math.max(0, item.amount) }))
+  } else if (isByYear) {
+    const map: Record<string, number> = {}
+
+    acceptedProposals.forEach(p => {
+      const year = String(new Date(p.createdAt).getFullYear())
+      const val = Math.max(0, p.totals?.final || 0)
+      map[year] = (map[year] || 0) + val
+    })
+
+    revenueHistory = Object.entries(map)
+      .sort(([yearA], [yearB]) => yearA.localeCompare(yearB))
+      .map(([date, amount]) => ({ date, amount: Math.max(0, amount) }))
+  } else {
+    const map: Record<string, number> = {}
+    acceptedProposals.forEach(p => {
+      const date = new Date(p.createdAt).toLocaleDateString('pt-BR')
+      const val = Math.max(0, p.totals?.final || 0)
+      map[date] = (map[date] || 0) + val
+    })
+    revenueHistory = Object.entries(map).map(([date, amount]) => ({ date, amount: Math.max(0, amount) }))
+  }
 
   // Status Distribution
   const statusLabels: any = {

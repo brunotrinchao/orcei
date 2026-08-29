@@ -40,7 +40,7 @@ export function useGenerateReportDrawer(
     { label: '7D', value: 'last_7_days', fullLabel: 'Últimos 7 dias' },
     { label: '30D', value: 'last_30_days', fullLabel: 'Últimos 30 dias' },
     { label: '90D', value: 'last_90_days', fullLabel: 'Últimos 90 dias' },
-    { label: 'Este Ano', value: 'year', fullLabel: 'Este Ano' },
+    { label: 'Este ano', value: 'year', fullLabel: 'Este ano' },
     { label: 'Total', value: 'all', fullLabel: 'Todo o período' }
   ]
 

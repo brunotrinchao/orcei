@@ -58,7 +58,7 @@ const {
 
         <BaseButton data-tour="catalogo-novo-item-btn" @click="openModal()" class="w-full sm:w-auto shadow-2xl shadow-blue-100">
           <Plus class="w-5 h-5 mr-2" />
-          Novo Item
+          Novo
         </BaseButton>
       </div>
 

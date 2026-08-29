@@ -63,7 +63,7 @@ const componentTag = computed(() => {
           :aria-disabled="componentTag !== 'button' && (disabled || loading) ? 'true' : undefined"
           :title="title || tooltip"
           :aria-label="tooltip || title"
-          class="inline-flex items-center justify-center rounded-[0.75rem] font-black transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 disabled:opacity-50 disabled:pointer-events-none"
+          class="inline-flex items-center justify-center rounded-[0.75rem] font-semibold transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 disabled:opacity-50 disabled:pointer-events-none"
           :class="[
             (disabled || loading) ? 'opacity-50 pointer-events-none' : '',
             variant === 'solid' ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-black dark:hover:bg-white shadow-gray-200 dark:shadow-gray-800/50' : '',
@@ -93,7 +93,7 @@ const componentTag = computed(() => {
         <TooltipContent
           :side="tooltipSide"
           :side-offset="6"
-          class="z-[999999] px-3 py-1.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-xs font-bold rounded-xl shadow-xl border border-slate-800 dark:border-slate-200 animate-in fade-in zoom-in-95 duration-150 pointer-events-none"
+          class="z-[999999] px-3 py-1.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-xs font-semibold rounded-xl shadow-xl border border-slate-800 dark:border-slate-200 animate-in fade-in zoom-in-95 duration-150 pointer-events-none"
         >
           {{ tooltip }}
           <TooltipArrow class="fill-slate-900 dark:fill-slate-100" />
@@ -113,7 +113,7 @@ const componentTag = computed(() => {
     :disabled="componentTag === 'button' ? (disabled || loading) : undefined"
     :aria-disabled="componentTag !== 'button' && (disabled || loading) ? 'true' : undefined"
     :title="title"
-    class="inline-flex items-center justify-center rounded-[0.75rem] font-black tracking-wide transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 disabled:opacity-50 disabled:pointer-events-none"
+    class="inline-flex items-center justify-center rounded-[0.75rem] font-semibold tracking-wide transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 disabled:opacity-50 disabled:pointer-events-none"
     :class="[
       (disabled || loading) ? 'opacity-50 pointer-events-none' : '',
       variant === 'solid' ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-black dark:hover:bg-white shadow-gray-200 dark:shadow-gray-800/50' : '',

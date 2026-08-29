@@ -112,7 +112,7 @@ const {
         </BaseButton>
         <BaseButton data-tour="orcamentos-novo-btn" @click="openModal()" class="shadow-2xl shadow-gray-200">
           <Plus class="w-5 h-5 mr-0 sm:mr-2" />
-          <span class="hidden sm:inline">Novo Orçamento</span>
+          <span class="hidden sm:inline">Novo</span>
         </BaseButton>
       </div>
 

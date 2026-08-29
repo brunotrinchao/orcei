@@ -84,7 +84,7 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
       empty-subtitle="Você ainda não gerou relatórios IA ou os filtros não retornaram resultados.">
       <template #cell-report="{ item: report }">
         <div
-          class="p-4 md:p-4 hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 w-full cursor-pointer "
+          class="hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 w-full cursor-pointer "
                 @click="openView(report)">
           <div class="flex items-center gap-4 w-full">
             <div class="space-y-1">
@@ -98,19 +98,15 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
                   {{ formatDate(report.createdAt) }}
                 </span>
                 <span class="w-1 h-1 bg-gray-200 dark:bg-gray-700 rounded-full hidden md:inline-block"></span>
-                <span class="text-xs font-bold text-blue-600 uppercase tracking-widest">
                   <BaseBadge variant="info">
                     {{ report.context?.totalProposals || 0 }} Orçamentos analisados
                   </BaseBadge>
-                </span>
                 <template v-if="getReportScore(report) !== null">
                   <span class="w-1 h-1 bg-gray-200 dark:bg-gray-700 rounded-full hidden md:inline-block"></span>
-                  <span>
                     <BaseBadge
                       :variant="getReportScore(report)! >= 70 ? 'success' : (getReportScore(report)! >= 50 ? 'warning' : 'error')">
                       Score {{ getReportScore(report) }}/100
                     </BaseBadge>
-                  </span>
                 </template>
               </div>
             </div>

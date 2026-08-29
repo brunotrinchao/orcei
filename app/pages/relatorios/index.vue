@@ -52,7 +52,7 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
 
 <template>
   <div class="space-y-10 relative">
-    <PageHeader title="Meus Relatórios IA" subtitle="Analises estratégicas geradas pela inteligência artificial.">
+    <PageHeader title="Relatórios IA" subtitle="Analises estratégicas geradas pela inteligência artificial.">
       <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
         <BaseButton @click="isReportDrawerOpen = true" class="shadow-2xl shadow-gray-200" variant="ia">
           <Sparkles class="w-4 h-4 mr-2 text-white animate-pulse" />

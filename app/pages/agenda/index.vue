@@ -39,7 +39,7 @@ const {
 
 <template>
   <div class="space-y-8 relative">
-    <PageHeader title="Sua Agenda" subtitle="Organize seus atendimentos, reuniões e orçamentos aprovados num único local.">
+    <PageHeader title="Agenda" subtitle="Organize seus atendimentos, reuniões e orçamentos aprovados num único local.">
       <BaseButton data-tour="agenda-novo-evento-btn" @click="openNewEventModal()" class="w-full sm:w-auto shadow-xl shadow-blue-500/10">
         <Plus class="w-5 h-5 mr-2" />
         Novo Compromisso
@@ -47,7 +47,7 @@ const {
     </PageHeader>
 
     <!-- Card de Alerta de Orçamentos Aceitos Pendentes de Agendamento -->
-    <div v-if="pendingSchedulingProposals.length > 0" class="bg-blue-50/80 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 p-4 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+    <div v-if="pendingSchedulingProposals.length > 0" class="bg-blue-50/80 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 p-4 rounded-[0.75rem] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-2xl bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
           <Sparkles class="w-5 h-5" />

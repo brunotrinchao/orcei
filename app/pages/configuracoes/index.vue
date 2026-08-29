@@ -105,7 +105,7 @@ const {
             <div :key="activeSection">
               <!-- Identidade Visual -->
               <SettingsVisual
-                v-if="activeSection === 'visual'"
+                v-if="activeSection === 'visual' && localProfile.brandConfig"
                 v-model:logoUrl="localProfile.brandConfig.logoUrl"
                 v-model:primaryColor="localProfile.brandConfig.primaryColor"
               />

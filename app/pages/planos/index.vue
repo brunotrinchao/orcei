@@ -50,12 +50,7 @@ const {
   <div class="max-w-7xl mx-auto space-y-12 pb-16">
     
     <!-- Cabeçalho de Créditos -->
-    <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-      <div>
-        <h1 class="text-4xl font-black text-gray-900 dark:text-white tracking-tight uppercase">Planos e Recargas</h1>
-        <p class="text-gray-500 dark:text-gray-400 font-medium">Adquira pacotes de créditos cumulativos vitalícios para criar orçamentos e relatórios.</p>
-      </div>
-      
+     <PageHeader title="Recargas" subtitle="Adquira pacotes de créditos cumulativos vitalícios para criar orçamentos e relatórios.">
       <!-- Saldo Glowing -->
       <div class="bg-slate-900 dark:bg-slate-900/90 text-white px-5 py-5 rounded-[0.75rem] shadow-2xl flex items-center gap-6 border border-white/5 relative overflow-hidden shrink-0">
         <div class="absolute -top-10 -right-10 w-24 h-24 bg-blue-500/10 rounded-full blur-xl"></div>
@@ -69,7 +64,7 @@ const {
           </p>
         </div>
       </div>
-    </header>
+     </PageHeader>
 
     <!-- Banners de Notificação Stripe -->
     <div v-if="success" class="bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-100 dark:border-emerald-900/50 p-6 rounded-[0.75rem] flex items-center gap-4 text-emerald-700 dark:text-emerald-300 animate-in fade-in slide-in-from-top-4">

@@ -53,7 +53,7 @@ describe('Billing Page', () => {
     const text = component.text()
 
     // Verificações visuais essenciais do novo modelo transacional
-    expect(text).toContain('Planos e Recargas')
+    expect(text).toContain('Recargas')
     expect(text).toContain('5 Créditos')
     expect(text).toContain('Crédito Avulso')
     expect(text).toContain('Pacote Starter')

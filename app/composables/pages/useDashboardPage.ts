@@ -229,6 +229,26 @@ export function useDashboardPage() {
   }
   const periodLabel = computed(() => periodLabels[period.value] || 'Todo o período')
 
+  const periodDays = computed(() => {
+    if (period.value === 'last_7_days') return 7
+    if (period.value === 'last_30_days') return 30
+    if (period.value === 'last_90_days') return 90
+    if (period.value === 'year') {
+      const now = new Date()
+      const start = new Date(now.getFullYear(), 0, 1)
+      const diffDays = Math.ceil(Math.abs(now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+      return diffDays || 365
+    }
+    return 30
+  })
+
+  const tmaPercentage = computed(() => {
+    if (!stats.value || !stats.value.tmaHours || periodDays.value <= 0) return 0
+    const tmaDays = stats.value.tmaHours / 24
+    const percentage = (tmaDays / periodDays.value) * 100
+    return Math.min(100, Math.max(0, Number(percentage.toFixed(1))))
+  })
+
   async function generateAIReport() {
     executeWithCreditCheck('analyzeReport', async () => {
       isAnalyzing.value = true
@@ -268,6 +288,8 @@ export function useDashboardPage() {
     stats,
     status,
     periodLabel,
+    periodDays,
+    tmaPercentage,
     statusChartData,
     revenueChartData,
     chartOptions,

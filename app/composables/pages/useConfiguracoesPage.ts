@@ -14,6 +14,12 @@ export function useConfiguracoesPage() {
   watch(profile, (val) => {
     if (!val) return
     const clone: ProfileDTO = JSON.parse(JSON.stringify(val))
+    if (!clone.brandConfig) {
+      clone.brandConfig = { primaryColor: '#3147F6', logoUrl: '' }
+    } else {
+      clone.brandConfig.primaryColor ??= '#3147F6'
+      clone.brandConfig.logoUrl ??= ''
+    }
     if (!clone.address) {
       clone.address = { street: '', number: '', neighborhood: '', city: '', state: '', zip: '' }
     }
@@ -212,13 +218,21 @@ export function useConfiguracoesPage() {
   }
 
   const route = useRoute()
+  const router = useRouter()
   const initialSection = typeof route.query.section === 'string' && sections.some(s => s.id === route.query.section)
     ? route.query.section
     : 'visual'
   const activeSection = ref(initialSection)
 
+  watch(() => route.query.section, (newSection) => {
+    if (typeof newSection === 'string' && sections.some(s => s.id === newSection)) {
+      activeSection.value = newSection
+    }
+  })
+
   function selectSection(id: string) {
     activeSection.value = id
+    router.replace({ query: { ...route.query, section: id } })
   }
 
   return {

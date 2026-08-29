@@ -104,7 +104,7 @@ const {
 
 <template>
   <div class="space-y-10 relative">
-    <PageHeader title="Seus Orçamentos" subtitle="Acompanhe e gerencie seus orçamentos comerciais.">
+    <PageHeader title="Orçamentos" subtitle="Acompanhe e gerencie seus orçamentos comerciais.">
       <div class="flex flex-row gap-3 w-full sm:w-auto">
          <BaseButton @click="isAIWizardOpen = true" class="shadow-2xl shadow-gray-200" variant="ia">
           <Sparkles class="w-4 h-4 mr-2 text-white animate-pulse" />

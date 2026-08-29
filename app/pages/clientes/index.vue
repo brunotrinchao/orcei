@@ -60,7 +60,7 @@ const {
 
 <template>
   <div class="space-y-10 relative">
-    <PageHeader title="Seus Clientes" subtitle="Gerencie seus contatos e acelere seus orçamentos.">
+    <PageHeader title="Clientes" subtitle="Gerencie seus contatos e acelere seus orçamentos.">
       <div class="flex flex-row gap-3 w-full sm:w-auto">
         <BaseButton
           type="button"

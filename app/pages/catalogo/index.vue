@@ -41,7 +41,7 @@ const {
 
 <template>
   <div class="space-y-10 relative">
-    <PageHeader title="Seu Catálogo" subtitle="Unifique seus produtos e serviços em um só lugar.">
+    <PageHeader title="Catálogo" subtitle="Unifique seus produtos e serviços em um só lugar.">
       <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
         <BaseButton
           type="button"

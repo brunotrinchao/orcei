@@ -12,8 +12,10 @@ const {
   refresh,
   mobileSentinelRef,
   showForm,
+  showInfo,
   selectedItem,
   openModal,
+  openInfoModal,
   handleItemSaved,
   deleteItem,
   getIcon,
@@ -31,6 +33,7 @@ const {
   HelpCircle,
   MoreVertical,
   Upload,
+  Eye,
   DropdownMenuRoot,
   DropdownMenuTrigger,
   DropdownMenuPortal,
@@ -83,10 +86,114 @@ const {
       @saved="handleItemSaved" 
     />
 
-    <!-- Listagem Unificada (desktop) -->
-    <div class="hidden md:block">
+    <!-- Modal de Detalhes do Item -->
+    <BaseDialog 
+      v-model:open="showInfo" 
+      :title="selectedItem?.name || 'Detalhes do Item'" 
+      size="lg"
+    >
+      <template #context-menu v-if="selectedItem">
+        <DropdownMenuRoot>
+          <DropdownMenuTrigger as-child>
+            <button
+              type="button"
+              class="p-2 text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[0.75rem] transition-all cursor-pointer"
+              title="Mais ações"
+              aria-label="Mais ações do item"
+            >
+              <MoreVertical class="w-5 h-5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuContent
+              align="end"
+              :side-offset="6"
+              class="min-w-[220px] bg-white dark:bg-gray-950 rounded-[0.75rem] shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-[9999]"
+            >
+              <DropdownMenuItem
+                @click="showInfo = false; openModal(selectedItem)"
+                class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
+              >
+                <Pencil class="w-4 h-4" />
+                Editar
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                @click="showInfo = false; deleteItem(selectedItem._id)"
+                class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-600 dark:hover:text-red-300 cursor-pointer outline-none transition-all"
+              >
+                <Trash2 class="w-4 h-4 text-red-500" />
+                Excluir
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenuPortal>
+        </DropdownMenuRoot>
+      </template>
+      <div v-if="selectedItem" class="space-y-6 py-2">
+        <!-- Header do Item -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-2xl bg-slate-50 dark:bg-gray-800/40 border border-slate-100 dark:border-gray-800">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden shrink-0 flex items-center justify-center shadow-xs">
+              <BaseImage v-if="selectedItem.imageUrl" :src="selectedItem.imageUrl" :alt="selectedItem.name" container-class="w-full h-full" img-class="w-full h-full object-cover" />
+              <div v-else class="text-gray-400 dark:text-gray-500">
+                <component :is="getIcon(selectedItem.icon || 'Package')" class="w-8 h-8" />
+              </div>
+            </div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2 mt-1.5">
+                <BaseBadge variant="info">{{ selectedItem.type === 'service' ? 'Serviço' : 'Produto' }}</BaseBadge>
+                <BaseBadge variant="ia"><Sparkles class="w-3 h-3" /> Gerado por IA</BaseBadge>
+                <BaseBadge variant="default" v-if="selectedItem.sku">SKU: {{ selectedItem.sku }}</BaseBadge>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cards de Preço e Unidade -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-4 rounded-2xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 space-y-1">
+            <span class="text-[10px] font-semibold text-blue-600 dark:text-blue-400 tracking-wide">Preço de Venda</span>
+            <p class="text-2xl font-black text-gray-900 dark:text-gray-100">
+              R$ {{ (selectedItem.price ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }} <span class="text-xs font-bold text-gray-400 dark:text-gray-500">/ {{ selectedItem.unit || 'unidade' }}</span>
+            </p>
+            
+          </div>
+
+          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-gray-800/40 border border-slate-100 dark:border-gray-800 space-y-1">
+            <span class="text-[10px] font-semibold text-gray-400 dark:text-gray-500 tracking-wide">Unidade Comercial</span>
+            <p class="text-xl font-black text-gray-900 dark:text-gray-100 capitalize">
+              {{ selectedItem.unit || 'Unidade' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Descrição Comercial -->
+        <div class="p-4 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 space-y-2">
+          <h4 class="text-[10px] font-semibold text-gray-400 dark:text-gray-500 tracking-wide">Descrição Comercial</h4>
+          <p class="text-sm text-gray-700 dark:text-gray-300 font-medium whitespace-pre-line leading-relaxed">
+            {{ selectedItem.description || 'Nenhuma descrição informada.' }}
+          </p>
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="flex justify-end items-center w-full">
+          <BaseButton variant="primary" @click="showInfo = false; openModal(selectedItem)">
+            <Pencil class="w-4 h-4 mr-2" />
+            Editar
+          </BaseButton>
+        </div>
+      </template>
+    </BaseDialog>
+
+    <!-- Listagem Unificada (desktop & mobile) -->
     <BaseDataList
-      :items="items"
+      :columns="[
+        { key: 'name', label: 'Item do Catálogo' },
+        { key: 'type', label: 'Tipo' },
+        { key: 'price', label: 'Preço' },
+        // { key: 'actions', label: '' }
+      ]"
+      :items="items || []"
       :pending="pending"
       :has-more="hasMore"
       :loading-more="loadingMore"
@@ -94,141 +201,92 @@ const {
       empty-title="Catálogo Vazio"
       empty-subtitle="Sua lista de produtos e serviços aparecerá aqui. Comece cadastrando o primeiro."
     >
-      <template #header>
-        <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Item do Catálogo</th>
-        <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] text-center">Tipo</th>
-        <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] text-right">Preço</th>
-        <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] text-right"></th>
-      </template>
-
-      <template #item="{ item }">
-        <tr class="hover:bg-gray-50/30 dark:hover:bg-gray-800/20 transition-all group">
-          <td class="px-8 py-8">
-            <div class="flex items-center gap-6">
-              <div class="w-16 h-16 rounded-[0.50rem] border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
-                <BaseImage v-if="item.imageUrl" :src="item.imageUrl" :alt="item.name" container-class="w-full h-full" img-class="w-full h-full object-cover" />
-                <div v-else class="text-gray-400">
-                  <component :is="getIcon(item.icon || 'Package')" class="w-8 h-8" />
-                </div>
-              </div>
-              <div class="flex flex-col">
-                <span class="font-black text-lg text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ item.name }}</span>
-                <span class="text-xs font-bold text-gray-400 dark:text-gray-500 line-clamp-1 max-w-xl mt-1">{{ item.description || 'Sem descrição comercial' }}</span>
-              </div>
+      <template #cell-name="{ item }">
+        <div class="flex items-center gap-4 md:gap-6 cursor-pointer group" @click="openInfoModal(item)">
+          <!-- <div class="w-12 h-12 md:w-16 md:h-16 rounded-[0.50rem] border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
+            <BaseImage v-if="item.imageUrl" :src="item.imageUrl" :alt="item.name" container-class="w-full h-full" img-class="w-full h-full object-cover" />
+            <div v-else class="text-gray-400">
+              <component :is="getIcon(item.icon || 'Package')" class="w-6 h-6 md:w-8 md:h-8" />
             </div>
-          </td>
-          <td class="px-10 py-8 text-center">
-            <span 
-              :class="item.type === 'service' ? 'bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-900/30' : 'bg-gray-100 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700'"
-              class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border"
-            >
-              {{ item.type === 'service' ? 'Serviço' : 'Produto' }}
+          </div> -->
+          <div class="flex flex-col">
+            <span class="font-black text-base md:text-lg text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+              {{ item.name }}
             </span>
-          </td>
-          <td class="px-10 py-8 text-right">
-            <div class="flex flex-col items-end">
-              <span class="font-black text-lg text-gray-900 dark:text-gray-100">R$ {{ (item.price ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-              <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">por {{ item.unit }}</span>
-            </div>
-          </td>
-          <td class="px-10 py-8 text-right">
-            <div class="flex justify-end gap-3 items-center">
-              <DropdownMenuRoot>
-                <DropdownMenuTrigger as-child>
-                  <button
-                    class="p-2.5 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl transition-all"
-                    title="Mais ações"
-                    aria-label="Mais ações do orçamento"
-                  >
-                    <MoreVertical class="w-5 h-5" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuPortal>
-                  <DropdownMenuContent
-                    align="end"
-                    :side-offset="6"
-                    class="min-w-[220px] bg-white dark:bg-gray-950 rounded-[0.75rem] shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
-                  >
-                  <DropdownMenuItem
-                      @click="openModal(item)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
-                    >
-                      <Pencil class="w-4 h-4" />
-                      Editar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      @click="deleteItem(item._id)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-red-600 dark:hover:text-red-400 cursor-pointer outline-none transition-all"
-                    >
-                      <Trash2 class="w-4 h-4" />
-                      Excluir
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenuPortal>
-              </DropdownMenuRoot>
-            </div>
-          </td>
-        </tr>
-      </template>
-
-      <!-- Custom skeleton -->
-      <template #skeleton>
-        <tr v-for="i in 5" :key="i">
-          <td class="px-10 py-8">
-            <div class="flex items-center gap-6">
-              <BaseSkeleton width="4rem" height="4rem" borderRadius="1rem" />
-              <div class="space-y-2 flex-1">
-                <BaseSkeleton width="60%" height="1.25rem" />
-                <BaseSkeleton width="90%" height="0.75rem" />
-              </div>
-            </div>
-          </td>
-          <td class="px-10 py-8 text-center">
-            <div class="flex justify-center">
-              <BaseSkeleton width="80px" height="1.5rem" borderRadius="999px" />
-            </div>
-          </td>
-          <td class="px-10 py-8 text-right">
-            <div class="space-y-2">
-              <BaseSkeleton width="100px" height="1.5rem" />
-              <BaseSkeleton width="60%" height="0.75rem" />
-            </div>
-          </td>
-          <td class="px-10 py-8 text-right">
-            <div class="flex justify-end gap-3">
-              <BaseSkeleton width="3rem" height="3rem" borderRadius="1rem" />
-              <BaseSkeleton width="3rem" height="3rem" borderRadius="1rem" />
-            </div>
-          </td>
-        </tr>
-      </template>
-    </BaseDataList>
-    </div>
-
-    <!-- Listagem em Cards (mobile) -->
-    <div class="md:hidden space-y-4">
-      <template v-if="pending && items.length === 0">
-        <BaseSkeleton v-for="i in 3" :key="i" height="9rem" borderRadius="1rem" />
-      </template>
-      <template v-else-if="items.length === 0">
-        <div class="py-16 text-center">
-          <p class="font-black text-gray-900 dark:text-gray-50">Catálogo Vazio</p>
-          <p class="text-sm text-gray-500 mt-1">Sua lista de produtos e serviços aparecerá aqui. Comece cadastrando o primeiro.</p>
+            <span class="text-xs font-bold text-gray-400 dark:text-gray-500 line-clamp-1 max-w-xl mt-0.5">
+              {{ item.description || 'Sem descrição comercial' }}
+            </span>
+          </div>
         </div>
       </template>
-      <template v-else>
-        <CatalogItemCard
-          v-for="item in items"
-          :key="item._id"
-          :item="item"
-          :get-icon="getIcon"
-          @edit="openModal(item)"
-          @delete="deleteItem(item._id)"
-        />
-        <div ref="mobileSentinelRef" v-if="hasMore" class="h-1" />
-        <div v-if="loadingMore" class="py-4 text-center text-sm text-gray-400 font-bold">Carregando...</div>
+
+      <template #cell-type="{ item }">
+        <div class="cursor-pointer" @click="openInfoModal(item)">
+          <span 
+            :class="item.type === 'service' ? 'bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-900/30' : 'bg-gray-100 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700'"
+            class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border inline-block"
+          >
+            {{ item.type === 'service' ? 'Serviço' : 'Produto' }}
+          </span>
+        </div>
       </template>
-    </div>
+
+      <template #cell-price="{ item }">
+        <div class="flex flex-col items-start md:items-end cursor-pointer" @click="openInfoModal(item)">
+          <span class="font-black text-base md:text-lg text-gray-900 dark:text-gray-100">
+            R$ {{ (item.price ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
+          </span>
+          <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">
+            por {{ item.unit }}
+          </span>
+        </div>
+      </template>
+
+      <!-- <template #cell-actions="{ item }">
+        <div class="flex justify-end gap-3 items-center" @click.stop>
+          <DropdownMenuRoot>
+            <DropdownMenuTrigger as-child>
+              <button
+                class="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl transition-all"
+                title="Mais ações"
+                aria-label="Mais ações do item"
+              >
+                <MoreVertical class="w-5 h-5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuContent
+                align="end"
+                :side-offset="6"
+                class="min-w-[220px] bg-white dark:bg-gray-950 rounded-[0.75rem] shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
+              >
+                <DropdownMenuItem
+                  @click="openInfoModal(item)"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
+                >
+                  <Eye class="w-4 h-4" />
+                  Ver Detalhes
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  @click="openModal(item)"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
+                >
+                  <Pencil class="w-4 h-4" />
+                  Editar
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  @click="deleteItem(item._id)"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-red-600 dark:hover:text-red-400 cursor-pointer outline-none transition-all"
+                >
+                  <Trash2 class="w-4 h-4" />
+                  Excluir
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenuPortal>
+          </DropdownMenuRoot>
+        </div>
+      </template> -->
+    </BaseDataList>
   </div>
 </template>
 

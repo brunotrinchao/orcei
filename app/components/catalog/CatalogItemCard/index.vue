@@ -8,15 +8,19 @@ defineProps<{
 }>()
 
 defineEmits<{
+  (e: 'view'): void
   (e: 'edit'): void
   (e: 'delete'): void
 }>()
 
-const { Pencil, Trash2 } = useCatalogItemCard()
+const { Pencil, Trash2, Eye } = useCatalogItemCard()
 </script>
 
 <template>
-  <div class="catalog-item-card rounded-[0.75rem] border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700 shadow-sm p-4">
+  <div 
+    class="catalog-item-card rounded-[0.75rem] border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700 shadow-sm p-4 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 transition-all"
+    @click="$emit('view')"
+  >
     <div class="flex items-center gap-4">
       <div class="w-14 h-14 rounded-[0.50rem] border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
         <BaseImage v-if="item.imageUrl" :src="item.imageUrl" :alt="item.name" container-class="w-full h-full" img-class="w-full h-full object-cover" />
@@ -25,7 +29,7 @@ const { Pencil, Trash2 } = useCatalogItemCard()
         </div>
       </div>
       <div class="flex flex-col min-w-0">
-        <span class="font-black text-gray-900 dark:text-gray-50 truncate">{{ item.name }}</span>
+        <span class="font-black text-gray-900 dark:text-gray-50 truncate hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{{ item.name }}</span>
         <span class="text-xs font-bold text-gray-400 dark:text-gray-500 line-clamp-1">{{ item.description || 'Sem descrição comercial' }}</span>
       </div>
     </div>
@@ -43,11 +47,14 @@ const { Pencil, Trash2 } = useCatalogItemCard()
       </div>
     </div>
 
-    <div class="flex items-center justify-end gap-1 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
-      <BaseButton variant="ghost" size="icon-sm" @click="$emit('edit')" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" aria-label="Editar item" title="Editar">
+    <div class="flex items-center justify-end gap-1 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800" @click.stop>
+      <BaseButton variant="ghost" size="icon-sm" @click.stop="$emit('view')" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" aria-label="Ver detalhes" title="Ver detalhes">
+        <Eye class="w-4 h-4" />
+      </BaseButton>
+      <BaseButton variant="ghost" size="icon-sm" @click.stop="$emit('edit')" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" aria-label="Editar item" title="Editar">
         <Pencil class="w-4 h-4" />
       </BaseButton>
-      <BaseButton variant="ghost" size="icon-sm" @click="$emit('delete')" class="text-gray-400 hover:text-red-600 dark:hover:text-red-400" aria-label="Excluir item" title="Excluir">
+      <BaseButton variant="ghost" size="icon-sm" @click.stop="$emit('delete')" class="text-gray-400 hover:text-red-600 dark:hover:text-red-400" aria-label="Excluir item" title="Excluir">
         <Trash2 class="w-4 h-4" />
       </BaseButton>
     </div>

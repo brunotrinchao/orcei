@@ -139,84 +139,66 @@ const formatDate = (ts: number | null) => ts ? new Date(ts).toLocaleDateString('
       </template>
     </PageHeader>
 
-    <div class="hidden md:block">
+    <!-- Listagem Unificada (desktop & mobile) -->
     <BaseDataList
-      :items="coupons"
+      :columns="[
+        { key: 'code', label: 'Código' },
+        { key: 'credits', label: 'Créditos', align: 'center' },
+        { key: 'audience', label: 'Público', align: 'center' },
+        { key: 'redemptions', label: 'Usos', align: 'center' },
+        { key: 'expiresAt', label: 'Expira em', align: 'center' },
+        { key: 'status', label: 'Status', align: 'center' },
+        { key: 'actions', label: 'Ações', align: 'right' }
+      ]"
+      :items="coupons || []"
       :pending="pending"
       empty-title="Nenhum cupom encontrado"
     >
-      <template #header>
-        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Código</th>
-        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Créditos</th>
-        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Público</th>
-        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Usos</th>
-        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Expira em</th>
-        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Status</th>
-        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Ações</th>
-      </template>
-
-      <template #item="{ item: coupon }">
-        <tr class="hover:bg-gray-50/30 transition-all group">
-          <td class="px-8 py-6">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
-                <Ticket class="w-5 h-5 text-gray-400" />
-              </div>
-              <span class="font-black text-gray-900 tracking-wide">{{ coupon.code }}</span>
-            </div>
-          </td>
-          <td class="px-8 py-6 text-center font-black text-gray-900">{{ coupon.credits }}</td>
-          <td class="px-8 py-6 text-center">
-            <BaseBadge variant="info">{{ audienceLabels[coupon.audience] || 'Todos' }}</BaseBadge>
-          </td>
-          <td class="px-8 py-6 text-center text-xs font-bold text-gray-500">
-            {{ coupon.timesRedeemed }} / {{ coupon.maxRedemptions ?? '∞' }}
-          </td>
-          <td class="px-8 py-6 text-center text-xs font-bold text-gray-500">{{ formatDate(coupon.expiresAt) }}</td>
-          <td class="px-8 py-6 text-center">
-            <BaseBadge :variant="coupon.active ? 'success' : 'error'">{{ coupon.active ? 'Ativo' : 'Inativo' }}</BaseBadge>
-          </td>
-          <td class="px-8 py-6 text-right">
-            <div class="flex justify-end gap-2">
-              <button @click="openEditModal(coupon)" class="p-2.5 text-blue-500 hover:bg-blue-50 rounded-xl transition-all" title="Editar">
-                <Pencil class="w-5 h-5" />
-              </button>
-              <button v-if="coupon.active" @click="confirmDeactivate(coupon)" class="p-2.5 text-red-500 hover:bg-red-50 rounded-xl transition-all" title="Excluir (desativa)">
-                <Trash2 class="w-5 h-5" />
-              </button>
-              <button v-else @click="reactivate(coupon)" class="p-2.5 text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all" title="Reativar">
-                <RotateCcw class="w-5 h-5" />
-              </button>
-            </div>
-          </td>
-        </tr>
-      </template>
-    </BaseDataList>
-    </div>
-
-    <!-- Listagem em Cards (mobile) -->
-    <div class="md:hidden space-y-4">
-      <template v-if="pending && coupons.length === 0">
-        <BaseSkeleton v-for="i in 3" :key="i" height="9rem" borderRadius="1rem" />
-      </template>
-      <template v-else-if="coupons.length === 0">
-        <div class="py-16 text-center">
-          <p class="font-black text-gray-900">Nenhum cupom encontrado</p>
+      <template #cell-code="{ item: coupon }">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0">
+            <Ticket class="w-4 h-4 md:w-5 md:h-5 text-gray-400" />
+          </div>
+          <span class="font-black text-xs md:text-sm text-gray-900 dark:text-gray-100 tracking-wide">{{ coupon.code }}</span>
         </div>
       </template>
-      <template v-else>
-        <CouponCard
-          v-for="coupon in coupons"
-          :key="coupon.id"
-          :coupon="coupon"
-          :audience-labels="audienceLabels"
-          :format-date="formatDate"
-          @edit="openEditModal(coupon)"
-          @deactivate="confirmDeactivate(coupon)"
-          @reactivate="reactivate(coupon)"
-        />
+
+      <template #cell-credits="{ item: coupon }">
+        <span class="font-black text-xs md:text-sm text-gray-900 dark:text-gray-100">{{ coupon.credits }}</span>
       </template>
-    </div>
+
+      <template #cell-audience="{ item: coupon }">
+        <BaseBadge variant="info">{{ audienceLabels[coupon.audience] || 'Todos' }}</BaseBadge>
+      </template>
+
+      <template #cell-redemptions="{ item: coupon }">
+        <span class="text-xs font-bold text-gray-500 dark:text-gray-400">
+          {{ coupon.timesRedeemed }} / {{ coupon.maxRedemptions ?? '∞' }}
+        </span>
+      </template>
+
+      <template #cell-expiresAt="{ item: coupon }">
+        <span class="text-xs font-bold text-gray-500 dark:text-gray-400">{{ formatDate(coupon.expiresAt) }}</span>
+      </template>
+
+      <template #cell-status="{ item: coupon }">
+        <BaseBadge :variant="coupon.active ? 'success' : 'error'">{{ coupon.active ? 'Ativo' : 'Inativo' }}</BaseBadge>
+      </template>
+
+      <template #cell-actions="{ item: coupon }">
+        <div class="flex justify-end gap-2" @click.stop>
+          <button @click="openEditModal(coupon)" class="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-xl transition-all" title="Editar">
+            <Pencil class="w-4 h-4 md:w-5 md:h-5" />
+          </button>
+          <button v-if="coupon.active" @click="confirmDeactivate(coupon)" class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-xl transition-all" title="Excluir (desativa)">
+            <Trash2 class="w-4 h-4 md:w-5 md:h-5" />
+          </button>
+          <button v-else @click="reactivate(coupon)" class="p-2 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-xl transition-all" title="Reativar">
+            <RotateCcw class="w-4 h-4 md:w-5 md:h-5" />
+          </button>
+        </div>
+      </template>
+    </BaseDataList>
 
     <!-- Modal Criar -->
     <BaseDialog v-model:open="isCreateOpen" title="Novo Cupom" size="md">

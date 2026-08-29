@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
 import * as LucideIcons from 'lucide-vue-next'
-import { Plus, Search, Image, Pencil, Trash2, Sparkles, RefreshCcw, Package, ShoppingBag, HelpCircle, MoreVertical, Upload } from 'lucide-vue-next'
+import { Plus, Search, Image, Pencil, Trash2, Sparkles, RefreshCcw, Package, ShoppingBag, HelpCircle, MoreVertical, Upload, Eye } from 'lucide-vue-next'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
 import type { CatalogItemDTO } from '~/types'
 
@@ -29,11 +29,17 @@ export function useCatalogoPage() {
   }, { threshold: 0.1 })
 
   const showForm = ref(false)
+  const showInfo = ref(false)
   const selectedItem = ref<CatalogItemDTO | null>(null)
 
   function openModal(item: CatalogItemDTO | null = null) {
     selectedItem.value = item
     showForm.value = true
+  }
+
+  function openInfoModal(item: CatalogItemDTO) {
+    selectedItem.value = item
+    showInfo.value = true
   }
 
   function handleItemSaved() {
@@ -80,8 +86,10 @@ export function useCatalogoPage() {
     refresh,
     mobileSentinelRef,
     showForm,
+    showInfo,
     selectedItem,
     openModal,
+    openInfoModal,
     handleItemSaved,
     deleteItem,
     getIcon,
@@ -99,6 +107,7 @@ export function useCatalogoPage() {
     HelpCircle,
     MoreVertical,
     Upload,
+    Eye,
     DropdownMenuRoot,
     DropdownMenuTrigger,
     DropdownMenuPortal,

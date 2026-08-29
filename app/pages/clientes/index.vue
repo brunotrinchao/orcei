@@ -334,10 +334,14 @@ const {
       </div>
 
       <template #footer>
-        <div class="flex justify-end w-full">
-          <BaseButton type="button" @click="showInfo = false; openModal(selectedClient)">
+        <div class="flex justify-end w-full gap-1">
+          <BaseButton type="button" variant="danger" class="w-full" @click="showInfo = false; openModal(selectedClient)">
+            <Trash2 class="w-4 h-4 mr-2" />
+            Excluír
+          </BaseButton>
+          <BaseButton type="button"class="w-full" @click="showInfo = false; openModal(selectedClient)">
             <Pencil class="w-4 h-4 mr-2" />
-            Editar Cliente
+            Editar
           </BaseButton>
         </div>
       </template>
@@ -475,10 +479,15 @@ const {
       </template>
     </BaseDialog>
 
-    <!-- Listagem Unificada (desktop) -->
-    <div class="hidden md:block">
+    <!-- Listagem Unificada (desktop & mobile) -->
     <BaseDataList
-      :items="clients"
+      :columns="[
+        { key: 'name', label: 'Cliente' },
+        { key: 'contact', label: 'Contato' },
+        { key: 'location', label: 'Localização' },
+        // { key: 'actions', label: '', align: 'right' }
+      ]"
+      :items="clients || []"
       :pending="pending"
       :has-more="hasMore"
       :loading-more="loadingMore"
@@ -486,133 +495,87 @@ const {
       empty-title="Sem Clientes"
       empty-subtitle="Sua lista de clientes aparecerá aqui. Comece cadastrando o primeiro."
     >
-      <template #header>
-        <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Cliente</th>
-        <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Contato</th>
-        <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Localização</th>
-        <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] text-right"></th>
-      </template>
-
-      <template #item="{ item: client }">
-        <tr class="hover:bg-gray-50/30 dark:hover:bg-gray-800/20 transition-all group cursor-pointer" @click="openInfoModal(client)">
-          <td class="px-8 py-8">
-            <div class="flex flex-col">
-              <span class="font-black text-lg text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ client.name }}</span>
-              <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">{{ client.taxId || 'Sem documento' }}</span>
-            </div>
-          </td>
-          <td class="px-10 py-8">
-            <div class="flex flex-col">
-              <span class="text-sm font-bold text-gray-600 dark:text-gray-300">{{ client.email }}</span>
-              <div class="flex items-center gap-2 mt-1">
-                <span class="text-xs font-black text-gray-400 dark:text-gray-500">{{ formatPhone(client.phone) }}</span>
-                <img v-if="client.isWhatsapp" :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5" alt="WhatsApp" loading="lazy"/>
-              </div>
-            </div>
-          </td>
-          <td class="px-10 py-8">
-            <div class="flex flex-col">
-              <span class="text-[10px] font-black text-gray-900 dark:text-gray-100 uppercase tracking-widest">{{ client.address?.city || '-' }} - {{ client.address?.state || '-' }}</span>
-              <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest line-clamp-1 max-w-[400px] mt-1">{{ client.address?.street }}, {{ client.address?.number }}</span>
-            </div>
-          </td>
-          <td class="px-10 py-8 text-right" @click.stop>
-            <div class="flex justify-end gap-3 items-center">
-              <DropdownMenuRoot>
-                <DropdownMenuTrigger as-child>
-                  <button
-                    @click.stop
-                    class="p-2.5 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[0.75rem] transition-all"
-                    title="Mais ações"
-                    aria-label="Mais ações do cliente"
-                  >
-                    <MoreVertical class="w-5 h-5" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuPortal>
-                  <DropdownMenuContent
-                    align="end"
-                    :side-offset="6"
-                    class="min-w-[220px] bg-white dark:bg-gray-950 rounded-[0.75rem] shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
-                  >
-                    <DropdownMenuItem
-                      @click.stop="openModal(client)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
-                    >
-                      <Pencil class="w-4 h-4" />
-                      Editar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      @click.stop="deleteClient(client._id)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-red-600 dark:hover:text-red-400 cursor-pointer outline-none transition-all"
-                    >
-                      <Trash2 class="w-4 h-4" />
-                      Excluir
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenuPortal>
-              </DropdownMenuRoot>
-            </div>
-          </td>
-        </tr>
-      </template>
-
-      <!-- Custom skeleton -->
-      <template #skeleton>
-        <tr v-for="i in 5" :key="i">
-          <td class="px-10 py-8">
-            <div class="space-y-2">
-              <BaseSkeleton width="60%" height="1.25rem" />
-              <BaseSkeleton width="30%" height="0.75rem" />
-            </div>
-          </td>
-          <td class="px-10 py-8">
-            <div class="space-y-2">
-              <BaseSkeleton width="150px" height="0.9rem" />
-              <BaseSkeleton width="120px" height="0.9rem" />
-            </div>
-          </td>
-          <td class="px-10 py-8">
-            <div class="space-y-2">
-              <BaseSkeleton width="100px" height="0.8rem" />
-              <BaseSkeleton width="140px" height="0.8rem" />
-            </div>
-          </td>
-          <td class="px-10 py-8 text-right">
-            <div class="flex justify-end gap-3">
-              <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="1rem" />
-              <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="1rem" />
-            </div>
-          </td>
-        </tr>
-      </template>
-    </BaseDataList>
-    </div>
-
-    <!-- Listagem em Cards (mobile) -->
-    <div class="md:hidden space-y-4">
-      <template v-if="pending && clients.length === 0">
-        <BaseSkeleton v-for="i in 3" :key="i" height="9rem" borderRadius="1rem" />
-      </template>
-      <template v-else-if="clients.length === 0">
-        <div class="py-16 text-center">
-          <p class="font-black text-gray-900 dark:text-gray-100">Sem Clientes</p>
-          <p class="text-sm text-gray-500 mt-1">Sua lista de clientes aparecerá aqui. Comece cadastrando o primeiro.</p>
+      <template #cell-name="{ item: client }">
+        <div class="flex flex-col cursor-pointer" @click="openInfoModal(client)">
+          <span class="font-black text-base md:text-lg text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            {{ client.name }}
+          </span>
+          <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">
+            {{ client.taxId || 'Sem documento' }}
+          </span>
         </div>
       </template>
-      <template v-else>
-        <ClientCard
-          v-for="client in clients"
-          :key="client._id"
-          :client="client"
-          :format-phone="formatPhone"
-          @view="openInfoModal(client)"
-          @edit="openModal(client)"
-          @delete="deleteClient(client._id)"
-        />
-        <div ref="mobileSentinelRef" v-if="hasMore" class="h-1" />
-        <div v-if="loadingMore" class="py-4 text-center text-sm text-gray-400 font-bold">Carregando...</div>
+
+      <template #cell-contact="{ item: client }">
+        <div class="flex flex-col cursor-pointer" @click="openInfoModal(client)">
+          <span class="text-xs md:text-sm font-bold text-gray-600 dark:text-gray-300">
+            {{ client.email }}
+          </span>
+          <div class="flex items-center gap-2 mt-0.5">
+            <span class="text-xs font-black text-gray-400 dark:text-gray-500">
+              {{ formatPhone(client.phone) }}
+            </span>
+            <img v-if="client.isWhatsapp" :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5" alt="WhatsApp" loading="lazy" />
+          </div>
+        </div>
       </template>
-    </div>
+
+      <template #cell-location="{ item: client }">
+        <div class="flex flex-col cursor-pointer" @click="openInfoModal(client)">
+          <span class="text-[10px] font-black text-gray-900 dark:text-gray-100 uppercase tracking-widest">
+            {{ client.address?.city || '-' }} - {{ client.address?.state || '-' }}
+          </span>
+          <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest line-clamp-1 max-w-[400px] mt-0.5">
+            {{ client.address?.street ? `${client.address?.street}, ${client.address?.number}` : '' }}
+          </span>
+        </div>
+      </template>
+
+      <!-- <template #cell-actions="{ item: client }">
+        <div class="flex justify-end gap-3 items-center hidden sm:inline" @click.stop>
+          <DropdownMenuRoot>
+            <DropdownMenuTrigger as-child>
+              <button
+                @click.stop
+                class="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[0.75rem] transition-all"
+                title="Mais ações"
+                aria-label="Mais ações do cliente"
+              >
+                <MoreVertical class="w-5 h-5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuContent
+                align="end"
+                :side-offset="6"
+                class="min-w-[220px] bg-white dark:bg-gray-950 rounded-[0.75rem] shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
+              >
+                <DropdownMenuItem
+                  @click.stop="openInfoModal(client)"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
+                >
+                  <User class="w-4 h-4" />
+                  Ver Detalhes
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  @click.stop="openModal(client)"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
+                >
+                  <Pencil class="w-4 h-4" />
+                  Editar
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  @click.stop="deleteClient(client._id)"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-red-600 dark:hover:text-red-400 cursor-pointer outline-none transition-all"
+                >
+                  <Trash2 class="w-4 h-4" />
+                  Excluir
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenuPortal>
+          </DropdownMenuRoot>
+        </div>
+      </template> -->
+    </BaseDataList>
   </div>
 </template>

@@ -89,28 +89,40 @@ onUnmounted(() => {
           ]"
         >
           <!-- Header fixo -->
-          <div class="flex-shrink-0 flex items-start justify-between px-8 pt-8 pb-6 border-b border-slate-200 dark:border-gray-800">
-            <div class="space-y-1">
-              <DialogTitle v-if="title" class="text-xl font-black text-gray-900 dark:text-gray-50 ">
-                {{ title }}
-              </DialogTitle>
-              <!-- Always rendered: satisfies Radix aria requirement; visually hidden when no description -->
-              <DialogDescription :class="description ? 'text-sm font-bold text-slate-500 dark:text-gray-400' : 'sr-only'">
-                {{ description || title }}
-              </DialogDescription>
+          <div class="flex-shrink-0 flex items-center justify-between px-6 sm:px-8 pt-6 sm:pt-8 pb-5 sm:pb-6 border-b border-slate-200 dark:border-gray-800 gap-4">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <DialogClose @click="open = false" as-child>
+                <BaseButton
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  class="shrink-0 cursor-pointer text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                  aria-label="Fechar"
+                  @click="open = false"
+                >
+                  <X class="h-5 w-5" />
+                </BaseButton>
+              </DialogClose>
+
+              <div class="space-y-0.5 min-w-0">
+                <DialogTitle v-if="title" class="text-lg sm:text-xl font-black text-gray-900 dark:text-gray-50 truncate leading-tight">
+                  {{ title }}
+                </DialogTitle>
+                <!-- Always rendered: satisfies Radix aria requirement; visually hidden when no description -->
+                <DialogDescription :class="description ? 'text-xs sm:text-sm font-bold text-slate-500 dark:text-gray-400' : 'sr-only'">
+                  {{ description || title }}
+                </DialogDescription>
+              </div>
             </div>
-            <DialogClose @click="open = false" as-child>
-              <BaseButton
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                class="ml-4 shrink-0 cursor-pointer"
-                aria-label="Fechar"
-                @click="open = false"
-              >
-                <X class="h-5 w-5" />
-              </BaseButton>
-            </DialogClose>
+
+            <!-- Menu de Contexto / Ações do Header -->
+            <div v-if="$slots['context-menu'] || $slots.actions || $slots['header-actions']" class="shrink-0 flex items-center gap-2">
+              <slot name="context-menu">
+                <slot name="actions">
+                  <slot name="header-actions" />
+                </slot>
+              </slot>
+            </div>
           </div>
 
           <!-- Conteúdo rolável -->

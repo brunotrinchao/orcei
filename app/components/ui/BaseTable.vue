@@ -5,6 +5,7 @@ export interface BaseTableColumn {
   key: string
   label: string
   align?: 'left' | 'center' | 'right'
+  type?: 'currency' | 'badge' | 'text' | 'date' | 'actions' | string
   class?: string
   headerClass?: string
   hideOnMobile?: boolean
@@ -18,6 +19,8 @@ interface Props {
   itemsPerPage?: number
   currentPage?: number
   emptyText?: string
+  pending?: boolean
+  skeletonCount?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -26,7 +29,9 @@ const props = withDefaults(defineProps<Props>(), {
   total: undefined,
   itemsPerPage: 10,
   currentPage: 1,
-  emptyText: 'Nenhum registro encontrado.'
+  emptyText: 'Nenhum registro encontrado.',
+  pending: false,
+  skeletonCount: 5
 })
 
 defineEmits(['update:currentPage'])
@@ -41,6 +46,12 @@ const getAlignmentClass = (align?: 'left' | 'center' | 'right') => {
   if (align === 'center') return 'text-center'
   if (align === 'right') return 'text-right'
   return 'text-left'
+}
+
+const shouldShowMobileLabel = (col: BaseTableColumn) => {
+  if (!col.label) return false
+  if (col.type === 'currency' || col.type === 'badge') return false
+  return true
 }
 </script>
 
@@ -75,8 +86,46 @@ const getAlignmentClass = (align?: 'left' | 'center' | 'right') => {
 
         <!-- BODY -->
         <tbody class="divide-y divide-slate-100 dark:divide-gray-800">
+          <!-- Pending Loading State -->
+          <template v-if="pending && (!items || items.length === 0)">
+            <slot name="skeleton">
+              <tr
+                v-for="i in skeletonCount"
+                :key="`skel-${i}`"
+                class="block md:table-row p-4 sm:p-5 md:p-0 space-y-2 md:space-y-0"
+              >
+                <template v-if="columns && columns.length > 0">
+                  <td
+                    v-for="col in columns"
+                    :key="`skel-col-${col.key}`"
+                    class="block md:table-cell p-0 md:px-4 md:py-3.5"
+                    :class="[col.hideOnMobile ? 'hidden md:table-cell' : '']"
+                  >
+                    <div class="flex items-center gap-2">
+                      <span v-if="shouldShowMobileLabel(col)" class="inline-block md:hidden text-[9px] font-black text-gray-300 dark:text-gray-700 uppercase tracking-widest mr-2">
+                        {{ col.label }}:
+                      </span>
+                      <BaseSkeleton width="80%" height="1.25rem" borderRadius="0.5rem" />
+                    </div>
+                  </td>
+                </template>
+                <template v-else>
+                  <td colspan="100%" class="px-6 py-4">
+                    <div class="flex items-center gap-4">
+                      <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="0.75rem" />
+                      <div class="space-y-2 flex-1">
+                        <BaseSkeleton width="50%" height="1.25rem" />
+                        <BaseSkeleton width="30%" height="0.75rem" />
+                      </div>
+                    </div>
+                  </td>
+                </template>
+              </tr>
+            </slot>
+          </template>
+
           <!-- Declarative items mode -->
-          <template v-if="items && items.length > 0">
+          <template v-else-if="items && items.length > 0">
             <tr
               v-for="(item, itemIndex) in items"
               :key="item.id || item._id || itemIndex"
@@ -88,13 +137,14 @@ const getAlignmentClass = (align?: 'left' | 'center' | 'right') => {
                 class="block md:table-cell p-0 md:px-4 md:py-3.5"
                 :class="[
                   col.hideOnMobile ? 'hidden md:table-cell' : '',
+                  col.type === 'currency' ? 'font-mono' : '',
                   getAlignmentClass(col.align),
                   col.class || ''
                 ]"
               >
                 <!-- Mobile Field Label -->
                 <span
-                  v-if="col.label"
+                  v-if="shouldShowMobileLabel(col)"
                   class="inline-block md:hidden text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mr-2"
                 >
                   {{ col.label }}:
@@ -103,9 +153,19 @@ const getAlignmentClass = (align?: 'left' | 'center' | 'right') => {
                 <!-- Cell Content Slot or Default Renderer -->
                 <slot :name="`cell-${col.key}`" :item="item" :value="item[col.key]" :index="itemIndex">
                   <slot :name="col.key" :item="item" :value="item[col.key]" :index="itemIndex">
-                    <span class="text-xs font-bold text-gray-900 dark:text-white">
-                      {{ col.format ? col.format(item[col.key], item) : (item[col.key] ?? '-') }}
-                    </span>
+                    <template v-if="col.type === 'currency'">
+                      <span class="text-xs font-bold font-mono text-gray-900 dark:text-white">
+                        {{ col.format ? col.format(item[col.key], item) : (typeof item[col.key] === 'number' ? item[col.key].toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : (item[col.key] ?? 'R$ 0,00')) }}
+                      </span>
+                    </template>
+                    <template v-else-if="col.type === 'badge'">
+                      <BaseBadge>{{ col.format ? col.format(item[col.key], item) : (item[col.key] ?? '-') }}</BaseBadge>
+                    </template>
+                    <template v-else>
+                      <span class="text-xs font-bold text-gray-900 dark:text-white">
+                        {{ col.format ? col.format(item[col.key], item) : (item[col.key] ?? '-') }}
+                      </span>
+                    </template>
                   </slot>
                 </slot>
               </td>
@@ -116,7 +176,7 @@ const getAlignmentClass = (align?: 'left' | 'center' | 'right') => {
           <slot v-else name="body"></slot>
 
           <!-- Empty State -->
-          <tr v-if="computedTotal === 0 && !$slots.body">
+          <tr v-if="!pending && computedTotal === 0 && !$slots.body">
             <td
               :colspan="columns && columns.length > 0 ? columns.length : 100"
               class="px-6 py-10 text-center text-slate-500 dark:text-gray-400 font-bold text-xs"

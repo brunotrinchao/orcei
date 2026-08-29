@@ -177,7 +177,15 @@ export default defineEventHandler(async (event) => {
   } else if (isByMonth) {
     const map: Record<string, { label: string; amount: number; sortKey: string }> = {}
 
-    if (periodParam === 'year') {
+    if (periodParam === 'last_90_days') {
+      const now = new Date()
+      for (let i = 2; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+        const sortKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+        const label = `${monthNames[d.getMonth()]}/${String(d.getFullYear()).slice(2)}`
+        map[sortKey] = { label, amount: 0, sortKey }
+      }
+    } else if (periodParam === 'year') {
       const currentYear = new Date().getFullYear()
       const currentMonth = new Date().getMonth()
       for (let m = 0; m <= currentMonth; m++) {

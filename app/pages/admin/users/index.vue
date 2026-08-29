@@ -116,118 +116,74 @@ function confirmImpersonate(targetUser: any) {
       />
     </div>
 
-    <!-- Listagem Unificada (desktop) -->
-    <div class="hidden md:block">
+    <!-- Listagem Unificada (desktop & mobile) -->
     <BaseDataList
-      :items="users"
+      :columns="[
+        { key: 'user', label: 'Usuário' },
+        { key: 'plan', label: 'Plano', align: 'center' },
+        { key: 'credits', label: 'Créditos', align: 'center' },
+        { key: 'createdAt', label: 'Cadastro', align: 'center' },
+        { key: 'actions', label: 'Ações', align: 'right' }
+      ]"
+      :items="users || []"
       :pending="pending"
       :has-more="hasMore"
       :loading-more="loadingMore"
       @load-more="loadMore"
       empty-title="Nenhum usuário encontrado"
     >
-      <template #header>
-        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Usuário</th>
-        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Plano</th>
-        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Créditos</th>
-        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Cadastro</th>
-        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Ações</th>
-      </template>
-
-      <template #item="{ item: user }">
-        <tr
-          class="hover:bg-gray-50/30 dark:hover:bg-gray-800/30 transition-all group"
-          :class="user.role !== 'admin' ? 'cursor-pointer' : ''"
+      <template #cell-user="{ item: user }">
+        <div 
+          class="flex items-center gap-3"
+          :class="user.role !== 'admin' ? 'cursor-pointer group' : ''"
           @click="user.role !== 'admin' ? openUserDetail(user) : null"
         >
-          <td class="px-8 py-6">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden border-2 border-white dark:border-gray-800 shadow-sm">
-                <img v-if="user.avatar" :src="user.avatar" class="w-full h-full object-cover" loading="lazy">
-                <User v-else class="w-5 h-5 text-gray-400" />
-              </div>
-              <div class="flex flex-col">
-                <span class="font-black text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">{{ user.name }}</span>
-                <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tight mt-1">{{ user.email }}</span>
-              </div>
-            </div>
-          </td>
-          <td class="px-8 py-6 text-center">
-            <BaseBadge :variant="user.subscriptionPlan === 'premium' ? 'success' : user.subscriptionPlan === 'starter' ? 'info' : 'default'">
-              {{ user.subscriptionPlan?.toUpperCase() || 'FREE' }}
-            </BaseBadge>
-          </td>
-          <td class="px-8 py-6 text-center font-black text-gray-900 dark:text-gray-100">
-            {{ user.creditsBalance }}
-          </td>
-          <td class="px-8 py-6 text-center text-xs font-bold text-gray-500 dark:text-gray-400">
-            {{ formatDate(user.createdAt) }}
-          </td>
-          <td class="px-8 py-6 text-right">
-            <div class="flex justify-end gap-2">
-              <button v-if="user.role !== 'admin'" @click.stop="openUserDetail(user)" class="p-2.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800/60 rounded-xl transition-all" title="Ver Detalhes">
-                <Eye class="w-5 h-5" />
-              </button>
-              <button @click.stop="openCreditModal(user)" class="p-2.5 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-xl transition-all" title="Ajustar Créditos">
-                <CreditCard class="w-5 h-5" />
-              </button>
-              <button v-if="user.role !== 'admin'" :disabled="isImpersonating" @click.stop="confirmImpersonate(user)" class="p-2.5 text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-xl transition-all disabled:opacity-50" title="Personificar Usuário">
-                <LogIn class="w-5 h-5" />
-              </button>
-              <button v-if="user.role === 'admin'" @click.stop class="p-2.5 text-red-500 bg-red-50 dark:bg-red-950/40 rounded-xl" title="Administrador">
-                <Shield class="w-5 h-5" />
-              </button>
-            </div>
-          </td>
-        </tr>
-      </template>
-
-      <!-- Custom skeleton -->
-      <template #skeleton>
-        <tr v-for="i in 5" :key="i">
-          <td class="px-8 py-6">
-            <div class="flex items-center gap-3">
-              <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="0.75rem" />
-              <div class="space-y-2 flex-1">
-                <BaseSkeleton width="150px" height="1.1rem" />
-                <BaseSkeleton width="100px" height="0.75rem" />
-              </div>
-            </div>
-          </td>
-          <td class="px-8 py-6 text-center"><div class="flex justify-center"><BaseSkeleton width="80px" height="1.5rem" borderRadius="999px" /></div></td>
-          <td class="px-8 py-6 text-center"><div class="flex justify-center"><BaseSkeleton width="30px" height="1.5rem" /></div></td>
-          <td class="px-8 py-6 text-center"><div class="flex justify-center"><BaseSkeleton width="80px" height="1rem" /></div></td>
-          <td class="px-8 py-6 text-right"><div class="flex justify-end gap-2"><BaseSkeleton width="2rem" height="2rem" borderRadius="0.5rem" /></div></td>
-        </tr>
-      </template>
-    </BaseDataList>
-    </div>
-
-    <!-- Listagem em Cards (mobile) -->
-    <div class="md:hidden space-y-4">
-      <template v-if="pending && users.length === 0">
-        <BaseSkeleton v-for="i in 3" :key="i" height="9rem" borderRadius="1rem" />
-      </template>
-      <template v-else-if="users.length === 0">
-        <div class="py-16 text-center">
-          <p class="font-black text-gray-900 dark:text-gray-100">Nenhum usuário encontrado</p>
+          <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden border-2 border-white dark:border-gray-800 shadow-sm shrink-0">
+            <img v-if="user.avatar" :src="user.avatar" class="w-full h-full object-cover" loading="lazy">
+            <User v-else class="w-4 h-4 md:w-5 md:h-5 text-gray-400" />
+          </div>
+          <div class="flex flex-col">
+            <span class="font-black text-xs md:text-sm text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
+              {{ user.name }}
+            </span>
+            <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tight mt-0.5">
+              {{ user.email }}
+            </span>
+          </div>
         </div>
       </template>
-      <template v-else>
-        <UserCard
-          v-for="user in users"
-          :key="user._id"
-          :user="user"
-          :is-impersonating="isImpersonating"
-          :format-date="formatDate"
-          @adjust-credits="openCreditModal(user)"
-          @impersonate="confirmImpersonate(user)"
-          @view-details="openUserDetail(user)"
-        />
-        <div ref="mobileSentinelRef" v-if="hasMore" class="h-1" />
-        <div v-if="loadingMore" class="py-4 text-center text-sm text-gray-400 font-bold">Carregando...</div>
+
+      <template #cell-plan="{ item: user }">
+        <BaseBadge :variant="user.subscriptionPlan === 'premium' ? 'success' : user.subscriptionPlan === 'starter' ? 'info' : 'default'">
+          {{ user.subscriptionPlan?.toUpperCase() || 'FREE' }}
+        </BaseBadge>
       </template>
-    </div>
+
+      <template #cell-credits="{ item: user }">
+        <span class="font-black text-xs md:text-sm text-gray-900 dark:text-gray-100">{{ user.creditsBalance }}</span>
+      </template>
+
+      <template #cell-createdAt="{ item: user }">
+        <span class="text-xs font-bold text-gray-500 dark:text-gray-400">{{ formatDate(user.createdAt) }}</span>
+      </template>
+
+      <template #cell-actions="{ item: user }">
+        <div class="flex justify-end gap-2" @click.stop>
+          <button v-if="user.role !== 'admin'" @click="openUserDetail(user)" class="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800/60 rounded-xl transition-all" title="Ver Detalhes">
+            <Eye class="w-4 h-4 md:w-5 md:h-5" />
+          </button>
+          <button @click="openCreditModal(user)" class="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-xl transition-all" title="Ajustar Créditos">
+            <CreditCard class="w-4 h-4 md:w-5 md:h-5" />
+          </button>
+          <button v-if="user.role !== 'admin'" :disabled="isImpersonating" @click="confirmImpersonate(user)" class="p-2 text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-xl transition-all disabled:opacity-50" title="Personificar Usuário">
+            <LogIn class="w-4 h-4 md:w-5 md:h-5" />
+          </button>
+          <button v-if="user.role === 'admin'" class="p-2 text-red-500 bg-red-50 dark:bg-red-950/40 rounded-xl" title="Administrador">
+            <Shield class="w-4 h-4 md:w-5 md:h-5" />
+          </button>
+        </div>
+      </template>
+    </BaseDataList>
 
     <!-- Modal de Créditos -->
     <BaseDialog v-model:open="isCreditModalOpen" title="Ajustar Créditos" size="md">

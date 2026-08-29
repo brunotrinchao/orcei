@@ -163,10 +163,16 @@ const {
       </template>
     </PageHeader>
 
-    <!-- Listagem Unificada (desktop) -->
-    <div class="hidden md:block">
+    <!-- Listagem Unificada (desktop & mobile) -->
     <BaseDataList
-      :items="proposals"
+      :columns="[
+        { key: 'title', label: 'Orçamento' },
+        { key: 'client', label: 'Cliente' },
+        { key: 'createdAt', label: 'Data' },
+        { key: 'status', label: 'Status', type: 'badge' },
+        { key: 'total', label: 'Total', align: 'right', type: 'currency' }
+      ]"
+      :items="proposals || []"
       :pending="pending"
       :has-more="hasMore"
       :loading-more="loadingMore"
@@ -174,196 +180,152 @@ const {
       empty-title="Sem Orçamentos"
       empty-subtitle="Clique no botão acima para criar seu primeiro orçamento."
     >
-      <template #header>
-        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Orçamento</th>
-        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Cliente</th>
-        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Data</th>
-        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Status</th>
-        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">Total</th>
-        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right"></th>
-      </template>
-
-      <template #item="{ item: proposal }">
-        <tr @click="openProposalInfo(proposal)" class="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-all group cursor-pointer">
-          <td class="px-8 py-6">
-            <div class="flex items-center gap-3">
-              <div class="flex flex-col">
-                <span class="font-black text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors text-lg tracking-tight">{{ proposal.title || 'Sem título' }}</span>
-              </div>
-            </div>
-          </td>
-          <td class="px-8 py-6">
-            <div class="flex flex-col">
-              <span class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">{{ proposal.client.name }}</span>
-              <span v-if="proposal.client.email" class="text-[10px] text-gray-400 dark:text-gray-500 font-medium normal-case mt-0.5">{{ proposal.client.email }}</span>
-            </div>
-          </td>
-          <td class="px-8 py-6 text-sm text-gray-500 font-medium">
-            {{ formatDate(proposal.createdAt) }}
-          </td>
-          <td class="px-8 py-6">
-            <BaseBadge :variant="getStatusVariant(proposal)">
-              {{ getProposalStatusLabel(proposal) }}
-            </BaseBadge>
-          </td>
-          <td class="px-8 py-6 text-right">
-            <span class="font-black text-gray-900 dark:text-gray-100 text-xl tracking-tight">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-          </td>
-          <td class="px-8 py-6 text-right">
-            <div class="flex justify-end items-center gap-1">
-              <button
-                v-if="canShowChatButton(proposal.status)"
-                @click.stop="openChat(proposal)"
-                class="p-2.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-2xl transition-all relative"
-                title="Chat e Interações"
-                aria-label="Abrir chat do orçamento"
-              >
-                <MessageCircle class="w-5 h-5" />
-                <span
-                  v-if="proposal.unreadMessages > 0"
-                  class="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[8px] font-black text-white ring-2 ring-white"
-                >
-                  {{ proposal.unreadMessages }}
-                </span>
-              </button>
-              <button
-                v-if="proposal.client.phone && canShowWhatsappButton(proposal.status)"
-                @click.stop="sendWhatsapp(proposal)"
-                class="p-2.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-[0.75rem] transition-all"
-                title="Enviar via WhatsApp"
-                aria-label="Enviar via WhatsApp"
-              >
-                <img :src="'/images/icons/whatsapp-svg.svg'" class="w-5 h-5" alt="WhatsApp" loading="lazy"/>
-              </button>
-              <DropdownMenuRoot>
-                <DropdownMenuTrigger as-child>
-                  <button
-                    @click.stop
-                    class="p-2.5 text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[0.75rem] transition-all"
-                    title="Mais ações"
-                    aria-label="Mais ações do orçamento"
-                  >
-                    <MoreVertical class="w-5 h-5" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuPortal>
-                  <DropdownMenuContent
-                    align="end"
-                    :side-offset="6"
-                    class="min-w-[220px] bg-white dark:bg-gray-950 rounded-[0.75rem] shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
-                  >
-                    <DropdownMenuItem
-                      @click="openHistory(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-950/40 hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer outline-none transition-all"
-                    >
-                      <History class="w-4 h-4  text-gray-500" />
-                      Ver Histórico
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      @click="downloadPdf(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-950/40 hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer outline-none transition-all"
-                    >
-                      <Download class="w-4 h-4 text-gray-500" />
-                      Baixar Orçamento
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      v-if="proposal.status !== 'draft' && proposal.status !== 'accepted'"
-                      :disabled="isResending === proposal._id"
-                      @click="resendEmail(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-950/40 hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer outline-none transition-all disabled:opacity-50"
-                    >
-                      <RefreshCcw v-if="isResending === proposal._id" class="w-4 h-4 animate-spin text-gray-500" />
-                      <Mail v-else class="w-4 h-4 text-gray-500" />
-                      Reenviar E-mail
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      v-if="proposal.status !== 'accepted'"
-                      @click="openModal(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-950/40 hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer outline-none transition-all"
-                    >
-                      <Pencil class="w-4 h-4 text-gray-500" />
-                      Editar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      v-if="proposal.status === 'pending'"
-                      @click="openContractModal(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-950/40 hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer outline-none transition-all"
-                    >
-                      <FileText class="w-4 h-4 text-gray-500" />
-                      Editar Contrato
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      v-if="proposal.status !== 'accepted'"
-                      @click="confirmDeleteProposal(proposal)"
-                      class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-600 dark:hover:text-red-300 cursor-pointer outline-none transition-all"
-                    >
-                      <Trash2 class="w-4 h-4 text-red-500" />
-                      Excluir
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenuPortal>
-              </DropdownMenuRoot>
-            </div>
-          </td>
-        </tr>
-      </template>
-
-      <!-- Custom skeleton for better fit -->
-      <template #skeleton>
-        <tr v-for="i in 5" :key="i">
-          <td class="px-8 py-6">
-            <div class="space-y-2">
-              <BaseSkeleton width="60%" height="1.25rem" />
-              <BaseSkeleton width="30%" height="0.75rem" />
-            </div>
-          </td>
-          <td class="px-8 py-6"><BaseSkeleton width="80px" height="1rem" /></td>
-          <td class="px-8 py-6"><BaseSkeleton width="70px" height="1.5rem" borderRadius="999px" /></td>
-          <td class="px-8 py-6"><div class="flex justify-end"><BaseSkeleton width="100px" height="1.5rem" /></div></td>
-          <td class="px-8 py-6"><div class="flex justify-end gap-2"><BaseSkeleton v-for="j in 4" :key="j" width="2rem" height="2rem" borderRadius="0.5rem" /></div></td>
-        </tr>
-      </template>
-    </BaseDataList>
-    </div>
-
-    <!-- Listagem em Cards (mobile) -->
-    <div class="md:hidden space-y-4">
-      <template v-if="pending && proposals.length === 0">
-        <BaseSkeleton v-for="i in 3" :key="i" height="10rem" borderRadius="1rem" />
-      </template>
-      <template v-else-if="proposals.length === 0">
-        <div class="py-16 text-center">
-          <p class="font-black text-gray-900 dark:text-gray-50">Sem Orçamentos</p>
-          <p class="text-sm text-gray-500 mt-1">Clique no botão acima para criar seu primeiro orçamento.</p>
+      <template #cell-title="{ item: proposal }">
+        <div class="flex items-center gap-3 cursor-pointer" @click="openProposalInfo(proposal)">
+          <div class="flex flex-col">
+            <span class="font-black text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-base md:text-lg tracking-tight">
+              {{ proposal.title || 'Sem título' }}
+            </span>
+          </div>
         </div>
       </template>
-      <template v-else>
-        <ProposalCard
-          v-for="proposal in proposals"
-          :key="proposal._id"
-          :proposal="proposal"
-          :status-variant="getStatusVariant(proposal)"
-          :status-label="getProposalStatusLabel(proposal)"
-          :is-resending="isResending === proposal._id"
-          @open-info="openProposalInfo(proposal)"
-          @open-chat="openChat(proposal)"
-          @send-whatsapp="sendWhatsapp(proposal)"
-          @open-history="openHistory(proposal)"
-          @download-pdf="downloadPdf(proposal)"
-          @resend-email="resendEmail(proposal)"
-          @edit="openModal(proposal)"
-          @delete="confirmDeleteProposal(proposal)"
-        />
-        <div ref="mobileSentinelRef" v-if="hasMore" class="h-1" />
-        <div v-if="loadingMore" class="py-4 text-center text-sm text-gray-400 font-bold">Carregando...</div>
+
+      <template #cell-client="{ item: proposal }">
+        <div class="flex flex-col cursor-pointer" @click="openProposalInfo(proposal)">
+          <span class="text-md font-bold text-gray-900 tracking-wide mt-0.5">{{ proposal.client?.name }}</span>
+          <span v-if="proposal.client?.email" class="text-[10px] text-gray-400 dark:text-gray-500 font-medium normal-case mt-0.5">{{ proposal.client.email }}</span>
+        </div>
       </template>
-    </div>
+
+      <template #cell-createdAt="{ item: proposal }">
+        <span class="text-xs md:text-sm text-gray-500 font-medium cursor-pointer" @click="openProposalInfo(proposal)">
+          {{ formatDate(proposal.createdAt) }}
+        </span>
+      </template>
+
+      <template #cell-status="{ item: proposal }">
+        <div class="cursor-pointer" @click="openProposalInfo(proposal)">
+          <BaseBadge :variant="getStatusVariant(proposal)">
+            {{ getProposalStatusLabel(proposal) }}
+          </BaseBadge>
+        </div>
+      </template>
+
+      <template #cell-total="{ item: proposal }">
+        <span class="font-semibold text-gray-900 dark:text-gray-100 text-xs md:text-base tracking-tight cursor-pointer" @click="openProposalInfo(proposal)">
+          R$ {{ proposal.totals?.final?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '0,00' }}
+        </span>
+      </template>
+
+      <!-- <template #cell-actions="{ item: proposal }">
+        <div class="flex justify-end items-center gap-1" @click.stop>
+          <button
+            v-if="canShowChatButton(proposal.status)"
+            @click.stop="openChat(proposal)"
+            class="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-2xl transition-all relative"
+            title="Chat e Interações"
+            aria-label="Abrir chat do orçamento"
+          >
+            <MessageCircle class="w-5 h-5" />
+            <span
+              v-if="proposal.unreadMessages > 0"
+              class="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[8px] font-black text-white ring-2 ring-white"
+            >
+              {{ proposal.unreadMessages }}
+            </span>
+          </button>
+          <button
+            v-if="proposal.client?.phone && canShowWhatsappButton(proposal.status)"
+            @click.stop="sendWhatsapp(proposal)"
+            class="p-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-[0.75rem] transition-all"
+            title="Enviar via WhatsApp"
+            aria-label="Enviar via WhatsApp"
+          >
+            <img :src="'/images/icons/whatsapp-svg.svg'" class="w-5 h-5" alt="WhatsApp" loading="lazy" />
+          </button>
+          <DropdownMenuRoot>
+            <DropdownMenuTrigger as-child>
+              <button
+                @click.stop
+                class="p-2 text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[0.75rem] transition-all"
+                title="Mais ações"
+                aria-label="Mais ações do orçamento"
+              >
+                <MoreVertical class="w-5 h-5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuContent
+                align="end"
+                :side-offset="6"
+                class="min-w-[220px] bg-white dark:bg-gray-950 rounded-[0.75rem] shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
+              >
+                <DropdownMenuItem
+                  @click="openHistory(proposal)"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 cursor-pointer outline-none transition-all"
+                >
+                  <History class="w-4 h-4 text-gray-500" />
+                  Ver Histórico
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  @click="downloadPdf(proposal)"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 cursor-pointer outline-none transition-all"
+                >
+                  <Download class="w-4 h-4 text-gray-500" />
+                  Baixar Orçamento
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  v-if="proposal.status !== 'draft' && proposal.status !== 'accepted'"
+                  :disabled="isResending === proposal._id"
+                  @click="resendEmail(proposal)"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 cursor-pointer outline-none transition-all disabled:opacity-50"
+                >
+                  <RefreshCcw v-if="isResending === proposal._id" class="w-4 h-4 animate-spin text-gray-500" />
+                  <Mail v-else class="w-4 h-4 text-gray-500" />
+                  Reenviar E-mail
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  v-if="proposal.status !== 'accepted'"
+                  @click="openModal(proposal)"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 cursor-pointer outline-none transition-all"
+                >
+                  <Pencil class="w-4 h-4 text-gray-500" />
+                  Editar
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  v-if="proposal.status === 'pending'"
+                  @click="openContractModal(proposal)"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 cursor-pointer outline-none transition-all"
+                >
+                  <FileText class="w-4 h-4 text-gray-500" />
+                  Editar Contrato
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  v-if="proposal.status !== 'accepted'"
+                  @click="confirmDeleteProposal(proposal)"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-600 dark:hover:text-red-300 cursor-pointer outline-none transition-all"
+                >
+                  <Trash2 class="w-4 h-4 text-red-500" />
+                  Excluir
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenuPortal>
+          </DropdownMenuRoot>
+        </div>
+      </template> -->
+    </BaseDataList>
 
     <!-- Modal de Informações Detalhadas do Orçamento -->
     <ProposalDetailModal
       v-model:open="showProposalInfo"
       :proposal="selectedProposalInfo"
+      :is-resending="isResending"
       @edit="p => { showProposalInfo = false; openModal(p) }"
+      @history="p => { openHistory(p) }"
+      @download-pdf="p => { downloadPdf(p) }"
+      @resend-email="p => { resendEmail(p) }"
+      @edit-contract="p => { showProposalInfo = false; openContractModal(p) }"
+      @delete="p => { showProposalInfo = false; confirmDeleteProposal(p) }"
     />
 
     <!-- Modal de Orçamento -->

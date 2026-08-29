@@ -207,7 +207,7 @@ onUnmounted(() => {
                   <p class="text-xs font-bold text-gray-900 dark:text-gray-50 truncate">{{ (user as any)?.name || profile?.name }}</p>
                 </div>
                 <NuxtLink to="/configuracoes" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition" active-class="!text-blue-600 dark:!text-blue-400 font-bold bg-blue-50/50 dark:bg-blue-950/30">Configurações</NuxtLink>
-                <NuxtLink to="/planos" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition" active-class="!text-blue-600 dark:!text-blue-400 font-bold bg-blue-50/50 dark:bg-blue-950/30">Plano</NuxtLink>
+                <NuxtLink to="/planos" @click="isMenuOpen = false" class="block px-4 py-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition" active-class="!text-blue-600 dark:!text-blue-400 font-bold bg-blue-50/50 dark:bg-blue-950/30">Plano e Recarga</NuxtLink>
                 <button @click="toggle()" class="w-full text-left px-4 py-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition flex items-center justify-between">
                   <span>Aparência</span>
                   <span class="text-[10px] font-black uppercase text-gray-400 flex items-center gap-1">

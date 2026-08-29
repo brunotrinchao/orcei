@@ -515,7 +515,7 @@ const {
                 <div class="font-bold text-gray-700 dark:text-gray-300">
                   {{ item.clientName }}
                   <span
-                    class="block text-[9px] text-gray-400 dark:text-gray-500 uppercase font-black tracking-wider mt-0.5 md:mt-0"
+                    class="block text-[9px] text-gray-400 dark:text-gray-500 font-semibold tracking-wider mt-0.5 md:mt-0"
                   >
                     {{ item.location }}
                   </span>
@@ -523,7 +523,7 @@ const {
               </template>
 
               <template #cell-minutesAgo="{ value }">
-                <span class="font-black text-gray-900 dark:text-white font-sm">
+                <span class="font-semibold text-gray-900 dark:text-white font-sm">
                   {{ formatRelativeTime(value) }}
                 </span>
               </template>

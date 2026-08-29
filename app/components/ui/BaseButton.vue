@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { Loader2 } from 'lucide-vue-next'
 import {
   TooltipProvider,
@@ -16,25 +17,35 @@ defineOptions({
 interface Props {
   variant?: 'solid' | 'outline' | 'ghost' | 'primary' | 'secondary' | 'danger' | 'ia' | 'whatsapp'
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'icon' | 'icon-sm'
-  type?: 'button' | 'submit' | 'reset'
+  type?: 'button' | 'submit' | 'reset' | 'link' | 'a'
   iconOnly?: boolean
   disabled?: boolean
   loading?: boolean
   to?: string
+  href?: string
+  target?: string
   tooltip?: string
   tooltipSide?: 'top' | 'right' | 'bottom' | 'left'
   title?: string
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   variant: 'primary',
   size: 'md',
   type: 'button',
   iconOnly: false,
-  tooltipSide: 'top'
+  tooltipSide: 'top',
+  href: undefined,
+  target: undefined
 })
 
 const NuxtLink = resolveComponent('NuxtLink')
+
+const componentTag = computed(() => {
+  if (props.to) return NuxtLink
+  if (props.type === 'link' || props.type === 'a' || props.href) return 'a'
+  return 'button'
+})
 </script>
 
 <template>
@@ -42,15 +53,19 @@ const NuxtLink = resolveComponent('NuxtLink')
     <TooltipRoot>
       <TooltipTrigger as-child>
         <component
-          :is="to ? NuxtLink : 'button'"
+          :is="componentTag"
           v-bind="$attrs"
           :to="to"
-          :type="!to ? type : undefined"
-          :disabled="disabled || loading"
+          :href="componentTag === 'a' ? href : undefined"
+          :target="componentTag === 'a' ? target : undefined"
+          :type="componentTag === 'button' ? type : undefined"
+          :disabled="componentTag === 'button' ? (disabled || loading) : undefined"
+          :aria-disabled="componentTag !== 'button' && (disabled || loading) ? 'true' : undefined"
           :title="title || tooltip"
           :aria-label="tooltip || title"
-          class="inline-flex items-center justify-center rounded-[0.75rem] font-black  transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 disabled:opacity-50 disabled:pointer-events-none"
+          class="inline-flex items-center justify-center rounded-[0.75rem] font-black transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 disabled:opacity-50 disabled:pointer-events-none"
           :class="[
+            (disabled || loading) ? 'opacity-50 pointer-events-none' : '',
             variant === 'solid' ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-black dark:hover:bg-white shadow-gray-200 dark:shadow-gray-800/50' : '',
             variant === 'primary' ? 'bg-[#3147F6] text-white hover:bg-[#2638d4] dark:hover:bg-[#4359ff] shadow-blue-200 dark:shadow-blue-950/50' : '',
             variant === 'danger' ? 'bg-red-500 text-white hover:bg-red-600 dark:hover:bg-red-400 shadow-red-200 dark:shadow-red-950/50' : '',
@@ -89,14 +104,18 @@ const NuxtLink = resolveComponent('NuxtLink')
 
   <component
     v-else
-    :is="to ? NuxtLink : 'button'"
+    :is="componentTag"
     v-bind="$attrs"
     :to="to"
-    :type="!to ? type : undefined"
-    :disabled="disabled || loading"
+    :href="componentTag === 'a' ? href : undefined"
+    :target="componentTag === 'a' ? target : undefined"
+    :type="componentTag === 'button' ? type : undefined"
+    :disabled="componentTag === 'button' ? (disabled || loading) : undefined"
+    :aria-disabled="componentTag !== 'button' && (disabled || loading) ? 'true' : undefined"
     :title="title"
     class="inline-flex items-center justify-center rounded-[0.75rem] font-black tracking-wide transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 disabled:opacity-50 disabled:pointer-events-none"
     :class="[
+      (disabled || loading) ? 'opacity-50 pointer-events-none' : '',
       variant === 'solid' ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-black dark:hover:bg-white shadow-gray-200 dark:shadow-gray-800/50' : '',
       variant === 'primary' ? 'bg-[#3147F6] text-white hover:bg-[#2638d4] dark:hover:bg-[#4359ff] shadow-blue-200 dark:shadow-blue-950/50' : '',
       variant === 'danger' ? 'bg-red-500 text-white hover:bg-red-600 dark:hover:bg-red-400 shadow-red-200 dark:shadow-red-950/50' : '',

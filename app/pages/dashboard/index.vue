@@ -105,9 +105,9 @@ const {
       </section>
 
       <!-- Funil + Follow-ups -->
-      <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <section class="grid grid-cols-1 lg:grid-cols-3  gap-4 sm:gap-6">
         <div
-          class="lg:col-span-2 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
+          class="lg:col-span-2 bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
           <BaseSkeleton width="10rem" height="1rem" />
           <div class="space-y-4">
             <BaseSkeleton v-for="j in 3" :key="j" width="100%" height="2.5rem" borderRadius="0.75rem" />
@@ -124,9 +124,9 @@ const {
       </section>
 
       <!-- Gráficos -->
-      <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div
-          class="lg:col-span-2 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
+          class="lg:col-span-2 bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
           <BaseSkeleton width="12rem" height="1rem" />
           <BaseSkeleton width="100%" height="20rem" borderRadius="1rem" />
         </div>
@@ -138,9 +138,9 @@ const {
       </section>
 
       <!-- Tracking + Top Clientes -->
-      <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div
-          class="lg:col-span-2 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
+          class="lg:col-span-2 bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
           <BaseSkeleton width="14rem" height="1rem" />
           <div class="space-y-3">
             <BaseSkeleton v-for="j in 5" :key="j" width="100%" height="2.25rem" borderRadius="0.5rem" />
@@ -200,22 +200,22 @@ const {
 
       <!-- Cartão Premium Glowing ROI de Inteligência Artificial -->
       <section
-        class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-8 rounded-[0.75rem] shadow-2xl border border-indigo-500/20 shadow-indigo-500/5 group">
+        class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-4 rounded-[0.75rem] shadow-2xl border border-indigo-500/20 shadow-indigo-500/5 group">
         <!-- Glow decorativo de IA -->
         <div
           class="absolute -top-10 -right-10 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl opacity-60 group-hover:bg-indigo-500/20 transition-all duration-700">
         </div>
         <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl opacity-60"></div>
 
-        <div class="relative flex flex-col lg:flex-row justify-between items-stretch gap-8 z-10">
+        <div class="relative flex flex-col lg:flex-row justify-between items-stretch gap-4 sm:gap-6 z-10">
           <!-- Textos e ROI Geral -->
-          <div class="space-y-6 flex-1">
-            <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+          <div class="space-y-3 flex-1">
+            <div class="flex flex-col md:flex-row items-start md:items-center gap-2 sm:gap-4">
               <div
-                class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-indigo-500/20 backdrop-blur-md rounded-full text-indigo-200 text-[9px] font-black uppercase tracking-widest border border-indigo-500/30">
+                class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-indigo-500/20 backdrop-blur-md rounded-full text-indigo-200 text-[9px] font-semibold tracking-wide border border-indigo-500/30">
                 <Sparkles class="w-3.5 h-3.5 text-indigo-400 animate-pulse" /> Inteligência Artificial Orcei Fácil
               </div>
-              <p class="text-slate-400 font-bold text-xs">
+              <p class="text-slate-400 font-bold text-xs  hidden sm:inline">
                 Sua IA Copilot está ativa economizando trabalho manual.
               </p>
             </div>
@@ -225,7 +225,7 @@ const {
                 Você poupou <span class="text-indigo-400 font-extrabold">{{ stats.aiRoi?.timeSavedHours }}h {{
                   stats.aiRoi?.timeSavedMinutes }}m</span> de redação comercial!
               </h2>
-              <p class="text-slate-400 text-sm max-w-2xl leading-relaxed">
+              <p class="text-slate-400 text-sm max-w-2xl leading-relaxed hidden sm:inline">
                 Cada proposta assistida e item do catálogo otimizado com IA economiza em média 12 minutos de digitação,
                 correção e formatação burocrática de contratos.
               </p>
@@ -255,7 +255,7 @@ const {
 
           <!-- Painel Reformulado de Créditos e Ações de IA -->
           <div
-            class="flex flex-col justify-between items-stretch gap-6 bg-slate-950/60 p-6 rounded-[0.75rem] border border-white/10 lg:w-80 shrink-0 shadow-inner">
+            class="flex flex-col justify-between items-stretch gap-6 bg-slate-950/60 p-4 rounded-[0.75rem] border border-white/10 lg:w-80 shrink-0 shadow-inner">
             <!-- Mini Cards de Saldo e Consumo -->
             <div class="space-y-3">
               <div class="flex items-center justify-between">
@@ -325,11 +325,11 @@ const {
       </section>
 
       <!-- Funil Comercial & Opcionais de Upsell -->
-      <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 
         <!-- Funil Comercial Horizontal -->
         <div
-          class="lg:col-span-2 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col justify-between">
+          class="lg:col-span-2 bg-white dark:bg-gray-900 p-4 sm: p-6 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col justify-between">
           <div>
             <div class="flex justify-between items-center mb-6">
               <h3 class="text-lg md:text-md font-black text-gray-900 dark:text-white tracking-wide">Funil Comercial e
@@ -350,7 +350,7 @@ const {
                   <template #footer>
                      <span
                     class="text-xs font-bold text-blue-800 dark:text-blue-300">
-                    {{ stats.pendingCount }} orçamentos aguardando resposta do cliente
+                    {{ stats.pendingCount }} orçamentos<span class="hidden sm:inline"> aguardando resposta do cliente</span>
                   </span>
                   </template>
                 </BaseProgressBar>
@@ -365,7 +365,7 @@ const {
                   <template #footer>
                      <span
                     class="text-xs font-bold text-emerald-800 dark:text-emerald-300">
-                    {{ stats.acceptedCount }} orçamentos fechados ({{ Math.round(stats.approvalRate) }}% conversão)
+                    {{ stats.acceptedCount }} orçamentos<span class="hidden sm:inline"> fechados</span> ({{ Math.round(stats.approvalRate) }}% conversão)
                   </span>
                   </template>
                 </BaseProgressBar>
@@ -400,42 +400,36 @@ const {
 
         <!-- Alertas de Follow-ups Inteligentes -->
         <div
-          class="lg:col-span-1 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-6">
+          class="lg:col-span-1 bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-6">
           <div class="flex justify-between items-center">
-            <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest">Ações e Follow-ups
+            <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-wide">Ações e Follow-ups
             </h3>
-            <AlertCircle class="w-5 h-5 text-indigo-500" />
+            <AlertCircle class="w-5 h-5 text-gray-300" />
           </div>
 
           <div class="space-y-4">
             <div v-for="alert in stats.followUpAlerts" :key="alert.id"
-              class="p-5 bg-orange-50/40 dark:bg-orange-950/10 border border-orange-100 dark:border-orange-900/30 rounded-[0.75rem] space-y-3 hover:border-orange-200 dark:hover:border-orange-850/50 transition-colors">
+              class="p-4 bg-orange-50/40 dark:bg-orange-950/10 border border-orange-100 dark:border-orange-900/30 rounded-[0.75rem] space-y-3 hover:border-orange-200 dark:hover:border-orange-850/50 transition-colors">
               <div class="flex justify-between items-start">
                 <span
-                  class="text-[8px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest bg-orange-100/50 dark:bg-orange-950/40 px-2 py-0.5 rounded-full">
+                  class="text-[8px] font-semibold text-orange-600 dark:text-orange-400 tracking-wide bg-orange-100/50 dark:bg-orange-950/40 px-2 py-0.5 rounded-full">
                   {{ alert.daysAgo === 0 ? 'Pendente hoje' : `Pendente há ${alert.daysAgo}d` }}
                 </span>
                 <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500">{{ alert.code }}</span>
               </div>
 
               <div class="space-y-1">
-                <h4 class="text-xs font-black text-gray-800 dark:text-white truncate uppercase">{{ alert.title }}</h4>
-                <p class="text-[10px] text-gray-500 dark:text-gray-400 font-bold">Cliente: {{ alert.clientName }}</p>
+                <!-- <h4 class="text-xs font-black text-gray-800 dark:text-white truncate uppercase">{{ alert.title }}</h4> -->
+                <p class="text-xs text-gray-800 dark:text-gray-400 font-bold">Cliente: {{ alert.clientName }}</p>
               </div>
 
-              <div class="flex items-center gap-2 pt-1">
-                <a v-if="alert.clientPhone"
-                  :href="`https://wa.me/${alert.clientPhone.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá ${alert.clientName}, gostaria de confirmar se conseguiu visualizar a proposta comercial que enviei? Qualquer dúvida fico à disposição!`)}`"
-                  target="_blank"
-                  class="flex-1 flex items-center justify-center gap-1.5 py-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white rounded-[0.75rem] text-[9px] font-black uppercase tracking-widest transition-all">
-                  <img :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5" alt="WhatsApp" loading="lazy" />
-                  WhatsApp
-                </a>
+              <div class="flex flex-1 flex-row items-center gap-2 pt-1">
+                <BaseButton type="link" :href="`https://wa.me/${alert.clientPhone.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá ${alert.clientName}, gostaria de confirmar se conseguiu visualizar a proposta comercial que enviei? Qualquer dúvida fico à disposição!`)}`"
+                  target="_blank" variant="whatsapp" size="sm" class="w-full">
+                  <img :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5 mr-1" alt="WhatsApp" loading="lazy" />
+                  WhatsApp</BaseButton>
 
-                <a :href="`${publicProposalUrl}/p/${alert.slug}?t=${alert.token}`" target="_blank"
-                  class="flex-1 flex items-center justify-center gap-1.5 py-2 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-[0.75rem] text-[9px] font-black uppercase tracking-widest transition-all">
-                  Ver Proposta
-                </a>
+                  <BaseButton type="link" :href="`${publicProposalUrl}/p/${alert.slug}?t=${alert.token}`" target="_blank" variant="outline" size="sm" class="w-full">Ver Proposta</BaseButton>
               </div>
             </div>
 
@@ -454,13 +448,13 @@ const {
       </section>
 
       <!-- Gráficos de Evolução de Faturamento e Status -->
-      <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 
         <!-- Gráfico de Evolução de Faturamento -->
         <div data-tour="dashboard-revenue-chart"
-          class="lg:col-span-2 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+          class="lg:col-span-2 bg-white dark:bg-gray-900 p-4 sm: p-6 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
           <div class="flex justify-between items-center">
-            <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest">Evolução do
+            <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-wide">Evolução do
               Faturamento
             </h3>
             <BarChart3 class="w-5 h-5 text-gray-400 dark:text-gray-500" />
@@ -474,7 +468,7 @@ const {
         <div
           class="lg:col-span-1 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
           <div class="flex justify-between items-center">
-            <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest">Status dos Orçamentos
+            <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-wide">Status dos Orçamentos
             </h3>
             <Activity class="w-5 h-5 text-gray-400 dark:text-gray-500" />
           </div>
@@ -486,71 +480,62 @@ const {
       </section>
 
       <!-- Tracking de Abertura & Ranking de Clientes -->
-      <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 
         <!-- Tracking de Aberturas em Tempo Real -->
         <div
-          class="lg:col-span-2 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col justify-between">
+          class="lg:col-span-2 bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col justify-between">
           <div>
             <div class="flex justify-between items-center mb-6">
-              <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest">Visualizações
-                Recentes
-                (Tracking)</h3>
+              <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-wide">Visualizações Recentes (Tracking)</h3>
               <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-ping"></span>
             </div>
 
-            <div class="overflow-x-auto">
-              <table class="w-full text-left border-collapse">
-                <thead>
-                  <tr class="border-b border-gray-100 dark:border-gray-800">
-                    <th class="pb-4 text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                      Orçamento</th>
-                    <th class="pb-4 text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                      Cliente
-                    </th>
-                    <th class="pb-4 text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                      Navegador</th>
-                    <th
-                      class="pb-4 text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest text-right">
-                      Quando</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
-                  <tr v-for="(view, idx) in stats.trackingViews" :key="idx"
-                    class="hover:bg-gray-50/40 dark:hover:bg-gray-800/30 transition-colors">
-                    <td class="py-4 text-xs font-bold text-gray-900 dark:text-white">
-                      {{ view.proposalCode }}
-                      <span
-                        class="block text-[9px] text-gray-400 dark:text-gray-500 font-bold truncate max-w-[150px]">{{
-                          view.proposalTitle }}</span>
-                    </td>
-                    <td class="py-4 text-xs font-bold text-gray-650 dark:text-gray-300">
-                      {{ view.clientName }}
-                      <span
-                        class="block text-[8px] text-gray-400 dark:text-gray-500 uppercase font-black tracking-wider">{{
-                          view.location }}</span>
-                    </td>
-                    <td class="py-4 text-[10px] text-gray-400 dark:text-gray-500 font-bold">{{ view.browser }}</td>
-                    <td class="py-4 text-xs font-black text-gray-900 dark:text-white text-right">
-                      {{ formatRelativeTime(view.minutesAgo) }}
-                    </td>
-                  </tr>
-                  <tr v-if="!stats.trackingViews?.length">
-                    <td colspan="4" class="py-12 text-center text-gray-400 dark:text-gray-500 text-xs font-semibold">
-                      Nenhuma visualização de proposta registrada ainda.
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <BaseTable
+              :columns="[
+                { key: 'proposalCode', label: 'Orçamento' },
+                { key: 'clientName', label: 'Cliente' },
+                { key: 'browser', label: 'Navegador' },
+                { key: 'minutesAgo', label: 'Quando', align: 'right' }
+              ]"
+              :items="stats.trackingViews || []"
+            >
+              <template #cell-proposalCode="{ item }">
+                <div class="font-bold text-gray-900 dark:text-white">
+                  {{ item.proposalCode }}
+                  <span
+                    class="block text-[9px] text-gray-400 dark:text-gray-500 font-bold truncate max-w-[250px] md:max-w-[150px] mt-0.5 md:mt-0"
+                  >
+                    {{ item.proposalTitle }}
+                  </span>
+                </div>
+              </template>
+
+              <template #cell-clientName="{ item }">
+                <div class="font-bold text-gray-700 dark:text-gray-300">
+                  {{ item.clientName }}
+                  <span
+                    class="block text-[9px] text-gray-400 dark:text-gray-500 uppercase font-black tracking-wider mt-0.5 md:mt-0"
+                  >
+                    {{ item.location }}
+                  </span>
+                </div>
+              </template>
+
+              <template #cell-minutesAgo="{ value }">
+                <span class="font-black text-gray-900 dark:text-white font-sm">
+                  {{ formatRelativeTime(value) }}
+                </span>
+              </template>
+            </BaseTable>
           </div>
         </div>
 
         <!-- Ranking de Clientes (Faturamento) -->
         <div
-          class="lg:col-span-1 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-6">
+          class="lg:col-span-1 bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-6">
           <div class="flex justify-between items-center">
-            <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest">Top Clientes</h3>
+            <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-wide">Top Clientes</h3>
             <NuxtLink to="/clientes"
               class="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest hover:text-blue-800 dark:hover:text-blue-300">
               Ver Todos</NuxtLink>
@@ -576,10 +561,7 @@ const {
               <div class="text-right">
                 <p class="text-xs font-black text-gray-900 dark:text-white">R$ {{ (client.revenue as
                   number).toLocaleString('pt-BR') }}</p>
-                <div class="w-16 h-1 bg-gray-100 dark:bg-gray-850 rounded-full mt-1.5 overflow-hidden">
-                  <div class="h-full bg-blue-600 dark:bg-blue-500 rounded-full"
-                    :style="{ width: ((client.revenue as number) / stats.totalRevenue * 100) + '%' }"></div>
-                </div>
+                  <BaseProgressBar color="bg-blue-600 dark:bg-blue-500" height="h-1" :value="((client.revenue as number) / stats.totalRevenue * 100)"></BaseProgressBar>
               </div>
             </div>
 

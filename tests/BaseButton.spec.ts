@@ -75,4 +75,32 @@ describe('BaseButton Component', () => {
     await wrapper.find('button').trigger('click')
     expect(clicked).toBe(true)
   })
+
+  it('renderiza uma tag <a> quando type é link ou a, ou quando href é informado', async () => {
+    const wrapperLink = await mountSuspended(BaseButton, {
+      props: {
+        type: 'link',
+        href: 'https://orcei.com.br',
+        target: '_blank'
+      },
+      slots: {
+        default: () => 'Abrir Site'
+      }
+    })
+
+    expect(wrapperLink.find('a').exists()).toBe(true)
+    expect(wrapperLink.find('a').attributes('href')).toBe('https://orcei.com.br')
+    expect(wrapperLink.find('a').attributes('target')).toBe('_blank')
+    expect(wrapperLink.text()).toContain('Abrir Site')
+
+    const wrapperTypeA = await mountSuspended(BaseButton, {
+      props: {
+        type: 'a',
+        href: '/relatorios'
+      }
+    })
+
+    expect(wrapperTypeA.find('a').exists()).toBe(true)
+    expect(wrapperTypeA.find('a').attributes('href')).toBe('/relatorios')
+  })
 })

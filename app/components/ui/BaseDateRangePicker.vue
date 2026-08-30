@@ -68,17 +68,17 @@ function setPreset(days: number) {
 
 <template>
   <div :class="label ? 'space-y-2' : ''">
-    <label v-if="label" class="block text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-2">
+    <label v-if="label" class="block text-xs font-normal text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-2">
       {{ label }}
     </label>
 
     <PopoverRoot v-model:open="isOpen">
       <div class="relative">
         <PopoverTrigger
-          class="w-full h-[52px] flex items-center gap-3 px-5 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-800 hover:border-gray-200 rounded-[0.75rem] transition-all text-left focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none group"
+          class="w-full h-[52px] flex items-center gap-3 px-5 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-800 hover:border-gray-200 rounded-[0.75rem] transition-all text-left focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none group"
         >
           <Calendar class="w-5 h-5 text-gray-400 dark:text-gray-500 group-hover:text-blue-600 transition-colors" />
-          <span :class="[(!start && !end) ? 'text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white', 'font-bold text-sm truncate flex-1']">
+          <span :class="[(!start && !end) ? 'text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white', 'font-normal text-sm truncate flex-1']">
             {{ formattedRange }}
           </span>
           <X 
@@ -93,12 +93,12 @@ function setPreset(days: number) {
             side="bottom"
             :side-offset="8"
             align="end"
-            class="z-[100] bg-white dark:bg-gray-900 rounded-[0.75rem] border-2 border-gray-300 dark:border-gray-800 shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-200 min-w-[320px]"
+            class="z-[100] bg-white dark:bg-gray-900 rounded-[0.75rem] border border-gray-300 dark:border-gray-800 shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-200 min-w-[320px]"
           >
             <div class="space-y-8">
               <!-- Presets -->
               <div class="grid grid-cols-2 gap-2">
-                <button 
+                <BaseButton size="sm" variant="secondary"
                   v-for="p in [
                     { label: 'Hoje', days: 0 },
                     { label: '7 dias', days: 7 },
@@ -107,40 +107,26 @@ function setPreset(days: number) {
                   ]"
                   :key="p.label"
                   @click="setPreset(p.days)"
-                  class="px-4 py-2 rounded-[0.75rem] text-[10px] font-black uppercase tracking-widest bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:text-blue-600 dark:hover:text-blue-400 transition-all border border-transparent hover:border-blue-100 dark:hover:border-blue-900/50"
                 >
                   {{ p.label }}
-                </button>
+                </BaseButton>
               </div>
 
               <!-- Inputs -->
               <div class="space-y-4">
                 <div class="space-y-2">
-                  <label class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Início</label>
-                  <input
-                    v-model="internalStart"
-                    type="date"
-                    class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-800 rounded-[0.75rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-bold text-sm text-gray-900 dark:text-white transition-all"
-                  >
+                  <BaseInput v-model="internalStart" type="date" label="Início"/>
                 </div>
                 <div class="space-y-2">
-                  <label class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Fim</label>
-                  <input
-                    v-model="internalEnd"
-                    type="date"
-                    class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-800 rounded-[0.75rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-bold text-sm text-gray-900 dark:text-white transition-all"
-                  >
+                  <BaseInput v-model="internalEnd" type="date" label="Fim"/>
                 </div>
               </div>
 
               <!-- Footer -->
               <div class="pt-4 border-t border-gray-50 dark:border-gray-800 flex gap-3">
-                <button 
-                  @click="clearRange"
-                  class="flex-1 px-4 py-3 rounded-[0.75rem] text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white transition-all"
-                >
+                <BaseButton size="sm" variant="ghost" class="flex-1" @click="clearRange">
                   Limpar
-                </button>
+                </BaseButton>
                 <BaseButton size="sm" class="flex-1" @click="applyRange">
                   Aplicar
                 </BaseButton>

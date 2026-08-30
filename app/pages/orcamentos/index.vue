@@ -104,7 +104,7 @@ const {
 
 <template>
   <div class="space-y-10 relative">
-    <PageHeader title="Orçamentos" subtitle="Acompanhe e gerencie seus orçamentos comerciais.">
+    <PageHeader>
       <div class="flex flex-row gap-3 w-full sm:w-auto justify-end">
          <BaseButton @click="isAIWizardOpen = true" variant="ia">
           <Sparkles class="w-4 h-4 mr-2 text-white animate-pulse" />
@@ -115,11 +115,22 @@ const {
           <span class="hidden sm:inline">Novo</span>
         </BaseButton>
       </div>
+    </PageHeader>
 
-      <template #filters>
+    <!-- Listagem Unificada (desktop & mobile) -->
+      <BaseCard>
+
+
+      <template #header>
         <BaseFilters :active-filters-count="activeFiltersCount" @clear="clearFilters" data-tour="orcamentos-filtros">
           <template #search>
-            <input
+            <BaseInput
+            v-model="searchQuery"
+              type="text"
+              placeholder="Buscar por título, cliente, e-mail ou código..."
+              :icon="Search"
+            ></BaseInput>
+            <!-- <input
               v-model="searchQuery"
               type="text"
               placeholder="Buscar por título, cliente, e-mail ou código..."
@@ -127,7 +138,7 @@ const {
             >
             <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
               <Search class="w-5 h-5" />
-            </div>
+            </div> -->
           </template>
 
           <div class="w-full md:w-56 shrink-0">
@@ -151,19 +162,16 @@ const {
             />
           </div>
 
-          <div class="flex items-center gap-3 px-5 h-[52px] bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-700 transition-all group cursor-pointer shadow-xs shrink-0 rounded-[0.75rem]">
+          <div class="flex items-center gap-3 px-5 h-[52px] bg-white dark:bg-gray-900  hover:border-gray-400 dark:hover:border-gray-700 transition-all group cursor-pointer shadow-xs shrink-0 rounded-[0.75rem]">
             <!-- Adicionado 'shrink-0' no checkbox para evitar que ele deforme -->
             <BaseCheckbox v-model="filterPendingChat" id="pending-chat" class="shrink-0" />
             
-            <label for="pending-chat" class="text-xs font-black text-slate-700 dark:text-gray-400 uppercase tracking-widest cursor-pointer group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors whitespace-nowrap select-none">
+            <label for="pending-chat" class="text-xs font-normal text-slate-700 dark:text-gray-400 tracking-wide cursor-pointer group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors whitespace-nowrap select-none">
               Chat Pendente
             </label>
           </div>
         </BaseFilters>
       </template>
-    </PageHeader>
-
-    <!-- Listagem Unificada (desktop & mobile) -->
     <BaseDataList
       :columns="[
         { key: 'title', label: 'Orçamento' },
@@ -183,7 +191,7 @@ const {
       <template #cell-title="{ item: proposal }">
         <div class="flex items-center gap-3 cursor-pointer" @click="openProposalInfo(proposal)">
           <div class="flex flex-col">
-            <span class="font-black text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-base md:text-lg tracking-tight">
+            <span class="font-normal text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-base tracking-tight">
               {{ proposal.title || 'Sem título' }}
             </span>
           </div>
@@ -192,7 +200,7 @@ const {
 
       <template #cell-client="{ item: proposal }">
         <div class="flex flex-col cursor-pointer" @click="openProposalInfo(proposal)">
-          <span class="text-md font-bold text-gray-900 tracking-wide mt-0.5">{{ proposal.client?.name }}</span>
+          <span class="text-md font-normal text-gray-900 tracking-wide mt-0.5">{{ proposal.client?.name }}</span>
           <span v-if="proposal.client?.email" class="text-[10px] text-gray-400 dark:text-gray-500 font-medium normal-case mt-0.5">{{ proposal.client.email }}</span>
         </div>
       </template>
@@ -212,7 +220,7 @@ const {
       </template>
 
       <template #cell-total="{ item: proposal }">
-        <span class="font-semibold text-gray-900 dark:text-gray-100 text-xs md:text-base tracking-tight cursor-pointer" @click="openProposalInfo(proposal)">
+        <span class="font-normal text-gray-900 dark:text-gray-100 text-xs md:text-base tracking-tight cursor-pointer" @click="openProposalInfo(proposal)">
           R$ {{ proposal.totals?.final?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '0,00' }}
         </span>
       </template>
@@ -262,7 +270,7 @@ const {
               >
                 <DropdownMenuItem
                   @click="openHistory(proposal)"
-                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 cursor-pointer outline-none transition-all"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-normal text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 cursor-pointer outline-none transition-all"
                 >
                   <History class="w-4 h-4 text-gray-500" />
                   Ver Histórico
@@ -314,6 +322,7 @@ const {
         </div>
       </template> -->
     </BaseDataList>
+    </BaseCard>
 
     <!-- Modal de Informações Detalhadas do Orçamento -->
     <ProposalDetailModal

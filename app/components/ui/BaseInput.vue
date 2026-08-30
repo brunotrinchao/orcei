@@ -92,47 +92,47 @@ const borderClasses = computed(() => {
 
   switch (props.border) {
     case 'slate':
-      return 'border-2 border-slate-300 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700 focus:border-slate-500 dark:focus:border-slate-400 focus:ring-4 focus:ring-slate-500/10'
+      return 'border-slate-300 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700 focus:ring-4 focus:ring-slate-500/10'
     case 'blue':
-      return 'border-2 border-blue-300 dark:border-blue-800 hover:border-blue-400 dark:hover:border-blue-700 focus:border-blue-600 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10'
+      return 'border-blue-300 dark:border-blue-800 hover:border-blue-400 dark:hover:border-blue-700 focus:ring-4 focus:ring-blue-500/10'
     case 'gray':
-      return 'border-2 border-gray-300 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-700 focus:border-gray-600 dark:focus:border-gray-500 focus:ring-4 focus:ring-gray-500/10'
+      return 'border-gray-300 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-700 ffocus:ring-4 focus:ring-gray-500/10'
     case 'emerald':
     case 'green':
-      return 'border-2 border-emerald-300 dark:border-emerald-800 hover:border-emerald-400 dark:hover:border-emerald-700 focus:border-emerald-600 dark:focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10'
+      return 'border-emerald-300 dark:border-emerald-800 hover:border-emerald-400 dark:hover:border-emerald-700 focus:ring-4 focus:ring-emerald-500/10'
     case 'violet':
     case 'purple':
-      return 'border-2 border-violet-300 dark:border-violet-800 hover:border-violet-400 dark:hover:border-violet-700 focus:border-violet-600 dark:focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10'
+      return 'border-violet-300 dark:border-violet-800 hover:border-violet-400 dark:hover:border-violet-700 focus:ring-4 focus:ring-violet-500/10'
     case 'amber':
-      return 'border-2 border-amber-300 dark:border-amber-800 hover:border-amber-400 dark:hover:border-amber-700 focus:border-amber-600 dark:focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10'
+      return 'border-amber-300 dark:border-amber-800 hover:border-amber-400 dark:hover:border-amber-700 focus:ring-4 focus:ring-amber-500/10'
     case true:
     case 'default':
     default:
       if (typeof props.border === 'string' && props.border.startsWith('border')) {
         return props.border
       }
-      return 'border-2 border-gray-300 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 dark:focus:border-blue-500'
+      return 'border-gray-300 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-700  focus:border-blue-600 dark:focus:border-blue-500'
   }
 })
 
 const sizeClasses = computed(() => {
   switch (props.size) {
     case 'xs':
-      return 'py-1.5 text-xs rounded-md'
+      return 'py-1.5 text-xs rounded-[.5rem]'
     case 'sm':
-      return 'py-2.5 text-xs rounded-lg'
+      return 'py-2.5 text-xs rounded-[.5rem]'
     case 'lg':
-      return 'py-4 text-base rounded-[0.75rem]'
+      return 'py-4 text-base rounded-[.5rem]'
     case 'xl':
-      return 'py-5 text-lg rounded-xl'
+      return 'py-5 text-lg rounded-[.5rem]'
     case '2xl':
-      return 'py-6 text-xl rounded-2xl'
+      return 'py-6 text-xl rounded-[.5rem]'
     case 'md':
     default:
       if (props.size && (props.size.startsWith('py-') || props.size.startsWith('text-'))) {
         return props.size
       }
-      return 'py-3.5 text-sm rounded-[0.75rem]'
+      return 'py-3.5 text-sm rounded-[.5rem]'
   }
 })
 
@@ -219,7 +219,7 @@ const displayError = computed(() => props.error || (showRequiredError.value ? 'C
 
 <template>
   <div class="space-y-2">
-    <label v-if="label" :for="inputId" class="block text-xs font-semibold text-slate-700 dark:text-gray-400 tracking-wide ml-1">
+    <label v-if="label" :for="inputId" class="block text-sm font-medium text-slate-500 dark:text-gray-500 tracking-wide ml-1">
       {{ label }} <span v-if="required" class="text-red-500">*</span>
     </label>
     <div class="relative flex items-center">
@@ -246,7 +246,7 @@ const displayError = computed(() => props.error || (showRequiredError.value ? 'C
         :readonly="readonly"
         :required="required"
         :class="[
-          'w-full transition-all outline-none font-bold disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:cursor-not-allowed shadow-xs',
+          'w-full transition-all outline-none font-normal disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:cursor-not-allowed shadow-xs border ',
           borderClasses,
           bgClasses,
           sizeClasses,

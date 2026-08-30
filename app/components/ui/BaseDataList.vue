@@ -108,11 +108,11 @@ useIntersectionObserver(sentinelRef, ([entry]) => {
         <template #empty>
           <slot name="empty">
             <div class="py-12 text-center">
-              <div class="w-16 h-16 bg-slate-100 dark:bg-gray-800 text-slate-400 dark:text-gray-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div class="w-16 h-16 bg-slate-100 dark:bg-gray-800 text-slate-400 dark:text-gray-500 rounded-[.5rem] flex items-center justify-center mx-auto mb-4">
                 <FileSearch class="w-8 h-8" />
               </div>
-              <h3 class="text-base font-black text-gray-900 dark:text-white uppercase tracking-tight">{{ emptyTitle }}</h3>
-              <p class="text-slate-400 dark:text-gray-500 text-xs font-bold mt-1 max-w-xs mx-auto">{{ emptySubtitle }}</p>
+              <h3 class="text-base font-semibold text-gray-900 dark:text-white tracking-wide">{{ emptyTitle }}</h3>
+              <p class="text-slate-400 dark:text-gray-500 text-xs font-normal mt-1 max-w-xs mx-auto">{{ emptySubtitle }}</p>
             </div>
           </slot>
         </template>

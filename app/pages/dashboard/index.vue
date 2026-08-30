@@ -52,18 +52,18 @@ const {
     <!-- Filtros de Período e Título -->
     <PageHeader title="Cockpit Comercial" subtitle="Acompanhe suas conversões, produtividade IA e receitas acumuladas.">
       <div v-if="stats" data-tour="dashboard-period-filter"
-        class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide bg-gray-100/80 dark:bg-gray-800 p-1.5 rounded-[0.75rem] border border-gray-200/50 dark:border-gray-700 md:w-auto w-full">
-        <button v-for="p in [
+        class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide bg-gray-100/80 dark:bg-gray-800 p-1.5 rounded-[.5rem] border border-gray-200/50 dark:border-gray-700 md:w-auto w-full">
+        
+        <BaseButton size="sm" v-for="p in [
           { label: '7D', value: 'last_7_days' },
           { label: '30D', value: 'last_30_days' },
           { label: '90D', value: 'last_90_days' },
-          { label: 'Este Ano', value: 'year' },
-          { label: 'Total', value: 'all' }
+          { label: (new Date().getFullYear()), value: 'year' },
+          { label: 'TOTAL', value: 'all' }
         ]" :key="p.value" @click="period = p.value"
-          :class="period === p.value ? 'bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 border border-gray-200/60 dark:border-gray-700 shadow-sm font-black' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-bold hover:bg-gray-200/40 dark:hover:bg-gray-700/40'"
-          class="md:px-5 px-3 py-2 rounded-[0.75rem] text-[10px] uppercase tracking-widest transition-all whitespace-nowrap">
+        :variant="period === p.value ? 'primary' : 'secondary'">
           {{ p.label }}
-        </button>
+        </BaseButton>
       </div>
     </PageHeader>
 
@@ -164,7 +164,7 @@ const {
 
         <!-- Receita Confirmada -->
         <BaseMetricCard title="Faturamento" :subtitle="`${stats.acceptedCount} orçamentos convertidos`"
-          :icon="DollarSign" color="green" badge="Faturado"
+          :icon="DollarSign" color="green"
           :value="`R$ ${(stats.totalRevenue ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`">
           <template #footer>
             <BaseProgressBar color="green"
@@ -174,14 +174,14 @@ const {
 
         <!-- Conversão Geral -->
         <BaseMetricCard title="Conversão" :subtitle="`${stats.proposalsCount} orçamentos totais`" :icon="TrendingUp"
-          color="blue" badge="Sucesso" :value="`${Math.round(stats.approvalRate ?? 0)}%`">
+          color="blue" :value="`${Math.round(stats.approvalRate ?? 0)}%`">
           <template #footer>
             <BaseProgressBar color="blue" :value="Math.round(stats.approvalRate ?? 0)" />
           </template>
         </BaseMetricCard>
 
         <!-- TMA (Tempo Médio de Atendimento/Fechamento) -->
-        <BaseMetricCard title="TMA" subtitle="tempo médio p/ aceite" :icon="Clock" color="purple" badge="Agilidade"
+        <BaseMetricCard title="TMA" subtitle="tempo médio p/ aceite" :icon="Clock" color="purple"
           :value="stats.tmaHours > 24 ? `${Math.round(stats.tmaHours / 24)}d` : `${Math.round(stats.tmaHours || 0)}h`">
           <template #footer>
             <BaseProgressBar color="purple" :value="tmaPercentage" />
@@ -189,7 +189,7 @@ const {
         </BaseMetricCard>
 
         <!-- SLA Comercial (Fechados em < 48h) -->
-        <BaseMetricCard title="SLA 48h" subtitle="fechados na meta" :icon="ShieldCheck" color="orange" badge="Meta"
+        <BaseMetricCard title="SLA 48h" subtitle="fechados na meta" :icon="ShieldCheck" color="orange"
           :value="`${Math.round(stats.slaRate ?? 0)}%`">
           <template #footer>
             <BaseProgressBar color="orange" :value="Math.round(stats.slaRate ?? 0)" />
@@ -199,13 +199,7 @@ const {
       </section>
 
       <!-- Cartão Premium Glowing ROI de Inteligência Artificial -->
-      <section
-        class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-4 rounded-[0.75rem] shadow-2xl border border-indigo-500/20 shadow-indigo-500/5 group">
-        <!-- Glow decorativo de IA -->
-        <div
-          class="absolute -top-10 -right-10 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl opacity-60 group-hover:bg-indigo-500/20 transition-all duration-700">
-        </div>
-        <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl opacity-60"></div>
+       <BaseCard class="lg:col-span-1" color="ia" >
 
         <div class="relative flex flex-col lg:flex-row justify-between items-stretch gap-4 sm:gap-6 z-10">
           <!-- Textos e ROI Geral -->
@@ -322,24 +316,14 @@ const {
           </div>
 
         </div>
-      </section>
+      </BaseCard>
 
       <!-- Funil Comercial & Opcionais de Upsell -->
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 
         <!-- Funil Comercial Horizontal -->
-        <div
-          class="lg:col-span-2 bg-white dark:bg-gray-900 p-4 sm: p-6 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col justify-between">
-          <div>
-            <div class="flex justify-between items-center mb-6">
-              <h3 class="text-lg md:text-md font-black text-gray-900 dark:text-white tracking-wide">Funil Comercial e
-                Conversão</h3>
-              <span
-                class="hidden md:block text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest bg-blue-50 dark:bg-blue-950/30 px-2 py-0.5 rounded-[0.75rem]">Passos
-                de Vendas</span>
-            </div>
-
-            <div class="space-y-4">
+       <BaseCard title="Funil Comercial e Conversão" class="lg:col-span-2">
+        <div class="space-y-4">
               <!-- Em Aberto / Enviados -->
               <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
                 <span
@@ -371,10 +355,8 @@ const {
                 </BaseProgressBar>
               </div>
             </div>
-          </div>
 
-          <!-- Receita de Opcionais (Upsell) -->
-          <div
+            <div
             class="mt-8 p-6 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 rounded-[0.75rem] flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="space-y-1 text-center sm:text-left">
               <span
@@ -395,43 +377,37 @@ const {
                 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
             </div>
           </div>
-
-        </div>
+      </BaseCard>
 
         <!-- Alertas de Follow-ups Inteligentes -->
-        <div
-          class="lg:col-span-1 bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-6">
-          <div class="flex justify-between items-center">
-            <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-wide">Ações e Follow-ups
-            </h3>
-            <AlertCircle class="w-5 h-5 text-gray-300" />
-          </div>
+        <BaseCard title="Ações e Follow-ups" class="lg:col-span-1">
 
           <div class="space-y-4">
-            <div v-for="alert in stats.followUpAlerts" :key="alert.id"
-              class="p-4 bg-orange-50/40 dark:bg-orange-950/10 border border-orange-100 dark:border-orange-900/30 rounded-[0.75rem] space-y-3 hover:border-orange-200 dark:hover:border-orange-850/50 transition-colors">
-              <div class="flex justify-between items-start">
-                <span
-                  class="text-[8px] font-semibold text-orange-600 dark:text-orange-400 tracking-wide bg-orange-100/50 dark:bg-orange-950/40 px-2 py-0.5 rounded-full">
-                  {{ alert.daysAgo === 0 ? 'Pendente hoje' : `Pendente há ${alert.daysAgo}d` }}
-                </span>
-                <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500">{{ alert.code }}</span>
-              </div>
 
-              <div class="space-y-1">
+            <BaseCard v-for="alert in stats.followUpAlerts" :key="alert.id" noPadding color="slate" compact>
+              <template #header>
+                <div class="flex justify-between w-full">
+                <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500">{{ alert.code }}</span>
+                  <BaseBadge variant="warning" light>
+                  {{ alert.daysAgo === 0 ? 'Pendente hoje' : `Pendente há ${alert.daysAgo}d` }}
+                  </BaseBadge>
+              </div>
+              </template>
+             <div class="px-6">
                 <!-- <h4 class="text-xs font-black text-gray-800 dark:text-white truncate uppercase">{{ alert.title }}</h4> -->
                 <p class="text-xs text-gray-800 dark:text-gray-400 font-bold">Cliente: {{ alert.clientName }}</p>
               </div>
+              <template #footer>
+                  <div class="flex flex-1 flex-row items-center gap-2 pt-1">
+                  <BaseButton type="link" :href="`https://wa.me/${alert.clientPhone.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá ${alert.clientName}, gostaria de confirmar se conseguiu visualizar a proposta comercial que enviei? Qualquer dúvida fico à disposição!`)}`"
+                    target="_blank" variant="whatsapp" size="sm" class="w-full">
+                    <img :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5 mr-1" alt="WhatsApp" loading="lazy" />
+                    WhatsApp</BaseButton>
 
-              <div class="flex flex-1 flex-row items-center gap-2 pt-1">
-                <BaseButton type="link" :href="`https://wa.me/${alert.clientPhone.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá ${alert.clientName}, gostaria de confirmar se conseguiu visualizar a proposta comercial que enviei? Qualquer dúvida fico à disposição!`)}`"
-                  target="_blank" variant="whatsapp" size="sm" class="w-full">
-                  <img :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5 mr-1" alt="WhatsApp" loading="lazy" />
-                  WhatsApp</BaseButton>
-
-                  <BaseButton type="link" :href="`${publicProposalUrl}/p/${alert.slug}?t=${alert.token}`" target="_blank" variant="outline" size="sm" class="w-full">Ver Proposta</BaseButton>
-              </div>
-            </div>
+                    <BaseButton type="link" :href="`${publicProposalUrl}/p/${alert.slug}?t=${alert.token}`" target="_blank" variant="outline" size="sm" class="w-full">Ver Proposta</BaseButton>
+                </div>
+              </template>
+            </BaseCard>
 
             <div v-if="!stats.followUpAlerts?.length" class="text-center py-8 space-y-3">
               <div
@@ -443,7 +419,7 @@ const {
                 no funil.</p>
             </div>
           </div>
-        </div>
+        </BaseCard>
 
       </section>
 
@@ -451,31 +427,19 @@ const {
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 
         <!-- Gráfico de Evolução de Faturamento -->
-        <div data-tour="dashboard-revenue-chart"
-          class="lg:col-span-2 bg-white dark:bg-gray-900 p-4 sm: p-6 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
-          <div class="flex justify-between items-center">
-            <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-wide">Evolução do
-              Faturamento
-            </h3>
-            <BarChart3 class="w-5 h-5 text-gray-400 dark:text-gray-500" />
-          </div>
+        <BaseCard title="Evolução do Faturamentos" class="lg:col-span-2">
           <div class="h-80 relative">
             <Line :data="revenueChartData" :options="lineChartOptions" />
           </div>
-        </div>
+        </BaseCard>
 
         <!-- Distribuição de Status -->
-        <div
-          class="lg:col-span-1 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
-          <div class="flex justify-between items-center">
-            <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-wide">Status dos Orçamentos
-            </h3>
-            <Activity class="w-5 h-5 text-gray-400 dark:text-gray-500" />
-          </div>
+        <BaseCard title="Status dos Orçamentos" class="lg:col-span-1">
+          
           <div class="h-80 relative flex items-center justify-center">
             <Doughnut :data="statusChartData" :options="chartOptions" />
           </div>
-        </div>
+        </BaseCard>
 
       </section>
 
@@ -483,13 +447,8 @@ const {
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 
         <!-- Tracking de Aberturas em Tempo Real -->
-        <div
-          class="lg:col-span-2 bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col justify-between">
+        <BaseCard title="Visualizações Recentes (Tracking)" class="lg:col-span-2" noPadding>
           <div>
-            <div class="flex justify-between items-center mb-6">
-              <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-wide">Visualizações Recentes (Tracking)</h3>
-              <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-ping"></span>
-            </div>
 
             <BaseTable
               :columns="[
@@ -529,21 +488,13 @@ const {
               </template>
             </BaseTable>
           </div>
-        </div>
+        </BaseCard>
 
-        <!-- Ranking de Clientes (Faturamento) -->
-        <div
-          class="lg:col-span-1 bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-6">
-          <div class="flex justify-between items-center">
-            <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-wide">Top Clientes</h3>
-            <NuxtLink to="/clientes"
-              class="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest hover:text-blue-800 dark:hover:text-blue-300">
-              Ver Todos</NuxtLink>
-          </div>
+        <!-- Ranking de Clientes (Faturamento)-->
+         <BaseCard title="Top Clientes" class="lg:col-span-1">
 
           <div class="space-y-4">
-            <div v-for="(client, idx) in stats.clientRanking" :key="idx"
-              class="flex items-center justify-between p-4 bg-gray-50/50 dark:bg-gray-800/40 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-850 transition-colors group">
+            <BaseCard v-for="(client, idx) in stats.clientRanking" :key="idx" color="slate" compact>
               <div class="flex items-center gap-3">
                 <div
                   class="w-8 h-8 bg-white dark:bg-gray-950 rounded-lg border border-gray-200 dark:border-gray-800 flex items-center justify-center text-[10px] font-black text-gray-400 dark:text-gray-500 group-hover:border-blue-200 dark:group-hover:border-blue-900 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-all">
@@ -563,14 +514,14 @@ const {
                   number).toLocaleString('pt-BR') }}</p>
                   <BaseProgressBar color="bg-blue-600 dark:bg-blue-500" height="h-1" :value="((client.revenue as number) / stats.totalRevenue * 100)"></BaseProgressBar>
               </div>
-            </div>
+            </BaseCard>
 
             <div v-if="!stats.clientRanking?.length"
               class="text-center py-12 text-gray-400 dark:text-gray-500 text-xs font-semibold">
               Nenhum dado de receita disponível.
             </div>
           </div>
-        </div>
+        </BaseCard>
 
       </section>
 

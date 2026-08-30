@@ -19,22 +19,20 @@ const isDrawerOpen = ref(false);
         <slot name="search" />
       </div>
       <slot />
-      <button
-        v-if="activeFiltersCount && activeFiltersCount > 0"
-        @click="$emit('clear')"
-        class="h-[52px] px-4 flex items-center justify-center gap-2 text-xs font-black text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-800 hover:border-red-200 dark:hover:border-red-900/50 hover:bg-red-50/50 dark:hover:bg-red-950/30 rounded-[0.75rem] uppercase tracking-widest transition-all shadow-sm active:scale-95 shrink-0"
-      >
-        <X class="w-4 h-4" /> Limpar
-      </button>
+      <BaseButton size="" variant="ghost"
+      v-if="activeFiltersCount && activeFiltersCount > 0"
+        @click="$emit('clear')">
+        <X class="w-4 h-4" />
+      </BaseButton>
     </div>
 
     <!-- Mobile Layout -->
-    <div class="md:hidden">
+    <div class="md:hidden flex flex-row-reverse">
       <!-- Botão para abrir o Modal de Filtros (largura total) -->
-      <BaseButton @click="isDrawerOpen = true" class="w-full flex justify-between" variant="outline">
+      <BaseButton @click="isDrawerOpen = true" size="sm" class="flex flex-end" variant="secondary">
         <div class="flex flex-row items-center">
-          <SlidersHorizontal class="w-5 h-5 mr-2" />
-          <span class="inline">Filtrar</span>
+          <SlidersHorizontal class="w-5 h-5 mr-0 sm:mr-2" />
+          <span class="hidden sm:inline">Filtrar</span>
         </div>
         <span
           v-if="activeFiltersCount && activeFiltersCount > 0"

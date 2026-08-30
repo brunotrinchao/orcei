@@ -44,7 +44,7 @@
 }
 
 .fc .fc-toolbar-title {
-  @apply text-base sm:text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight text-center whitespace-nowrap;
+  @apply text-base sm:text-xl font-semibold text-gray-900 dark:text-white uppercase tracking-tight text-center whitespace-nowrap;
 }
 
 /* Layout Responsivo para Mobile */
@@ -104,7 +104,7 @@
 }
 
 .fc .fc-button {
-  @apply rounded-xl font-black uppercase text-[10px] tracking-widest px-3.5 py-2.5 transition-all shadow-none touch-manipulation border;
+  @apply rounded-[.5rem] font-normal uppercase text-[10px] tracking-widest px-3.5 py-2.5 transition-all shadow-none touch-manipulation border;
 }
 
 .fc .fc-button-primary:not(:disabled).fc-button-active,
@@ -113,13 +113,13 @@
 }
 
 .fc .fc-daygrid-day-number {
-  @apply font-black text-xs text-gray-400 dark:text-gray-500 p-2 sm:p-4;
+  @apply font-normal text-xs text-gray-400 dark:text-gray-500 p-2 sm:p-4;
 }
 
 .fc .fc-event {
-  @apply rounded-lg border-none px-2 py-1 shadow-sm cursor-pointer hover:scale-[1.02] transition-transform;
+  @apply rounded-[.5rem] border-none px-2 py-1 shadow-sm cursor-pointer hover:scale-[1.02] transition-transform;
 }
 
 .fc .fc-event-title {
-  @apply font-bold text-[10px] uppercase tracking-tight;
+  @apply font-normal text-[10px] uppercase tracking-tight;
 }

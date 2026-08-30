@@ -39,7 +39,7 @@ const {
 
 <template>
   <div class="space-y-8 relative">
-    <PageHeader title="Agenda" subtitle="Organize seus atendimentos, reuniões e orçamentos aprovados num único local.">
+    <PageHeader>
       <div class="flex flex-row gap-3 w-full sm:w-auto justify-end">
       <BaseButton data-tour="agenda-novo-evento-btn" @click="openNewEventModal()">
         <Plus class="w-5 h-5 mr-0 sm:mr-2" />
@@ -55,7 +55,7 @@ const {
           <Sparkles class="w-5 h-5" />
         </div>
         <div>
-          <h4 class="text-xs font-black text-blue-950 dark:text-blue-100">
+          <h4 class="text-xs font-normal text-blue-950 dark:text-blue-100">
             Você possui {{ pendingSchedulingProposals.length }} orçamento(s) aceito(s) aguardando agendamento!
           </h4>
           <p class="text-[11px] font-medium text-blue-700 dark:text-blue-300">
@@ -63,7 +63,7 @@ const {
           </p>
         </div>
       </div>
-      <BaseButton size="sm" variant="secondary" @click="openNewEventModal()" class="shrink-0 w-full sm:w-auto">
+      <BaseButton size="sm" variant="outline" @click="openNewEventModal()" class="shrink-0 w-full sm:w-auto">
         Agendar Agora
       </BaseButton>
     </div>
@@ -73,7 +73,7 @@ const {
       <ClientOnly>
         <FullCalendar :options="calendarOptions" />
         <template #fallback>
-          <div class="h-[550px] bg-gray-50 dark:bg-gray-800/40 rounded-[0.75rem] animate-pulse flex items-center justify-center text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest">
+          <div class="h-[550px] bg-gray-50 dark:bg-gray-800/40 rounded-[.5rem] animate-pulse flex items-center justify-center text-gray-400 dark:text-gray-500 text-xs font-normal uppercase tracking-widest">
             Carregando agenda...
           </div>
         </template>
@@ -89,7 +89,7 @@ const {
             <label class="text-xs font-semibold tracking-wide text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
               <CheckCircle2 class="w-4 h-4 text-emerald-500" /> Vincular Orçamento Aceito
             </label>
-            <span v-if="form.proposalId" class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+            <span v-if="form.proposalId" class="text-[10px] font-normal text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
               Vinculado
             </span>
           </div>
@@ -112,20 +112,20 @@ const {
         <!-- Card de Detalhes do Orçamento Vinculado -->
         <div v-if="linkedProposal" class="p-5 bg-blue-50/70 dark:bg-blue-950/30 rounded-2xl border border-blue-100 dark:border-blue-900/50 space-y-3">
           <div class="flex items-center justify-between">
-            <h4 class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest flex items-center gap-1.5">
+            <h4 class="text-[10px] font-normal text-blue-600 dark:text-blue-400 uppercase tracking-widest flex items-center gap-1.5">
               <FileText class="w-3.5 h-3.5" /> Orçamento Vinculado
             </h4>
-            <NuxtLink :to="`${linkedProposal.driveWebViewLink}`" target="_blank" class="text-[10px] font-black text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+            <NuxtLink :to="`${linkedProposal.driveWebViewLink}`" target="_blank" class="text-[10px] font-normal text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
               Ver PDF <ExternalLink class="w-3 h-3" />
             </NuxtLink>
           </div>
           <div class="space-y-1">
-            <p class="text-sm font-black text-gray-900 dark:text-gray-100">{{ linkedProposal.title }}</p>
+            <p class="text-sm font-normal text-gray-900 dark:text-gray-100">{{ linkedProposal.title }}</p>
             <p v-if="linkedProposal.client" class="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
               <User class="w-3.5 h-3.5 text-blue-500" />
               <span><strong>Cliente:</strong> {{ linkedProposal.client.name }} ({{ linkedProposal.client.phone || linkedProposal.client.email }})</span>
             </p>
-            <p v-if="linkedProposal.total" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 pt-1">
+            <p v-if="linkedProposal.total" class="text-xs font-normal text-emerald-600 dark:text-emerald-400 pt-1">
               Valor Total: R$ {{ Number(linkedProposal.total).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
             </p>
           </div>
@@ -144,7 +144,7 @@ const {
           v-if="selectedEvent"
           type="button"
           @click="deleteEvent"
-          class="mr-auto flex items-center gap-2 text-xs font-black text-red-500 hover:text-red-700 dark:hover:text-red-400 uppercase tracking-widest transition-colors"
+          class="mr-auto flex items-center gap-2 text-xs font-normal text-red-500 hover:text-red-700 dark:hover:text-red-400 uppercase tracking-widest transition-colors"
         >
           <Trash2 class="w-4 h-4" /> Excluir
         </button> -->

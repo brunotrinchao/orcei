@@ -56,15 +56,15 @@ const shouldShowMobileLabel = (col: BaseTableColumn) => {
 </script>
 
 <template>
-  <div class="overflow-hidden bg-white dark:bg-gray-900 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm shadow-slate-200/50 dark:shadow-none transition-all">
+  <div class="overflow-hidden bg-white dark:bg-gray-900  transition-all">
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">
         <!-- HEADER -->
         <thead
           v-if="columns && columns.length > 0"
-          class="hidden md:table-header-group bg-slate-50 dark:bg-gray-800/50 border-b border-slate-200 dark:border-gray-800"
+          class="hidden md:table-header-group border-b border-black/10 dark:border-white/10"
         >
-          <tr class="text-xs font-black text-slate-600 dark:text-gray-400 uppercase tracking-wider">
+          <tr class="text-sm font-semibold text-slate-600 dark:text-gray-400 uppercase tracking-wider">
             <th
               v-for="col in columns"
               :key="col.key"
@@ -77,7 +77,7 @@ const shouldShowMobileLabel = (col: BaseTableColumn) => {
         </thead>
         <thead
           v-else-if="$slots.header"
-          class="hidden md:table-header-group bg-slate-50 dark:bg-gray-800/50 border-b border-slate-200 dark:border-gray-800"
+          class="hidden md:table-header-group bg-slate-50 dark:bg-gray-800/50 border-b border-black/10 dark:border-white/10"
         >
           <tr class="text-xs font-black text-slate-600 dark:text-gray-400 uppercase tracking-wider">
             <slot name="header"></slot>
@@ -102,7 +102,7 @@ const shouldShowMobileLabel = (col: BaseTableColumn) => {
                     :class="[col.hideOnMobile ? 'hidden md:table-cell' : '']"
                   >
                     <div class="flex items-center gap-2">
-                      <span v-if="shouldShowMobileLabel(col)" class="inline-block md:hidden text-[9px] font-black text-gray-300 dark:text-gray-700 uppercase tracking-widest mr-2">
+                      <span v-if="shouldShowMobileLabel(col)" class="inline-block md:hidden text-[9px] font-normal text-gray-300 dark:text-gray-700 uppercase tracking-widest mr-2">
                         {{ col.label }}:
                       </span>
                       <BaseSkeleton width="80%" height="1.25rem" borderRadius="0.5rem" />
@@ -145,7 +145,7 @@ const shouldShowMobileLabel = (col: BaseTableColumn) => {
                 <!-- Mobile Field Label -->
                 <span
                   v-if="shouldShowMobileLabel(col)"
-                  class="inline-block md:hidden text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mr-2"
+                  class="inline-block md:hidden text-[9px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest mr-2"
                 >
                   {{ col.label }}:
                 </span>
@@ -193,7 +193,7 @@ const shouldShowMobileLabel = (col: BaseTableColumn) => {
     <!-- PAGINATION -->
     <div
       v-if="computedTotal > itemsPerPage"
-      class="p-4 border-t border-slate-200 dark:border-gray-800 flex items-center justify-center"
+      class="p-4 border-t border-black/10 dark:border-white/10 flex items-center justify-center"
     >
       <BasePagination
         :total="computedTotal"

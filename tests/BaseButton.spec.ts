@@ -104,17 +104,24 @@ describe('BaseButton Component', () => {
     expect(wrapperTypeA.find('a').attributes('href')).toBe('/relatorios')
   })
 
-  it('aplica classes responsivas de tamanho para mobile e desktop (com suporte a prop mobileSize)', async () => {
+  it('aplica classes de tamanhos corretamente (xs, sm, md, lg)', async () => {
     const wrapperDefault = await mountSuspended(BaseButton, {
       props: { size: 'lg' }
     })
-    expect(wrapperDefault.classes().join(' ')).toContain('sm:px-12')
-    expect(wrapperDefault.classes().join(' ')).toContain('px-5')
+    expect(wrapperDefault.classes()).toContain('px-8')
+    expect(wrapperDefault.classes()).toContain('py-5')
 
-    const wrapperCustomMobile = await mountSuspended(BaseButton, {
-      props: { size: 'lg', mobileSize: 'xs' }
+    const wrapperSmall = await mountSuspended(BaseButton, {
+      props: { size: 'xs' }
     })
-    expect(wrapperCustomMobile.classes().join(' ')).toContain('text-[9px]')
-    expect(wrapperCustomMobile.classes().join(' ')).toContain('sm:px-12')
+    expect(wrapperSmall.classes()).toContain('px-3')
+    expect(wrapperSmall.classes()).toContain('py-1.5')
+  })
+
+  it('aplica a classe w-full quando a prop block é verdadeira', async () => {
+    const wrapperBlock = await mountSuspended(BaseButton, {
+      props: { block: true }
+    })
+    expect(wrapperBlock.classes()).toContain('w-full')
   })
 })

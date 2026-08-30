@@ -132,19 +132,19 @@ const borderClasses = computed(() => {
 
   switch (props.border) {
     case 'slate':
-      return 'border-2 border-slate-300 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700 focus:border-slate-500 dark:focus:border-slate-400 focus:ring-4 focus:ring-slate-500/10'
+      return 'border border-slate-300 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700 focus:border-slate-500 dark:focus:border-slate-400 focus:ring-4 focus:ring-slate-500/10'
     case 'blue':
-      return 'border-2 border-blue-300 dark:border-blue-800 hover:border-blue-400 dark:hover:border-blue-700 focus:border-blue-600 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10'
+      return 'border border-blue-300 dark:border-blue-800 hover:border-blue-400 dark:hover:border-blue-700 focus:border-blue-600 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10'
     case 'gray':
-      return 'border-2 border-gray-300 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-700 focus:border-gray-600 dark:focus:border-gray-500 focus:ring-4 focus:ring-gray-500/10'
+      return 'border border-gray-300 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-700 focus:border-gray-600 dark:focus:border-gray-500 focus:ring-4 focus:ring-gray-500/10'
     case 'emerald':
     case 'green':
-      return 'border-2 border-emerald-300 dark:border-emerald-800 hover:border-emerald-400 dark:hover:border-emerald-700 focus:border-emerald-600 dark:focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10'
+      return 'border border-emerald-300 dark:border-emerald-800 hover:border-emerald-400 dark:hover:border-emerald-700 focus:border-emerald-600 dark:focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10'
     case 'violet':
     case 'purple':
-      return 'border-2 border-violet-300 dark:border-violet-800 hover:border-violet-400 dark:hover:border-violet-700 focus:border-violet-600 dark:focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10'
+      return 'border border-violet-300 dark:border-violet-800 hover:border-violet-400 dark:hover:border-violet-700 focus:border-violet-600 dark:focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10'
     case 'amber':
-      return 'border-2 border-amber-300 dark:border-amber-800 hover:border-amber-400 dark:hover:border-amber-700 focus:border-amber-600 dark:focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10'
+      return 'border border-amber-300 dark:border-amber-800 hover:border-amber-400 dark:hover:border-amber-700 focus:border-amber-600 dark:focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10'
     case true:
     case 'default':
     default:
@@ -154,7 +154,7 @@ const borderClasses = computed(() => {
       ) {
         return props.border
       }
-      return 'border-2 border-gray-300 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 dark:focus:border-blue-500'
+      return 'border border-gray-300 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 dark:focus:border-blue-500'
   }
 })
 
@@ -185,7 +185,7 @@ const sizeClasses = computed(() => {
 
 <template>
   <div class="space-y-2">
-    <label v-if="label" :id="`label-${id}`" class="block text-xs font-black text-slate-700 dark:text-gray-400 uppercase tracking-widest ml-1">
+    <label v-if="label" :id="`label-${id}`" class="block text-xs font-normal text-gray-900 dark:text-white uppercase tracking-widest ml-1">
       {{ label }} <span v-if="required" class="text-red-500">*</span>
     </label>
 
@@ -202,7 +202,7 @@ const sizeClasses = computed(() => {
           ref="triggerRef"
           :aria-labelledby="label ? `label-${id}` : undefined"
           :class="[
-            'inline-flex items-center justify-between w-full transition-all outline-none font-bold group disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:cursor-not-allowed shadow-xs',
+            'inline-flex items-center justify-between w-full transition-all outline-none font-normal group disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:cursor-not-allowed shadow-xs',
             borderClasses,
             bgClasses,
             sizeClasses,
@@ -218,7 +218,7 @@ const sizeClasses = computed(() => {
 
         <SelectPortal>
           <SelectContent
-            class="z-[9999] min-w-[var(--radix-select-trigger-width)] bg-white dark:bg-gray-900 rounded-[0.75rem] border-2 border-gray-300 dark:border-gray-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+            class="z-[9999] min-w-[var(--radix-select-trigger-width)] bg-white dark:bg-gray-900 rounded-[0.75rem] border border-gray-300 dark:border-gray-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
             position="popper"
             :side-offset="8"
             :avoid-collisions="true"
@@ -236,7 +236,7 @@ const sizeClasses = computed(() => {
                 v-for="option in options"
                 :key="option.value"
                 :value="option.value || '__EMPTY__'"
-                class="relative flex items-center px-8 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 rounded-[0.75rem] cursor-pointer outline-none focus:bg-gray-50 dark:focus:bg-gray-800 focus:text-gray-900 dark:focus:text-white data-[state=checked]:text-gray-900 dark:data-[state=checked]:text-white data-[state=checked]:bg-gray-50 dark:data-[state=checked]:bg-gray-800 transition-colors"
+                class="relative flex items-center px-8 py-3 text-sm font-normal text-gray-600 dark:text-gray-300 rounded-[0.75rem] cursor-pointer outline-none focus:bg-gray-50 dark:focus:bg-gray-800 focus:text-gray-900 dark:focus:text-white data-[state=checked]:text-gray-900 dark:data-[state=checked]:text-white data-[state=checked]:bg-gray-50 dark:data-[state=checked]:bg-gray-800 transition-colors"
               >
                 <SelectItemIndicator class="absolute left-2 inline-flex items-center justify-center">
                   <Check class="w-4 h-4 text-gray-900 dark:text-white" />

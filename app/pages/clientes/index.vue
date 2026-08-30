@@ -60,7 +60,7 @@ const {
 
 <template>
   <div class="space-y-10 relative">
-    <PageHeader title="Clientes" subtitle="Gerencie seus contatos e acelere seus orçamentos.">
+    <PageHeader>
       <div class="flex flex-row gap-3 w-full sm:w-auto justify-end">
         <BaseButton
           type="button"
@@ -77,22 +77,6 @@ const {
         </BaseButton>
         
       </div>
-
-      <template #filters>
-        <BaseFilters :active-filters-count="activeFiltersCount" @clear="clearFilters" data-tour="clientes-busca">
-          <template #search>
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Buscar por nome, e-mail ou documento..." 
-              class="w-full h-[52px] pl-12 pr-5 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-xs"
-            >
-            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
-              <Search class="w-5 h-5" />
-            </div>
-          </template>
-        </BaseFilters>
-      </template>
     </PageHeader>
 
      <!-- Modal de Info do Cliente -->
@@ -479,6 +463,22 @@ const {
     </BaseDialog>
 
     <!-- Listagem Unificada (desktop & mobile) -->
+     <BaseCard >
+      <template #header>
+        <BaseFilters :active-filters-count="activeFiltersCount" @clear="clearFilters" data-tour="clientes-busca">
+          <template #search>
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Buscar por nome, e-mail ou documento..." 
+              class="w-full h-[52px] pl-12 pr-5 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-xs"
+            >
+            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
+              <Search class="w-5 h-5" />
+            </div>
+          </template>
+        </BaseFilters>
+      </template>
     <BaseDataList
       :columns="[
         { key: 'name', label: 'Cliente' },
@@ -496,10 +496,10 @@ const {
     >
       <template #cell-name="{ item: client }">
         <div class="flex flex-col cursor-pointer" @click="openInfoModal(client)">
-          <span class="font-black text-base md:text-lg text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+          <span class="font-normal text-base md:text-lg text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
             {{ client.name }}
           </span>
-          <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">
+          <span class="text-[10px] font-normal text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">
             {{ client.taxId || 'Sem documento' }}
           </span>
         </div>
@@ -511,7 +511,7 @@ const {
             {{ client.email }}
           </span>
           <div class="flex items-center gap-2 mt-0.5">
-            <span class="text-xs font-black text-gray-400 dark:text-gray-500">
+            <span class="text-xs font-normal text-gray-400 dark:text-gray-500">
               {{ formatPhone(client.phone) }}
             </span>
             <img v-if="client.isWhatsapp" :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5" alt="WhatsApp" loading="lazy" />
@@ -521,7 +521,7 @@ const {
 
       <template #cell-location="{ item: client }">
         <div class="flex flex-col cursor-pointer" @click="openInfoModal(client)">
-          <span class="text-[10px] font-black text-gray-900 dark:text-gray-100 uppercase tracking-widest">
+          <span class="text-[10px] font-normal text-gray-900 dark:text-gray-100 uppercase tracking-widest">
             {{ client.address?.city || '-' }} - {{ client.address?.state || '-' }}
           </span>
           <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest line-clamp-1 max-w-[400px] mt-0.5">
@@ -576,5 +576,6 @@ const {
         </div>
       </template> -->
     </BaseDataList>
+    </BaseCard>
   </div>
 </template>

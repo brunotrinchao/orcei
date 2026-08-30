@@ -103,4 +103,18 @@ describe('BaseButton Component', () => {
     expect(wrapperTypeA.find('a').exists()).toBe(true)
     expect(wrapperTypeA.find('a').attributes('href')).toBe('/relatorios')
   })
+
+  it('aplica classes responsivas de tamanho para mobile e desktop (com suporte a prop mobileSize)', async () => {
+    const wrapperDefault = await mountSuspended(BaseButton, {
+      props: { size: 'lg' }
+    })
+    expect(wrapperDefault.classes().join(' ')).toContain('sm:px-12')
+    expect(wrapperDefault.classes().join(' ')).toContain('px-5')
+
+    const wrapperCustomMobile = await mountSuspended(BaseButton, {
+      props: { size: 'lg', mobileSize: 'xs' }
+    })
+    expect(wrapperCustomMobile.classes().join(' ')).toContain('text-[9px]')
+    expect(wrapperCustomMobile.classes().join(' ')).toContain('sm:px-12')
+  })
 })

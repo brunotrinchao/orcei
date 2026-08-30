@@ -61,18 +61,17 @@ const {
 <template>
   <div class="space-y-10 relative">
     <PageHeader title="Clientes" subtitle="Gerencie seus contatos e acelere seus orçamentos.">
-      <div class="flex flex-row gap-3 w-full sm:w-auto">
+      <div class="flex flex-row gap-3 w-full sm:w-auto justify-end">
         <BaseButton
           type="button"
           variant="outline"
-          class="w-4/6  sm:w-auto"
           @click="navigateTo('/configuracoes?section=multiplos-cadastros')"
         >
           <Upload class="w-4 h-4 mr-2" />
           Importar
         </BaseButton>
 
-        <BaseButton data-tour="clientes-novo-btn" @click="openModal()" class="w-2/6 sm:w-auto shadow-2xl shadow-blue-100">
+        <BaseButton data-tour="clientes-novo-btn" @click="openModal()" >
           <Plus class="w-5 h-5 mr-0 sm:mr-2" />
           <span class="hidden sm:inline">Novo</span>
         </BaseButton>

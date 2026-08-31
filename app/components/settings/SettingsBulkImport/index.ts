@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { Upload, Download } from 'lucide-vue-next'
+import { Upload, Download, Users, Package, FileSpreadsheet, Sparkles, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-vue-next'
 
 export function useSettingsBulkImport() {
   const modalOpen = ref(false)
@@ -13,15 +13,43 @@ export function useSettingsBulkImport() {
   const cards = [
     {
       type: 'client' as const,
-      title: 'Clientes',
-      description: 'Importe vários clientes de uma vez a partir de um arquivo CSV.',
-      templateHref: '/templates/modelo-clientes.csv'
+      title: 'Importar Clientes',
+      badge: 'Contatos & Empresas',
+      description: 'Cadastre dezenas ou centenas de clientes de forma automatizada enviando uma planilha CSV.',
+      icon: Users,
+      accentColor: 'bg-blue-500',
+      badgeClass: 'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300',
+      templateHref: '/templates/modelo-clientes.csv',
+      fields: ['Nome / Razão Social', 'CPF / CNPJ', 'E-mail', 'Telefone / WhatsApp', 'Endereço Completo']
     },
     {
       type: 'catalog' as const,
-      title: 'Catálogo',
-      description: 'Importe vários produtos ou serviços de uma vez a partir de um arquivo CSV.',
-      templateHref: '/templates/modelo-catalogo.csv'
+      title: 'Importar Catálogo',
+      badge: 'Produtos & Serviços',
+      description: 'Agilize o cadastro dos seus itens de catálogo com preços, unidades e categorias via planilha CSV.',
+      icon: Package,
+      accentColor: 'bg-emerald-500',
+      badgeClass: 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300',
+      templateHref: '/templates/modelo-catalogo.csv',
+      fields: ['Código / SKU', 'Nome do Item', 'Descrição', 'Preço Unitário (R$)', 'Unidade de Medida']
+    }
+  ]
+
+  const importSteps = [
+    {
+      step: '01',
+      title: 'Baixar Modelo',
+      description: 'Baixe o modelo oficial no formato CSV formatado para a estrutura do Orcei.'
+    },
+    {
+      step: '02',
+      title: 'Preencher Dados',
+      description: 'Abra no Excel ou Google Sheets e preencha as colunas sem alterar os cabeçalhos.'
+    },
+    {
+      step: '03',
+      title: 'Enviar e Validar',
+      description: 'Faça o upload do arquivo. Nosso sistema valida os dados e importa tudo em segundos.'
     }
   ]
 
@@ -30,7 +58,15 @@ export function useSettingsBulkImport() {
     modalType,
     openModal,
     cards,
+    importSteps,
     Upload,
-    Download
+    Download,
+    Users,
+    Package,
+    FileSpreadsheet,
+    Sparkles,
+    ArrowRight,
+    CheckCircle2,
+    AlertCircle
   }
 }

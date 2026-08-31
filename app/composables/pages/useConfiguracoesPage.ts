@@ -98,16 +98,65 @@ export function useConfiguracoesPage() {
   }
 
   const sections = [
-    { id: 'visual',   label: 'Visual',   icon: SwatchBook },
-    { id: 'empresa',  label: 'Empresa',  icon: Briefcase },
-    { id: 'endereco', label: 'Endereço', icon: MapPin },
-    { id: 'contato',  label: 'Contato',  icon: Phone },
-    { id: 'integracoes', label: 'Integrações', icon: Globe },
-    { id: 'multiplos-cadastros', label: 'Múltiplos Cadastros', icon: Upload },
-    { id: 'negocio',  label: 'Negócio',  icon: RefreshCcw },
-    { id: 'modelos',  label: 'Modelos',  icon: FileText },
-    { id: 'privacidade', label: 'Privacidade', icon: Shield },
+    {
+      id: 'visual',
+      label: 'Identidade Visual',
+      icon: SwatchBook,
+      description: 'Personalize o logotipo da sua marca e a cor primária para personalização visual em todas as suas propostas e orçamentos.'
+    },
+    {
+      id: 'empresa',
+      label: 'Dados da Empresa',
+      icon: Briefcase,
+      description: 'Cadastre os dados cadastrais corporativos como CNPJ/CPF, razão social, nome fantasia e inscrições estaduais ou municipais.'
+    },
+    {
+      id: 'endereco',
+      label: 'Endereço',
+      icon: MapPin,
+      description: 'Mantenha o endereço comercial atualizado para exibição automática nos cabeçalhos de orçamentos e contratos.'
+    },
+    {
+      id: 'contato',
+      label: 'Contato',
+      icon: Phone,
+      description: 'Gerencie os números de telefone comerciais (com suporte a identificação WhatsApp) e os links das suas redes sociais.'
+    },
+    {
+      id: 'integracoes',
+      label: 'Integrações',
+      icon: Globe,
+      description: 'Conecte com segurança suas contas Google Calendar para agendamentos e Google Drive para backup automático em PDF dos orçamentos.'
+    },
+    {
+      id: 'multiplos-cadastros',
+      label: 'Múltiplos Cadastros',
+      icon: Upload,
+      description: 'Importe listas completas de clientes e itens do seu catálogo rapidamente utilizando modelos de planilhas CSV.'
+    },
+    {
+      id: 'negocio',
+      label: 'Regras de Negócio',
+      icon: RefreshCcw,
+      description: 'Defina prazos de validade padrão para novos orçamentos, descontos à vista e parâmetros de aceitação para pagamento em cartão.'
+    },
+    {
+      id: 'modelos',
+      label: 'Modelos Legais',
+      icon: FileText,
+      description: 'Customize os minutas dos contratos e termos de aceite utilizando variáveis dinâmicas pré-definidas para automação dos documentos.'
+    },
+    {
+      id: 'privacidade',
+      label: 'Privacidade e Dados',
+      icon: Shield,
+      description: 'Gerencie sua privacidade com opções de exportação de dados em JSON (backup completo), reset de dados operacionais ou exclusão de conta.'
+    },
   ]
+
+  const activeSectionData = computed(() => {
+    return sections.find(s => s.id === activeSection.value) || sections[0]
+  })
 
   const isExporting = ref(false)
   const isDeleting = ref(false)
@@ -258,6 +307,7 @@ export function useConfiguracoesPage() {
     resetData,
     deleteAccount,
     activeSection,
+    activeSectionData,
     selectSection,
     SwatchBook,
     MapPin,

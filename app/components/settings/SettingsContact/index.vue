@@ -6,10 +6,12 @@ const props = defineProps<{
     phones: { number: string; isWhatsapp: boolean }[]
     social: { instagram: string; youtube: string; facebook: string; twitter: string }
   }
+  isSaving?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update:contact', val: any): void
+  (e: 'save'): void
 }>()
 
 const {
@@ -27,7 +29,7 @@ const {
 </script>
 
 <template>
-  <BaseSectionCard id="contato" data-tour="config-contato" title="Contato e Redes Sociais" :icon="Phone" icon-bg-class="bg-blue-50 dark:bg-blue-950/50" icon-color-class="text-blue-600 dark:text-blue-400">
+  <BaseCard title="Contato e Redes Sociais">
 
     <div class="space-y-8 settings-contact-container">
       <div class="space-y-4">
@@ -112,7 +114,12 @@ const {
         </BaseInput>
       </div>
     </div>
-  </BaseSectionCard>
+    <template #footer>
+      <BaseButton type="button" size="md" class="shrink-0" :disabled="isSaving" :loading="isSaving" @click="emit('save')">
+        {{ isSaving ? 'Salvando...' : 'Salvar' }}
+      </BaseButton>
+    </template>
+  </BaseCard>
 </template>
 
 <style scoped src="./index.css"></style>

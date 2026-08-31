@@ -19,8 +19,12 @@ describe('BaseCard Component', () => {
     expect(wrapper.text()).toContain('Conteúdo do corpo do card')
   })
 
-  it('renderiza os slots de header e footer com linhas divisórias de um lado ao outro', async () => {
+  it('renderiza os slots de header e footer com linhas divisórias de um lado ao outro quando habilitadas', async () => {
     const wrapper = await mountSuspended(BaseCard, {
+      props: {
+        headerSeparator: true,
+        footerSeparator: true
+      },
       slots: {
         header: () => 'Cabeçalho Customizado',
         default: () => 'Corpo do Card',
@@ -43,12 +47,10 @@ describe('BaseCard Component', () => {
     expect(wrapper.classes()).toContain('bg-blue-50')
   })
 
-  it('permite ocultar as linhas divisórias via props headerSeparator e footerSeparator', async () => {
+  it('oculta as linhas divisórias por padrão (headerSeparator e footerSeparator false por padrão)', async () => {
     const wrapperNoSeparators = await mountSuspended(BaseCard, {
       props: {
-        title: 'Sem Linhas Divisórias',
-        headerSeparator: false,
-        footerSeparator: false
+        title: 'Sem Linhas Divisórias'
       },
       slots: {
         default: () => 'Corpo',

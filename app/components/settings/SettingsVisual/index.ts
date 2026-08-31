@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue'
-import { SwatchBook, Image as PhotoIcon, Pencil, Sun, Moon } from 'lucide-vue-next'
+import { SwatchBook, Image as PhotoIcon, Pencil, Sun, Moon, Trash2, Upload, Sparkles, Check, Eye } from 'lucide-vue-next'
 
 export function useSettingsVisual(
   props: { logoUrl: string; primaryColor: string },
@@ -19,6 +19,24 @@ export function useSettingsVisual(
     get: () => props.primaryColor,
     set: (val) => emit('update:primaryColor', val)
   })
+
+  const presetColors = [
+    { hex: '#3147F6', label: 'Azul Orcei' },
+    { hex: '#10B981', label: 'Esmeralda' },
+    { hex: '#8B5CF6', label: 'Violeta' },
+    { hex: '#F43F5E', label: 'Rubro' },
+    { hex: '#F59E0B', label: 'Âmbar' },
+    { hex: '#0F172A', label: 'Grafite' }
+  ]
+
+  function selectPresetColor(hex: string) {
+    localPrimaryColor.value = hex
+  }
+
+  function removeLogo() {
+    localLogoUrl.value = ''
+    notify('Logotipo removido', 'O logotipo foi removido. Lembre-se de salvar as alterações.')
+  }
 
   async function cropLogo() {
     if (!cropperRef.value) return
@@ -54,6 +72,9 @@ export function useSettingsVisual(
   return {
     localLogoUrl,
     localPrimaryColor,
+    presetColors,
+    selectPresetColor,
+    removeLogo,
     isSaving,
     Cropper,
     showCropper,
@@ -68,6 +89,11 @@ export function useSettingsVisual(
     PhotoIcon,
     Pencil,
     Sun,
-    Moon
+    Moon,
+    Trash2,
+    Upload,
+    Sparkles,
+    Check,
+    Eye
   }
 }

@@ -4,11 +4,13 @@ import { useSettingsTemplates } from './index'
 const props = defineProps<{
   contractTemplate: string
   termsAndConditions: string
+  isSaving?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update:contractTemplate', val: string): void
   (e: 'update:termsAndConditions', val: string): void
+  (e: 'save'): void
 }>()
 
 const {
@@ -26,7 +28,7 @@ const {
 </script>
 
 <template>
-  <BaseSectionCard id="modelos" title="Modelos Legais" :icon="FileText" icon-bg-class="bg-blue-50 dark:bg-blue-950/50" icon-color-class="text-blue-600 dark:text-blue-400">
+  <BaseCard title="Modelos Legais">
 
     <div class="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-[0.75rem] mb-8 max-w-sm settings-templates-container">
       <BaseButton
@@ -83,7 +85,12 @@ const {
       <label class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Termos e Condições</label>
       <LazyRichTextEditor v-model="localTermsAndConditions" class="min-h-[350px] border-2 border-gray-50 dark:border-gray-800 rounded-[0.75rem] overflow-hidden" />
     </div>
-  </BaseSectionCard>
+    <template #footer>
+      <BaseButton type="button" size="md" class="shrink-0" :disabled="isSaving" :loading="isSaving" @click="emit('save')">
+        {{ isSaving ? 'Salvando...' : 'Salvar' }}
+      </BaseButton>
+    </template>
+  </BaseCard>
 </template>
 
 <style scoped src="./index.css"></style>

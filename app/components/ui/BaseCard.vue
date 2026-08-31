@@ -110,7 +110,7 @@ const cardColorClasses = computed(() => {
     <!-- Footer -->
     <footer
       v-if="$slots.footer"
-      class="flex items-center justify-between gap-4"
+      class="flex items-center justify-end gap-4"
       :class="[footerPaddingClasses, showFooterSeparator ? 'border-t border-black/10 dark:border-white/10' : '']"
     >
       <slot name="footer" />

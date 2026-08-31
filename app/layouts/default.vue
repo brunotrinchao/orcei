@@ -4,8 +4,9 @@ import { onClickOutside } from '@vueuse/core'
 import {
   Shield, ArrowLeft, Home, FileText, Plus, Users, Settings, LogOut,
   BookOpen, ReceiptText, Coins, Moon, Sun, HelpCircle, Menu, X,
-  ChevronRight, Calendar, Bell, Search, LayoutDashboard, Sparkles, ChevronLeft
+  ChevronRight, ChevronDown, Calendar, Bell, Search, LayoutDashboard, Sparkles, ChevronLeft
 } from 'lucide-vue-next'
+import type { Component } from 'vue'
 import type { ProfileDTO } from '../../types'
 import NotificationCenterDrawer from '~/components/notifications/NotificationCenterDrawer.vue'
 import { useNotifications } from '~/composables/useNotifications'
@@ -121,16 +122,79 @@ onUnmounted(() => {
   }
 })
 
-const navigationItems = [
+interface NavSubItem {
+  id: string
+  label: string
+  to: string
+  sectionId?: string
+}
+
+interface NavItem {
+  label: string
+  to: string
+  icon: Component
+  children?: NavSubItem[]
+}
+
+const settingsChildren: NavSubItem[] = [
+  { id: 'visual', label: 'Identidade Visual', to: '/configuracoes?section=visual', sectionId: 'visual' },
+  { id: 'empresa', label: 'Dados da Empresa', to: '/configuracoes?section=empresa', sectionId: 'empresa' },
+  { id: 'endereco', label: 'Endereço', to: '/configuracoes?section=endereco', sectionId: 'endereco' },
+  { id: 'contato', label: 'Contato', to: '/configuracoes?section=contato', sectionId: 'contato' },
+  { id: 'integracoes', label: 'Integrações', to: '/configuracoes?section=integracoes', sectionId: 'integracoes' },
+  { id: 'multiplos-cadastros', label: 'Múltiplos Cadastros', to: '/configuracoes?section=multiplos-cadastros', sectionId: 'multiplos-cadastros' },
+  { id: 'negocio', label: 'Regras de Negócio', to: '/configuracoes?section=negocio', sectionId: 'negocio' },
+  { id: 'modelos', label: 'Modelos Legais', to: '/configuracoes?section=modelos', sectionId: 'modelos' },
+  { id: 'privacidade', label: 'Privacidade e Dados', to: '/configuracoes?section=privacidade', sectionId: 'privacidade' }
+]
+
+const navigationItems: NavItem[] = [
   { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
   { label: 'Clientes', to: '/clientes', icon: Users },
   { label: 'Catálogo', to: '/catalogo', icon: BookOpen },
   { label: 'Orçamentos', to: '/orcamentos', icon: FileText },
   { label: 'Agenda', to: '/agenda', icon: Calendar },
   { label: 'Relatórios', to: '/relatorios', icon: ReceiptText },
-  { label: 'Configurações', to: '/configuracoes', icon: Settings },
+  { label: 'Configurações', to: '/configuracoes', icon: Settings, children: settingsChildren },
   { label: 'Planos & Créditos', to: '/planos', icon: Coins }
 ]
+
+const openMenus = ref<Record<string, boolean>>({})
+
+watch(() => route.path, (newPath) => {
+  if (newPath?.startsWith('/configuracoes')) {
+    openMenus.value['/configuracoes'] = true
+  }
+}, { immediate: true })
+
+function toggleMenu(to: string) {
+  openMenus.value[to] = !openMenus.value[to]
+}
+
+function handleParentClick(item: NavItem) {
+  if (item.children) {
+    if (isSidebarCollapsed.value) {
+      isSidebarCollapsed.value = false
+    }
+    toggleMenu(item.to)
+    if (!route.path.startsWith(item.to)) {
+      navigateTo(item.to)
+    }
+  } else {
+    navigateTo(item.to)
+  }
+}
+
+function isNavActive(item: NavItem) {
+  if (item.to === '/dashboard') return route.path === '/dashboard'
+  return route.path.startsWith(item.to)
+}
+
+function isSubActive(sub: NavSubItem) {
+  if (!route.path.startsWith('/configuracoes')) return false
+  const currentSection = (route.query.section as string) || 'visual'
+  return currentSection === sub.sectionId
+}
 </script>
 
 <template>
@@ -149,27 +213,80 @@ const navigationItems = [
       </div>
 
       <!-- Menu Principal de Links -->
-      <div class="flex-1 space-y-1.5 overflow-y-auto custom-scrollbar">
+      <div class="flex-1 space-y-1 overflow-y-auto custom-scrollbar px-2 py-2">
+        <div v-for="item in navigationItems" :key="item.to">
+          <!-- Item com Submenu -->
+          <template v-if="item.children">
+            <div
+              @click="handleParentClick(item)"
+              class="group flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-gray-800/60 transition-all cursor-pointer select-none"
+              :class="isNavActive(item) ? 'text-blue-600 dark:text-blue-400 font-bold bg-blue-50/70 dark:bg-blue-950/40' : ''"
+              :title="isSidebarCollapsed ? item.label : undefined"
+            >
+              <div class="flex items-center gap-3.5 min-w-0">
+                <component :is="item.icon" class="w-5 h-5 shrink-0 transition-transform group-hover:scale-105" :class="isNavActive(item) ? 'text-blue-600 dark:text-blue-400' : ''" />
+                <span v-if="!isSidebarCollapsed" class="truncate">{{ item.label }}</span>
+              </div>
 
-        <NuxtLink v-for="item in navigationItems" :key="item.to" :to="item.to"
-          @mouseenter="preloadRouteComponents(item.to)" @focus="preloadRouteComponents(item.to)"
-          class="group flex items-center justify-between px-3.5 py-4 pl-6 text-base font-medium text-slate-600 dark:text-gray-300 hover:text-blue-400 dark:hover:text-white transition-all"
-          :active-class="isSidebarCollapsed ? 'bg-blue-300 dark:bg-blue-900 !text-blue-600 dark:!text-blue-400 font-medium' : '!text-blue-600 dark:!text-blue-400 font-medium'"
-          :title="isSidebarCollapsed ? item.label : undefined">
-          <div class="flex items-center gap-3.5 min-w-0">
-            <component :is="item.icon" class="w-5 h-5 shrink-0 transition-transform group-hover:scale-110" />
-            <span v-if="!isSidebarCollapsed" class="truncate">{{ item.label }}</span>
-          </div>
+              <component
+                v-if="!isSidebarCollapsed"
+                :is="openMenus[item.to] ? ChevronDown : ChevronRight"
+                class="w-4 h-4 text-slate-400 dark:text-gray-500 transition-transform shrink-0"
+              />
+            </div>
 
-          <ChevronRight v-if="!isSidebarCollapsed"
-            class="w-4 h-4 text-slate-300 dark:text-gray-600 group-hover:text-slate-500 dark:group-hover:text-gray-400 group-hover:translate-x-0.5 transition-all shrink-0" />
-        </NuxtLink>
+            <!-- Lista de Submenus (Visualmente idêntica à imagem de exemplo) -->
+            <div
+              v-if="openMenus[item.to] && !isSidebarCollapsed"
+              class="pl-9 pr-2 py-1 space-y-0.5"
+            >
+              <NuxtLink
+                v-for="sub in item.children"
+                :key="sub.id"
+                :to="sub.to"
+                class="flex items-center justify-between px-3 py-3 text-xs transition-all font-normal"
+                :class="isSubActive(sub)
+                  ? 'text-blue-600 dark:text-blue-400 font-normal'
+                  : 'text-slate-500 dark:text-gray-400 hover:text-slate-900'"
+              >
+                <div class="flex items-center gap-2.5 min-w-0">
+                  
+                  <span class="truncate">{{ sub.label }}</span>
+                </div>
+              </NuxtLink>
+            </div>
+          </template>
+
+          <!-- Item Normal sem Submenu -->
+          <NuxtLink
+            v-else
+            :to="item.to"
+            @mouseenter="preloadRouteComponents(item.to)"
+            @focus="preloadRouteComponents(item.to)"
+            class="group flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-gray-800/60 transition-all"
+            :class="isNavActive(item) ? '!text-blue-600 dark:!text-blue-400 font-bold bg-blue-50/70 dark:bg-blue-950/40' : ''"
+            :title="isSidebarCollapsed ? item.label : undefined"
+          >
+            <div class="flex items-center gap-3.5 min-w-0">
+              <component :is="item.icon" class="w-5 h-5 shrink-0 transition-transform group-hover:scale-105" :class="isNavActive(item) ? 'text-blue-600 dark:text-blue-400' : ''" />
+              <span v-if="!isSidebarCollapsed" class="truncate">{{ item.label }}</span>
+            </div>
+
+            <ChevronRight
+              v-if="!isSidebarCollapsed"
+              class="w-4 h-4 text-slate-300 dark:text-gray-600 group-hover:text-slate-500 dark:group-hover:text-gray-400 group-hover:translate-x-0.5 transition-all shrink-0"
+            />
+          </NuxtLink>
+        </div>
 
         <!-- Link Admin no Sidebar se for admin -->
-        <NuxtLink v-if="user?.role === 'admin'" to="/admin"
-          class="group flex items-center justify-between px-3.5 py-4 pl-6 text-base font-medium text-red-600 dark:text-red-400 transition-all"
-          :active-class="isSidebarCollapsed ? 'bg-red-100/80 dark:bg-red-950/50 !text-red-600 dark:!text-red-400 font-medium' : '!text-red-600 dark:!text-red-400 font-medium'"
-          :title="isSidebarCollapsed ? 'Painel Admin' : undefined">
+        <NuxtLink
+          v-if="user?.role === 'admin'"
+          to="/admin"
+          class="group flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all"
+          :class="route.path.startsWith('/admin') ? 'bg-red-100/80 dark:bg-red-950/50 font-bold' : ''"
+          :title="isSidebarCollapsed ? 'Painel Admin' : undefined"
+        >
           <div class="flex items-center gap-3.5 min-w-0">
             <Shield class="w-5 h-5 shrink-0" />
             <span v-if="!isSidebarCollapsed" class="truncate">Painel Admin</span>
@@ -187,7 +304,7 @@ const navigationItems = [
             <span v-if="!isSidebarCollapsed" class="truncate">Novo Orçamento</span>
             </div>
           </NuxtLink>
-        </baseButton>
+        </BaseButton>
 
         <!-- Informações Rápidas do Usuário / Créditos -->
         <div v-if="!isSidebarCollapsed"
@@ -229,8 +346,6 @@ const navigationItems = [
 
           <!-- Título da Página -->
           <div class="flex items-center gap-2 min-w-0">
-
-
             <button @click="toggleSidebar"
               class="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-gray-800 rounded-xl transition-all cursor-pointer shrink-0"
               :title="isSidebarCollapsed ? 'Expandir Menu' : 'Recolher Menu'">
@@ -247,13 +362,6 @@ const navigationItems = [
         <div class="flex items-center gap-2 sm:gap-4 shrink-0">
 
           <template v-if="loggedIn">
-            <!-- Barra de Pesquisa Global (Estilo Vora)
-            <div class="hidden lg:flex items-center relative w-64">
-              <Search class="w-4 h-4 text-slate-400 dark:text-gray-500 absolute left-3.5 pointer-events-none" />
-              <input v-model="globalSearch" type="text" placeholder="Buscar no sistema..."
-                class="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-gray-800/80 border border-transparent focus:border-blue-500/50 rounded-xl text-xs font-bold text-slate-900 dark:text-gray-100 placeholder:text-slate-400 dark:placeholder:text-gray-500 focus:outline-none transition-all" />
-            </div> -->
-
             <!-- Botão de Aparência (Dark Mode) -->
             <button @click="toggle()"
               class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-600 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-gray-800 transition-all cursor-pointer"
@@ -278,7 +386,7 @@ const navigationItems = [
               <button @click="isUserMenuOpen = !isUserMenuOpen"
                 class="flex items-center gap-3 p-1.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-gray-800 transition-all cursor-pointer outline-none">
                 <div
-                  class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center overflow-hidden font-black text-xs shadow-xs shrink-0">
+                  class="w-9 h-9 rounded-[.5rem] bg-blue-600 text-white flex items-center justify-center overflow-hidden font-black text-xs shadow-xs shrink-0">
                   <img v-if="(user as any)?.avatar || profile?.avatar" :src="(user as any)?.avatar || profile?.avatar"
                     class="w-full h-full object-cover" loading="lazy">
                   <span v-else>{{ (user as any)?.name?.charAt(0).toUpperCase() || profile?.name?.charAt(0).toUpperCase()
@@ -286,11 +394,11 @@ const navigationItems = [
                 </div>
 
                 <div class="hidden sm:flex flex-col text-left">
-                  <span class="text-xs font-black text-slate-900 dark:text-white leading-tight truncate max-w-[140px]">
+                  <span class="text-xs font-normal text-slate-900 dark:text-white leading-tight truncate max-w-[140px]">
                     {{ (user as any)?.name || profile?.name || 'Usuário' }}
                   </span>
                   <span
-                    class="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-wider leading-none mt-0.5">
+                    class="text-[10px] font-normal text-slate-400 dark:text-gray-500 uppercase tracking-wider leading-none mt-0.5">
                     {{ user?.role === 'admin' ? 'Super Admin' : (profile?.subscriptionPlan || 'Membro') }}
                   </span>
                 </div>
@@ -298,92 +406,68 @@ const navigationItems = [
 
               <!-- Dropdown do Perfil -->
               <div v-if="isUserMenuOpen"
-                class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-slate-200 dark:border-gray-800 py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                <div class="px-4 py-2.5 border-b border-slate-100 dark:border-gray-800">
-                  <p class="text-xs font-black text-slate-900 dark:text-white truncate">{{ (user as any)?.name ||
-                    profile?.name }}</p>
-                  <p class="text-[10px] font-bold text-slate-400 dark:text-gray-500 truncate">{{ (user as any)?.email ||
-                    profile?.email }}</p>
+                class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div class="px-4 py-2 border-b border-slate-100 dark:border-gray-800 mb-1">
+                  <p class="text-xs font-bold text-slate-900 dark:text-white truncate">
+                    {{ (user as any)?.name || profile?.name || 'Usuário' }}
+                  </p>
+                  <p class="text-[10px] text-slate-400 dark:text-gray-500 truncate">
+                    {{ user?.email || (profile as any)?.email || '' }}
+                  </p>
                 </div>
 
-                <NuxtLink to="/configuracoes"
-                  class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-800 transition-colors">
-                  <Settings class="w-4 h-4 text-slate-400" />
-                  <span>Configurações</span>
+                <NuxtLink to="/configuracoes" @click="isUserMenuOpen = false"
+                  class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-gray-800 transition-colors">
+                  <Settings class="w-4 h-4 text-slate-400" /> Configurações
                 </NuxtLink>
 
-                <NuxtLink to="/planos"
-                  class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-800 transition-colors">
-                  <Coins class="w-4 h-4 text-amber-500" />
-                  <span>Planos & Recarga</span>
+                <NuxtLink to="/planos" @click="isUserMenuOpen = false"
+                  class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-gray-800 transition-colors">
+                  <Coins class="w-4 h-4 text-amber-500" /> Planos & Créditos
                 </NuxtLink>
 
-                <button @click="toggle()"
-                  class="w-full flex items-center justify-between px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-800 transition-colors">
-                  <div class="flex items-center gap-2.5">
-                    <Sun v-if="isDark" class="w-4 h-4 text-amber-500" />
-                    <Moon v-else class="w-4 h-4 text-slate-400" />
-                    <span>Aparência</span>
-                  </div>
-                  <span class="text-[10px] font-black uppercase text-slate-400">{{ isDark ? 'Escuro' : 'Claro' }}</span>
+                <div class="my-1 border-t border-slate-100 dark:border-gray-800"></div>
+
+                <button @click="logout"
+                  class="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
+                  <LogOut class="w-4 h-4" /> Sair da Conta
                 </button>
-
-                <div class="pt-1.5 border-t border-slate-100 dark:border-gray-800 mt-1.5">
-                  <button @click="logout"
-                    class="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
-                    <LogOut class="w-4 h-4" />
-                    <span>Sair da Conta</span>
-                  </button>
-                </div>
               </div>
             </div>
           </template>
 
           <template v-else>
             <NuxtLink to="/auth/login"
-              class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition shadow-xs">
+              class="px-4 py-2 text-xs font-bold text-slate-700 dark:text-gray-300 hover:text-blue-600 transition-colors">
               Entrar
+            </NuxtLink>
+            <NuxtLink to="/auth/register"
+              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all">
+              Criar Conta
             </NuxtLink>
           </template>
         </div>
       </header>
 
-      <!-- Banner de Personificação (Admin) -->
-      <div v-if="session?.impersonatedBy"
-        class="bg-amber-500 text-white px-6 py-2 flex items-center justify-center gap-3 text-xs font-black uppercase tracking-widest">
-        <span>Personificando: {{ user?.name }}</span>
-        <button @click="stopImpersonating"
-          class="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg transition-all">
-          <LogOut class="w-3.5 h-3.5" />
-          Voltar ao Admin
-        </button>
-      </div>
-
-      <!-- Área de Conteúdo da Página -->
+      <!-- Conteúdo da Página Solicitada -->
       <main class="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto">
         <slot />
       </main>
 
-      <!-- Rodapé Compacto -->
+      <!-- Rodapé Simples -->
       <footer
-        class="bg-white dark:bg-gray-900 border-t border-slate-200/80 dark:border-gray-800 py-4 px-6 text-center sm:text-left">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p class="text-xs font-bold text-slate-400 dark:text-gray-500">
-            {{ systemInfo?.footerText || `© ${new Date().getFullYear()} ${systemInfo?.landingPage?.appName || 'ORCEI'}.
-            Todos
-            os direitos reservados.` }}
-          </p>
-
-          <div class="flex items-center gap-4 text-xs font-bold text-slate-400 dark:text-gray-500">
-            <NuxtLink to="/terms" class="hover:text-blue-600">Termos</NuxtLink>
-            <NuxtLink to="/privacy" class="hover:text-blue-600">Privacidade</NuxtLink>
-            <button @click="resetConsent" class="hover:text-blue-600">Cookies</button>
+        class="border-t border-slate-200/60 dark:border-gray-800/80 py-4 px-4 sm:px-8 bg-white/50 dark:bg-gray-900/50 backdrop-blur-xs text-center text-xs text-slate-400 dark:text-gray-500">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span>&copy; {{ new Date().getFullYear() }} Orcei Fácil. Todos os direitos reservados.</span>
+          <div class="flex items-center gap-4">
+            <NuxtLink to="/terms" class="hover:underline">Termos de Uso</NuxtLink>
+            <NuxtLink to="/privacy" class="hover:underline">Política de Privacidade</NuxtLink>
           </div>
         </div>
       </footer>
     </div>
 
-    <!-- ─── DRAWER MOBILE SLIDEOVER ──────────────────────────────── -->
+    <!-- ─── DRAWER MOBILE ─────────────────────────────────────────── -->
     <ClientOnly>
       <Teleport to="body">
         <Transition enter-active-class="transition-opacity duration-300 ease-out" enter-from-class="opacity-0"
@@ -411,16 +495,53 @@ const navigationItems = [
               <div class="space-y-1">
                 <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-500 px-3 mb-2">
                   Navegação</p>
-                <NuxtLink v-for="item in navigationItems" :key="item.to" :to="item.to"
-                  @click="isMobileDrawerOpen = false"
-                  class="flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-bold text-slate-600 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-gray-800 transition-colors"
-                  active-class="bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-black">
-                  <div class="flex items-center gap-3.5">
-                    <component :is="item.icon" class="w-5 h-5" />
-                    <span>{{ item.label }}</span>
-                  </div>
-                  <ChevronRight class="w-4 h-4 opacity-40" />
-                </NuxtLink>
+                <div v-for="item in navigationItems" :key="item.to">
+                  <!-- Item com Submenu Mobile -->
+                  <template v-if="item.children">
+                    <div class="space-y-1">
+                      <div
+                        @click="toggleMenu(item.to); if (!route.path.startsWith(item.to)) navigateTo(item.to)"
+                        class="flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-bold text-slate-600 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                        :class="isNavActive(item) ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-black' : ''"
+                      >
+                        <div class="flex items-center gap-3.5">
+                          <component :is="item.icon" class="w-5 h-5" />
+                          <span>{{ item.label }}</span>
+                        </div>
+                        <component :is="openMenus[item.to] ? ChevronDown : ChevronRight" class="w-4 h-4 opacity-60" />
+                      </div>
+
+                      <div v-if="openMenus[item.to]" class="pl-8 pr-2 space-y-1">
+                        <NuxtLink
+                          v-for="sub in item.children"
+                          :key="sub.id"
+                          :to="sub.to"
+                          @click="isMobileDrawerOpen = false"
+                          class="flex items-center gap-2.5 py-2 px-3 text-xs font-medium rounded-xl transition-colors"
+                          :class="isSubActive(sub) ? 'text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-950/40' : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'"
+                        >
+                          <span class="w-1.5 h-1.5 rounded-full shrink-0" :class="isSubActive(sub) ? 'bg-blue-600 dark:bg-blue-400' : 'bg-slate-300 dark:bg-gray-600'" />
+                          <span>{{ sub.label }}</span>
+                        </NuxtLink>
+                      </div>
+                    </div>
+                  </template>
+
+                  <!-- Item Normal Mobile -->
+                  <NuxtLink
+                    v-else
+                    :to="item.to"
+                    @click="isMobileDrawerOpen = false"
+                    class="flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-bold text-slate-600 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-gray-800 transition-colors"
+                    :class="isNavActive(item) ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-black' : ''"
+                  >
+                    <div class="flex items-center gap-3.5">
+                      <component :is="item.icon" class="w-5 h-5" />
+                      <span>{{ item.label }}</span>
+                    </div>
+                    <ChevronRight class="w-4 h-4 opacity-40" />
+                  </NuxtLink>
+                </div>
               </div>
             </div>
 

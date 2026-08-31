@@ -6,7 +6,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="space-y-6 mb-10">
+  <div class="space-y-6">
     <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
         <h1 class="text-4xl font-black text-gray-900 dark:text-white tracking-tight">{{ title }}</h1>

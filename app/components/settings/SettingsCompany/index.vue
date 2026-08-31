@@ -10,17 +10,19 @@ const props = defineProps<{
     municipalRegistration?: string
     titleCard?: string
   }
+  isSaving?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update:company', val: any): void
+  (e: 'save'): void
 }>()
 
 const { localCompany, isSearchingCnpj, handleCnpjInput, Building2 } = useSettingsCompany(props, emit)
 </script>
 
 <template>
-  <BaseSectionCard id="empresa" data-tour="config-empresa" title="Dados da Empresa" :icon="Building2" icon-bg-class="bg-blue-50 dark:bg-blue-950/50" icon-color-class="text-blue-600 dark:text-blue-400">
+  <BaseCard title="Dados da Empresa">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 settings-company-container">
       <BaseInput
         v-model="localCompany.titleCard"
@@ -62,7 +64,12 @@ const { localCompany, isSearchingCnpj, handleCnpjInput, Building2 } = useSetting
         placeholder="Nº da inscrição"
       />
     </div>
-  </BaseSectionCard>
+     <template #footer>
+      <BaseButton type="button" size="md" class="shrink-0" :disabled="isSaving" :loading="isSaving" @click="emit('save')">
+        {{ isSaving ? 'Salvando...' : 'Salvar' }}
+      </BaseButton>
+    </template>
+  </BaseCard>
 </template>
 
 <style scoped src="./index.css"></style>

@@ -627,6 +627,50 @@ function scrollToSection(id: string) {
           </div>
         </BaseSectionCard>
       </section>
+
+      <!-- ─── 9. CALLOUTS (AVISOS & NOTIFICAÇÕES INLINE) ──────────── -->
+      <section id="callouts" class="space-y-6">
+        <BaseSectionCard title="Callouts (Avisos Inline)" subtitle="Alertas e banners explicativos sem bordas, com suporte a ícones, variantes de cores e botão de fechar.">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <BaseCallout
+              variant="info"
+              title="Informação do Sistema"
+              description="Conexão com os servidores ativa e operacional."
+            />
+
+            <BaseCallout
+              variant="success"
+              title="Orçamento Enviado"
+              description="A proposta em PDF foi entregue com sucesso no e-mail do cliente."
+            />
+
+            <BaseCallout
+              variant="warning"
+              title="Atenção à Validade"
+              description="Esta proposta expira em menos de 24 horas."
+            />
+
+            <BaseCallout
+              variant="danger"
+              title="Falha na Operação"
+              description="Não foi possível sincronizar o evento com o Google Calendar."
+            />
+
+            <BaseCallout
+              variant="violet"
+              title="Recurso com Inteligência Artificial"
+              description="Gere propostas completas em segundos com assistência por IA."
+            />
+
+            <BaseCallout
+              variant="neutral"
+              title="Dica de Uso"
+              description="Utilize a barra de pesquisa rápida para filtrar cadastros instantaneamente."
+              dismissible
+            />
+          </div>
+        </BaseSectionCard>
+      </section>
     </div>
   </div>
 </template>

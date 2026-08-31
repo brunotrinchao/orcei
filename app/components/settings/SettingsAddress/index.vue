@@ -11,17 +11,19 @@ const props = defineProps<{
     city?: string
     state?: string
   }
+  isSaving?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update:address', val: any): void
+  (e: 'save'): void
 }>()
 
 const { localAddress, isSearchingCep, handleCepInput, MapPin } = useSettingsAddress(props, emit)
 </script>
 
 <template>
-  <BaseSectionCard id="endereco" data-tour="config-endereco" title="Endereço Comercial" :icon="MapPin" icon-bg-class="bg-blue-50 dark:bg-blue-950/50" icon-color-class="text-blue-600 dark:text-blue-400">
+  <BaseCard  title="Endereço Comercial">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 settings-address-container">
       <BaseInput
         v-model="localAddress.zip"
@@ -71,7 +73,12 @@ const { localAddress, isSearchingCep, handleCepInput, MapPin } = useSettingsAddr
         placeholder="Ex: SP"
       />
     </div>
-  </BaseSectionCard>
+     <template #footer>
+      <BaseButton type="button" size="md" class="shrink-0" :disabled="isSaving" :loading="isSaving" @click="emit('save')">
+        {{ isSaving ? 'Salvando...' : 'Salvar' }}
+      </BaseButton>
+    </template>
+  </BaseCard>
 </template>
 
 <style scoped src="./index.css"></style>

@@ -50,11 +50,9 @@ const {
 </script>
 
 <template>
-  <BaseDialog
-    v-model:open="showForm"
-    :title="itemToEdit ? 'Editar Item' : 'Novo Item'"
-    size="lg"
-  >
+  <BaseDrawer  v-model:open="showForm"
+    :title="itemToEdit ? 'Editar Item' : 'Novo Item'" size="xl">
+    
     <!-- Modal Modo Cortar Foto (Cropper Active) -->
     <div v-if="showCropper" class="space-y-4 animate-in fade-in duration-200">
       <div class="flex items-center justify-between">
@@ -102,8 +100,6 @@ const {
       class="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-300 py-2 catalog-item-form-dialog"
     >
       <!-- Seção 1: Identidade Visual e Classificação -->
-      <BaseSectionCard noBorder
-      >
         <div class="space-y-6">
           <div class="grid grid-cols-1 gap-4 items-start">
             <!-- Identidade Visual (Ícone vs Foto) -->
@@ -118,14 +114,14 @@ const {
                         ? 'bg-white dark:bg-gray-950 shadow-sm text-blue-600 dark:text-blue-400 font-bold'
                         : 'text-gray-400 dark:text-gray-500',
                     ]"
-                    class="flex-1 px-2 py-1 rounded-lg text-[9px] font-black uppercase transition-all"
+                    class="flex-1 px-2 py-1 rounded-lg text-[9px] font-semibold transition-all"
                   >
                     Ícone
                   </button>
                   <button
                     type="button"
                     @click="isPhotoType = true"
-                    class="relative flex-1 px-2 py-1 rounded-lg text-[9px] font-black uppercase transition-all overflow-hidden"
+                    class="relative flex-1 px-2 py-1 rounded-lg text-[9px] font-semibold transition-all overflow-hidden"
                     :class="[
                       isPhotoType || form.imageUrl
                         ? 'bg-white dark:bg-gray-950 shadow-sm text-blue-600 dark:text-blue-400 font-bold'
@@ -232,7 +228,7 @@ const {
           <!-- Seção 3: Descrição e Assistente de IA -->
           <div class="space-y-2">
             <div class="flex items-center justify-between">
-              <label class="text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">
+              <label class="text-sm font-semibold text-slate-500 dark:text-gray-400 tracking-wide ml-1">
                 Descrição Comercial do {{ typeLabel }}
               </label>
 
@@ -259,7 +255,6 @@ const {
             />
           </div>
         </div>
-      </BaseSectionCard>
     </form>
 
     <!-- Modal de Confirmação de Uso de Créditos IA -->
@@ -288,7 +283,7 @@ const {
         </BaseButton>
       </div>
     </template>
-  </BaseDialog>
+    </BaseDrawer>
 </template>
 
 <style scoped src="./index.css"></style>

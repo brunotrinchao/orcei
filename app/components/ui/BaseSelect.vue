@@ -66,7 +66,7 @@ const id = useId()
 
 const triggerRef = ref<InstanceType<typeof SelectTrigger> | null>(null)
 
-const isEmpty = () => !!props.required && !modelValue.value
+const isEmpty = () => !!props.required && (!modelValue.value || modelValue.value === '__EMPTY__' || modelValue.value.trim() === '')
 const { submitAttempted } = useFieldValidation({
   isEmpty,
   focus: () => (triggerRef.value as any)?.$el?.focus?.()
@@ -185,7 +185,7 @@ const sizeClasses = computed(() => {
 
 <template>
   <div class="space-y-2">
-    <label v-if="label" :id="`label-${id}`" class="block text-xs font-normal text-gray-900 dark:text-white uppercase tracking-widest ml-1">
+    <label v-if="label" :id="`label-${id}`" class="block text-sm font-medium text-gray-500 dark:text-white tracking-wide ml-1">
       {{ label }} <span v-if="required" class="text-red-500">*</span>
     </label>
 

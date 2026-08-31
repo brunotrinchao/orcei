@@ -34,12 +34,16 @@ const createForm = ref({
   maxRedemptions: null as number | null
 })
 
+const { validate: validateCreate, reset: resetCreate } = useFormValidation()
+watch(isCreateOpen, (open) => { if (!open) resetCreate() })
+
 function openCreateModal() {
   createForm.value = { code: '', credits: 10, audience: 'all', expiresAt: '', maxRedemptions: null }
   isCreateOpen.value = true
 }
 
 async function createCoupon() {
+  if (!validateCreate()) return
   isSavingCreate.value = true
   try {
     await $fetch('/api/admin/coupons', {
@@ -203,9 +207,9 @@ const formatDate = (ts: number | null) => ts ? new Date(ts).toLocaleDateString('
     <!-- Modal Criar -->
     <BaseDialog v-model:open="isCreateOpen" title="Novo Cupom" size="md">
       <div class="space-y-5">
-        <BaseInput v-model="createForm.code" label="Código do Cupom" placeholder="EX: PROMO20" />
-        <BaseInput v-model.number="createForm.credits" type="number" label="Créditos Concedidos" />
-        <BaseSelect v-model="createForm.audience" :options="audienceOptions" label="Público-alvo" />
+        <BaseInput v-model="createForm.code" label="Código do Cupom" placeholder="EX: PROMO20" required />
+        <BaseInput v-model.number="createForm.credits" type="number" label="Créditos Concedidos" required />
+        <BaseSelect v-model="createForm.audience" :options="audienceOptions" label="Público-alvo" required />
         <BaseInput v-model="createForm.expiresAt" type="date" label="Expira em (opcional)" />
         <BaseInput v-model.number="createForm.maxRedemptions" type="number" label="Limite de usos (opcional)" placeholder="Ilimitado" />
       </div>

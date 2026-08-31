@@ -55,8 +55,14 @@ export function useCatalogoPage() {
       onConfirm: async () => {
         try {
           await $fetch(`/api/catalog/${id}`, { method: 'DELETE' as any })
+          notify('Sucesso', 'Item do catálogo removido com sucesso')
           refresh()
-        } catch (e) {
+        } catch (e: any) {
+          if (e?.statusCode === 404 || e?.response?.status === 404) {
+            notify('Sucesso', 'Item do catálogo removido com sucesso')
+            refresh()
+            return
+          }
           notify('Erro', 'Erro ao excluir item')
         }
       }

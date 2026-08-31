@@ -209,10 +209,11 @@ const {
         </template>
 
         <template #cell-total="{ item: proposal }">
-          <span class="font-normal text-gray-900 dark:text-gray-100 text-xs md:text-base tracking-tight cursor-pointer"
-            @click="openProposalInfo(proposal)">
+           <div class="flex flex-col items-start md:items-end cursor-pointer" @click="openProposalInfo(proposal)">
+            <span class="font-normal text-base md:text-lg text-gray-900 dark:text-gray-100">
             R$ {{ proposal.totals?.final?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '0,00' }}
           </span>
+          </div>
         </template>
       </BaseDataList>
     </BaseCard>

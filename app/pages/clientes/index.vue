@@ -261,8 +261,8 @@ const {
     </BaseDialog>
 
     <!-- Modal de Formulário -->
-    <BaseDialog v-model:open="showForm" :title="selectedClient ? 'Editar Cliente' : 'Novo Cliente'" size="lg">
-      <form id="client-form" @submit.prevent="saveClient" class="space-y-8 py-4">
+     <BaseDrawer v-model:open="showForm" :title="selectedClient ? 'Editar Cliente' : 'Novo Cliente'" size="xl">
+          <form id="client-form" @submit.prevent="saveClient" class="space-y-8 py-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <BaseInput v-model="form.name" label="Nome Completo / Razão Social" placeholder="Ex: João Silva" required />
           <BaseInput v-model="form.taxId" label="CPF / CNPJ" placeholder="000.000.000-00" mask="document" />
@@ -327,14 +327,14 @@ const {
       </form>
 
       <template #footer>
-        <BaseButton variant="secondary" size="md" @click="showForm = false" :disabled="isSubmitting">
+        <BaseButton variant="ghost" size="md" @click="showForm = false" :disabled="isSubmitting">
           Cancelar
         </BaseButton>
         <BaseButton type="button" :disabled="isSubmitting" :loading="isSubmitting" @click="saveClient">
           {{ selectedClient ? 'Salvar' : 'Cadastrar' }}
         </BaseButton>
       </template>
-    </BaseDialog>
+    </BaseDrawer>
 
     <!-- Listagem Unificada (desktop & mobile) -->
     <BaseCard>

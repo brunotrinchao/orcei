@@ -12,8 +12,9 @@ export default defineEventHandler(async (event) => {
   if (!profile) throw createError({ statusCode: 404, statusMessage: 'Perfil não encontrado' })
 
   const deleted = await CatalogService.delete(id, profile._id.toString())
+  // Garantir a idempotência do endpoint DELETE: se o item já foi excluído ou não existe mais, retornamos sucesso
   if (!deleted) {
-    throw createError({ statusCode: 404, statusMessage: 'Item do catálogo não encontrado' })
+    return { success: true, message: 'Item já não existe ou foi removido' }
   }
 
   return { success: true }

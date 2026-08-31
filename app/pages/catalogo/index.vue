@@ -164,7 +164,7 @@ const {
       <BaseDataList :columns="[
         { key: 'name', label: 'Item do Catálogo' },
         { key: 'type', label: 'Tipo' },
-        { key: 'price', label: 'Preço' },
+        { key: 'price', label: 'Preço', align: 'right', type: 'currency' },
         // { key: 'actions', label: '' }
       ]" :items="items || []" :pending="pending" :has-more="hasMore" :loading-more="loadingMore" @load-more="loadMore"
         empty-title="Catálogo Vazio"
@@ -195,14 +195,14 @@ const {
           </div>
         </template>
 
-        <template #cell-price="{ item }">
+        <template #cell-total="{ item }">
           <div class="flex flex-col items-start md:items-end cursor-pointer" @click="openInfoModal(item)">
             <span class="font-normal text-base md:text-lg text-gray-900 dark:text-gray-100">
               R$ {{ (item.price ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
             </span>
-            <span class="text-[10px] font-normal text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">
+            <!-- <span class="text-[10px] font-normal text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">
               por {{ item.unit }}
-            </span>
+            </span> -->
           </div>
         </template>
 

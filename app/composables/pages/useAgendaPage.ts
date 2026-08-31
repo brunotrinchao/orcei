@@ -155,7 +155,7 @@ export function useAgendaPage() {
           allDay: e.allDay
         }
       })
-      notify('Sucesso', 'Compromisso reagendado com sucesso!')
+      notify('Compromisso Reagendado', 'Compromisso movido na agenda em segundo plano.', true)
     } catch (err) {
       dropInfo.revert()
       notify('Erro', 'Não foi possível mover o compromisso.')
@@ -172,7 +172,7 @@ export function useAgendaPage() {
           end: e.end?.toISOString()
         }
       })
-      notify('Sucesso', 'Duração do compromisso atualizada!')
+      notify('Duração Atualizada', 'Duração do compromisso ajustada em segundo plano.', true)
     } catch (err) {
       resizeInfo.revert()
       notify('Erro', 'Erro ao alterar a duração.')

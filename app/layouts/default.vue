@@ -375,10 +375,10 @@ function isSubActive(sub: NavSubItem) {
               class="relative w-10 h-10 rounded-xl flex items-center justify-center text-slate-600 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-gray-800 transition-all cursor-pointer"
               title="Notificações">
               <Bell class="w-5 h-5 text-slate-600 dark:text-gray-300" />
-              <span v-if="unreadCount > 0"
-                class="absolute -top-1 -right-1 min-w-[18px] h-4 px-1 flex items-center justify-center bg-blue-600 text-white text-[9px] font-black rounded-full border-2 border-white dark:border-gray-900">
-                {{ unreadCount > 99 ? '99+' : unreadCount }}
-              </span>
+
+              <BaseBadge class="absolute -top-1 -right-1 !bg-blue-600 !text-white !text-[9px] !font-black !rounded-full">
+              {{ unreadCount > 99 ? '99+' : unreadCount }}
+              </BaseBadge>
             </button>
 
             <!-- Menu de Perfil do Usuário (Avatar + Nome + Cargo) -->

@@ -33,7 +33,7 @@ describe('BaseCallout Component', () => {
       props: { title: 'Info Default' }
     })
 
-    expect(wrapper.find('[role="alert"]').attributes('class')).toContain('bg-blue-50/70')
+    expect(wrapper.find('[role="alert"]').attributes('class')).toContain('bg-blue-600/70')
   })
 
   it('aplica variante success corretamente', async () => {

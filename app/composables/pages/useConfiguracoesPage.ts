@@ -80,6 +80,7 @@ export function useConfiguracoesPage() {
   }
 
   const { validate } = useFormValidation()
+  const { success, error } = useToast()
 
   async function updateProfile() {
     if (!localProfile.value) return
@@ -88,10 +89,16 @@ export function useConfiguracoesPage() {
     isSaving.value = true
     try {
       await $fetch('/api/profile', { method: 'PUT', body: localProfile.value })
-      notify('Sucesso', 'Configurações salvas com sucesso!')
+      success('Sucesso', 'Configurações salvas com sucesso!', {
+        position: 'top-right',
+        delay: 4000
+      })
       refresh()
     } catch {
-      notify('Erro', 'Ocorreu uma falha ao salvar as configurações.')
+      error('Erro', 'Ocorreu uma falha ao salvar as configurações. Tente novamente.', {
+        position: 'top-right',
+        delay: 5000
+      })
     } finally {
       isSaving.value = false
     }

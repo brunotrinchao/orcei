@@ -79,6 +79,8 @@ async function handleCancel() {
     @confirm="handleConfirm"
     @cancel="handleCancel"
   />
+
+  <BaseToastContainer />
 </template>
 
 <style>

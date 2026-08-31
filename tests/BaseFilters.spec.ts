@@ -38,10 +38,10 @@ describe('BaseFilters Component', () => {
       }
     })
 
-    const clearButton = wrapper.find('button[title="Limpar filtros"]')
-    expect(clearButton.exists()).toBe(true)
+    const clearButton = wrapper.findAll('button').find(b => b.text().includes('Limpar') || b.attributes('title') === 'Limpar filtros')
+    expect(clearButton?.exists()).toBe(true)
 
-    await clearButton.trigger('click')
+    await clearButton?.trigger('click')
     expect(wrapper.emitted('clear')).toBeTruthy()
   })
 

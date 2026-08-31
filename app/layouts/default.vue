@@ -386,7 +386,7 @@ function isSubActive(sub: NavSubItem) {
               <button @click="isUserMenuOpen = !isUserMenuOpen"
                 class="flex items-center gap-3 p-1.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-gray-800 transition-all cursor-pointer outline-none">
                 <div
-                  class="w-9 h-9 rounded-[.5rem] bg-blue-600 text-white flex items-center justify-center overflow-hidden font-black text-xs shadow-xs shrink-0">
+                  class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center overflow-hidden font-black text-xs shadow-xs shrink-0">
                   <img v-if="(user as any)?.avatar || profile?.avatar" :src="(user as any)?.avatar || profile?.avatar"
                     class="w-full h-full object-cover" loading="lazy">
                   <span v-else>{{ (user as any)?.name?.charAt(0).toUpperCase() || profile?.name?.charAt(0).toUpperCase()

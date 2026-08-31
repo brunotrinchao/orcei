@@ -493,8 +493,6 @@ function isSubActive(sub: NavSubItem) {
 
               <!-- Menu Mobile -->
               <div class="space-y-1">
-                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-500 px-3 mb-2">
-                  Navegação</p>
                 <div v-for="item in navigationItems" :key="item.to">
                   <!-- Item com Submenu Mobile -->
                   <template v-if="item.children">

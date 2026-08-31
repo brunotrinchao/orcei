@@ -347,7 +347,7 @@ function isSubActive(sub: NavSubItem) {
           <!-- Título da Página -->
           <div class="flex items-center gap-2 min-w-0">
             <button @click="toggleSidebar"
-              class="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-gray-800 rounded-xl transition-all cursor-pointer shrink-0"
+              class="hidden md:inline p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-gray-800 rounded-xl transition-all cursor-pointer shrink-0"
               :title="isSidebarCollapsed ? 'Expandir Menu' : 'Recolher Menu'">
               <ChevronLeft
                 :class="['w-5 h-5 transition-transform duration-300', isSidebarCollapsed ? 'rotate-180' : '']" />

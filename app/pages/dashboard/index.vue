@@ -51,8 +51,9 @@ const {
 
     <!-- Filtros de Período e Título -->
     <PageHeader title="Cockpit Comercial" subtitle="Acompanhe suas conversões, produtividade IA e receitas acumuladas.">
-      <div v-if="stats" data-tour="dashboard-period-filter"
-        class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide bg-gray-100/80 dark:bg-gray-800 p-1.5 rounded-[.5rem] border border-gray-200/50 dark:border-gray-700 md:w-auto w-full">
+      <BaseCard compact v-if="stats" data-tour="dashboard-period-filter">
+        
+      <div class="flex items-center gap-2 overflow-x-auto w-full">
         
         <BaseButton size="sm" v-for="p in [
           { label: '7D', value: 'last_7_days' },
@@ -61,10 +62,11 @@ const {
           { label: (new Date().getFullYear()), value: 'year' },
           { label: 'TOTAL', value: 'all' }
         ]" :key="p.value" @click="period = p.value"
-        :variant="period === p.value ? 'primary' : 'secondary'">
+        :variant="period === p.value ? 'primary' : 'ghost'">
           {{ p.label }}
         </BaseButton>
       </div>
+      </BaseCard>
     </PageHeader>
 
     <!-- Loading State Geral -->

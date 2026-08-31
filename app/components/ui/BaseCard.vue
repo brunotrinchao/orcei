@@ -81,14 +81,14 @@ const cardColorClasses = computed(() => {
 
 <template>
   <div
-    class="rounded-[.5rem] shadow-sm overflow-hidden transition-all duration-200 border"
+    class="rounded-[.5rem] shadow-sm overflow-hidden transition-all duration-200 -"
     :class="cardColorClasses"
   >
     <!-- Header -->
     <header
       v-if="title || $slots.header"
       class="flex items-center justify-between gap-4"
-      :class="[headerPaddingClasses, showHeaderSeparator ? 'border-b border-black/10 dark:border-white/10' : '']"
+      :class="[headerPaddingClasses, showHeaderSeparator ? 'border-b border-black/10 dark:border-gray-800' : '']"
     >
       <slot name="header">
         <div class="min-w-0 flex-1">
@@ -111,7 +111,7 @@ const cardColorClasses = computed(() => {
     <footer
       v-if="$slots.footer"
       class="flex items-center justify-end gap-4"
-      :class="[footerPaddingClasses, showFooterSeparator ? 'border-t border-black/10 dark:border-white/10' : '']"
+      :class="[footerPaddingClasses, showFooterSeparator ? 'border-t border-black/10 dark:border-gray-800' : '']"
     >
       <slot name="footer" />
     </footer>

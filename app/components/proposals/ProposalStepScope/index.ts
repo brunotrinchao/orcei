@@ -100,6 +100,27 @@ export function useProposalStepScope(
            props.form.upsellItems.some((i: any) => i.catalogItemId?.toString() === item._id?.toString() || (i.name === item.name && i.price === item.price))
   }
 
+  function parseNumeric(val: any): number {
+    if (val === null || val === undefined || val === '') return 0
+    if (typeof val === 'number') return isNaN(val) ? 0 : val
+    const str = String(val).trim()
+    if (!str) return 0
+    if (str.includes(',') || str.includes('R$')) {
+      const cleaned = str.replace(/[R$\s.]/g, '').replace(',', '.')
+      const parsed = parseFloat(cleaned)
+      return isNaN(parsed) ? 0 : parsed
+    }
+    const parsed = parseFloat(str)
+    return isNaN(parsed) ? 0 : parsed
+  }
+
+  function getItemTotal(item: any): number {
+    if (!item) return 0
+    const price = parseNumeric(item.price)
+    const qty = parseNumeric(item.quantity) || 1
+    return price * qty
+  }
+
   return {
     internalSearch,
     validateStep,
@@ -117,6 +138,7 @@ export function useProposalStepScope(
     moveToUpsell,
     moveToItems,
     isItemSelected,
+    getItemTotal,
     Plus,
     Trash2,
     ArrowDown,

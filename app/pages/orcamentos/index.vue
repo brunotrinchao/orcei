@@ -242,7 +242,7 @@ const {
         <!-- Total Parcial no passo 2 -->
         <div v-if="proposalFormRef?.currentStep === 2" class="hidden sm:block text-center mr-4">
           <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Total Parcial</span>
-          <span class="text-lg font-black text-blue-600">R$ {{ (proposalFormRef?.finalTotal ||
+          <span class="text-lg font-black text-blue-600">R$ {{ (proposalFormRef?.scopeTotal ||
             0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
         </div>
 

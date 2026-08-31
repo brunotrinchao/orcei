@@ -204,14 +204,54 @@ export function useProposalForm(
     }, { title: 'Gerar Descrição com IA' })
   }
 
-  const finalTotal = computed(() => {
-    const subtotal = form.value.items.reduce((acc, i) => acc + (i.price * i.quantity), 0)
-    const baseTotal = subtotal + form.value.totals.additional - form.value.totals.discount
-    
-    if (form.value.paymentConfig.method === PaymentMethod.CASH) {
-      return baseTotal * (1 - (form.value.paymentConfig.cashDiscount / 100))
+  function parseNumeric(val: any): number {
+    if (val === null || val === undefined || val === '') return 0
+    if (typeof val === 'number') return isNaN(val) ? 0 : val
+    const str = String(val).trim()
+    if (!str) return 0
+    if (str.includes(',') || str.includes('R$')) {
+      const cleaned = str.replace(/[R$\s.]/g, '').replace(',', '.')
+      const parsed = parseFloat(cleaned)
+      return isNaN(parsed) ? 0 : parsed
     }
-    return baseTotal
+    const parsed = parseFloat(str)
+    return isNaN(parsed) ? 0 : parsed
+  }
+
+  const itemsSubtotal = computed(() => {
+    const items = form.value.items || []
+    return items.reduce((acc, i) => {
+      const price = parseNumeric(i.price)
+      const qty = parseNumeric(i.quantity) || 1
+      return acc + (price * qty)
+    }, 0)
+  })
+
+  const upsellSubtotal = computed(() => {
+    const items = form.value.upsellItems || []
+    return items.reduce((acc, i) => {
+      const price = parseNumeric(i.price)
+      const qty = parseNumeric(i.quantity) || 1
+      return acc + (price * qty)
+    }, 0)
+  })
+
+  const scopeTotal = computed(() => {
+    return itemsSubtotal.value + upsellSubtotal.value
+  })
+
+  const baseTotal = computed(() => {
+    const additional = parseNumeric(form.value.totals?.additional)
+    const discount = parseNumeric(form.value.totals?.discount)
+    return itemsSubtotal.value + additional - discount
+  })
+
+  const finalTotal = computed(() => {
+    const cashDiscount = parseNumeric(form.value.paymentConfig?.cashDiscount)
+    if (form.value.paymentConfig?.method === PaymentMethod.CASH && cashDiscount > 0) {
+      return baseTotal.value * (1 - (cashDiscount / 100))
+    }
+    return baseTotal.value
   })
 
   function validateStep(step: number): boolean {
@@ -274,6 +314,10 @@ export function useProposalForm(
     confirmDescription,
     generateDescription,
     refreshCatalog,
+    itemsSubtotal,
+    upsellSubtotal,
+    scopeTotal,
+    baseTotal,
     finalTotal,
     setPrefilledClientAndStep,
     validateStep,

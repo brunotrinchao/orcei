@@ -48,24 +48,20 @@ defineExpose({ validate, reset })
 
 <template>
   <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 proposal-step-client-container">
-    <div class="space-y-2 px-3">
-      <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight">Detalhes do Orçamento</h3>
-      <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Comece identificando o cliente.</p>
-    </div>
 
-    <BaseSectionCard :noBorder="true">
-      <template #header-actions>
+    <div>
+      <div class="w-full mb-2 flex justify-end">
         <BaseButton 
           type="button"
-          variant="ghost"
-          size="md"
+          :variant="!isAIExtractOpen ? 'ia' : 'ghost'"
+          size="xs"
           @click="isAIExtractOpen = !isAIExtractOpen"
         >
-          {{ isAIExtractOpen ? 'Buscar Cadastrado' : 'Importar Conversa com IA' }}
-          <ArrowDown v-if="!isAIExtractOpen" class="w-3.5 h-3.5 ml-1 shrink-0" />
-          <Search v-else class="w-3.5 h-3.5 ml-1 shrink-0" />
+        <Sparkles v-if="!isAIExtractOpen"class="w-3.5 h-3.5 mr-1 shrink-0"/>
+          <Search v-else class="w-3.5 h-3.5 mr-1 shrink-0" />
+          {{ isAIExtractOpen ? 'Buscar Cadastrado' : 'Usar IA' }}
         </BaseButton>
-      </template>
+      </div>
 
       <div class="space-y-6">
         <!-- Extrator de Leads com IA ou Busca de Cliente Cadastrado com transição suave -->
@@ -117,11 +113,9 @@ defineExpose({ validate, reset })
                 <span class="block text-[10px] ml-2 invisible" aria-hidden="true">&nbsp;</span>
                 <BaseButton
                   type="button"
-                  variant="outline"
+                  variant="ghost"
                   title="Cadastrar novo cliente"
-                  aria-label="Cadastrar novo cliente"
-                  style="height: 3.5rem; width: 3.5rem; padding: 0;"
-                  class="flex items-center justify-center"
+                  iconOnly
                   @click="openManualCreate()"
                 >
                   <Plus class="w-4 h-4" />
@@ -146,7 +140,7 @@ defineExpose({ validate, reset })
           <BaseInput v-model="form.client.phone" label="WhatsApp" readonly disabled />
         </div>
       </div>
-    </BaseSectionCard>
+    </div>
 
     <!-- Modal de Cadastro Rápido -->
     <BaseDialog

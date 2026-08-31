@@ -261,4 +261,13 @@ describe('BaseInput — configuração de máscara', () => {
     })
     expect(wrapper.find('input').exists()).toBe(true)
   })
+
+  it('passa atributos min e max para o elemento input quando type é number', async () => {
+    const wrapper = await mountSuspended(BaseInput, {
+      props: { modelValue: 5, type: 'number', min: 1, max: 10 }
+    })
+    const input = wrapper.find('input')
+    expect(input.attributes('min')).toBe('1')
+    expect(input.attributes('max')).toBe('10')
+  })
 })

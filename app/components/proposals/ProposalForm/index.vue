@@ -35,6 +35,10 @@ const {
   confirmDescription,
   generateDescription,
   refreshCatalog,
+  itemsSubtotal,
+  upsellSubtotal,
+  scopeTotal,
+  baseTotal,
   finalTotal,
   setPrefilledClientAndStep,
   prevStep,
@@ -59,6 +63,10 @@ defineExpose({
   setPrefilledClientAndStep,
   totalSteps: steps.length,
   isEditingNonDraft: computed(() => props.isEditing && props.initialData?.status !== ProposalStatus.DRAFT),
+  itemsSubtotal,
+  upsellSubtotal,
+  scopeTotal,
+  baseTotal,
   finalTotal
 })
 </script>

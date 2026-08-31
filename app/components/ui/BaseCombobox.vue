@@ -96,26 +96,21 @@ const selectOption = (option: Option) => {
 
 <template>
   <div class="space-y-2" ref="containerRef">
-    <label v-if="label" class="block text-xs font-semibold text-slate-700 dark:text-gray-400 tracking-wide ml-1">
+    <label v-if="label" class="block text-sm font-semibold text-slate-500 dark:text-gray-400 tracking-wide ml-1">
       {{ label }}
     </label>
     
     <div class="relative w-full group">
-      <input
-        type="text"
+      <BaseInput
+      type="text"
         v-model="internalSearch"
         @focus="onInputFocus"
         @input="onInput"
         :placeholder="placeholder || 'Buscar...'"
         :disabled="disabled"
-        class="w-full px-5 py-4 pl-12 bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 rounded-[0.75rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-gray-900 dark:text-gray-50 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-        :class="{ 'border-red-300 dark:border-red-500/50 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500/20': error }"
-      />
-      
-      <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-        <Loader2 v-if="loading" class="w-5 h-5 text-blue-500 animate-spin" />
-        <Search v-else class="w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
-      </div>
+        :icon="loading ? Loader2 : Search"
+      >
+      </BaseInput>
 
       <transition
         enter-active-class="transition duration-200 ease-out"

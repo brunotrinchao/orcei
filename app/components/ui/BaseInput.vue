@@ -15,6 +15,8 @@ const props = withDefaults(defineProps<{
   placeholder?: string
   error?: string
   type?: string
+  min?: number | string
+  max?: number | string
   required?: boolean
   disabled?: boolean
   readonly?: boolean
@@ -241,6 +243,8 @@ const displayError = computed(() => props.error || (showRequiredError.value ? 'C
         @blur="emit('blur', $event)"
         @focus="emit('focus', $event)"
         :type="type || 'text'"
+        :min="min"
+        :max="max"
         :placeholder="placeholder"
         :disabled="disabled"
         :readonly="readonly"

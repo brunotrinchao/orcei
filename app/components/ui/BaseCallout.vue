@@ -122,11 +122,11 @@ const variantStyles = computed(() => {
     case 'blue':
     default:
       return {
-        bg: 'bg-blue-50/70 dark:bg-blue-950/40',
-        iconBg: 'bg-blue-100 dark:bg-blue-900/50',
-        iconColor: 'text-blue-600 dark:text-blue-400',
+        bg: 'bg-blue-600/70 dark:bg-blue-950/40',
+        iconBg: 'bg-blue-200 dark:bg-blue-900/50',
+        iconColor: 'text-blue-300 dark:text-blue-400',
         titleColor: 'text-blue-950 dark:text-blue-100',
-        textColor: 'text-blue-800/90 dark:text-blue-300/90',
+        textColor: 'text-white dark:text-blue-300/90',
         dismissColor: 'text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/60'
       }
   }
@@ -153,7 +153,7 @@ const paddingClasses = computed(() => {
         <!-- Slot de Ícone ou Ícone Padrão -->
         <div
           v-if="$slots.icon || resolvedIcon"
-          class="w-9 h-9 rounded-[0.5rem] flex items-center justify-center shrink-0 mt-0.5 !font-normal !text-white"
+          class="w-9 h-9 rounded-[0.5rem] flex items-center justify-center shrink-0 mt-0.5 font-normal !text-white"
           :class="[variantStyles.iconColor]"
         >
           <slot name="icon">

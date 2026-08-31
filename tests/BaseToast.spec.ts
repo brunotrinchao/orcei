@@ -5,7 +5,7 @@ import { useToast } from '../app/composables/useToast'
 import { ShieldAlert } from 'lucide-vue-next'
 
 describe('BaseToast Component', () => {
-  it('renderiza o título e a descrição fornecidos via props em texto branco', async () => {
+  it('renderiza o título e a descrição fornecidos via props', async () => {
     const wrapper = await mountSuspended(BaseToast, {
       props: {
         title: 'Orçamento Enviado',
@@ -15,8 +15,8 @@ describe('BaseToast Component', () => {
 
     expect(wrapper.text()).toContain('Orçamento Enviado')
     expect(wrapper.text()).toContain('O cliente recebeu a notificação por e-mail.')
-    expect(wrapper.find('h4').classes()).toContain('text-white')
-    expect(wrapper.find('p').classes()).toContain('text-white/90')
+    expect(wrapper.find('h4').attributes('class')).toContain('text-slate-900')
+    expect(wrapper.find('p').attributes('class')).toContain('text-slate-500')
   })
 
   it('aplica as posições configuradas (top-right, bottom-left, top-center, etc)', async () => {
@@ -37,17 +37,17 @@ describe('BaseToast Component', () => {
     const wrapperSuccess = await mountSuspended(BaseToast, {
       props: { title: 'Sucesso', variant: 'success', standalone: true }
     })
-    expect(wrapperSuccess.find('[role="status"]').attributes('class')).toContain('bg-green-950/90')
+    expect(wrapperSuccess.find('[role="status"]').attributes('class')).toContain('bg-white')
 
     const wrapperDanger = await mountSuspended(BaseToast, {
       props: { title: 'Erro', variant: 'danger', standalone: true }
     })
-    expect(wrapperDanger.find('[role="status"]').attributes('class')).toContain('bg-red-950/90')
+    expect(wrapperDanger.find('[role="status"]').attributes('class')).toContain('bg-white')
 
     const wrapperViolet = await mountSuspended(BaseToast, {
       props: { title: 'Destaque IA', variant: 'violet', standalone: true }
     })
-    expect(wrapperViolet.find('[role="status"]').attributes('class')).toContain('bg-violet-950/90')
+    expect(wrapperViolet.find('[role="status"]').attributes('class')).toContain('bg-white')
   })
 
   it('permite ícone customizado via prop icon', async () => {
@@ -81,7 +81,7 @@ describe('useToast Composable', () => {
   })
 
   it('adiciona e remove toasts da fila reativa', () => {
-    const { toasts, show, dismiss, clear } = useToast()
+    const { toasts, show, dismiss } = useToast()
     expect(toasts.value.length).toBe(0)
 
     const id = show({ title: 'Novo Orçamento', variant: 'success' })

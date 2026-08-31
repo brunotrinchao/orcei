@@ -60,80 +60,69 @@ const resolvedIcon = computed(() => {
   return defaultIconMap[v] || Info
 })
 
-// Estilos de Variantes (Background, Borda, Ícone, Barra de Progresso) - TÍTULO E DESCRIÇÃO BRANCOS
+// Estilos de Variantes (Tema Claro e Escuro baseados na referência visual do usuário)
 const variantStyles = computed(() => {
   const v = props.variant?.toLowerCase() || 'info'
+
+  const cardStyle = {
+    bg: 'bg-white dark:bg-[#151d2a] border border-slate-200/90 dark:border-slate-800/90 shadow-xl shadow-slate-900/5 dark:shadow-black/50 rounded-[0.875rem]',
+    titleColor: 'text-slate-900 dark:text-white font-semibold',
+    textColor: 'text-slate-500 dark:text-slate-300 font-normal',
+    closeHover: 'text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+  }
 
   switch (v) {
     case 'success':
     case 'emerald':
     case 'green':
       return {
-        bg: 'bg-green-950/90 dark:bg-green-950/95 text-white border-green-800/60 shadow-green-950/20',
-        iconBg: 'bg-green-500/20 text-green-400',
-        titleColor: 'text-white font-semibold',
-        textColor: 'text-white/90',
-        progressBg: 'bg-green-400',
-        closeHover: 'hover:bg-green-800/50 text-white'
+        ...cardStyle,
+        iconColor: 'text-emerald-500 dark:text-emerald-400',
+        progressBg: 'bg-emerald-500 dark:bg-emerald-400'
       }
 
     case 'warning':
     case 'amber':
     case 'yellow':
       return {
-        bg: 'bg-amber-950/90 dark:bg-amber-950/95 text-white border-amber-800/60 shadow-amber-950/20',
-        iconBg: 'bg-amber-500/20 text-amber-400',
-        titleColor: 'text-white font-semibold',
-        textColor: 'text-white/90',
-        progressBg: 'bg-amber-400',
-        closeHover: 'hover:bg-amber-800/50 text-white'
+        ...cardStyle,
+        iconColor: 'text-amber-500 dark:text-amber-400',
+        progressBg: 'bg-amber-500 dark:bg-amber-400'
       }
 
     case 'error':
     case 'danger':
     case 'red':
       return {
-        bg: 'bg-red-950/90 dark:bg-red-950/95 text-white border-red-800/60 shadow-red-950/20',
-        iconBg: 'bg-red-500/20 text-red-400',
-        titleColor: 'text-white font-semibold',
-        textColor: 'text-white/90',
-        progressBg: 'bg-red-400',
-        closeHover: 'hover:bg-red-800/50 text-white'
+        ...cardStyle,
+        iconColor: 'text-rose-500 dark:text-rose-400',
+        progressBg: 'bg-rose-500 dark:bg-rose-400'
       }
 
     case 'neutral':
     case 'slate':
     case 'gray':
       return {
-        bg: 'bg-slate-900/90 dark:bg-gray-900/95 text-white border-slate-700/60 shadow-slate-950/20',
-        iconBg: 'bg-slate-700/50 text-slate-300',
-        titleColor: 'text-white font-semibold',
-        textColor: 'text-white/90',
-        progressBg: 'bg-slate-400',
-        closeHover: 'hover:bg-slate-800 text-white'
+        ...cardStyle,
+        iconColor: 'text-slate-500 dark:text-slate-400',
+        progressBg: 'bg-slate-500 dark:bg-slate-400'
       }
 
     case 'violet':
     case 'purple':
       return {
-        bg: 'bg-violet-950/90 dark:bg-violet-950/95 text-white border-violet-800/60 shadow-violet-950/20',
-        iconBg: 'bg-violet-500/20 text-violet-400',
-        titleColor: 'text-white font-semibold',
-        textColor: 'text-white/90',
-        progressBg: 'bg-violet-400',
-        closeHover: 'hover:bg-violet-800/50 text-white'
+        ...cardStyle,
+        iconColor: 'text-violet-500 dark:text-violet-400',
+        progressBg: 'bg-violet-500 dark:bg-violet-400'
       }
 
     case 'info':
     case 'blue':
     default:
       return {
-        bg: 'bg-blue-950/90 dark:bg-blue-950/95 text-white border-blue-800/60 shadow-blue-950/20',
-        iconBg: 'bg-blue-500/20 text-blue-400',
-        titleColor: 'text-white font-semibold',
-        textColor: 'text-white/90',
-        progressBg: 'bg-blue-400',
-        closeHover: 'hover:bg-blue-800/50 text-white'
+        ...cardStyle,
+        iconColor: 'text-blue-500 dark:text-blue-400',
+        progressBg: 'bg-blue-500 dark:bg-blue-400'
       }
   }
 })
@@ -225,27 +214,29 @@ onUnmounted(() => {
   >
     <div
       v-if="isVisible"
-      class="pointer-events-auto flex flex-col w-full max-w-md rounded-[0.75rem] border shadow-2xl backdrop-blur-xl overflow-hidden transition-all duration-300 ease-out hover:scale-[1.015]"
+      class="pointer-events-auto flex flex-col w-full max-w-md backdrop-blur-xl overflow-hidden transition-all duration-300 ease-out hover:scale-[1.015]"
       :class="[variantStyles.bg, positionClasses]"
       @mouseenter="pauseTimer"
       @mouseleave="resumeTimer"
       role="status"
     >
-      <div class="p-4 flex items-start gap-3.5 relative">
+      <div class="p-4 flex items-start gap-3 relative">
+        <!-- Ícone Contornado -->
         <div
           v-if="$slots.icon || resolvedIcon"
-          class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
-          :class="variantStyles.iconBg"
+          class="shrink-0 mt-0.5"
+          :class="variantStyles.iconColor"
         >
           <slot name="icon">
             <component :is="resolvedIcon" class="w-5 h-5" />
           </slot>
         </div>
 
+        <!-- Conteúdo (Título + Descrição) -->
         <div class="flex-1 min-w-0 pr-6">
           <h4
             v-if="title || $slots.title"
-            class="text-sm font-semibold tracking-tight truncate leading-snug text-white"
+            class="text-sm leading-snug tracking-tight truncate"
             :class="variantStyles.titleColor"
           >
             <slot name="title">{{ title }}</slot>
@@ -253,7 +244,7 @@ onUnmounted(() => {
 
           <p
             v-if="description || $slots.default"
-            class="text-xs font-normal mt-1 leading-relaxed whitespace-pre-line text-white/90"
+            class="text-xs leading-relaxed mt-0.5 whitespace-pre-line"
             :class="variantStyles.textColor"
           >
             <slot>{{ description }}</slot>
@@ -264,10 +255,11 @@ onUnmounted(() => {
           </div>
         </div>
 
+        <!-- Botão de Fechar -->
         <button
           type="button"
           @click="dismiss"
-          class="absolute top-3.5 right-3.5 p-1 rounded-md transition-colors duration-200 cursor-pointer text-white/80 hover:text-white"
+          class="absolute top-3.5 right-3.5 p-1 rounded-md transition-colors duration-200 cursor-pointer"
           :class="variantStyles.closeHover"
           aria-label="Fechar notificação"
         >
@@ -275,7 +267,8 @@ onUnmounted(() => {
         </button>
       </div>
 
-      <div v-if="delay > 0" class="w-full h-1 bg-black/20 overflow-hidden">
+      <!-- Barra de Progresso do Tempo -->
+      <div v-if="delay > 0" class="w-full h-1 bg-slate-100 dark:bg-slate-800/50 overflow-hidden">
         <div
           class="h-full transition-all duration-75 ease-linear"
           :class="variantStyles.progressBg"
@@ -287,27 +280,29 @@ onUnmounted(() => {
 
   <div
     v-else
-    class="pointer-events-auto flex flex-col w-full max-w-md rounded-[0.75rem] border shadow-2xl backdrop-blur-xl overflow-hidden transition-all duration-300 ease-out hover:scale-[1.015]"
+    class="pointer-events-auto flex flex-col w-full max-w-md backdrop-blur-xl overflow-hidden transition-all duration-300 ease-out hover:scale-[1.015]"
     :class="[variantStyles.bg]"
     @mouseenter="pauseTimer"
     @mouseleave="resumeTimer"
     role="status"
   >
-    <div class="p-4 flex items-start gap-3.5 relative">
+    <div class="p-4 flex items-start gap-3 relative">
+      <!-- Ícone Contornado -->
       <div
         v-if="$slots.icon || resolvedIcon"
-        class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
-        :class="variantStyles.iconBg"
+        class="shrink-0 mt-0.5"
+        :class="variantStyles.iconColor"
       >
         <slot name="icon">
           <component :is="resolvedIcon" class="w-5 h-5" />
         </slot>
       </div>
 
+      <!-- Conteúdo (Título + Descrição) -->
       <div class="flex-1 min-w-0 pr-6">
         <h4
           v-if="title || $slots.title"
-          class="text-sm font-semibold tracking-tight truncate leading-snug text-white"
+          class="text-sm leading-snug tracking-tight truncate"
           :class="variantStyles.titleColor"
         >
           <slot name="title">{{ title }}</slot>
@@ -315,7 +310,7 @@ onUnmounted(() => {
 
         <p
           v-if="description || $slots.default"
-          class="text-xs font-normal mt-1 leading-relaxed whitespace-pre-line text-white/90"
+          class="text-xs leading-relaxed mt-0.5 whitespace-pre-line"
           :class="variantStyles.textColor"
         >
           <slot>{{ description }}</slot>
@@ -326,10 +321,11 @@ onUnmounted(() => {
         </div>
       </div>
 
+      <!-- Botão de Fechar -->
       <button
         type="button"
         @click="dismiss"
-        class="absolute top-3.5 right-3.5 p-1 rounded-md transition-colors duration-200 cursor-pointer text-white/80 hover:text-white"
+        class="absolute top-3.5 right-3.5 p-1 rounded-md transition-colors duration-200 cursor-pointer"
         :class="variantStyles.closeHover"
         aria-label="Fechar notificação"
       >
@@ -337,7 +333,8 @@ onUnmounted(() => {
       </button>
     </div>
 
-    <div v-if="delay > 0" class="w-full h-1 bg-black/20 overflow-hidden">
+    <!-- Barra de Progresso do Tempo -->
+    <div v-if="delay > 0" class="w-full h-1 bg-slate-100 dark:bg-slate-800/50 overflow-hidden">
       <div
         class="h-full transition-all duration-75 ease-linear"
         :class="variantStyles.progressBg"

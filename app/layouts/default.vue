@@ -313,7 +313,7 @@ function isSubActive(sub: NavSubItem) {
             <Coins class="w-4 h-4 text-amber-500 shrink-0" />
             <div class="flex flex-col">
               <span
-                class="text-[9px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-wider leading-none">Créditos</span>
+                class="text-[9px] font-semibold text-slate-400 dark:text-gray-500 tracking-widr leading-none">Créditos</span>
               <span class="text-xs font-black text-slate-800 dark:text-slate-100 mt-0.5 leading-none">{{
                 profile?.creditsBalance ?? 0 }}</span>
             </div>
@@ -450,7 +450,7 @@ function isSubActive(sub: NavSubItem) {
       </header>
 
       <!-- Conteúdo da Página Solicitada -->
-      <main class="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto">
+      <main class="flex-1 p-4 sm:p-8 w-full mx-auto">
         <slot />
       </main>
 

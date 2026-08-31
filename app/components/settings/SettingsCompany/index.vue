@@ -24,21 +24,6 @@ const { localCompany, isSearchingCnpj, handleCnpjInput, Building2 } = useSetting
 <template>
   <BaseCard title="Dados da Empresa">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 settings-company-container">
-      <BaseInput
-        v-model="localCompany.titleCard"
-        label="Título do Perfil"
-        placeholder="Ex: Minha Empresa / Meu Perfil"
-        class="md:col-span-2"
-      />
-
-      <BaseInput
-        v-model="localCompany.taxId"
-        label="CNPJ / CPF"
-        mask="document"
-        placeholder="00.000.000/0000-00"
-        :loading="isSearchingCnpj"
-        @input="handleCnpjInput"
-      />
 
       <BaseInput
         v-model="localCompany.tradeName"
@@ -56,6 +41,15 @@ const { localCompany, isSearchingCnpj, handleCnpjInput, Building2 } = useSetting
         v-model="localCompany.stateRegistration"
         label="Inscrição Estadual"
         placeholder="Isento ou nº"
+      />
+
+      <BaseInput
+        v-model="localCompany.taxId"
+        label="CNPJ / CPF"
+        mask="document"
+        placeholder="00.000.000/0000-00"
+        :loading="isSearchingCnpj"
+        @input="handleCnpjInput"
       />
 
       <BaseInput

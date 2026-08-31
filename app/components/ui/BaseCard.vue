@@ -81,7 +81,7 @@ const cardColorClasses = computed(() => {
 
 <template>
   <div
-    class="rounded-[.5rem] shadow-sm overflow-hidden transition-all duration-200"
+    class="rounded-[.5rem] shadow-sm overflow-hidden transition-all duration-200 border"
     :class="cardColorClasses"
   >
     <!-- Header -->

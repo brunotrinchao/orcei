@@ -54,11 +54,11 @@ const emit = defineEmits(['update:open', 'confirm', 'cancel'])
         <AlertDialogContent 
           class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md bg-white dark:bg-gray-900 rounded-[0.75rem] p-8 shadow-2xl z-[301] focus:outline-none border border-gray-100 dark:border-gray-800"
         >
-          <AlertDialogTitle class="text-xl font-black text-gray-900 dark:text-gray-50 uppercase tracking-tight mb-2">
+          <AlertDialogTitle class="text-xl font-medium text-gray-900 dark:text-gray-50 tracking-normal mb-2">
             {{ title }}
           </AlertDialogTitle>
           
-          <AlertDialogDescription v-if="description" class="text-sm text-gray-500 dark:text-gray-400 font-medium leading-relaxed mb-8" v-html="description" />
+          <AlertDialogDescription v-if="description" class="text-sm text-gray-500 dark:text-gray-400 font-base leading-relaxed mb-8" v-html="description" />
 
           <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
             <AlertDialogCancel v-if="cancelText" @click="emit('update:open', false); emit('cancel')" as-child>

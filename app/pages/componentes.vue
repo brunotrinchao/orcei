@@ -52,9 +52,10 @@ const selectValue = ref('opcao1')
 const comboboxValue = ref('sp')
 const iconSelectValue = ref('User')
 
-// Estado para Dialogs
+// Estado para Dialogs e Drawers
 const isDialogOpen = ref(false)
 const isAlertDialogOpen = ref(false)
+const isDrawerDemoOpen = ref(false)
 
 // Estado para DataList / BaseTable
 const currentPage = ref(1)
@@ -532,33 +533,16 @@ function scrollToSection(id: string) {
             size="lg"
           >
             <template #context-menu>
-              <DropdownMenuRoot>
-                <DropdownMenuTrigger as-child>
-                  <button
-                    type="button"
-                    class="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[0.75rem] transition-all cursor-pointer"
-                    title="Mais ações"
-                  >
-                    <MoreVertical class="w-5 h-5" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuPortal>
-                  <DropdownMenuContent
-                    align="end"
-                    :side-offset="6"
-                    class="min-w-[220px] bg-white dark:bg-gray-950 rounded-[0.75rem] shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-[9999]"
-                  >
-                    <DropdownMenuItem class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 cursor-pointer">
-                      <Download class="w-4 h-4 text-blue-500" />
-                      Baixar Relatório PDF
-                    </DropdownMenuItem>
-                    <DropdownMenuItem class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 cursor-pointer">
-                      <History class="w-4 h-4 text-purple-500" />
-                      Ver Histórico
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenuPortal>
-              </DropdownMenuRoot>
+              <BaseDropdownMenu>
+                <BaseDropdownMenuItem>
+                  <Download class="w-4 h-4 text-blue-500" />
+                  <span>Baixar Relatório PDF</span>
+                </BaseDropdownMenuItem>
+                <BaseDropdownMenuItem href="https://orcei.com.br" target="_blank">
+                  <ExternalLink class="w-4 h-4 text-purple-500" />
+                  <span>Acessar Link Externo</span>
+                </BaseDropdownMenuItem>
+              </BaseDropdownMenu>
             </template>
 
             <div class="space-y-4 py-2">
@@ -669,6 +653,54 @@ function scrollToSection(id: string) {
               dismissible
             />
           </div>
+        </BaseSectionCard>
+      </section>
+
+      <!-- ─── 10. DRAWERS (PAINÉIS LATERAIS) ───────────────────────── -->
+      <section id="drawers" class="space-y-6">
+        <BaseSectionCard title="Drawers (Painéis Deslizantes)" subtitle="Painéis deslizantes com botão de fechar à esquerda, título e subtítulo centralizados, suporte a menu de contexto à direita e 100% de largura no mobile.">
+          <div class="flex flex-wrap gap-4 items-center">
+            <BaseButton variant="primary" @click="isDrawerDemoOpen = true">
+              Abrir BaseDrawer (Painel Lateral)
+            </BaseButton>
+          </div>
+
+          <BaseDrawer
+            v-model:open="isDrawerDemoOpen"
+            title="Detalhes do Cliente"
+            description="Visualização rápida das informações cadastradas"
+            position="right"
+            size="md"
+          >
+            <template #context-menu>
+              <button type="button" class="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-800 transition-colors" title="Mais opções">
+                <MoreVertical class="w-4 h-4" />
+              </button>
+            </template>
+
+            <div class="space-y-4 py-2">
+              <div class="p-4 bg-slate-50 dark:bg-gray-900 rounded-xl space-y-2 border border-slate-100 dark:border-gray-800">
+                <div class="text-xs font-black uppercase text-gray-400">Cliente</div>
+                <div class="text-sm font-bold text-gray-900 dark:text-gray-100">Orcei Tecnologia LTDA</div>
+                <div class="text-xs text-gray-500">CNPJ: 12.345.678/0001-90</div>
+              </div>
+
+              <div class="p-4 bg-slate-50 dark:bg-gray-900 rounded-xl space-y-2 border border-slate-100 dark:border-gray-800">
+                <div class="text-xs font-black uppercase text-gray-400">Contato</div>
+                <div class="text-xs text-gray-600 dark:text-gray-300">contato@orcei.com.br</div>
+                <div class="text-xs text-gray-600 dark:text-gray-300">(11) 98765-4321</div>
+              </div>
+            </div>
+
+            <template #footer>
+              <BaseButton variant="ghost" size="sm" @click="isDrawerDemoOpen = false">
+                Cancelar
+              </BaseButton>
+              <BaseButton variant="primary" size="sm" @click="isDrawerDemoOpen = false">
+                Salvar Alterações
+              </BaseButton>
+            </template>
+          </BaseDrawer>
         </BaseSectionCard>
       </section>
     </div>

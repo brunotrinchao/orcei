@@ -64,96 +64,88 @@ const {
     <!-- Modal de Detalhes do Item -->
     <BaseDialog v-model:open="showInfo" :title="selectedItem?.name || 'Detalhes do Item'" size="lg">
       <template #context-menu v-if="selectedItem">
-        <DropdownMenuRoot>
-          <DropdownMenuTrigger as-child>
-            <button type="button"
-              class="p-2 text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[0.75rem] transition-all cursor-pointer"
-              title="Mais ações" aria-label="Mais ações do item">
-              <MoreVertical class="w-5 h-5" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuPortal>
-            <DropdownMenuContent align="end" :side-offset="6"
-              class="min-w-[220px] bg-white dark:bg-gray-950 rounded-[0.75rem] shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-[9999]">
-              <DropdownMenuItem @click="showInfo = false; openModal(selectedItem)"
-                class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all">
-                <Pencil class="w-4 h-4" />
-                Editar
-              </DropdownMenuItem>
-              <DropdownMenuItem @click="showInfo = false; deleteItem(selectedItem._id)"
-                class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-600 dark:hover:text-red-300 cursor-pointer outline-none transition-all">
-                <Trash2 class="w-4 h-4 text-red-500" />
-                Excluir
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenuPortal>
-        </DropdownMenuRoot>
+        <BaseDropdownMenu>
+          <BaseDropdownMenuItem @click="showInfo = false; openModal(selectedItem)">
+            <Pencil class="w-4 h-4 text-gray-500" />
+            <span>Editar</span>
+          </BaseDropdownMenuItem>
+          <BaseDropdownMenuItem variant="danger" @click="showInfo = false; deleteItem(selectedItem._id)">
+            <Trash2 class="w-4 h-4 text-red-500" />
+            <span>Excluir</span>
+          </BaseDropdownMenuItem>
+        </BaseDropdownMenu>
       </template>
+
       <div v-if="selectedItem" class="space-y-6 py-2">
-        <!-- Header do Item -->
-        <div
-          class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-2xl bg-slate-50 dark:bg-gray-800/40 border border-slate-100 dark:border-gray-800">
-          <div class="flex items-center gap-4">
+
+        <!-- Header do Item (Padronizado com BaseCard compact color="slate") -->
+        <BaseCard compact color="slate">
+          <div class="flex gap-4 items-center content-center">
             <div
-              class="w-16 h-16 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden shrink-0 flex items-center justify-center shadow-xs">
+              class="hidden sm:flex w-20 h-20 rounded-full bg-blue-600 dark:bg-blue-700 flex items-center justify-center text-white text-xl font-black shrink-0 overflow-hidden">
               <BaseImage v-if="selectedItem.imageUrl" :src="selectedItem.imageUrl" :alt="selectedItem.name"
                 container-class="w-full h-full" img-class="w-full h-full object-cover" />
-              <div v-else class="text-gray-400 dark:text-gray-500">
-                <component :is="getIcon(selectedItem.icon || 'Package')" class="w-8 h-8" />
-              </div>
+              <component v-else :is="getIcon(selectedItem.icon || 'Package')" class="w-9 h-9" />
             </div>
-            <div>
-              <div class="flex flex-wrap items-center gap-2 mt-1.5">
-                <BaseBadge variant="info">{{ selectedItem.type === 'service' ? 'Serviço' : 'Produto' }}</BaseBadge>
-                <BaseBadge variant="ia">
-                  <Sparkles class="w-3 h-3" /> Gerado por IA
-                </BaseBadge>
-                <BaseBadge variant="default" v-if="selectedItem.sku">SKU: {{ selectedItem.sku }}</BaseBadge>
+            <div class="flex gap-1 grid sm:grid-cols-2 grid-cols-1 flex-1">
+              <div>
+                <h3 class="font-semibold tracking-normal text-lg text-gray-700 dark:text-gray-200">{{ selectedItem.name }}</h3>
+                <p class="font-base tracking-wide text-sm text-gray-500">{{ selectedItem.sku ? `SKU: ${selectedItem.sku}` : 'Sem SKU cadastrado' }}</p>
+
+                <div class="flex flex-wrap items-center gap-1.5 mt-1">
+                  <BaseBadge light :variant="selectedItem.type === 'service' ? 'info' : 'success'">
+                    {{ selectedItem.type === 'service' ? 'Serviço' : 'Produto' }}
+                  </BaseBadge>
+                  <BaseBadge light variant="ia" v-if="selectedItem.aiGenerated">
+                    <Sparkles class="w-3 h-3 mr-1" /> IA
+                  </BaseBadge>
+                </div>
+              </div>
+              <div>
+                <h3 class="font-semibold tracking-normal text-lg text-gray-700 dark:text-gray-200">
+                  R$ {{ (selectedItem.price ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
+                </h3>
+                <p class="font-base tracking-wide text-sm text-gray-500">por {{ selectedItem.unit || 'unidade' }}</p>
               </div>
             </div>
           </div>
-        </div>
+        </BaseCard>
 
-        <!-- Cards de Preço e Unidade -->
+        <!-- Cards de Preço e Unidade (utilizando BaseMetricCard com variant) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div
-            class="p-4 rounded-2xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 space-y-1">
-            <span class="text-[10px] font-semibold text-blue-600 dark:text-blue-400 tracking-wide">Preço de Venda</span>
-            <p class="text-2xl font-normal text-gray-900 dark:text-gray-100">
-              R$ {{ (selectedItem.price ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }} <span
-                class="text-xs font-bold text-gray-400 dark:text-gray-500">/ {{ selectedItem.unit || 'unidade' }}</span>
-            </p>
+          <BaseMetricCard
+            color="sky"
+            title="Preço de Venda"
+            :subtitle="`Unidade comercial: ${selectedItem.unit || 'un'}`"
+            :value="`R$ ${(selectedItem.price ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`"
+            :icon="DollarSign"
+            variant
+          />
 
-          </div>
-
-          <div
-            class="p-4 rounded-2xl bg-slate-50 dark:bg-gray-800/40 border border-slate-100 dark:border-gray-800 space-y-1">
-            <span class="text-[10px] font-semibold text-gray-400 dark:text-gray-500 tracking-wide">Unidade
-              Comercial</span>
-            <p class="text-xl font-black text-gray-900 dark:text-gray-100 capitalize">
-              {{ selectedItem.unit || 'Unidade' }}
-            </p>
-          </div>
+          <BaseMetricCard
+            color="green"
+            title="Unidade Comercial"
+            :subtitle="selectedItem.type === 'service' ? 'Prestação de Serviço' : 'Item Físico / Produto'"
+            :value="selectedItem.unit || 'Unidade'"
+            :icon="Package"
+            variant
+          />
         </div>
 
         <!-- Descrição Comercial -->
-        <div
-          class="p-4 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 space-y-2">
-          <h4 class="text-[10px] font-semibold text-gray-400 dark:text-gray-500 tracking-wide">Descrição Comercial</h4>
-          <p class="text-sm text-gray-700 dark:text-gray-300 font-medium whitespace-pre-line leading-relaxed">
-            {{ selectedItem.description || 'Nenhuma descrição informada.' }}
-          </p>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between px-1">
+            <h3 class="text-[10px] font-semibold text-gray-400 dark:text-gray-500 tracking-wide uppercase">
+              Descrição Comercial
+            </h3>
+          </div>
+          <div class="p-4 rounded-[.5rem] bg-gray-50/60 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800">
+            <p class="text-sm text-gray-700 dark:text-gray-300 font-medium whitespace-pre-line leading-relaxed">
+              {{ selectedItem.description || 'Nenhuma descrição informada.' }}
+            </p>
+          </div>
         </div>
       </div>
-
-      <template #footer>
-        <div class="flex justify-end items-center w-full">
-          <BaseButton variant="primary" @click="showInfo = false; openModal(selectedItem)">
-            <Pencil class="w-4 h-4 mr-2" />
-            Editar
-          </BaseButton>
-        </div>
-      </template>
     </BaseDialog>
 
     <!-- Listagem Unificada (desktop & mobile) -->
@@ -161,11 +153,11 @@ const {
       <template #header>
         <BaseFilters :active-filters-count="activeFiltersCount" @clear="clearFilters" data-tour="catalogo-busca">
           <template #search>
-            <input v-model="searchQuery" type="text" placeholder="Buscar itens por nome, código ou descrição..."
-              class="w-full h-[52px] pl-12 pr-5 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-xs">
-            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
-              <Search class="w-5 h-5" />
-            </div>
+            <BaseInput
+            v-model="searchQuery"
+              type="text"
+              placeholder="Buscar itens por nome, código ou descrição..."
+              :icon="Search"></BaseInput>
           </template>
         </BaseFilters>
       </template>
@@ -199,7 +191,7 @@ const {
 
         <template #cell-type="{ item }">
           <div class="cursor-pointer" @click="openInfoModal(item)">
-            <BaseBadge variant="success">{{ item.type === 'service' ? 'Serviço' : 'Produto' }}</BaseBadge>
+            <BaseBadge :variant=" item.type === 'service' ? 'info' : 'success' " light>{{ item.type === 'service' ? 'Serviço' : 'Produto' }}</BaseBadge>
           </div>
         </template>
 

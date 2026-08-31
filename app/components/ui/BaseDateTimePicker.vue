@@ -114,7 +114,7 @@ function setPreset(daysToAdd: number) {
             side="bottom"
             :side-offset="8"
             align="start"
-            class="z-[100] bg-white dark:bg-gray-900 rounded-[0.75rem] border-2 border-gray-100 dark:border-gray-700 shadow-2xl dark:shadow-gray-950/50 p-6 sm:p-6 animate-in fade-in zoom-in-95 duration-200 min-w-[320px] max-w-[90vw]"
+            class="z-[99999] bg-white dark:bg-gray-900 rounded-[0.75rem] border-2 border-gray-100 dark:border-gray-700 shadow-2xl dark:shadow-gray-950/50 p-6 sm:p-6 animate-in fade-in zoom-in-95 duration-200 min-w-[320px] max-w-[90vw]"
           >
             <div class="space-y-6">
               

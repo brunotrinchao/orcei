@@ -129,7 +129,8 @@ const shouldShowMobileLabel = (col: BaseTableColumn) => {
             <tr
               v-for="(item, itemIndex) in items"
               :key="item.id || item._id || itemIndex"
-              class="block md:table-row p-4 sm:p-5 md:p-0 space-y-2 md:space-y-0 hover:bg-slate-50/40 dark:hover:bg-gray-800/30 transition-colors"
+              class="block md:table-row p-4 sm:p-5 md:p-0 space-y-2 md:space-y-0 hover:bg-slate-100/80 dark:hover:bg-gray-800/60 transition-colors cursor-pointer group"
+              @click="$emit('row-click', item, itemIndex)"
             >
               <td
                 v-for="col in columns"

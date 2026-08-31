@@ -40,8 +40,8 @@ const {
               <FileSpreadsheet class="w-4 h-4 text-gray-400 opacity-60" />
             </div>
             <div>
-              <h4 class="text-xs font-normal uppercase tracking-tight text-gray-900 dark:text-gray-100">{{ step.title }}</h4>
-              <p class="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed mt-1">{{ step.description }}</p>
+              <h4 class="text-xs font-semibold uppercase tracking-tight text-gray-900 dark:text-gray-100">{{ step.title }}</h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 font-base leading-relaxed mt-1">{{ step.description }}</p>
             </div>
           </div>
         </div>
@@ -53,42 +53,43 @@ const {
           v-for="card in cards"
           :key="card.type"
           compact
-          "
         >
           <!-- Cabeçalho do Card -->
           <div class="space-y-4">
             <div class="flex items-center justify-between">
-              <div class="w-12 h-12 rounded-2xl bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-800 flex items-center justify-center shadow-sm">
+              <div class="w-12 h-12 rounded-[.5rem] bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-800 flex items-center justify-center shadow-sm">
                 <component :is="card.icon" class="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
-              <span class="px-3 py-1 rounded-full text-[10px] font-normal uppercase tracking-wider" :class="card.badgeClass">
+              <BaseBadge :variant="card.badgeVariant" light>{{ card.badge }}</BaseBadge>
+              <!-- <span class="px-3 py-1 rounded-full text-[10px] font-normal uppercase tracking-wider" :class="card.badgeClass">
                 {{ card.badge }}
-              </span>
+              </span> -->
             </div>
 
             <div>
-              <h3 class="text-base font-normal text-gray-900 dark:text-white uppercase tracking-tight">{{ card.title }}</h3>
-              <p class="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed mt-1">{{ card.description }}</p>
+              <h3 class="text-base font-semibold text-gray-900 dark:text-white uppercase tracking-tight">{{ card.title }}</h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400 font-base leading-relaxed mt-1">{{ card.description }}</p>
             </div>
 
             <!-- Lista de Campos Suportados -->
             <div class="pt-2 space-y-2">
-              <span class="text-[10px] font-normal uppercase tracking-widest text-gray-400">Campos incluídos no modelo:</span>
+              <span class="text-[10px] font-normal tracking-wide text-gray-400">Campos incluídos no modelo:</span>
               <div class="flex flex-wrap gap-1.5">
-                <span
+                <BaseBadge v-for="field in card.fields" rounded="full" outline light> <CheckCircle2 class="w-3 h-3 mr-1 text-emerald-500" />{{ field }}</BaseBadge>
+                <!-- <span
                   v-for="field in card.fields"
                   :key="field"
                   class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white dark:bg-gray-950 border border-slate-200/80 dark:border-gray-800 text-[11px] font-semibold text-gray-600 dark:text-gray-300"
                 >
                   <CheckCircle2 class="w-3 h-3 text-emerald-500" />
                   {{ field }}
-                </span>
+                </span> -->
               </div>
             </div>
           </div>
 
           <!-- Ações do Card (Baixar Modelo & Processar) -->
-          <div class="pt-4 border-t border-slate-200/60 dark:border-gray-800 flex flex-col sm:flex-row items-center gap-3">
+          <div class="pt-4 flex flex-col sm:flex-row items-center gap-3">
             <a
               :href="card.templateHref"
               download

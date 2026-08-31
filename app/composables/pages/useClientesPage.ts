@@ -74,6 +74,28 @@ export function useClientesPage() {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
   }
 
+  function formatDate(dateStr?: string) {
+    if (!dateStr) return '-'
+    return new Date(dateStr).toLocaleDateString('pt-BR')
+  }
+
+  function getProposalStatusLabel(proposal: any) {
+    if (!proposal) return 'Sem Status'
+    if (proposal.status === 'accepted') return 'Aprovado'
+    if (proposal.status === 'rejected') return 'Recusado'
+    if (proposal.status === 'expired') return 'Expirado'
+    if (proposal.status === 'draft') return 'Rascunho'
+    return 'Em Aberto'
+  }
+
+  function getStatusVariant(proposal: any): 'success' | 'warning' | 'danger' | 'info' | 'secondary' {
+    if (!proposal) return 'secondary'
+    if (proposal.status === 'accepted') return 'success'
+    if (proposal.status === 'rejected' || proposal.status === 'expired') return 'danger'
+    if (proposal.status === 'draft') return 'secondary'
+    return 'warning'
+  }
+
   function getStatusBadge(status: string) {
     switch (status) {
       case 'accepted':
@@ -272,6 +294,9 @@ export function useClientesPage() {
     isSearchingZip,
     openInfoModal,
     formatCurrency,
+    formatDate,
+    getProposalStatusLabel,
+    getStatusVariant,
     getStatusBadge,
     formattedAddress,
     openModal,

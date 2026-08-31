@@ -161,15 +161,15 @@ const borderClasses = computed(() => {
 const sizeClasses = computed(() => {
   switch (props.size) {
     case 'xs':
-      return 'py-1.5 text-xs rounded-md min-h-[32px]'
+      return 'py-1.5 text-xs  min-h-[32px]'
     case 'sm':
-      return 'py-2.5 text-xs rounded-lg min-h-[40px]'
+      return 'py-2.5 text-xs  min-h-[40px]'
     case 'lg':
-      return 'py-4 text-base rounded-[0.75rem] min-h-[60px]'
+      return 'py-4 text-base min-h-[60px]'
     case 'xl':
-      return 'py-5 text-lg rounded-xl min-h-[68px]'
+      return 'py-5 text-lg  min-h-[68px]'
     case '2xl':
-      return 'py-6 text-xl rounded-2xl min-h-[76px]'
+      return 'py-6 text-xl  min-h-[76px]'
     case 'md':
     default:
       if (
@@ -178,7 +178,7 @@ const sizeClasses = computed(() => {
       ) {
         return props.size
       }
-      return 'py-3.5 text-sm rounded-[0.75rem] min-h-[52px]'
+      return 'py-3.5 text-sm min-h-[52px]'
   }
 })
 </script>
@@ -202,7 +202,7 @@ const sizeClasses = computed(() => {
           ref="triggerRef"
           :aria-labelledby="label ? `label-${id}` : undefined"
           :class="[
-            'inline-flex items-center justify-between w-full transition-all outline-none font-normal group disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:cursor-not-allowed shadow-xs',
+            'inline-flex items-center justify-between w-full transition-all outline-none font-normal group disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:cursor-not-allowed shadow-xs rounded-[.5rem]',
             borderClasses,
             bgClasses,
             sizeClasses,
@@ -218,7 +218,7 @@ const sizeClasses = computed(() => {
 
         <SelectPortal>
           <SelectContent
-            class="z-[9999] min-w-[var(--radix-select-trigger-width)] bg-white dark:bg-gray-900 rounded-[0.75rem] border border-gray-300 dark:border-gray-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+            class="z-[9999] min-w-[var(--radix-select-trigger-width)] bg-white dark:bg-gray-900 rounded-[.5rem] border border-gray-300 dark:border-gray-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
             position="popper"
             :side-offset="8"
             :avoid-collisions="true"
@@ -236,7 +236,7 @@ const sizeClasses = computed(() => {
                 v-for="option in options"
                 :key="option.value"
                 :value="option.value || '__EMPTY__'"
-                class="relative flex items-center px-8 py-3 text-sm font-normal text-gray-600 dark:text-gray-300 rounded-[0.75rem] cursor-pointer outline-none focus:bg-gray-50 dark:focus:bg-gray-800 focus:text-gray-900 dark:focus:text-white data-[state=checked]:text-gray-900 dark:data-[state=checked]:text-white data-[state=checked]:bg-gray-50 dark:data-[state=checked]:bg-gray-800 transition-colors"
+                class="relative flex items-center px-8 py-3 text-sm font-normal text-gray-600 dark:text-gray-300 rounded-[.5rem] cursor-pointer outline-none focus:bg-gray-50 dark:focus:bg-gray-800 focus:text-gray-900 dark:focus:text-white data-[state=checked]:text-gray-900 dark:data-[state=checked]:text-white data-[state=checked]:bg-gray-50 dark:data-[state=checked]:bg-gray-800 transition-colors"
               >
                 <SelectItemIndicator class="absolute left-2 inline-flex items-center justify-center">
                   <Check class="w-4 h-4 text-gray-900 dark:text-white" />

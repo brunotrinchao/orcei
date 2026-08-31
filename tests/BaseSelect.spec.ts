@@ -49,7 +49,7 @@ describe('BaseSelect', () => {
     const wrapperDefault = await mountSuspended(BaseSelect, {
       props: { options }
     })
-    expect(wrapperDefault.find('button').classes()).toContain('border-2')
+    expect(wrapperDefault.find('button').classes()).toContain('border-gray-300')
 
     const wrapperNone = await mountSuspended(BaseSelect, {
       props: { options, border: 'none' }

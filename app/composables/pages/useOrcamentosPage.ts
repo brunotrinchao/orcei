@@ -14,6 +14,12 @@ export function useOrcamentosPage() {
   const filterStartDate = ref('')
   const filterEndDate = ref('')
   const filterPendingChat = ref(false)
+
+  const stagedFilterStatus = ref('')
+  const stagedFilterStartDate = ref('')
+  const stagedFilterEndDate = ref('')
+  const stagedFilterPendingChat = ref(false)
+
   const itemsPerPage = 10
 
   const showProposalInfo = ref(false)
@@ -51,7 +57,25 @@ export function useOrcamentosPage() {
     return count
   })
 
+  function onOpenFilters() {
+    stagedFilterStatus.value = filterStatus.value
+    stagedFilterStartDate.value = filterStartDate.value
+    stagedFilterEndDate.value = filterEndDate.value
+    stagedFilterPendingChat.value = filterPendingChat.value
+  }
+
+  function applyFilters() {
+    filterStatus.value = stagedFilterStatus.value
+    filterStartDate.value = stagedFilterStartDate.value
+    filterEndDate.value = stagedFilterEndDate.value
+    filterPendingChat.value = stagedFilterPendingChat.value
+  }
+
   function clearFilters() {
+    stagedFilterStatus.value = ''
+    stagedFilterStartDate.value = ''
+    stagedFilterEndDate.value = ''
+    stagedFilterPendingChat.value = false
     searchQuery.value = ''
     filterStatus.value = ''
     filterStartDate.value = ''
@@ -485,6 +509,12 @@ export function useOrcamentosPage() {
     filterStartDate,
     filterEndDate,
     filterPendingChat,
+    stagedFilterStatus,
+    stagedFilterStartDate,
+    stagedFilterEndDate,
+    stagedFilterPendingChat,
+    onOpenFilters,
+    applyFilters,
     showProposalInfo,
     selectedProposalInfo,
     openProposalInfo,

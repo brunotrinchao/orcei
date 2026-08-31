@@ -130,11 +130,11 @@ describe('BaseInput — sem máscara', () => {
     expect(wrapper.find('input').classes()).toContain('py-6')
   })
 
-  it('aplica borda default (border-2)', async () => {
+  it('aplica borda default (border-gray-300)', async () => {
     const wrapper = await mountSuspended(BaseInput, {
       props: { modelValue: '' }
     })
-    expect(wrapper.find('input').classes()).toContain('border-2')
+    expect(wrapper.find('input').classes()).toContain('border-gray-300')
   })
 
   it('aplica borda none / false', async () => {

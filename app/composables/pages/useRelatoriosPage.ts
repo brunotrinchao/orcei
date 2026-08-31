@@ -6,6 +6,8 @@ export function useRelatoriosPage() {
   const searchQuery = ref('')
   const startDate = ref('')
   const endDate = ref('')
+  const stagedStartDate = ref('')
+  const stagedEndDate = ref('')
   const { data: profile } = useLazyFetch<any>('/api/profile', { key: 'profile' })
   const { getCost } = useCreditCosts()
   const { 
@@ -28,7 +30,19 @@ export function useRelatoriosPage() {
     return count
   })
 
+  function onOpenFilters() {
+    stagedStartDate.value = startDate.value
+    stagedEndDate.value = endDate.value
+  }
+
+  function applyFilters() {
+    startDate.value = stagedStartDate.value
+    endDate.value = stagedEndDate.value
+  }
+
   function clearFilters() {
+    stagedStartDate.value = ''
+    stagedEndDate.value = ''
     startDate.value = ''
     endDate.value = ''
   }
@@ -140,6 +154,10 @@ export function useRelatoriosPage() {
     searchQuery,
     startDate,
     endDate,
+    stagedStartDate,
+    stagedEndDate,
+    onOpenFilters,
+    applyFilters,
     profile,
     getCost,
     isCreditConfirmOpen,

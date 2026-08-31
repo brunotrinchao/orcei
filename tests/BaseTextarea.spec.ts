@@ -37,24 +37,25 @@ describe('BaseTextarea', () => {
     const wrapperDefault = await mountSuspended(BaseTextarea, {
       props: { modelValue: '' }
     })
-    expect(wrapperDefault.find('textarea').classes()).toContain('p-3.5')
+    expect(wrapperDefault.find('textarea').classes()).toContain('py-3.5')
 
     const wrapperXs = await mountSuspended(BaseTextarea, {
       props: { modelValue: '', size: 'xs' }
     })
-    expect(wrapperXs.find('textarea').classes()).toContain('p-2')
+    expect(wrapperXs.find('textarea').classes()).toContain('py-1.5')
 
     const wrapperLg = await mountSuspended(BaseTextarea, {
       props: { modelValue: '', size: 'lg' }
     })
-    expect(wrapperLg.find('textarea').classes()).toContain('p-4')
+    expect(wrapperLg.find('textarea').classes()).toContain('py-4')
   })
 
-  it('aplica propriedades de borda (border)', async () => {
+  it('aplica propriedades de borda (border) alinhadas 1:1 ao BaseInput', async () => {
     const wrapperDefault = await mountSuspended(BaseTextarea, {
       props: { modelValue: '' }
     })
-    expect(wrapperDefault.find('textarea').classes()).toContain('border-2')
+    expect(wrapperDefault.find('textarea').classes()).toContain('border-gray-300')
+    expect(wrapperDefault.find('textarea').classes()).toContain('border')
 
     const wrapperNone = await mountSuspended(BaseTextarea, {
       props: { modelValue: '', border: 'none' }
@@ -65,5 +66,20 @@ describe('BaseTextarea', () => {
       props: { modelValue: '', border: 'violet' }
     })
     expect(wrapperViolet.find('textarea').classes()).toContain('border-violet-300')
+  })
+
+  it('aplica variante (variant) definindo tema de background e borda', async () => {
+    const wrapperSlate = await mountSuspended(BaseTextarea, {
+      props: { modelValue: '', variant: 'slate' }
+    })
+    expect(wrapperSlate.find('textarea').classes()).toContain('bg-slate-100')
+    expect(wrapperSlate.find('textarea').classes()).toContain('border-slate-300')
+  })
+
+  it('aplica cor customizada de texto (color)', async () => {
+    const wrapperColor = await mountSuspended(BaseTextarea, {
+      props: { modelValue: '', color: 'violet' }
+    })
+    expect(wrapperColor.find('textarea').classes()).toContain('!text-violet-600')
   })
 })

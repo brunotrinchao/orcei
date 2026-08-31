@@ -1,9 +1,9 @@
 import { ref, computed } from 'vue'
-import { SwatchBook, Image as PhotoIcon, Pencil, Sun, Moon, Trash2, Upload, Sparkles, Check, Eye } from 'lucide-vue-next'
+import { SwatchBook, Image as PhotoIcon, Pencil, Sun, Moon, Trash2, Upload, Sparkles } from 'lucide-vue-next'
 
 export function useSettingsVisual(
-  props: { logoUrl: string; primaryColor: string },
-  emit: { (e: 'update:logoUrl', val: string): void; (e: 'update:primaryColor', val: string): void }
+  props: { logoUrl: string; primaryColor?: string },
+  emit: { (e: 'update:logoUrl', val: string): void; (e?: any, val?: any): void }
 ) {
   const { notify } = useAlerts()
   const isSaving = ref(false)
@@ -14,24 +14,6 @@ export function useSettingsVisual(
     get: () => props.logoUrl,
     set: (val) => emit('update:logoUrl', val)
   })
-
-  const localPrimaryColor = computed({
-    get: () => props.primaryColor,
-    set: (val) => emit('update:primaryColor', val)
-  })
-
-  const presetColors = [
-    { hex: '#3147F6', label: 'Azul Orcei' },
-    { hex: '#10B981', label: 'Esmeralda' },
-    { hex: '#8B5CF6', label: 'Violeta' },
-    { hex: '#F43F5E', label: 'Rubro' },
-    { hex: '#F59E0B', label: 'Âmbar' },
-    { hex: '#0F172A', label: 'Grafite' }
-  ]
-
-  function selectPresetColor(hex: string) {
-    localPrimaryColor.value = hex
-  }
 
   function removeLogo() {
     localLogoUrl.value = ''
@@ -71,9 +53,6 @@ export function useSettingsVisual(
 
   return {
     localLogoUrl,
-    localPrimaryColor,
-    presetColors,
-    selectPresetColor,
     removeLogo,
     isSaving,
     Cropper,
@@ -92,8 +71,6 @@ export function useSettingsVisual(
     Moon,
     Trash2,
     Upload,
-    Sparkles,
-    Check,
-    Eye
+    Sparkles
   }
 }

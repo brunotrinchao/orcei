@@ -173,7 +173,7 @@ const {
     </BaseDialog>
 
     <!-- Cupom Promocional -->
-    <section class="bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm">
+    <BaseCard compact noPadding>
       <div class="flex flex-col md:flex-row md:items-end gap-4">
         <div class="flex-1">
           <BaseInput
@@ -188,7 +188,7 @@ const {
           Aplicar Cupom
         </BaseButton>
       </div>
-    </section>
+    </BaseCard>
 
     <!-- Grade de Pacotes Transacionais de Recarga -->
     <section class="space-y-8">
@@ -271,14 +271,8 @@ const {
     </section>
 
     <!-- Histórico de Pagamentos Stripe -->
-    <section class="pt-8">
-      <div class="flex items-center gap-3 mb-8">
-        <h2 class="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Histórico de Recargas</h2>
-        <div class="h-px flex-1 bg-gray-100 dark:bg-gray-800"></div>
-      </div>
+    <BaseCard title="Histórico de Recargas" noPadding>
 
-      <div class="bg-white dark:bg-gray-900 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
@@ -320,9 +314,7 @@ const {
               </tr>
             </tbody>
           </table>
-        </div>
-      </div>
-    </section>
+    </BaseCard>
 
   </div>
 </template>

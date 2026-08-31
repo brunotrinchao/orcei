@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
 import * as LucideIcons from 'lucide-vue-next'
-import { Plus, Search, Image, Pencil, Trash2, Sparkles, RefreshCcw, Package, ShoppingBag, HelpCircle, MoreVertical, Upload, Eye } from 'lucide-vue-next'
+import { Plus, Search, Image, Pencil, Trash2, Sparkles, RefreshCcw, Package, ShoppingBag, HelpCircle, MoreVertical, Upload, Eye, DollarSign } from 'lucide-vue-next'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
 import type { CatalogItemDTO } from '~/types'
 
@@ -108,6 +108,7 @@ export function useCatalogoPage() {
     MoreVertical,
     Upload,
     Eye,
+    DollarSign,
     DropdownMenuRoot,
     DropdownMenuTrigger,
     DropdownMenuPortal,

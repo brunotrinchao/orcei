@@ -25,7 +25,7 @@ export function useProposalForm(
     key: 'clients-search',
     query: computed(() => ({
       limit: 20,
-      search: clientSearch.value
+      search: clientSearch.value.trim().length >= 2 ? clientSearch.value : ''
     })),
     watch: [clientSearch],
     server: false

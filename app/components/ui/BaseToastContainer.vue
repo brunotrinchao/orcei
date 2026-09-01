@@ -52,13 +52,13 @@ function getContainerClasses(position: string) {
         :class="getContainerClasses(pos)"
       >
         <TransitionGroup
-          enter-active-class="transition-all duration-500 ease-out transform"
-          enter-from-class="opacity-0 -translate-y-8"
-          enter-to-class="opacity-100 translate-y-0"
-          leave-active-class="transition-all duration-500 ease-in transform"
-          leave-from-class="opacity-100 translate-y-0"
-          leave-to-class="opacity-0 -translate-y-8"
-          move-class="transition-all duration-500 ease-out"
+          enter-active-class="transition-all duration-200 ease-out"
+          enter-from-class="opacity-0 translate-y-2 scale-[0.97]"
+          enter-to-class="opacity-100 translate-y-0 scale-100"
+          leave-active-class="transition-all duration-150 ease-in"
+          leave-from-class="opacity-100 translate-y-0 scale-100"
+          leave-to-class="opacity-0 translate-y-1 scale-[0.98]"
+          move-class="transition-all duration-200 ease-out"
         >
           <BaseToast
             v-for="item in items"

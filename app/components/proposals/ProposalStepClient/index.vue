@@ -65,26 +65,32 @@ defineExpose({ validate, reset })
 
       <div class="space-y-6">
         <!-- Extrator de Leads com IA ou Busca de Cliente Cadastrado com transição suave -->
-        <Transition name="section-fade-slide" mode="default">
+        <Transition name="section-fade-slide" mode="out-in">
           <div v-if="isAIExtractOpen" key="ai-extract-section" class="space-y-4 p-6 bg-gradient-to-br from-violet-50 to-fuchsia-50/50 dark:from-violet-950/20 dark:to-fuchsia-950/10 border border-violet-100/50 dark:border-violet-900/30 rounded-[.5rem]">
-            <div class="flex items-start gap-3">
-              <Sparkles class="w-5 h-5 text-violet-600 dark:text-violet-400 shrink-0 mt-0.5 animate-pulse" />
-              <p class="text-xs text-slate-600 dark:text-slate-400 font-bold leading-relaxed">
-                Cole o texto bruto recebido do seu lead (conversa do WhatsApp, e-mail ou anotação). A IA extrairá os dados e cadastrará o cliente automaticamente!
-              </p>
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-[.5rem] bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-300 flex items-center justify-center shrink-0">
+                  <Sparkles class="w-4.5 h-4.5" />
+                </div>
+                <div>
+                  <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Extração inteligente de dados</h4>
+                  <p class="text-xs text-muted">Cole a conversa ou anotação do lead — a IA cadastra o cliente por você.</p>
+                </div>
+              </div>
             </div>
-            
+
             <BaseTextarea
               v-model="rawLeadText"
               :rows="4"
               :maxLength="maxClientExtractLength"
+              class="font-medium"
               placeholder="Ex: Oi, sou o João Silva. Preciso de uma proposta comercial. Meu e-mail é cliente@email.com e WhatsApp (11) 98888-7777..."
             />
-            
-            <div class="flex justify-end">
-              <BaseButton 
-                type="button" 
-                @click="extractClient" 
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-[11px] text-muted tabular-nums">{{ rawLeadText.length }}/{{ maxClientExtractLength }}</span>
+              <BaseButton
+                type="button"
+                @click="extractClient"
                  :tooltip="creditLabel('clientExtract')"
                 :disabled="!rawLeadText.trim() || rawLeadText.length > maxClientExtractLength || isExtracting"
                 class="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white"
@@ -105,6 +111,7 @@ defineExpose({ validate, reset })
                   label="Buscar Cliente Cadastrado"
                   :options="clientOptions"
                   :loading="pending"
+                  :show-avatar="false"
                   placeholder="Selecione ou busque..."
                   @update:model-value="onClientSelect"
                 />
@@ -122,8 +129,11 @@ defineExpose({ validate, reset })
                 </BaseButton>
               </div>
             </div>
-            <div v-if="!pending && internalSearch.trim() && clientOptions.length === 0" class="flex items-center justify-between gap-3 px-1">
-              <span class="text-xs font-bold text-gray-500 dark:text-gray-400">Nenhum cliente encontrado para "{{ internalSearch }}".</span>
+            <div v-if="internalSearch.trim() && internalSearch.trim().length < 2" class="px-1">
+              <p class="text-xs text-muted">Digite ao menos 2 caracteres para buscar no cadastro.</p>
+            </div>
+            <div v-else-if="!pending && internalSearch.trim().length >= 2 && clientOptions.length === 0" class="flex items-center justify-between gap-3 px-1">
+              <span class="text-xs font-semibold text-muted">Nenhum cliente encontrado para "{{ internalSearch }}".</span>
               <BaseButton type="button" variant="outline" size="sm" @click="openManualCreate(internalSearch)">
                 <UserPlus class="w-3.5 h-3.5 mr-1.5" />
                 Cadastrar este cliente

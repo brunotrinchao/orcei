@@ -1,7 +1,7 @@
 {
   "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"/home/brunotrinchao/.claude/squeez/bin/squeez wrap 'cd ~/Documents/Bruno/Orcei && python3 ~/.claude/skills/ui-ux-pro-max/scripts/search.py \\\"ai assistant dashboard CTA conversion card\\\" --...",
-  "error": "Exit code 2\nsh: 1: cd: can't cd to /home/brunotrinchao/Documents/Bruno/Orcei",
-  "timestamp": "2026-09-01T16:58:10.628Z",
+  "tool_input_preview": "{\"command\":\"/home/brunotrinchao/.claude/squeez/bin/squeez wrap 'pkill -f '\\\"'\\\"'nuxt build'\\\"'\\\"' 2>/dev/null; pkill -f '\\\"'\\\"'vite build'\\\"'\\\"' 2>/dev/null; sleep 2; cd ~/Documentos/Bruno/Orcei && no...",
+  "error": "Exit code 144",
+  "timestamp": "2026-09-01T17:44:24.176Z",
   "retry_count": 1
 }

@@ -219,12 +219,12 @@ function isSubActive(sub: NavSubItem) {
           <template v-if="item.children">
             <div
               @click="handleParentClick(item)"
-              class="group flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-gray-800/60 transition-all cursor-pointer select-none"
-              :class="isNavActive(item) ? 'text-blue-600 dark:text-blue-400 font-bold bg-blue-50/70 dark:bg-blue-950/40' : ''"
+              class="group flex items-center justify-between px-3.5 py-3 rounded-[.5rem] text-sm font-medium text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-gray-800/60 transition-colors cursor-pointer select-none"
+              :class="isNavActive(item) ? 'text-brand dark:text-blue-400 font-semibold bg-brand-soft/60 dark:bg-blue-950/40' : ''"
               :title="isSidebarCollapsed ? item.label : undefined"
             >
               <div class="flex items-center gap-3.5 min-w-0">
-                <component :is="item.icon" class="w-5 h-5 shrink-0 transition-transform group-hover:scale-105" :class="isNavActive(item) ? 'text-blue-600 dark:text-blue-400' : ''" />
+                <component :is="item.icon" class="w-5 h-5 shrink-0 transition-colors" :class="isNavActive(item) ? 'text-brand dark:text-blue-400' : 'text-slate-400 dark:text-gray-500' " />
                 <span v-if="!isSidebarCollapsed" class="truncate">{{ item.label }}</span>
               </div>
 
@@ -244,10 +244,10 @@ function isSubActive(sub: NavSubItem) {
                 v-for="sub in item.children"
                 :key="sub.id"
                 :to="sub.to"
-                class="flex items-center justify-between px-3 py-3 text-xs transition-all font-normal"
+                class="flex items-center justify-between px-3 py-2.5 text-xs rounded-[.5rem] transition-colors font-normal border-l-2"
                 :class="isSubActive(sub)
-                  ? 'text-blue-600 dark:text-blue-400 font-normal'
-                  : 'text-slate-500 dark:text-gray-400 hover:text-slate-900'"
+                  ? 'text-brand dark:text-blue-400 font-medium bg-brand-soft/40 dark:bg-blue-950/30 border-brand dark:border-blue-400'
+                  : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-gray-200 border-transparent'"
               >
                 <div class="flex items-center gap-2.5 min-w-0">
                   
@@ -263,12 +263,12 @@ function isSubActive(sub: NavSubItem) {
             :to="item.to"
             @mouseenter="preloadRouteComponents(item.to)"
             @focus="preloadRouteComponents(item.to)"
-            class="group flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-gray-800/60 transition-all"
-            :class="isNavActive(item) ? '!text-blue-600 dark:!text-blue-400 font-bold bg-blue-50/70 dark:bg-blue-950/40' : ''"
+            class="group flex items-center justify-between px-3.5 py-3 rounded-[.5rem] text-sm font-medium text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-gray-800/60 transition-colors"
+            :class="isNavActive(item) ? '!text-brand dark:!text-blue-400 font-semibold bg-brand-soft/60 dark:bg-blue-950/40' : ''"
             :title="isSidebarCollapsed ? item.label : undefined"
           >
             <div class="flex items-center gap-3.5 min-w-0">
-              <component :is="item.icon" class="w-5 h-5 shrink-0 transition-transform group-hover:scale-105" :class="isNavActive(item) ? 'text-blue-600 dark:text-blue-400' : ''" />
+              <component :is="item.icon" class="w-5 h-5 shrink-0 transition-colors" :class="isNavActive(item) ? 'text-brand dark:text-blue-400' : 'text-slate-400 dark:text-gray-500'" />
               <span v-if="!isSidebarCollapsed" class="truncate">{{ item.label }}</span>
             </div>
 

@@ -110,29 +110,25 @@ const {
                     <div class="space-y-4">
                       <div class="flex items-center gap-3">
                         <div
-                          class="w-10 h-10 rounded-[.5rem] bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-xs"
+                          class="w-10 h-10 rounded-[.5rem] bg-brand-soft dark:bg-blue-950/60 text-brand dark:text-blue-400 flex items-center justify-center"
                         >
                           <component
                             :is="steps[currentStep - 1]?.icon"
                             class="w-5 h-5"
                           />
                         </div>
-                        <span
-                          class="text-xs font-bold text-gray-500 dark:text-gray-400"
-                        >
+                        <span class="text-xs font-medium text-muted">
                           Etapa {{ currentStep }} de {{ steps.length }}
                         </span>
                       </div>
 
                       <div class="space-y-1.5">
                         <h1
-                          class="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight"
+                          class="text-2xl md:text-3xl font-bold text-ink dark:text-white tracking-tight"
                         >
                           {{ steps[currentStep - 1]?.title }}
                         </h1>
-                        <p
-                          class="text-sm md:text-base text-gray-500 dark:text-gray-400 font-medium"
-                        >
+                        <p class="text-sm md:text-base text-muted">
                           {{ steps[currentStep - 1]?.subtitle }}
                         </p>
                       </div>
@@ -167,28 +163,6 @@ const {
                           label="Razão Social"
                           placeholder="Ex: João Silva Serviços LTDA"
                         />
-
-                        <!-- Cor da Marca -->
-                        <div
-                          v-if="localProfile.brandConfig"
-                          class="space-y-2 pt-2"
-                        >
-                          <label
-                            class="form-label block mb-1.5 ml-1"
-                          >
-                            Cor Primária da Organização
-                          </label>
-                          <div class="flex items-center gap-3">
-                            <BaseColorInput
-                              v-model="localProfile.brandConfig.primaryColor"
-                            />
-                            <span
-                              class="text-xs font-mono font-bold text-gray-500 dark:text-gray-400"
-                            >
-                              {{ localProfile.brandConfig.primaryColor }}
-                            </span>
-                          </div>
-                        </div>
                       </div>
 
                       <!-- Step 2: Cadastrar Primeiro Cliente -->
@@ -206,12 +180,12 @@ const {
                       <!-- Step 4: Revisão dos Dados -->
                       <div v-else-if="currentStep === 4" class="space-y-6">
                         <div
-                          class="p-6 bg-white dark:bg-gray-900 rounded-[.5rem] border border-gray-200 dark:border-gray-800 space-y-4 shadow-sm"
+                          class="p-6 bg-white dark:bg-gray-900 rounded-[.5rem] border border-line dark:border-gray-800 space-y-4"
                         >
                           <div
-                            class="flex items-center gap-3 pb-3 border-b border-gray-100 dark:border-gray-800"
+                            class="flex items-center gap-3 pb-3 border-b border-line dark:border-gray-800"
                           >
-                            <Building2 class="w-5 h-5 text-blue-600" />
+                            <Building2 class="w-5 h-5 text-brand" />
                             <h3
                               class="text-sm font-bold text-gray-900 dark:text-white"
                             >
@@ -222,7 +196,7 @@ const {
                             class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs"
                           >
                             <div>
-                              <span class="text-gray-400 font-medium block"
+                              <span class="text-muted font-medium block"
                                 >Nome do Projeto:</span
                               >
                               <strong
@@ -234,7 +208,7 @@ const {
                               >
                             </div>
                             <div>
-                              <span class="text-gray-400 font-medium block"
+                              <span class="text-muted font-medium block"
                                 >Documento:</span
                               >
                               <strong
@@ -249,12 +223,12 @@ const {
 
                         <!-- Resumo Cliente -->
                         <div
-                          class="p-6 bg-white dark:bg-gray-900 rounded-[.5rem] border border-gray-200 dark:border-gray-800 space-y-4 shadow-sm"
+                          class="p-6 bg-white dark:bg-gray-900 rounded-[.5rem] border border-line dark:border-gray-800 space-y-4"
                         >
                           <div
-                            class="flex items-center gap-3 pb-3 border-b border-gray-100 dark:border-gray-800"
+                            class="flex items-center gap-3 pb-3 border-b border-line dark:border-gray-800"
                           >
-                            <UserPlus class="w-5 h-5 text-blue-600" />
+                            <UserPlus class="w-5 h-5 text-brand" />
                             <h3
                               class="text-sm font-bold text-gray-900 dark:text-white"
                             >
@@ -265,7 +239,7 @@ const {
                             class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs"
                           >
                             <div>
-                              <span class="text-gray-400 font-medium block"
+                              <span class="text-muted font-medium block"
                                 >Nome:</span
                               >
                               <strong
@@ -276,7 +250,7 @@ const {
                               >
                             </div>
                             <div v-if="clientData.email">
-                              <span class="text-gray-400 font-medium block"
+                              <span class="text-muted font-medium block"
                                 >E-mail:</span
                               >
                               <strong
@@ -289,12 +263,12 @@ const {
 
                         <!-- Resumo Produto -->
                         <div
-                          class="p-6 bg-white dark:bg-gray-900 rounded-[.5rem] border border-gray-200 dark:border-gray-800 space-y-4 shadow-sm"
+                          class="p-6 bg-white dark:bg-gray-900 rounded-[.5rem] border border-line dark:border-gray-800 space-y-4"
                         >
                           <div
-                            class="flex items-center gap-3 pb-3 border-b border-gray-100 dark:border-gray-800"
+                            class="flex items-center gap-3 pb-3 border-b border-line dark:border-gray-800"
                           >
-                            <BookOpen class="w-5 h-5 text-blue-600" />
+                            <BookOpen class="w-5 h-5 text-brand" />
                             <h3
                               class="text-sm font-bold text-gray-900 dark:text-white"
                             >
@@ -305,7 +279,7 @@ const {
                             class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs"
                           >
                             <div>
-                              <span class="text-gray-400 font-medium block"
+                              <span class="text-muted font-medium block"
                                 >Item:</span
                               >
                               <strong
@@ -316,7 +290,7 @@ const {
                               >
                             </div>
                             <div v-if="productData.price">
-                              <span class="text-gray-400 font-medium block"
+                              <span class="text-muted font-medium block"
                                 >Valor Base:</span
                               >
                               <strong class="text-gray-900 dark:text-gray-100"

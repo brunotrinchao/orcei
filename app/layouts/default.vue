@@ -399,7 +399,7 @@ function isSubActive(sub: NavSubItem) {
                   </span>
                   <span
                     class="text-[10px] font-normal text-slate-400 dark:text-gray-500 tracking-wider leading-none mt-0.5">
-                    {{ user?.role === 'admin' ? 'Super Admin' : (profile?.subscriptionPlan || 'Membro') }}
+                    {{ user?.role === 'admin' ? 'Super Admin' : '' }}
                   </span>
                 </div>
               </button>

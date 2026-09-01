@@ -53,7 +53,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     const { data: profile } = useNuxtData<any>('profile')
     let userProfile = profile.value
 
-    if (!userProfile && import.meta.client) {
+    if (!userProfile || (typeof userProfile.setupWizardCompleted !== 'boolean' && import.meta.client)) {
       try {
         userProfile = await $fetch('/api/profile')
       } catch (e) {}

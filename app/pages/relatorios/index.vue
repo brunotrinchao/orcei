@@ -93,7 +93,7 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
           { key: 'title', label: 'Relatório' },
           { key: 'createdAt', label: 'Data' },
           { key: 'proposals', label: 'Orçamentos' },
-          { key: 'score', label: 'Score IA', align: 'right' }
+          { key: 'score', label: 'Score IA', align: 'right', type: 'badge' }
         ]"
         :items="filteredReports || []"
         :pending="pending"
@@ -103,7 +103,7 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
       >
         <template #cell-title="{ item: report }">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-[.5rem] bg-brand-soft text-brand dark:text-blue-400 flex items-center justify-center shrink-0">
+            <div class="hidden sm:flex w-10 h-10 rounded-[.5rem] bg-brand-soft text-brand dark:text-blue-400 flex items-center justify-center shrink-0">
               <Sparkles class="w-5 h-5" />
             </div>
             <div class="flex flex-col min-w-0">

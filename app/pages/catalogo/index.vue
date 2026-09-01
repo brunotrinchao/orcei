@@ -162,8 +162,9 @@ const {
         </BaseFilters>
       </template>
       <BaseDataList :columns="[
-        { key: 'name', label: 'Item do Catálogo' },
-        { key: 'type', label: 'Tipo' },
+        { key: 'name', label: 'Item' },
+        { key: 'description', label: 'Descrição' },
+        { key: 'type', label: 'Tipo', type: 'badge' },
         { key: 'price', label: 'Preço', align: 'right', type: 'currency' },
         // { key: 'actions', label: '' }
       ]" :items="items || []" :pending="pending" :has-more="hasMore" :loading-more="loadingMore" @load-more="loadMore"
@@ -172,17 +173,18 @@ const {
         empty-subtitle="Sua lista de produtos e serviços aparecerá aqui. Comece cadastrando o primeiro.">
         <template #cell-name="{ item }">
           <div class="flex items-center gap-4 md:gap-6 group">
-            <!-- <div class="w-12 h-12 md:w-16 md:h-16 rounded-[0.50rem] border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
-            <BaseImage v-if="item.imageUrl" :src="item.imageUrl" :alt="item.name" container-class="w-full h-full" img-class="w-full h-full object-cover" />
-            <div v-else class="text-gray-400">
-              <component :is="getIcon(item.icon || 'Package')" class="w-6 h-6 md:w-8 md:h-8" />
-            </div>
-          </div> -->
             <div class="flex flex-col">
               <span
                 class="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-brand dark:group-hover:text-brand transition-colors">
                 {{ item.name }}
               </span>
+            </div>
+          </div>
+        </template>
+
+        <template #cell-description="{ item }">
+          <div class="flex items-center gap-4 md:gap-6 group">
+            <div class="flex flex-col">
               <span class="text-xs font-normal text-gray-400 dark:text-gray-500 line-clamp-1 max-w-xl mt-0.5">
                 {{ item.description || 'Sem descrição comercial' }}
               </span>

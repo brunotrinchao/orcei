@@ -189,7 +189,7 @@ const {
           <div class="flex flex-col">
             <span class="text-sm font-medium text-gray-900 tracking-wide">{{ proposal.client?.name }}</span>
             <span v-if="proposal.client?.email"
-              class="text-sm font-medium text-gray-500 dark:text-gray-400">{{
+              class="text-[10px] font-base text-gray-500 dark:text-gray-400">{{
                 proposal.client.email }}</span>
           </div>
         </template>

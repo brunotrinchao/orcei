@@ -198,68 +198,95 @@ const {
       </div>
     </BaseCard>
 
-    <!-- Grade de Pacotes de Recarga -->
     <section class="space-y-8">
       <div class="text-center space-y-1.5">
         <h2 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Escolha a melhor opção de recarga</h2>
         <p class="text-sm text-muted">Créditos cumulativos e vitalícios aplicados na hora.</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
-        <div
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+        <BaseCard
+        
           v-for="pack in packages"
           :key="pack.id"
           :class="[
-            'bg-white dark:bg-gray-900 p-6 rounded-[.5rem] border transition-all flex flex-col justify-between relative',
+            'relative flex flex-col rounded-[.5rem] transition-all',
             pack.highlight
-              ? 'border-brand shadow-lg scale-[1.02] z-10'
-              : 'border-line dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-md'
+              ? 'bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 border border-white/10 shadow-lg shadow-indigo-900/20 z-10'
+              : 'bg-white dark:bg-gray-900 border border-line dark:border-gray-800 hover:shadow-md hover:border-gray-200 dark:hover:border-gray-700'
           ]"
         >
-          <!-- Selo Recomendado -->
+          <!-- Badge do plano -->
           <div
-            v-if="pack.highlight"
-            class="absolute top-5 right-5 bg-brand text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full"
+            :class="[
+              'inline-flex w-fit items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium',
+              pack.highlight
+                ? 'bg-indigo-500/15 border border-indigo-400/20 text-indigo-200'
+                : 'bg-brand-soft/70 text-brand border border-brand/15'
+            ]"
           >
-            Recomendado
+            <span>{{ pack.badge }}</span>
+            <span v-if="pack.highlight" class="flex items-center gap-1">
+              <CheckCircle2 class="w-3 h-3" /> Recomendado
+            </span>
           </div>
 
-          <div class="space-y-5">
-            <div class="space-y-1.5">
-              <span class="text-[10px] font-semibold text-muted bg-soft dark:bg-gray-800 border border-line dark:border-gray-700 px-2 py-0.5 rounded w-fit block">
-                {{ pack.badge }}
-              </span>
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ pack.name }}</h3>
-              <p class="text-gray-500 dark:text-gray-400 text-xs leading-relaxed">{{ pack.description }}</p>
-            </div>
+          <div class="mt-4 space-y-1.5">
+            <h3
+              :class="pack.highlight ? 'text-white' : 'text-gray-900 dark:text-white'"
+              class="text-lg font-semibold leading-snug"
+            >
+              {{ pack.name }}
+            </h3>
+            <p
+              :class="pack.highlight ? 'text-slate-400' : 'text-muted'"
+              class="text-xs leading-relaxed"
+            >
+              {{ pack.description }}
+            </p>
+          </div>
 
-            <!-- Preço -->
-            <div class="flex items-baseline gap-2">
-              <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ pack.price }}</span>
-              <span class="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-1.5 py-0.5 rounded">
-                {{ pack.unitPrice }}
-              </span>
-            </div>
+          <!-- Preço -->
+          <div class="mt-4 space-y-1">
+            <span
+              :class="pack.highlight ? 'text-white' : 'text-gray-900 dark:text-white'"
+              class="text-3xl font-bold tracking-tight"
+            >
+              {{ pack.price }}
+            </span>
+            <p
+              :class="pack.highlight ? 'text-indigo-200' : 'text-brand dark:text-blue-400'"
+              class="text-xs font-medium"
+            >
+              {{ pack.unitPrice }}
+            </p>
+          </div>
 
-            <div class="h-px bg-line dark:bg-gray-800"></div>
+          <div
+            :class="pack.highlight ? 'bg-white/10' : 'bg-line dark:bg-gray-800'"
+            class="h-px my-5"
+          ></div>
 
-            <!-- Recursos incluídos -->
-            <ul class="space-y-3">
-              <li
-                v-for="feature in pack.features"
-                :key="feature"
-                class="flex items-start gap-2.5 text-xs text-gray-600 dark:text-gray-300"
+          <!-- Recursos incluídos -->
+          <ul class="space-y-2.5">
+            <li
+              v-for="feature in pack.features"
+              :key="feature"
+              class="flex items-start gap-2.5 text-xs leading-relaxed"
+              :class="pack.highlight ? 'text-slate-300' : 'text-gray-600 dark:text-gray-300'"
+            >
+              <span
+                :class="pack.highlight ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-400/20' : 'bg-brand-soft text-brand border border-brand/10'"
+                class="w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5"
               >
-                <div class="w-5 h-5 bg-brand-soft text-brand rounded flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 class="w-3.5 h-3.5" />
-                </div>
-                <span>{{ feature }}</span>
-              </li>
-            </ul>
-          </div>
+                <CheckCircle2 class="w-3 h-3" />
+              </span>
+              <span>{{ feature }}</span>
+            </li>
+          </ul>
 
-          <!-- Botão de recarga -->
-          <div class="pt-6">
+          <!-- Botão de recarga (alinhado embaixo) -->
+          <template #footer>
             <BaseButton
               @click="handleAction(pack.id)"
               :disabled="isLoading === pack.id || !!isLoading"
@@ -268,11 +295,11 @@ const {
             >
               <Loader2 v-if="isLoading === pack.id" class="w-4 h-4 animate-spin mr-2" />
               <template v-else>
-                {{ pack.credits }} {{ pack.credits === 1 ? 'Crédito' : 'Créditos' }}
+                Adicionar {{ pack.credits }} {{ pack.credits === 1 ? 'crédito' : 'créditos' }}
               </template>
             </BaseButton>
-          </div>
-        </div>
+          </template>
+        </BaseCard>
       </div>
     </section>
 

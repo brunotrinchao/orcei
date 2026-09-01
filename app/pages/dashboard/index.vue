@@ -49,8 +49,16 @@ const {
 <template>
   <div class="space-y-10 relative">
 
-    <!-- Filtros de Período e Título -->
-    <PageHeader title="Cockpit Comercial" subtitle="Acompanhe suas conversões, produtividade IA e receitas acumuladas.">
+    <!-- Filtros de Período e Saudação -->
+    <PageHeader
+      :title="(() => {
+        const h = new Date().getHours()
+        const greeting = h >= 6 && h < 12 ? 'Bom dia' : h >= 12 && h < 18 ? 'Boa tarde' : h >= 18 && h < 24 ? 'Boa noite' : 'Boa madrugada'
+        const name = user?.name || user?.firstName || ''
+        return name ? `${greeting}, ${name}!` : `${greeting}!`
+      })()"
+      subtitle="Acompanhe suas conversões, produtividade IA e receitas acumuladas."
+    >
       
       <BaseCard compact v-if="stats" data-tour="dashboard-period-filter">
         
@@ -201,225 +209,180 @@ const {
 
       </section>
 
-      <!-- Cartão Premium Glowing ROI de Inteligência Artificial -->
-       <BaseCard class="lg:col-span-1" color="ia" >
-
-        <div class="relative flex flex-col lg:flex-row justify-between items-stretch gap-4 sm:gap-6 z-10">
-          <!-- Textos e ROI Geral -->
-          <div class="space-y-3 flex-1">
-            <div class="flex flex-col md:flex-row items-start md:items-center gap-2 sm:gap-4">
+      <!-- Cartão IA Orcei Fácil -->
+      <BaseCard class="lg:col-span-1" color="ia">
+        <div class="relative z-10 flex flex-col lg:flex-row justify-between items-stretch gap-5 sm:gap-7">
+          <!-- Lado esquerdo: valor + prova -->
+          <div class="space-y-4 flex-1 min-w-0">
+            <div class="flex items-center gap-3 flex-wrap">
               <div
-                class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-indigo-500/20 backdrop-blur-md rounded-full text-indigo-200 text-[9px] font-semibold tracking-wide border border-indigo-500/30">
-                <Sparkles class="w-3.5 h-3.5 text-indigo-400 animate-pulse" /> Inteligência Artificial Orcei Fácil
+                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/15 border border-indigo-400/20 text-indigo-200 text-xs font-medium">
+                <Sparkles class="w-3.5 h-3.5 text-indigo-300" /> IA Orcei Fácil
               </div>
-              <p class="text-slate-400 font-bold text-xs  hidden sm:inline">
-                Sua IA Copilot está ativa economizando trabalho manual.
-              </p>
+              <span class="text-xs text-indigo-200/60 hidden sm:inline">Copilot ativa</span>
             </div>
 
-            <div class="space-y-2">
-              <h2 class="text-2xl md:text-3xl font-black text-white tracking-tight leading-tight">
-                Você poupou <span class="text-indigo-400 font-extrabold">{{ stats.aiRoi?.timeSavedHours }}h {{
-                  stats.aiRoi?.timeSavedMinutes }}m</span> de redação comercial!
+            <div class="space-y-1.5">
+              <h2 class="text-2xl md:text-[1.75rem] font-semibold text-white leading-snug tracking-tight">
+                Você já economizou <span class="text-indigo-300 font-bold">{{ stats.aiRoi?.timeSavedHours }}h {{
+                  stats.aiRoi?.timeSavedMinutes }}m</span> de trabalho manual
               </h2>
-              <p class="text-slate-400 text-sm max-w-2xl leading-relaxed hidden sm:inline">
-                Cada proposta assistida e item do catálogo otimizado com IA economiza em média 12 minutos de digitação,
-                correção e formatação burocrática de contratos.
+              <p class="text-sm text-slate-400 leading-relaxed max-w-xl">
+                Sua IA prepara propostas, otimiza catálogo e analisa seu funil. Gere o relatório e descubra onde crescer.
               </p>
             </div>
 
-            <!-- Barras de Adoção de IA -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-              <div class="space-y-2 bg-slate-950/40 p-4 rounded-[.5rem] border border-white/5">
-                <div class="flex justify-between text-xs font-bold text-slate-300">
-                  <span class="tracking-wide text-[11px] text-slate-400">Adoção em Propostas</span>
-                  <span class="text-indigo-400">{{ Math.round(stats.aiRoi?.adoptionRates?.proposals || 0) }}%</span>
+            <!-- KPIs de Adoção -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="space-y-1.5 bg-white/[0.04] border border-white/10 rounded-[.5rem] p-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-slate-400">Propostas com IA</span>
+                  <span class="text-sm font-semibold text-white">{{ Math.round(stats.aiRoi?.adoptionRates?.proposals || 0) }}%</span>
                 </div>
-                <BaseProgressBar color="bg-gradient-to-r from-blue-500 to-indigo-500"
-                  :value="stats.aiRoi?.adoptionRates?.proposals || 0"></BaseProgressBar>
+                <BaseProgressBar color="bg-gradient-to-r from-brand to-indigo-400"
+                  :value="stats.aiRoi?.adoptionRates?.proposals || 0" />
               </div>
-
-              <div class="space-y-2 bg-slate-950/40 p-4 rounded-[.5rem] border border-white/5">
-                <div class="flex justify-between text-xs font-bold text-slate-300">
-                  <span class="tracking-wide text-[11px] text-slate-400">Adoção no Catálogo</span>
-                  <span class="text-emerald-400">{{ Math.round(stats.aiRoi?.adoptionRates?.catalog || 0) }}%</span>
+              <div class="space-y-1.5 bg-white/[0.04] border border-white/10 rounded-[.5rem] p-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-slate-400">Itens do catálogo com IA</span>
+                  <span class="text-sm font-semibold text-white">{{ Math.round(stats.aiRoi?.adoptionRates?.catalog || 0) }}%</span>
                 </div>
-                <BaseProgressBar color="bg-gradient-to-r from-indigo-500 to-emerald-500"
-                  :value="stats.aiRoi?.adoptionRates?.catalog || 0"></BaseProgressBar>
+                <BaseProgressBar color="bg-gradient-to-r from-indigo-400 to-emerald-400"
+                  :value="stats.aiRoi?.adoptionRates?.catalog || 0" />
               </div>
             </div>
           </div>
 
-          <!-- Painel Reformulado de Créditos e Ações de IA -->
-          <div
-            class="flex flex-col justify-between items-stretch gap-6 bg-slate-950/60 p-4 rounded-[.5rem] border border-white/10 lg:w-80 shrink-0 shadow-inner">
-            <!-- Mini Cards de Saldo e Consumo -->
-            <div class="space-y-3">
-              <div class="flex items-center justify-between">
-                <baseButton @click="isCostTableModalOpen = true" size="sm"
-                  class="text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 border-indigo-500/20 transition-all flex items-center gap-1 cursor-pointer active:scale-95 w-full">
-                  Tabela de Custos
-                  <ChevronRight class="w-3 h-3" />
-                </baseButton>
-              </div>
-
-              <div class="grid grid-cols-2 gap-3">
-                <!-- Saldo Atual -->
-                <div class="bg-slate-900/80 p-3 rounded-[.5rem] border border-white/5 space-y-1">
-                  <div class="flex items-center gap-1.5 text-blue-400">
-                    <Coins class="w-3.5 h-3.5 animate-pulse" />
-                    <span class="text-[9px] font-black tracking-wider text-slate-400">Saldo</span>
-                  </div>
-                  <p class="text-xl font-black text-white leading-none">
-                    {{ profile?.creditsBalance ?? 0 }} <span
-                      class="text-[9px] font-bold text-slate-500 ml-1">Créditos</span>
-                  </p>
-
+          <!-- Lado direito: custo + ação -->
+          <div class="flex flex-col lg:w-72 shrink-0 gap-4 rounded-[.5rem] border border-white/10 bg-white/[0.04] p-4">
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2">
+                <div class="w-9 h-9 rounded-[.5rem] bg-white/[0.06] border border-white/10 flex items-center justify-center text-indigo-300">
+                  <Coins class="w-4 h-4" />
                 </div>
-
-                <!-- Créditos Consumidos -->
-                <div class="bg-slate-900/80 p-3 rounded-[.5rem] border border-white/5 space-y-1">
-                  <div class="flex items-center gap-1.5 text-violet-400">
-                    <Zap class="w-3.5 h-3.5" />
-                    <span class="text-[9px] font-black tracking-wider text-slate-400">Utilizados</span>
-                  </div>
-                  <p class="text-xl font-black text-white leading-none">
-                    {{ stats.aiRoi?.creditsUsed || 0 }}<span class="text-[9px] font-bold text-slate-500 ml-1">Total
-                      geral</span>
-                  </p>
-
+                <div>
+                  <p class="text-xs text-slate-400 leading-none">Seu saldo</p>
+                  <p class="text-lg font-semibold text-white leading-tight">{{ profile?.creditsBalance ?? 0 }} <span class="text-xs font-medium text-slate-400">créditos</span></p>
                 </div>
               </div>
-              <!-- Ação Principal + Atalho para Recarga -->
-              <div class="">
-                <BaseButton data-tour="dashboard-ai-report" @click="isReportDrawerOpen = true" :disabled="isAnalyzing"
-                  variant="primary"
-                  class="w-full">
-                  <template v-if="isAnalyzing">
-                    <Loader2 class="w-4 h-4 animate-spin mr-2" /> Analisando Dados...
-                  </template>
-                  <template v-else>
-                    <Sparkles class="w-4 h-4 text-indigo-200" /> Gerar relatório
-                  </template>
-                </BaseButton>
-
-                <div class="flex items-center justify-between text-[9px] font-bold mt-2">
-                  <span class="text-slate-500 tracking-wider">Período: {{ periodLabel }}</span>
-                  <NuxtLink to="/planos"
-                    class="text-indigo-400 hover:text-indigo-300 font-black tracking-wider hover:underline flex items-center gap-0.5">
-                    Recarregar
-                    <ChevronRight class="w-3 h-3" />
-                  </NuxtLink>
-                </div>
+              <div class="text-right">
+                <p class="text-xs text-slate-400 leading-tight">Custo da análise</p>
+                <p class="text-sm font-semibold text-white leading-tight">{{ getCost('analyzeReport') }} créditos</p>
               </div>
             </div>
 
+            <BaseButton data-tour="dashboard-ai-report" @click="isReportDrawerOpen = true" :disabled="isAnalyzing"
+              variant="primary"
+              class="w-full bg-gradient-to-r from-brand to-indigo-500 hover:from-brand-dark hover:to-indigo-600 border-0 shadow-lg shadow-indigo-900/40">
+              <template v-if="isAnalyzing">
+                <Loader2 class="w-5 h-5 animate-spin mr-2" /> Analisando dados...
+              </template>
+              <template v-else>
+                <Sparkles class="w-5 h-5 mr-2" /> Gerar relatório IA
+              </template>
+            </BaseButton>
 
-
+            <div class="flex items-center justify-between text-xs">
+              <button type="button" @click="isCostTableModalOpen = true"
+                class="text-slate-400 hover:text-white transition-colors font-medium flex items-center gap-1 cursor-pointer">
+                Tabela de custos <ChevronRight class="w-3.5 h-3.5" />
+              </button>
+              <NuxtLink to="/planos"
+                class="text-indigo-300 hover:text-indigo-200 font-medium flex items-center gap-1">
+                Recarregar <Coins class="w-3.5 h-3.5" />
+              </NuxtLink>
+            </div>
+            <p class="text-[11px] text-slate-500">{{ periodLabel }}</p>
           </div>
-
         </div>
       </BaseCard>
 
-      <!-- Funil Comercial & Opcionais de Upsell -->
+      <!-- Funil Comercial & Upsell -->
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 
-        <!-- Funil Comercial Horizontal -->
-       <BaseCard title="Funil Comercial e Conversão" class="lg:col-span-2">
-        <div class="space-y-4">
-              <!-- Em Aberto / Enviados -->
-              <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                <span
-                  class="w-full md:w-20 text-[10px] font-black text-gray-400 dark:text-gray-500 text-left md:text-right">Em
-                  Aberto</span>
-                <BaseProgressBar height="h-10" color="bg-blue-100 dark:bg-blue-900/50"
-                  :value="stats.proposalsCount > 0 ? (stats.pendingCount / stats.proposalsCount * 100) : 0">
-                  <template #footer>
-                     <span
-                    class="text-xs font-bold text-blue-800 dark:text-blue-300">
-                    {{ stats.pendingCount }} orçamentos<span class="hidden sm:inline"> aguardando resposta do cliente</span>
-                  </span>
-                  </template>
-                </BaseProgressBar>
-              </div>
-
-              <!-- Aceitos (Finalizados) -->
-              <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                <span
-                  class="w-full md:w-20 text-[10px] font-black text-gray-400 dark:text-gray-500 text-left md:text-right">Aceitos</span>
-                  <BaseProgressBar height="h-10" color="bg-emerald-100 dark:bg-emerald-900/50"
-                  :value="stats.proposalsCount > 0 ? (stats.pendingCount / stats.proposalsCount * 100) : 0">
-                  <template #footer>
-                     <span
-                    class="text-xs font-bold text-emerald-800 dark:text-emerald-300">
-                    {{ stats.acceptedCount }} orçamentos<span class="hidden sm:inline"> fechados</span> ({{ Math.round(stats.approvalRate) }}% conversão)
-                  </span>
-                  </template>
-                </BaseProgressBar>
-              </div>
+        <!-- Funil Comercial -->
+        <BaseCard title="Funil Comercial e Conversão" class="lg:col-span-2">
+          <div class="space-y-5">
+            <!-- Em Aberto -->
+            <div class="flex items-center gap-4">
+              <span class="w-24 shrink-0 text-sm font-medium text-muted">Em aberto</span>
+              <BaseProgressBar height="h-2" class="flex-1" color="bg-blue-100 dark:bg-blue-900/40"
+                :value="stats.proposalsCount > 0 ? (stats.pendingCount / stats.proposalsCount * 100) : 0" />
+              <span class="w-36 shrink-0 text-right text-sm font-medium text-ink dark:text-gray-100">
+                {{ stats.pendingCount }} <span class="text-muted font-normal">aguardando</span>
+              </span>
             </div>
 
-            <div
-            class="mt-8 p-6 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 rounded-[.5rem] flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="space-y-1 text-center sm:text-left">
-              <span
-                class="text-[9px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest bg-emerald-100/60 dark:bg-emerald-950/30 px-2 py-0.5 rounded-full">Exclusivo
-                Upsell</span>
-              <h4 class="font-black text-gray-900 dark:text-white text-xs ">Receita de Itens
-                Opcionais</h4>
-              <p class="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed">Faturamento extra trazido
-                por
-                opcionais aceitos pelos clientes nas propostas.</p>
+            <!-- Aceitos -->
+            <div class="flex items-center gap-4">
+              <span class="w-24 shrink-0 text-sm font-medium text-muted">Aceitos</span>
+              <BaseProgressBar height="h-2" class="flex-1" color="bg-emerald-100 dark:bg-emerald-900/40"
+                :value="stats.proposalsCount > 0 ? (stats.acceptedCount / stats.proposalsCount * 100) : 0" />
+              <span class="w-36 shrink-0 text-right text-sm font-medium text-ink dark:text-gray-100">
+                {{ stats.acceptedCount }} <span class="text-muted font-normal">fechados</span>
+              </span>
             </div>
 
-            <div
-              class="text-center sm:text-right shrink-0 bg-white dark:bg-gray-950 px-6 py-3 rounded-[.5rem] border border-emerald-100 dark:border-emerald-900/30 shadow-sm">
-              <p class="text-[8px] font-black text-gray-400 dark:text-gray-500 ">Valor
-                Adicional</p>
-              <p class="text-xl font-black text-emerald-600 dark:text-emerald-400">R$ {{ (stats.upsellRevenue ??
-                0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
+            <!-- Enviados -->
+            <div class="flex items-center gap-4">
+              <span class="w-24 shrink-0 text-sm font-medium text-muted">Enviados</span>
+              <BaseProgressBar height="h-2" class="flex-1" color="bg-indigo-100 dark:bg-indigo-900/40"
+                :value="stats.proposalsCount > 0 ? ((stats.sentCount ?? stats.proposalsCount) / stats.proposalsCount * 100) : 0" />
+              <span class="w-36 shrink-0 text-right text-sm font-medium text-ink dark:text-gray-100">
+                {{ stats.sentCount ?? stats.proposalsCount }} <span class="text-muted font-normal">no total</span>
+              </span>
+            </div>
+
+            <!-- Upsell -->
+            <div class="pt-5 border-t border-line dark:border-gray-800 flex items-center justify-between gap-4">
+              <div>
+                <h4 class="text-sm font-semibold text-ink dark:text-gray-100">Receita de itens opcionais</h4>
+                <p class="helper-text mt-0.5">Faturamento extra trazido por opcionais aceitos nas propostas.</p>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="text-[10px] font-medium text-muted">Valor adicional</p>
+                <p class="text-lg font-semibold text-emerald-600 dark:text-emerald-400">R$ {{ (stats.upsellRevenue ??
+                  0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
+              </div>
             </div>
           </div>
-      </BaseCard>
+        </BaseCard>
 
         <!-- Alertas de Follow-ups Inteligentes -->
         <BaseCard title="Ações e Follow-ups" class="lg:col-span-1">
 
-          <div class="space-y-4">
+          <div class="space-y-3">
 
-            <BaseCard v-for="alert in stats.followUpAlerts" :key="alert.id" noPadding color="slate" compact>
-              <template #header>
-                <div class="flex justify-between w-full">
-                <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500">{{ alert.code }}</span>
-                  <BaseBadge variant="warning" light>
+            <div v-for="alert in stats.followUpAlerts" :key="alert.id"
+              class="bg-soft dark:bg-gray-900 rounded-[.5rem] border border-line dark:border-gray-800 p-3.5 space-y-3">
+              <div class="flex items-start justify-between gap-2">
+                <span class="text-[10px] font-semibold text-muted truncate">{{ alert.code }}</span>
+                <BaseBadge variant="warning" light>
                   {{ alert.daysAgo === 0 ? 'Pendente hoje' : `Pendente há ${alert.daysAgo}d` }}
-                  </BaseBadge>
+                </BaseBadge>
               </div>
-              </template>
-             <div class="px-6">
-                <!-- <h4 class="text-xs font-black text-gray-800 dark:text-white truncate ">{{ alert.title }}</h4> -->
-                <p class="text-xs text-gray-800 dark:text-gray-400 font-bold">Cliente: {{ alert.clientName }}</p>
-              </div>
-              <template #footer>
-                  <div class="flex flex-1 flex-row items-center gap-2 pt-1">
-                  <BaseButton type="link" :href="`https://wa.me/${alert.clientPhone.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá ${alert.clientName}, gostaria de confirmar se conseguiu visualizar a proposta comercial que enviei? Qualquer dúvida fico à disposição!`)}`"
-                    target="_blank" variant="whatsapp" size="sm" class="w-full">
-                    <img :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5 mr-1" alt="WhatsApp" loading="lazy" />
-                    WhatsApp</BaseButton>
 
-                    <BaseButton type="link" :href="`${publicProposalUrl}/p/${alert.slug}?t=${alert.token}`" target="_blank" variant="outline" size="sm" class="w-full">Ver Proposta</BaseButton>
-                </div>
-              </template>
-            </BaseCard>
+              <p class="text-sm font-medium text-ink dark:text-gray-100">
+                Cliente: <span class="font-semibold">{{ alert.clientName }}</span>
+              </p>
+
+              <div class="flex items-center gap-2">
+                <BaseButton type="link" :href="`https://wa.me/${alert.clientPhone.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá ${alert.clientName}, gostaria de confirmar se conseguiu visualizar a proposta comercial que enviei? Qualquer dúvida fico à disposição!`)}`"
+                  target="_blank" variant="whatsapp" size="sm" class="w-full">
+                  <img :src="'/images/icons/whatsapp-svg.svg'" class="w-3.5 h-3.5 mr-1" alt="WhatsApp" loading="lazy" />
+                  WhatsApp
+                </BaseButton>
+
+                <BaseButton type="link" :href="`${publicProposalUrl}/p/${alert.slug}?t=${alert.token}`" target="_blank" variant="outline" size="sm" class="w-full">Ver Proposta</BaseButton>
+              </div>
+            </div>
 
             <div v-if="!stats.followUpAlerts?.length" class="text-center py-8 space-y-3">
               <div
-                class="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 rounded-[.5rem] flex items-center justify-center mx-auto">
+                class="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
                 <CheckCircle2 class="w-6 h-6" />
               </div>
-              <p class="text-xs text-gray-400 dark:text-gray-500 font-semibold">Tudo em ordem! Nenhuma proposta pendente
-                presa
-                no funil.</p>
+              <p class="text-sm text-muted">Tudo em ordem! Nenhuma proposta pendente presa no funil.</p>
             </div>
           </div>
         </BaseCard>
@@ -430,7 +393,7 @@ const {
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 
         <!-- Gráfico de Evolução de Faturamento -->
-        <BaseCard title="Evolução do Faturamentos" class="lg:col-span-2">
+        <BaseCard title="Evolução do Faturamento" class="lg:col-span-2">
           <div class="h-80 relative">
             <Line :data="revenueChartData" :options="lineChartOptions" />
           </div>
@@ -463,10 +426,10 @@ const {
               :items="stats.trackingViews || []"
             >
               <template #cell-proposalCode="{ item }">
-                <div class="font-bold text-gray-900 dark:text-white">
+                <div class="text-sm font-medium text-ink dark:text-gray-100">
                   {{ item.proposalCode }}
                   <span
-                    class="block text-[9px] text-gray-400 dark:text-gray-500 font-bold truncate max-w-[250px] md:max-w-[150px] mt-0.5 md:mt-0"
+                    class="block text-xs text-muted truncate max-w-[250px] md:max-w-[150px]"
                   >
                     {{ item.proposalTitle }}
                   </span>
@@ -474,48 +437,52 @@ const {
               </template>
 
               <template #cell-clientName="{ item }">
-                <div class="font-bold text-gray-700 dark:text-gray-300">
+                <div class="text-sm font-medium text-gray-700 dark:text-gray-200">
                   {{ item.clientName }}
-                  <span
-                    class="block text-[9px] text-gray-400 dark:text-gray-500 font-semibold tracking-wider mt-0.5 md:mt-0"
-                  >
+                  <span class="block text-xs text-muted truncate max-w-[180px]">
                     {{ item.location }}
                   </span>
                 </div>
               </template>
 
               <template #cell-minutesAgo="{ value }">
-                <span class="font-semibold text-gray-900 dark:text-white font-sm">
+                <span class="text-sm font-medium text-gray-900 dark:text-white">
                   {{ formatRelativeTime(value) }}
                 </span>
+              </template>
+
+              <template #empty>
+                <div class="py-10 text-center space-y-2">
+                  <div class="w-12 h-12 bg-soft dark:bg-gray-900 text-muted rounded-full flex items-center justify-center mx-auto">
+                    <Activity class="w-6 h-6" />
+                  </div>
+                  <p class="text-sm font-medium text-muted">Nenhuma visualização recente</p>
+                  <p class="text-xs text-muted/80">Quando alguém abrir sua proposta, aparece aqui.</p>
+                </div>
               </template>
             </BaseTable>
           </div>
         </BaseCard>
 
         <!-- Ranking de Clientes (Faturamento)-->
-         <BaseCard title="Top Clientes" class="lg:col-span-1">
+        <BaseCard title="Top Clientes" class="lg:col-span-1">
 
-          <div class="space-y-4">
-            <BaseCard v-for="(client, idx) in stats.clientRanking" :key="idx" color="slate" compact>
-              <div class="flex items-center gap-3">
+          <div class="space-y-3">
+            <BaseCard v-for="(client, idx) in stats.clientRanking" :key="idx" color="slate" compact noPadding>
+              <div class="flex items-center gap-3 px-4 py-3">
                 <div
-                  class="w-8 h-8 bg-white dark:bg-gray-950 rounded-lg border border-gray-200 dark:border-gray-800 flex items-center justify-center text-[10px] font-black text-gray-400 dark:text-gray-500 group-hover:border-blue-200 dark:group-hover:border-blue-900 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-all">
+                  class="w-7 h-7 bg-soft dark:bg-gray-950 rounded-[.5rem] border border-line dark:border-gray-800 flex items-center justify-center text-xs font-semibold text-muted shrink-0">
                   #{{ (idx as number) + 1 }}
                 </div>
-                <div>
-                  <p class="text-xs font-bold text-gray-900 dark:text-white truncate max-w-[120px]">{{ client.name }}
-                  </p>
-                  <p class="text-[8px] font-black text-gray-400 dark:text-gray-500 tracking-wider">Faturamento
-                    total
-                  </p>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-ink dark:text-gray-100 truncate">{{ client.name }}</p>
+                  <BaseProgressBar height="h-1" class="mt-1.5" color="bg-brand"
+                    :value="stats.totalRevenue > 0 ? ((client.revenue as number) / stats.totalRevenue * 100) : 0" />
                 </div>
-              </div>
-
-              <div class="text-right">
-                <p class="text-xs font-black text-gray-900 dark:text-white">R$ {{ (client.revenue as
-                  number).toLocaleString('pt-BR') }}</p>
-                  <BaseProgressBar color="bg-blue-600 dark:bg-blue-500" height="h-1" :value="((client.revenue as number) / stats.totalRevenue * 100)"></BaseProgressBar>
+                <div class="text-right shrink-0">
+                  <p class="text-sm font-semibold text-ink dark:text-gray-100">R$ {{ (client.revenue as
+                    number).toLocaleString('pt-BR') }}</p>
+                </div>
               </div>
             </BaseCard>
 
@@ -566,31 +533,31 @@ const {
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div v-for="item in actionCostsList" :key="item.key"
-            class="bg-gray-50/60 dark:bg-gray-800/60 p-5 rounded-2xl border border-gray-100 dark:border-gray-700/60 flex flex-col justify-between space-y-4">
+            class="bg-soft dark:bg-gray-800/60 p-5 rounded-[.5rem] border border-line dark:border-gray-700/60 flex flex-col justify-between space-y-4">
             <div class="space-y-2.5">
               <div class="flex items-center justify-between gap-2">
                 <div
-                  class="w-8 h-8 rounded-xl bg-white dark:bg-gray-700 flex items-center justify-center text-gray-900 dark:text-white border border-gray-100 dark:border-gray-600 shadow-sm shrink-0">
-                  <component :is="item.icon" class="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  class="w-8 h-8 rounded-[.5rem] bg-white dark:bg-gray-700 flex items-center justify-center text-gray-900 dark:text-white border border-line dark:border-gray-600 shadow-sm shrink-0">
+                  <component :is="item.icon" class="w-4 h-4 text-brand dark:text-brand" />
                 </div>
                 <span
-                  :class="['text-[8px] font-black px-2 py-0.5 rounded-md border', item.badgeColor]">
+                  :class="['text-[10px] font-semibold px-2 py-0.5 rounded-[.5rem] border', item.badgeColor]">
                   {{ item.badge }}
                 </span>
               </div>
               <div>
-                <h4 class="text-sm font-black text-gray-900 dark:text-white tracking-tight">{{ item.name }}
+                <h4 class="text-sm font-semibold text-gray-900 dark:text-white">{{ item.name }}
                 </h4>
-                <p class="text-[11px] font-medium text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{{
+                <p class="text-xs font-normal text-muted dark:text-gray-400 mt-1 leading-relaxed">{{
                   item.description
                   }}</p>
               </div>
             </div>
 
-            <div class="pt-3 border-t border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
-              <span class="text-[9px] font-black text-gray-400 ">Custo</span>
+            <div class="pt-3 border-t border-line dark:border-gray-700/50 flex items-center justify-between">
+              <span class="text-xs font-medium text-muted">Custo</span>
               <span
-                class="text-xs font-black text-gray-900 dark:text-white bg-white dark:bg-gray-900 px-3 py-1 rounded-xl border border-gray-200/60 dark:border-gray-700">
+                class="text-sm font-semibold text-gray-900 dark:text-white bg-white dark:bg-gray-900 px-3 py-1 rounded-[.5rem] border border-line dark:border-gray-700">
                 {{ costText(item.key) }}
               </span>
             </div>

@@ -309,6 +309,12 @@
       "type": "file"
     },
     {
+      "path": "app/components/ui/BaseMetricCard.vue",
+      "accessCount": 11,
+      "lastAccessed": 1788283837238,
+      "type": "file"
+    },
+    {
       "path": "app/components/ui/BaseDateTimePicker.vue",
       "accessCount": 8,
       "lastAccessed": 1788268031106,
@@ -390,12 +396,6 @@
       "path": "app/components/proposals/ProposalStepClient/index.vue",
       "accessCount": 4,
       "lastAccessed": 1788268315620,
-      "type": "file"
-    },
-    {
-      "path": "app/components/ui/BaseMetricCard.vue",
-      "accessCount": 4,
-      "lastAccessed": 1788268916755,
       "type": "file"
     },
     {

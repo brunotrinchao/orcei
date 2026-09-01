@@ -259,45 +259,39 @@ const subtitleTextClass = computed(() => {
   <div v-else
     class="p-4 md:p-5 rounded-[.5rem] flex flex-col transition-all duration-200"
     :class="cardBgClass">
-    <div class="group flex flex-row md:flex-col items-center md:items-start justify-between md:justify-start gap-3 md:gap-0 w-full md:w-auto">
-      <div class="flex flex-row justify-between w-auto md:w-full items-center md:items-start mb-0 shrink-0 w-full">
-        <div class="flex items-center flex-1 min-w-0 w-full">
-          <div v-if="cardIcon"
-            class="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-full flex items-center justify-center transition-colors shrink-0"
-            :class="iconBgClass">
-            <component :is="cardIcon" class="w-5 h-5 md:w-6 md:h-6" />
-          </div>
-          <div class="ml-2.5 md:ml-3 min-w-0 w-full">
-            <p v-if="cardTitle"
-              class="text-right sm:text-sm text-xs font-semibold tracking-wider mb-0 md:mb-1 truncate"
-              :class="titleTextClass">
-              {{ cardTitle }}
-            </p>
-            <div class="min-w-0 w-full text-right">
-              <h3 v-if="value !== undefined && value !== null"
-                class="text-base sm:text-lg md:text-3xl font-semibold tracking-tight truncate"
-                :class="valueTextClass">
-                {{ value }}
-              </h3>
-              <slot v-else name="value" />
-            </div>
-            <div v-if="$slots.footer" class="mt-1.5 md:mt-2 w-full">
-              <slot name="footer" />
-            </div>
-            <p v-if="cardSubtitle"
-              class="hidden text-right md:block text-[11px] mt-0.5 font-medium truncate"
-              :class="subtitleTextClass">
-              {{ cardSubtitle }}
-            </p>
-          </div>
+    <!-- Linha superior: ícone + título + badge -->
+    <div class="flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div v-if="cardIcon"
+          class="w-9 h-9 md:w-10 md:h-10 rounded-[.5rem] flex items-center justify-center transition-colors shrink-0"
+          :class="iconBgClass">
+          <component :is="cardIcon" class="w-4.5 h-4.5 md:w-5 md:h-5" />
         </div>
-
-        <span v-if="badge" class="hidden md:inline-block shrink-0 ml-2">
-          <BaseBadge size="sm">
-            {{ badge }}
-          </BaseBadge>
-        </span>
+        <p v-if="cardTitle" class="text-sm font-medium truncate" :class="titleTextClass">
+          {{ cardTitle }}
+        </p>
       </div>
+      <span v-if="badge" class="shrink-0">
+        <BaseBadge size="sm">{{ badge }}</BaseBadge>
+      </span>
+    </div>
+
+    <!-- Valor -->
+    <div class="min-w-0 w-full mt-3">
+      <h3 v-if="value !== undefined && value !== null"
+        class="text-2xl md:text-3xl font-semibold tracking-tight truncate"
+        :class="valueTextClass">
+        {{ value }}
+      </h3>
+      <slot v-else name="value" />
+      <p v-if="cardSubtitle" class="text-[11px] md:text-xs font-medium mt-1 truncate" :class="subtitleTextClass">
+        {{ cardSubtitle }}
+      </p>
+    </div>
+
+    <!-- Barra / extra -->
+    <div v-if="$slots.footer" class="mt-3 w-full">
+      <slot name="footer" />
     </div>
   </div>
 </template>

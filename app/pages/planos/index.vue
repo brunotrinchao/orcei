@@ -173,7 +173,7 @@ const {
     </BaseDialog>
 
     <!-- Cupom Promocional -->
-    <BaseCard compact noPadding>
+    <BaseCard compact>
       <div class="flex flex-col md:flex-row md:items-end gap-4">
         <div class="flex-1">
           <BaseInput

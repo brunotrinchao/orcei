@@ -99,7 +99,7 @@ function timeAgo(dateStr: string) {
     <div class="space-y-4">
       <!-- Abas de Filtro e Atalhos -->
       <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-        <div class="flex bg-slate-200/60 dark:bg-slate-800/60 p-1 rounded-xl gap-1">
+        <div class="flex bg-slate-200/60 dark:bg-slate-800/60 p-1 rounded-[.5rem] gap-1">
           <button type="button" @click="activeTab = 'unread'"
             class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
             :class="activeTab === 'unread' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'">
@@ -143,10 +143,10 @@ function timeAgo(dateStr: string) {
           <template #header>
             <!-- Avatar do usuário (cadastro/compra de crédito) no lugar do ícone genérico -->
             <img v-if="n.details?.userAvatar && (n.type === 'admin_new_signup' || n.type === 'admin_credit_purchase')"
-              :src="n.details.userAvatar" class="w-9 h-9 rounded-xl object-cover shrink-0 ring-2"
+              :src="n.details.userAvatar" class="w-9 h-9 rounded-[.5rem] object-cover shrink-0 ring-2"
               :class="n.type === 'admin_new_signup' ? 'ring-orange-400' : 'ring-emerald-400'" alt="" />
             <!-- Ícone Distintivo por Tipo -->
-            <div v-else class="p-2.5 rounded-xl shrink-0" :class="{
+            <div v-else class="p-2.5 rounded-[.5rem] shrink-0" :class="{
               'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400': n.type === 'proposal_accepted' || n.type === 'admin_credit_purchase',
               'bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400': n.type === 'proposal_rejected',
               'bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400': n.type === 'proposal_sent',

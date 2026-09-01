@@ -65,7 +65,7 @@ const variantStyles = computed(() => {
   const v = props.variant?.toLowerCase() || 'info'
 
   const cardStyle = {
-    bg: 'bg-white dark:bg-[#151d2a] border border-slate-200/90 dark:border-slate-800/90 shadow-xl shadow-slate-900/5 dark:shadow-black/50 rounded-[0.875rem]',
+    bg: 'bg-white dark:bg-gray-900 border border-line/90 dark:border-slate-800/90 shadow-xl shadow-slate-900/5 dark:shadow-black/50 rounded-[.5rem]',
     titleColor: 'text-slate-900 dark:text-white font-semibold',
     textColor: 'text-slate-500 dark:text-slate-300 font-normal',
     closeHover: 'text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'

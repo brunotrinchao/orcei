@@ -64,7 +64,7 @@ const {
         </BaseButton>
       </div>
 
-      <div class="bg-gray-100 dark:bg-gray-950 rounded-[0.75rem] overflow-hidden min-h-[380px] border border-gray-200 dark:border-gray-800">
+      <div class="bg-gray-100 dark:bg-gray-950 rounded-[.5rem] overflow-hidden min-h-[380px] border border-gray-200 dark:border-gray-800">
         <Cropper
           ref="cropperRef"
           :src="rawImage"
@@ -105,7 +105,7 @@ const {
             <!-- Identidade Visual (Ícone vs Foto) -->
             <div class="space-y-2">
               <div class="flex items-center justify-between min-h-[20px]">
-                <div class="flex bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl w-[120px]">
+                <div class="flex bg-gray-100 dark:bg-gray-800/80 p-1 rounded-[.5rem] w-[120px]">
                   <button
                     type="button"
                     @click="isPhotoType = false; form.imageUrl = '';"
@@ -136,7 +136,7 @@ const {
               <!-- Preview de Imagem Enviada -->
               <div
                 v-if="form.imageUrl"
-                class="relative group w-full h-[200px] bg-gray-50 dark:bg-gray-950 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-800 overflow-hidden flex items-center justify-center animate-in fade-in zoom-in-95 duration-200 shadow-sm"
+                class="relative group w-full h-[200px] bg-gray-50 dark:bg-gray-950 rounded-[.5rem] border-2 border-dashed border-gray-200 dark:border-gray-800 overflow-hidden flex items-center justify-center animate-in fade-in zoom-in-95 duration-200 shadow-sm"
               >
                 <BaseImage
                   :src="form.imageUrl"
@@ -145,7 +145,7 @@ const {
                   img-class="w-full h-full object-cover"
                 />
                 <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                  <label class="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center bg-white dark:bg-gray-800 rounded-xl text-gray-900 dark:text-white cursor-pointer hover:scale-105 transition-transform shadow-md">
+                  <label class="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center bg-white dark:bg-gray-800 rounded-[.5rem] text-gray-900 dark:text-white cursor-pointer hover:scale-105 transition-transform shadow-md">
                     <Pencil class="w-4 h-4" />
                     <input type="file" accept="image/*" @change="onFileChange" class="hidden" />
                   </label>
@@ -167,7 +167,7 @@ const {
               </div>
 
               <div v-if="isPhotoType && form.imageUrl == ''" class="transition-all animate-fadeIn">
-                <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl cursor-pointer bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-900 transition-all relative group">
+                <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-[.5rem] cursor-pointer bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-900 transition-all relative group">
                   <div class="flex flex-col items-center justify-center pt-5 pb-6 px-4 text-center">
                     <svg class="w-8 h-8 mb-2 text-gray-400 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />

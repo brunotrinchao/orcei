@@ -122,7 +122,7 @@ const selectOption = (option: Option) => {
       >
         <div 
           v-if="isOpen && !disabled"
-          class="absolute z-50 w-full mt-2 bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl rounded-[0.75rem] border-2 border-gray-200 dark:border-gray-700 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-gray-900/20 overflow-hidden"
+          class="absolute z-50 w-full mt-2 bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl rounded-[.5rem] border-2 border-line dark:border-gray-700 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-gray-900/20 overflow-hidden"
         >
           <div class="max-h-[300px] overflow-y-auto p-2 space-y-1 sm:w-full">
             <div v-if="internalSearch.length < 2" class="px-6 py-8 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] text-center">

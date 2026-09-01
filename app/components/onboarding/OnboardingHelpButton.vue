@@ -17,7 +17,7 @@ function handleClick() {
   <button
     v-if="tourId"
     @click="handleClick"
-    class="w-10 h-10 rounded-[0.75rem] flex items-center justify-center text-gray-500 dark:text-gray-400  hover:ring-4 ring-gray-100 dark:ring-gray-800/50 transition-all"
+    class="w-10 h-10 rounded-[.5rem] flex items-center justify-center text-gray-500 dark:text-gray-400  hover:ring-4 ring-gray-100 dark:ring-gray-800/50 transition-all"
     title="Ajuda - Tour guiado"
     aria-label="Iniciar tour guiado da página"
   >

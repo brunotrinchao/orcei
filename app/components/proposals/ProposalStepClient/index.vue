@@ -66,7 +66,7 @@ defineExpose({ validate, reset })
       <div class="space-y-6">
         <!-- Extrator de Leads com IA ou Busca de Cliente Cadastrado com transição suave -->
         <Transition name="section-fade-slide" mode="default">
-          <div v-if="isAIExtractOpen" key="ai-extract-section" class="space-y-4 p-6 bg-gradient-to-br from-violet-50 to-fuchsia-50/50 dark:from-violet-950/20 dark:to-fuchsia-950/10 border border-violet-100/50 dark:border-violet-900/30 rounded-[0.75rem]">
+          <div v-if="isAIExtractOpen" key="ai-extract-section" class="space-y-4 p-6 bg-gradient-to-br from-violet-50 to-fuchsia-50/50 dark:from-violet-950/20 dark:to-fuchsia-950/10 border border-violet-100/50 dark:border-violet-900/30 rounded-[.5rem]">
             <div class="flex items-start gap-3">
               <Sparkles class="w-5 h-5 text-violet-600 dark:text-violet-400 shrink-0 mt-0.5 animate-pulse" />
               <p class="text-xs text-slate-600 dark:text-slate-400 font-bold leading-relaxed">
@@ -142,12 +142,12 @@ defineExpose({ validate, reset })
       </div>
     </div>
 
-    <!-- Modal de Cadastro Rápido -->
-    <BaseDialog
+    <!-- Drawer de Cadastro Rápido -->
+    <BaseDrawer
       v-model:open="isManualOpen"
       title="Novo Cliente"
       description="Informe nome e pelo menos um contato. Endereço e demais dados podem ser completados depois em Clientes."
-      size="sm"
+      size="lg"
     >
       <form id="manual-client-form" @submit.prevent="createManualClient" class="grid grid-cols-1 gap-4 py-2">
         <BaseInput v-model="manualClient.name" label="Nome do Cliente" placeholder="Ex: João Silva" required />
@@ -163,7 +163,7 @@ defineExpose({ validate, reset })
           Cadastrar
         </BaseButton>
       </template>
-    </BaseDialog>
+    </BaseDrawer>
 
     <ConfirmCreditDialog
       v-model:open="isCreditConfirmOpen"

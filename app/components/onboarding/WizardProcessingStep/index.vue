@@ -14,7 +14,7 @@ const { Sparkles, Loader2, CheckCircle2 } = useWizardProcessingStep()
   <div class="flex flex-col items-center justify-center text-center px-6 py-12 max-w-lg mx-auto space-y-8 animate-fade-in processing-step-container">
     <!-- Ícone Central Animado -->
     <div class="relative group">
-      <div class="w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-lg border border-blue-200/50 dark:border-blue-900/40">
+      <div class="w-20 h-20 md:w-24 md:h-24 rounded-[.5rem] bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-lg border border-blue-200/50 dark:border-blue-900/40">
         <CheckCircle2 v-if="isComplete" class="w-10 h-10 md:w-12 md:h-12 text-emerald-500 animate-bounce" />
         <Sparkles v-else class="w-10 h-10 md:w-12 md:h-12 animate-pulse text-blue-600 dark:text-blue-400" />
       </div>

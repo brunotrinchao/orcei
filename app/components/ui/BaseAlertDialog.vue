@@ -52,7 +52,7 @@ const emit = defineEmits(['update:open', 'confirm', 'cancel'])
         leave-to-class="opacity-0 scale-95 translate-y-4"
       >
         <AlertDialogContent 
-          class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md bg-white dark:bg-gray-900 rounded-[0.75rem] p-8 shadow-2xl z-[301] focus:outline-none border border-gray-100 dark:border-gray-800"
+          class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md bg-white dark:bg-gray-900 rounded-[.5rem] p-8 shadow-2xl z-[301] focus:outline-none border border-line dark:border-gray-800"
         >
           <AlertDialogTitle class="text-xl font-medium text-gray-900 dark:text-gray-50 tracking-normal mb-2">
             {{ title }}

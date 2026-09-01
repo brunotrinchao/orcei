@@ -1,22 +1,13 @@
 import { ref, computed, watch } from 'vue'
-import { 
-  DialogRoot, 
-  DialogPortal, 
-  DialogOverlay, 
-  DialogContent, 
-  DialogTitle, 
-  DialogClose 
-} from 'radix-vue'
-import { 
-  Sparkles, 
-  Loader2, 
-  X, 
-  Calendar, 
-  Coins, 
-  TrendingUp, 
-  DollarSign, 
-  Clock, 
-  Award, 
+import {
+  Sparkles,
+  Loader2,
+  Calendar,
+  Coins,
+  TrendingUp,
+  DollarSign,
+  Clock,
+  Award,
   Zap
 } from 'lucide-vue-next'
 
@@ -106,15 +97,8 @@ export function useGenerateReportDrawer(
     close,
     handleOpenUpdate,
     handleConfirm,
-    DialogRoot,
-    DialogPortal,
-    DialogOverlay,
-    DialogContent,
-    DialogTitle,
-    DialogClose,
     Sparkles,
     Loader2,
-    X,
     Calendar,
     Coins,
     TrendingUp,

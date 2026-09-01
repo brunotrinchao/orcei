@@ -44,7 +44,7 @@ const isCurrentRoute = (path: string, exact?: boolean) => {
             v-if="item.isPrimary" 
             class="absolute -top-6 flex flex-col items-center justify-center"
           >
-            <div class="flex items-center justify-center w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg shadow-blue-200 active:scale-95 transition-transform duration-200 ring-4 ring-white">
+            <div class="flex items-center justify-center w-14 h-14 bg-brand text-white rounded-full active:scale-95 transition-transform duration-200 ring-4 ring-white dark:ring-gray-950">
               <component :is="item.icon" class="w-6 h-6" aria-hidden="true" />
             </div>
             <span class="text-[9px] font-bold tracking-wide mt-1 text-gray-500">{{ item.label }}</span>

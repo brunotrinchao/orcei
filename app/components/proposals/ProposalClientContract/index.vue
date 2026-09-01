@@ -9,12 +9,12 @@ const { safeContractText, Shield } = useProposalClientContract(props)
 </script>
 
 <template>
-  <section class="bg-white rounded-[0.75rem] border border-gray-100 shadow-sm overflow-hidden">
+  <section class="bg-white rounded-[.5rem] border border-gray-100 shadow-sm overflow-hidden">
     <details class="group">
-      <summary class="px-8 py-6 flex items-center justify-between cursor-pointer select-none list-none outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-inset">
+      <summary class="px-8 py-6 flex items-center justify-between cursor-pointer select-none list-none outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset">
         <div class="flex items-center gap-3">
-          <div class="w-8 h-8 bg-[#3147F6]/10 rounded-xl flex items-center justify-center">
-            <Shield class="w-4 h-4 text-[#3147F6]" />
+          <div class="w-8 h-8 bg-brand/10 rounded-[.5rem] flex items-center justify-center">
+            <Shield class="w-4 h-4 text-brand" />
           </div>
           <h2 class="text-[10px] font-bold text-gray-600 uppercase tracking-[0.25em]">Contrato e Detalhes</h2>
         </div>

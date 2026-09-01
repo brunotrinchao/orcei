@@ -135,7 +135,7 @@ const {
         <!-- Descrição Comercial -->
         <div class="space-y-3">
           <div class="flex items-center justify-between px-1">
-            <h3 class="text-[10px] font-semibold text-gray-400 dark:text-gray-500 tracking-wide uppercase">
+            <h3 class="text-[10px] font-semibold text-gray-400 dark:text-gray-500 tracking-wide">
               Descrição Comercial
             </h3>
           </div>
@@ -167,10 +167,11 @@ const {
         { key: 'price', label: 'Preço', align: 'right', type: 'currency' },
         // { key: 'actions', label: '' }
       ]" :items="items || []" :pending="pending" :has-more="hasMore" :loading-more="loadingMore" @load-more="loadMore"
+        @row-click="(item) => openInfoModal(item)"
         empty-title="Catálogo Vazio"
         empty-subtitle="Sua lista de produtos e serviços aparecerá aqui. Comece cadastrando o primeiro.">
         <template #cell-name="{ item }">
-          <div class="flex items-center gap-4 md:gap-6 cursor-pointer group" @click="openInfoModal(item)">
+          <div class="flex items-center gap-4 md:gap-6 group">
             <!-- <div class="w-12 h-12 md:w-16 md:h-16 rounded-[0.50rem] border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
             <BaseImage v-if="item.imageUrl" :src="item.imageUrl" :alt="item.name" container-class="w-full h-full" img-class="w-full h-full object-cover" />
             <div v-else class="text-gray-400">
@@ -179,7 +180,7 @@ const {
           </div> -->
             <div class="flex flex-col">
               <span
-                class="font-normal text-base md:text-lg text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                class="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-brand dark:group-hover:text-brand transition-colors">
                 {{ item.name }}
               </span>
               <span class="text-xs font-normal text-gray-400 dark:text-gray-500 line-clamp-1 max-w-xl mt-0.5">
@@ -190,17 +191,15 @@ const {
         </template>
 
         <template #cell-type="{ item }">
-          <div class="cursor-pointer" @click="openInfoModal(item)">
-            <BaseBadge :variant=" item.type === 'service' ? 'info' : 'success' " light>{{ item.type === 'service' ? 'Serviço' : 'Produto' }}</BaseBadge>
-          </div>
+          <BaseBadge :variant=" item.type === 'service' ? 'info' : 'success' " light>{{ item.type === 'service' ? 'Serviço' : 'Produto' }}</BaseBadge>
         </template>
 
         <template #cell-total="{ item }">
-          <div class="flex flex-col items-start md:items-end cursor-pointer" @click="openInfoModal(item)">
-            <span class="font-normal text-base md:text-lg text-gray-900 dark:text-gray-100">
+          <div class="flex flex-col items-start md:items-end">
+            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">
               R$ {{ (item.price ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
             </span>
-            <!-- <span class="text-[10px] font-normal text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">
+            <!-- <span class="text-[10px] font-normal text-gray-400 dark:text-gray-500 mt-0.5">
               por {{ item.unit }}
             </span> -->
           </div>
@@ -222,25 +221,25 @@ const {
               <DropdownMenuContent
                 align="end"
                 :side-offset="6"
-                class="min-w-[220px] bg-white dark:bg-gray-950 rounded-[0.75rem] shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
+                class="min-w-[220px] bg-white dark:bg-gray-950 rounded-[.5rem] shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
               >
                 <DropdownMenuItem
                   @click="openInfoModal(item)"
-                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[.5rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
                 >
                   <Eye class="w-4 h-4" />
                   Ver Detalhes
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   @click="openModal(item)"
-                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[.5rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
                 >
                   <Pencil class="w-4 h-4" />
                   Editar
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   @click="deleteItem(item._id)"
-                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-red-600 dark:hover:text-red-400 cursor-pointer outline-none transition-all"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[.5rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-red-600 dark:hover:text-red-400 cursor-pointer outline-none transition-all"
                 >
                   <Trash2 class="w-4 h-4" />
                   Excluir

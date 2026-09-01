@@ -127,14 +127,14 @@ const bgClasses = computed(() => {
 
 const borderClasses = computed(() => {
   if (props.border === false || props.border === 'none') {
-    return 'border-0 focus:ring-4 focus:ring-blue-500/10'
+    return 'border-0 focus:ring-4 focus:ring-brand/10'
   }
 
   switch (props.border) {
     case 'slate':
       return 'border border-slate-300 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700 focus:border-slate-500 dark:focus:border-slate-400 focus:ring-4 focus:ring-slate-500/10'
     case 'blue':
-      return 'border border-blue-300 dark:border-blue-800 hover:border-blue-400 dark:hover:border-blue-700 focus:border-blue-600 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10'
+      return 'border border-blue-300 dark:border-blue-800 hover:border-blue-400 dark:hover:border-blue-700 focus:border-brand dark:focus:border-brand focus:ring-4 focus:ring-brand/10'
     case 'gray':
       return 'border border-gray-300 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-700 focus:border-gray-600 dark:focus:border-gray-500 focus:ring-4 focus:ring-gray-500/10'
     case 'emerald':
@@ -154,7 +154,7 @@ const borderClasses = computed(() => {
       ) {
         return props.border
       }
-      return 'border border-gray-300 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 dark:focus:border-blue-500'
+      return 'border border-line dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-700 focus:ring-4 focus:ring-brand/10 focus:border-brand dark:focus:border-brand'
   }
 })
 

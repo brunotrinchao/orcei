@@ -319,7 +319,7 @@ function isSubActive(sub: NavSubItem) {
             </div>
           </div>
           <NuxtLink to="/planos"
-            class="text-[10px] font-semibold text-blue-600 dark:text-blue-400 hover:underline uppercase tracking-wider">
+            class="text-[10px] font-semibold text-blue-600 dark:text-blue-400 hover:underline tracking-wider">
             Recarregar</NuxtLink>
         </div>
       </div>
@@ -376,7 +376,7 @@ function isSubActive(sub: NavSubItem) {
               title="Notificações">
               <Bell class="w-5 h-5 text-slate-600 dark:text-gray-300" />
 
-              <BaseBadge class="absolute -top-1 -right-1 !bg-blue-600 !text-white !text-[9px] !font-black !rounded-full">
+              <BaseBadge v-if="unreadCount > 0" class="absolute -top-1 -right-1 !bg-blue-600 !text-white !text-[9px] !font-black !rounded-full">
               {{ unreadCount > 99 ? '99+' : unreadCount }}
               </BaseBadge>
             </button>
@@ -398,7 +398,7 @@ function isSubActive(sub: NavSubItem) {
                     {{ (user as any)?.name || profile?.name || 'Usuário' }}
                   </span>
                   <span
-                    class="text-[10px] font-normal text-slate-400 dark:text-gray-500 uppercase tracking-wider leading-none mt-0.5">
+                    class="text-[10px] font-normal text-slate-400 dark:text-gray-500 tracking-wider leading-none mt-0.5">
                     {{ user?.role === 'admin' ? 'Super Admin' : (profile?.subscriptionPlan || 'Membro') }}
                   </span>
                 </div>

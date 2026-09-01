@@ -51,7 +51,7 @@ const componentTag = computed(() => {
 
 const sizeClasses = computed(() => {
   if (props.iconOnly || props.size === 'icon') {
-    return 'p-3 min-w-[56px] min-h-[56px] rounded-[0.75rem]'
+    return 'p-3 min-w-[56px] min-h-[56px] rounded-[.5rem]'
   }
   if (props.size === 'icon-sm') {
     return 'p-2 w-8 h-8 rounded-[.5rem]'
@@ -86,17 +86,17 @@ const sizeClasses = computed(() => {
           :aria-disabled="componentTag !== 'button' && (disabled || loading) ? 'true' : undefined"
           :title="title || tooltip"
           :aria-label="tooltip || title"
-          class="rounded-[.5rem] inline-flex items-center justify-center rounded-[.5rem] font-semibold transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 disabled:opacity-50 disabled:pointer-events-none cursor-pointer align-middle select-none border border-solid transition-colors duration-150 ease-in-out rounded-lg font-medium"
+          class="rounded-[.5rem] inline-flex items-center justify-center font-semibold transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 disabled:opacity-50 disabled:pointer-events-none cursor-pointer align-middle select-none border border-solid transition-colors duration-150 ease-in-out font-medium text-[0.813rem] leading-[1.5]"
           :class="[
             block ? 'w-full' : '',
             (disabled || loading) ? 'opacity-50 pointer-events-none' : '',
             variant === 'solid' ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-black dark:hover:bg-white shadow-gray-200 dark:shadow-gray-800/50' : '',
-            variant === 'primary' ? 'bg-[#3147F6] text-white hover:bg-[#2638d4] dark:hover:bg-[#4359ff] shadow-blue-200 dark:shadow-blue-950/50' : '',
+            variant === 'primary' ? 'bg-brand text-white hover:bg-brand-dark' : '',
             variant === 'danger' ? 'bg-red-500 text-white hover:bg-red-600 dark:hover:bg-red-400 shadow-red-200 dark:shadow-red-950/50' : '',
             variant === 'outline' ? 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-50 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800/80' : '',
             variant === 'secondary' ? 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white' : '',
             variant === 'ghost' ? 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white' : '',
-            variant === 'ia' ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-black tracking-wider shadow-lg shadow-violet-500/20 active:scale-98 transition-all' : '',
+            variant === 'ia' ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-bold tracking-wide' : '',
             variant === 'whatsapp' ? 'bg-emerald-600 text-white hover:bg-emerald-200 dark:hover:bg-emerald-700 hover:text-white-900 dark:hover:text-white' : '',
             sizeClasses
           ]"
@@ -132,17 +132,17 @@ const sizeClasses = computed(() => {
     :disabled="componentTag === 'button' ? (disabled || loading) : undefined"
     :aria-disabled="componentTag !== 'button' && (disabled || loading) ? 'true' : undefined"
     :title="title"
-    class="inline-flex items-center justify-center rounded-[.5rem] font-semibold tracking-wide transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+    class="inline-flex items-center justify-center rounded-[.5rem] font-semibold tracking-wide transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
     :class="[
       block ? 'w-full' : '',
       (disabled || loading) ? 'opacity-50 pointer-events-none' : '',
       variant === 'solid' ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-black dark:hover:bg-white shadow-gray-200 dark:shadow-gray-800/50' : '',
-      variant === 'primary' ? 'bg-[#3147F6] text-white hover:bg-[#2638d4] dark:hover:bg-[#4359ff] shadow-blue-200 dark:shadow-blue-950/50' : '',
+      variant === 'primary' ? 'bg-brand text-white hover:bg-brand-dark' : '',
       variant === 'danger' ? 'bg-red-500 text-white hover:bg-red-600 dark:hover:bg-red-400 shadow-red-200 dark:shadow-red-950/50' : '',
       variant === 'outline' ? 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-50 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800/80' : '',
       variant === 'secondary' ? 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white' : '',
       variant === 'ghost' ? 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white' : '',
-      variant === 'ia' ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-black tracking-wider shadow-lg shadow-violet-500/20 active:scale-98 transition-all' : '',
+      variant === 'ia' ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-bold tracking-wide' : '',
       variant === 'whatsapp' ? 'bg-emerald-600 text-white hover:bg-emerald-200 dark:hover:bg-emerald-700 hover:text-white-900 dark:hover:text-white' : '',
       sizeClasses
     ]"

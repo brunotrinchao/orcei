@@ -34,25 +34,25 @@ const {
     <div class="space-y-8 settings-contact-container">
       <div class="space-y-4">
         <div class="flex justify-between items-center px-1">
-          <label class="text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest">Telefones</label>
+          <label class="form-label block mb-1.5">Telefones</label>
           <BaseButton
             type="button"
             variant="ghost"
             size="sm"
             @click="addPhone"
-            class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest hover:text-blue-700 dark:hover:text-blue-300"
+            class="text-[10px] font-black text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
           >
             <Plus class="w-3 h-3 mr-1" /> Adicionar
           </BaseButton>
         </div>
-        <div v-for="(phone, idx) in localContact.phones" :key="idx" class="flex flex-col sm:flex-row gap-4 p-6 bg-gray-50/50 dark:bg-gray-950/50 rounded-[0.75rem] border border-gray-100 dark:border-gray-800">
+        <div v-for="(phone, idx) in localContact.phones" :key="idx" class="flex flex-col sm:flex-row gap-4 p-6 bg-gray-50/50 dark:bg-gray-950/50 rounded-[.5rem] border border-gray-100 dark:border-gray-800">
           <div class="flex-1">
             <BaseInput v-model="phone.number" label="Número" placeholder="(00) 00000-0000" mask="phone" />
           </div>
           <div class="flex items-center gap-4 shrink-0">
             <div class="flex items-center gap-2">
               <BaseCheckbox v-model="phone.isWhatsapp" :id="'wa-'+idx" />
-              <label :for="'wa-'+idx" class="text-[10px] font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest cursor-pointer flex items-center gap-1.5 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
+              <label :for="'wa-'+idx" class="text-[10px] font-black text-gray-600 dark:text-gray-400 cursor-pointer flex items-center gap-1.5 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
                 <img :src="'/images/icons/whatsapp-svg.svg'" class="w-3 h-3" alt="WhatsApp" loading="lazy"/> WhatsApp
               </label>
             </div>

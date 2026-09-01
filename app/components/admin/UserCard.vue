@@ -16,12 +16,12 @@ defineEmits<{
 
 <template>
   <div
-    class="rounded-2xl border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700 shadow-sm p-4"
+    class="rounded-[.5rem] border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700 shadow-sm p-4"
     :class="user.role !== 'admin' ? 'cursor-pointer' : ''"
     @click="user.role !== 'admin' ? $emit('view-details') : null"
   >
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden border-2 border-white dark:border-gray-700 shadow-sm flex-shrink-0">
+      <div class="w-10 h-10 rounded-[.5rem] bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden border-2 border-white dark:border-gray-700 shadow-sm flex-shrink-0">
         <img v-if="user.avatar" :src="user.avatar" class="w-full h-full object-cover" loading="lazy">
         <User v-else class="w-5 h-5 text-gray-400" />
       </div>

@@ -80,7 +80,7 @@ onUnmounted(() => {
         <DialogContent
           :style="{ zIndex: 101 + (currentZIndex * 2) }"
           :class="[
-            'fixed left-[50%] top-[50%] flex flex-col w-[100vw] sm:w-full h-[100dvh] sm:h-auto translate-x-[-50%] translate-y-[-50%] bg-white dark:bg-gray-900 shadow-2xl rounded-none sm:rounded-[0.75rem] sm:border-2 border-slate-200 dark:border-gray-800 max-h-[100dvh] sm:max-h-[90vh] overflow-hidden outline-none',
+            'fixed left-[50%] top-[50%] flex flex-col w-[100vw] sm:w-full h-[100dvh] sm:h-auto translate-x-[-50%] translate-y-[-50%] bg-white dark:bg-gray-900 shadow-2xl rounded-none sm:rounded-[.5rem] sm:border-2 border-slate-200 dark:border-gray-800 max-h-[100dvh] sm:max-h-[90vh] overflow-hidden outline-none',
             size === 'sm' ? 'sm:max-w-sm' : '',
             size === 'md' ? 'sm:max-w-lg' : '',
             size === 'lg' ? 'sm:max-w-2xl' : '',

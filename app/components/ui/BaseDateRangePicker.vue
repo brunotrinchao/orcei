@@ -75,7 +75,7 @@ function setPreset(days: number) {
     <PopoverRoot v-model:open="isOpen">
       <div class="relative">
         <PopoverTrigger
-          class="w-full h-[52px] flex items-center gap-3 px-5 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-800 hover:border-gray-200 rounded-[.5rem] transition-all text-left focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none group"
+          class="w-full h-[52px] flex items-center gap-3 px-5 bg-white dark:bg-gray-900 border border-line dark:border-gray-800 hover:border-gray-200 rounded-[.5rem] transition-all text-left focus:ring-4 focus:ring-brand/10 focus:border-brand outline-none group"
         >
           <Calendar class="w-5 h-5 text-gray-400 dark:text-gray-500 group-hover:text-blue-600 transition-colors" />
           <span :class="[(!start && !end) ? 'text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white', 'font-normal text-sm truncate flex-1']">

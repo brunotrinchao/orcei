@@ -48,9 +48,11 @@ const getAlignmentClass = (align?: 'left' | 'center' | 'right') => {
   return 'text-left'
 }
 
+const badgeColumns = computed(() => props.columns.filter((c) => c.type === 'badge'))
+
 const shouldShowMobileLabel = (col: BaseTableColumn) => {
   if (!col.label) return false
-  if (col.type === 'currency' || col.type === 'badge') return false
+  if (col.type === 'badge') return false
   return true
 }
 </script>
@@ -58,7 +60,7 @@ const shouldShowMobileLabel = (col: BaseTableColumn) => {
 <template>
   <div class="overflow-hidden bg-white dark:bg-gray-900  transition-all">
     <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
+      <table class="w-full text-left border-collapse table-fixed">
         <!-- HEADER -->
         <thead
           v-if="columns && columns.length > 0"
@@ -102,7 +104,7 @@ const shouldShowMobileLabel = (col: BaseTableColumn) => {
                     :class="[col.hideOnMobile ? 'hidden md:table-cell' : '']"
                   >
                     <div class="flex items-center gap-2">
-                      <span v-if="shouldShowMobileLabel(col)" class="inline-block md:hidden text-[9px] font-normal text-gray-300 dark:text-gray-700 uppercase tracking-widest mr-2">
+                      <span v-if="shouldShowMobileLabel(col)" class="inline-block md:hidden text-[11px] font-medium text-gray-300 dark:text-gray-700 mr-2">
                         {{ col.label }}:
                       </span>
                       <BaseSkeleton width="80%" height="1.25rem" borderRadius="0.5rem" />
@@ -112,7 +114,7 @@ const shouldShowMobileLabel = (col: BaseTableColumn) => {
                 <template v-else>
                   <td colspan="100%" class="px-6 py-4">
                     <div class="flex items-center gap-4">
-                      <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="0.75rem" />
+                      <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="0.5rem" />
                       <div class="space-y-2 flex-1">
                         <BaseSkeleton width="50%" height="1.25rem" />
                         <BaseSkeleton width="30%" height="0.75rem" />
@@ -129,24 +131,28 @@ const shouldShowMobileLabel = (col: BaseTableColumn) => {
             <tr
               v-for="(item, itemIndex) in items"
               :key="item.id || item._id || itemIndex"
-              class="block md:table-row p-4 sm:p-5 md:p-0 space-y-2 md:space-y-0 hover:bg-slate-100/80 dark:hover:bg-gray-800/60 transition-colors cursor-pointer group"
+              class="flex flex-wrap md:table-row p-4 sm:p-5 md:p-0 mb-3 md:mb-0 rounded-[.5rem] border border-line dark:border-gray-800 shadow-sm md:border-0 md:shadow-none md:rounded-none bg-white dark:bg-gray-900 md:bg-transparent hover:bg-slate-100/80 dark:hover:bg-gray-800/60 transition-colors cursor-pointer group"
               @click="$emit('row-click', item, itemIndex)"
             >
               <td
-                v-for="col in columns"
+                v-for="(col, colIndex) in columns"
                 :key="col.key"
-                class="block md:table-cell p-0 md:px-4 md:py-3.5"
+                class="md:table-cell p-0 md:px-4 md:py-3.5"
                 :class="[
                   col.hideOnMobile ? 'hidden md:table-cell' : '',
-                  col.type === 'currency' ? 'font-mono' : '',
                   getAlignmentClass(col.align),
+                  colIndex === 0
+                    ? 'block md:block flex-1 order-0'
+                    : col.type === 'badge'
+                      ? 'block md:block order-0 ml-auto flex justify-end items-center py-1 md:py-3.5'
+                      : 'block md:block order-1 w-full flex items-center gap-1.5 py-2 md:py-3.5',
                   col.class || ''
                 ]"
               >
-                <!-- Mobile Field Label -->
+                <!-- Mobile Field Label (colunas secundárias) -->
                 <span
-                  v-if="shouldShowMobileLabel(col)"
-                  class="inline-block md:hidden text-[9px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest mr-2"
+                  v-if="shouldShowMobileLabel(col) && colIndex !== 0"
+                  class="inline-block md:hidden text-[11px] font-medium text-muted shrink-0"
                 >
                   {{ col.label }}:
                 </span>
@@ -155,7 +161,7 @@ const shouldShowMobileLabel = (col: BaseTableColumn) => {
                 <slot :name="`cell-${col.key}`" :item="item" :value="item[col.key]" :index="itemIndex">
                   <slot :name="col.key" :item="item" :value="item[col.key]" :index="itemIndex">
                     <template v-if="col.type === 'currency'">
-                      <span class="text-xs font-bold font-mono text-gray-900 dark:text-white">
+                      <span class="text-sm font-medium text-gray-900 dark:text-white">
                         {{ col.format ? col.format(item[col.key], item) : (typeof item[col.key] === 'number' ? item[col.key].toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : (item[col.key] ?? 'R$ 0,00')) }}
                       </span>
                     </template>
@@ -163,7 +169,7 @@ const shouldShowMobileLabel = (col: BaseTableColumn) => {
                       <BaseBadge>{{ col.format ? col.format(item[col.key], item) : (item[col.key] ?? '-') }}</BaseBadge>
                     </template>
                     <template v-else>
-                      <span class="text-xs font-bold text-gray-900 dark:text-white">
+                      <span class="text-sm font-medium text-gray-900 dark:text-white">
                         {{ col.format ? col.format(item[col.key], item) : (item[col.key] ?? '-') }}
                       </span>
                     </template>

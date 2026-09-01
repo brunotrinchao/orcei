@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"/home/brunotrinchao/.claude/squeez/bin/squeez wrap 'cd ~/Documentos/Bruno/Orcei && grep -rn '\\\"'\\\"'ShieldAlert\\\\|FolderOpen'\\\"'\\\"' app/components/settings/SettingsIntegrations/ && echo \\\"-...",
+  "error": "Exit code 1",
+  "timestamp": "2026-09-01T16:08:54.396Z",
+  "retry_count": 1
+}

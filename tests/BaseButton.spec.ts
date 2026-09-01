@@ -18,7 +18,7 @@ describe('BaseButton Component', () => {
     const wrapperPrimary = await mountSuspended(BaseButton, {
       props: { variant: 'primary' }
     })
-    expect(wrapperPrimary.classes()).toContain('bg-[#3147F6]')
+    expect(wrapperPrimary.classes()).toContain('bg-brand')
 
     const wrapperDanger = await mountSuspended(BaseButton, {
       props: { variant: 'danger' }

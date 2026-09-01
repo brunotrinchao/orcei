@@ -48,10 +48,10 @@ onClickOutside(dropdownRef, () => isOpen.value = false)
     <button 
       type="button"
       @click="isOpen = !isOpen"
-      class="w-full h-[56px] flex items-center justify-between px-5 bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 rounded-[0.75rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:focus:border-blue-500 transition-all text-left outline-none group shadow-sm"
+      class="w-full h-[56px] flex items-center justify-between px-5 bg-white dark:bg-gray-950 border-2 border-line dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 rounded-[.5rem] focus:ring-4 focus:ring-brand/10 focus:border-brand dark:focus:border-brand transition-all text-left outline-none group shadow-sm"
     >
       <div class="flex items-center gap-3">
-        <div class="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-[0.75rem] flex items-center justify-center text-gray-600 dark:text-gray-300">
+        <div class="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-[.5rem] flex items-center justify-center text-gray-600 dark:text-gray-300">
           <component :is="getIcon(modelValue || 'Package')" class="w-4 h-4" />
         </div>
         <span class="font-bold text-sm text-gray-900 dark:text-gray-50">{{ modelValue || 'Selecione um ícone' }}</span>
@@ -62,7 +62,7 @@ onClickOutside(dropdownRef, () => isOpen.value = false)
     <!-- Dropdown -->
     <div 
       v-if="isOpen" 
-      class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800 rounded-[0.75rem] shadow-2xl z-[100] overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+      class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-900 border-2 border-line dark:border-gray-800 rounded-[.5rem] shadow-2xl z-[100] overflow-hidden animate-in fade-in zoom-in-95 duration-200"
     >
       <div class="p-4 border-b border-gray-100 dark:border-gray-800">
         <div class="relative">

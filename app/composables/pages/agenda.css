@@ -44,7 +44,7 @@
 }
 
 .fc .fc-toolbar-title {
-  @apply text-base sm:text-xl font-semibold text-gray-900 dark:text-white uppercase tracking-tight text-center whitespace-nowrap;
+  @apply text-base sm:text-xl font-semibold text-gray-900 dark:text-white tracking-tight text-center whitespace-nowrap;
 }
 
 /* Layout Responsivo para Mobile */
@@ -104,7 +104,7 @@
 }
 
 .fc .fc-button {
-  @apply rounded-[.5rem] font-normal uppercase text-[10px] tracking-widest px-3.5 py-2.5 transition-all shadow-none touch-manipulation border;
+  @apply rounded-[.5rem] font-normal text-[10px] px-3.5 py-2.5 transition-all shadow-none touch-manipulation border;
 }
 
 .fc .fc-button-primary:not(:disabled).fc-button-active,
@@ -121,5 +121,5 @@
 }
 
 .fc .fc-event-title {
-  @apply font-normal text-[10px] uppercase tracking-tight;
+  @apply font-normal text-[10px] tracking-tight;
 }

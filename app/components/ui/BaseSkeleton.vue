@@ -30,9 +30,9 @@ withDefaults(defineProps<Props>(), {
 .skeleton-shimmer {
   background: linear-gradient(
     90deg,
-    #e2e8f0 25%,
-    #f1f5f9 50%,
-    #e2e8f0 75%
+    #dfe6f0 25%,
+    #f4f7fb 50%,
+    #dfe6f0 75%
   ) !important;
   background-size: 200% 100% !important;
   animation: shimmer 1.5s infinite linear;
@@ -42,9 +42,9 @@ withDefaults(defineProps<Props>(), {
 :global(.dark) .skeleton-shimmer {
   background: linear-gradient(
     90deg,
-    #1e293b 25%,
-    #334155 50%,
-    #1e293b 75%
+    #192435 25%,
+    #223048 50%,
+    #192435 75%
   ) !important;
   background-size: 200% 100% !important;
 }

@@ -46,7 +46,7 @@ const {
       <!-- <div class="lg:hidden flex gap-2 overflow-x-auto pb-3 mb-6 scrollbar-hide">
         <button v-for="s in sections" :key="s.id" @click="selectSection(s.id)"
           :class="activeSection === s.id ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-md' : 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'"
-          class="shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-[0.75rem] text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer">
+          class="shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-[.5rem] text-[10px] font-black transition-all cursor-pointer">
           <component :is="s.icon" class="w-3 h-3" />
           {{ s.label }}
         </button>

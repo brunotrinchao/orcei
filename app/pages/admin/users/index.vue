@@ -99,7 +99,7 @@ function confirmImpersonate(targetUser: any) {
   <div class="max-w-7xl mx-auto space-y-8">
     <PageHeader title="Gestão de Usuários" subtitle="Monitore e gerencie as contas de todos os usuários da plataforma.">
       <template #default>
-        <NuxtLink to="/admin" class="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline mr-6">Voltar ao Painel</NuxtLink>
+        <NuxtLink to="/admin" class="text-xs font-black text-blue-600 hover:underline mr-6">Voltar ao Painel</NuxtLink>
         <BaseButton variant="secondary" @click="() => {}" class="opacity-50 cursor-not-allowed">
           <Plus class="w-4 h-4 mr-2" />
           Novo Usuário (Em breve)
@@ -146,7 +146,7 @@ function confirmImpersonate(targetUser: any) {
             <span class="font-black text-xs md:text-sm text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
               {{ user.name }}
             </span>
-            <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tight mt-0.5">
+            <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 tracking-tight mt-0.5">
               {{ user.email }}
             </span>
           </div>
@@ -195,7 +195,7 @@ function confirmImpersonate(targetUser: any) {
           </div>
           <div>
             <p class="font-black text-gray-900 dark:text-gray-100 leading-none mb-1">{{ selectedUser.name }}</p>
-            <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Saldo Atual: {{ selectedUser.creditsBalance }} créditos</p>
+            <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 ">Saldo Atual: {{ selectedUser.creditsBalance }} créditos</p>
           </div>
         </div>
 
@@ -206,7 +206,7 @@ function confirmImpersonate(targetUser: any) {
               :key="a.id"
               @click="creditAction = a.id as any"
               :class="creditAction === a.id ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'"
-              class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
+              class="flex-1 py-3 text-[10px] font-black rounded-xl transition-all"
             >
               {{ a.label }}
             </button>

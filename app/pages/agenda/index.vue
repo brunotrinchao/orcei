@@ -49,7 +49,7 @@ const {
     </PageHeader>
 
     <!-- Card de Alerta de Orçamentos Aceitos Pendentes de Agendamento -->
-    <div v-if="pendingSchedulingProposals.length > 0" class="bg-blue-50/80 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 p-4 rounded-[0.75rem] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+    <div v-if="pendingSchedulingProposals.length > 0" class="bg-blue-50/80 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 p-4 rounded-[.5rem] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-2xl bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
           <Sparkles class="w-5 h-5" />
@@ -69,22 +69,22 @@ const {
     </div>
 
     <!-- Container da Agenda (Dark Mode & Touch Ready) -->
-    <div data-tour="agenda-calendario" class="bg-white dark:bg-gray-900 p-3 sm:p-8 rounded-[0.75rem] sm:rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+    <div data-tour="agenda-calendario" class="bg-white dark:bg-gray-900 p-3 sm:p-8 rounded-[.5rem] sm:rounded-[.5rem] border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
       <ClientOnly>
         <FullCalendar :options="calendarOptions" />
         <template #fallback>
-          <div class="h-[550px] bg-gray-50 dark:bg-gray-800/40 rounded-[.5rem] animate-pulse flex items-center justify-center text-gray-400 dark:text-gray-500 text-xs font-normal uppercase tracking-widest">
+          <div class="h-[550px] bg-gray-50 dark:bg-gray-800/40 rounded-[.5rem] animate-pulse flex items-center justify-center text-gray-400 dark:text-gray-500 text-xs font-normal ">
             Carregando agenda...
           </div>
         </template>
       </ClientOnly>
     </div>
 
-    <!-- Modal de Configuração de Evento -->
-    <BaseDialog v-model:open="isModalOpen" :title="selectedEvent ? 'Editar Compromisso' : 'Novo Compromisso'" size="lg">
+    <!-- Drawer de Configuração de Evento -->
+    <BaseDrawer v-model:open="isModalOpen" :title="selectedEvent ? 'Editar Compromisso' : 'Novo Compromisso'" size="lg">
       <form id="event-form" @submit.prevent="saveEvent" class="space-y-6 py-2">
         <!-- Seleção de Orçamento Aceito / Qualquer Orçamento -->
-        <div class="bg-gray-50/80 dark:bg-gray-800/50 p-4 rounded-[0.75rem] border border-gray-100 dark:border-gray-700/60 space-y-2">
+        <div class="bg-gray-50/80 dark:bg-gray-800/50 p-4 rounded-[.5rem] border border-gray-100 dark:border-gray-700/60 space-y-2">
           <div class="flex items-center justify-between">
             <label class="text-xs font-semibold tracking-wide text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
               <CheckCircle2 class="w-4 h-4 text-emerald-500" /> Vincular Orçamento Aceito
@@ -112,7 +112,7 @@ const {
         <!-- Card de Detalhes do Orçamento Vinculado -->
         <div v-if="linkedProposal" class="p-5 bg-blue-50/70 dark:bg-blue-950/30 rounded-2xl border border-blue-100 dark:border-blue-900/50 space-y-3">
           <div class="flex items-center justify-between">
-            <h4 class="text-[10px] font-normal text-blue-600 dark:text-blue-400 uppercase tracking-widest flex items-center gap-1.5">
+            <h4 class="text-[10px] font-normal text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
               <FileText class="w-3.5 h-3.5" /> Orçamento Vinculado
             </h4>
             <NuxtLink :to="`${linkedProposal.driveWebViewLink}`" target="_blank" class="text-[10px] font-normal text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
@@ -144,7 +144,7 @@ const {
           v-if="selectedEvent"
           type="button"
           @click="deleteEvent"
-          class="mr-auto flex items-center gap-2 text-xs font-normal text-red-500 hover:text-red-700 dark:hover:text-red-400 uppercase tracking-widest transition-colors"
+          class="mr-auto flex items-center gap-2 text-xs font-normal text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-colors"
         >
           <Trash2 class="w-4 h-4" /> Excluir
         </button> -->
@@ -154,7 +154,7 @@ const {
           {{ selectedEvent ? 'Salvar' : 'Cadastrar' }}
         </BaseButton>
       </template>
-    </BaseDialog>
+    </BaseDrawer>
   </div>
 </template>
 

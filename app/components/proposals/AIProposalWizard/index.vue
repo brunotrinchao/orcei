@@ -134,9 +134,9 @@ const {
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-[60] bg-slate-950/60 backdrop-blur-md" />
       <DialogContent
-        class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[61] w-[90vw] max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-5 text-white">
+        class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[61] w-[90vw] max-w-md bg-slate-900 border border-slate-800 rounded-[.5rem] p-6 shadow-2xl space-y-5 text-white">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+          <div class="w-10 h-10 rounded-[.5rem] bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
             <UserCheck class="w-5 h-5" />
           </div>
           <div>
@@ -150,7 +150,7 @@ const {
         </div>
 
         <!-- Card do Cliente Encontrado -->
-        <div v-if="existingClientFound" class="p-4 bg-slate-800/80 border border-slate-700/60 rounded-xl space-y-2">
+        <div v-if="existingClientFound" class="p-4 bg-slate-800/80 border border-slate-700/60 rounded-[.5rem] space-y-2">
           <div class="flex items-center justify-between">
             <span class="text-sm font-black text-white">{{ existingClientFound.name }}</span>
             <BaseBadge varaint="info">Cadastrado</BaseBadge>

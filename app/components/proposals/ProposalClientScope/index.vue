@@ -21,11 +21,11 @@ const { toggleUpsell, FileText } = useProposalClientScope(props, selectedUpsells
 </script>
 
 <template>
-  <section class="bg-white rounded-[0.75rem] border border-gray-100 shadow-sm overflow-hidden proposal-client-scope-container">
+  <section class="bg-white rounded-[.5rem] border border-gray-100 shadow-sm overflow-hidden proposal-client-scope-container">
     <!-- Section header -->
     <div class="px-8 py-6 border-b border-gray-100 flex items-center gap-3">
-      <div class="w-8 h-8 bg-[#3147F6]/10 rounded-xl flex items-center justify-center">
-        <FileText class="w-4 h-4 text-[#3147F6]" />
+      <div class="w-8 h-8 bg-brand/10 rounded-[.5rem] flex items-center justify-center">
+        <FileText class="w-4 h-4 text-brand" />
       </div>
       <h2 class="text-[10px] font-bold text-gray-600 uppercase tracking-[0.25em]">Escopo do Projeto</h2>
     </div>
@@ -38,7 +38,7 @@ const { toggleUpsell, FileText } = useProposalClientScope(props, selectedUpsells
         class="px-8 py-7 flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6"
       >
         <!-- Index bubble -->
-        <div class="shrink-0 w-9 h-9 rounded-[0.75rem] bg-gray-50 border border-gray-100 flex items-center justify-center">
+        <div class="shrink-0 w-9 h-9 rounded-[.5rem] bg-gray-50 border border-gray-100 flex items-center justify-center">
           <span class="text-xs font-black text-gray-600">{{ String(idx + 1).padStart(2, '0') }}</span>
         </div>
 
@@ -145,8 +145,8 @@ const { toggleUpsell, FileText } = useProposalClientScope(props, selectedUpsells
         <span class="font-bold text-orange-600">+ R$ {{ totals.additional.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
       </div>
       <div class="pt-3 border-t border-gray-200 flex justify-between items-baseline">
-        <span class="text-sm font-black text-gray-900 uppercase tracking-widest">Total</span>
-        <span class="text-2xl font-black text-[#3147F6]">
+        <span class="section-title">Total</span>
+        <span class="text-2xl font-black text-brand">
           R$ {{ finalTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
         </span>
       </div>

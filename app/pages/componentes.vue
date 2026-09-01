@@ -146,7 +146,7 @@ function scrollToSection(id: string) {
           <div class="space-y-8">
             <!-- Variantes de Cores -->
             <div class="space-y-3">
-              <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest">1. Variantes de Cor (`variant`)</h4>
+              <h4 class="text-xs font-black text-slate-400 ">1. Variantes de Cor (`variant`)</h4>
               <div class="flex flex-wrap gap-3 items-center">
                 <BaseButton variant="primary">Primary</BaseButton>
                 <BaseButton variant="secondary">Secondary</BaseButton>
@@ -164,7 +164,7 @@ function scrollToSection(id: string) {
 
             <!-- Tamanhos -->
             <div class="space-y-3">
-              <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest">2. Tamanhos (`size`)</h4>
+              <h4 class="text-xs font-black text-slate-400 ">2. Tamanhos (`size`)</h4>
               <div class="flex flex-wrap gap-3 items-center">
                 <BaseButton size="xs">Extra Small (xs)</BaseButton>
                 <BaseButton size="sm">Small (sm)</BaseButton>
@@ -175,7 +175,7 @@ function scrollToSection(id: string) {
 
             <!-- Ícones e Icon Only -->
             <div class="space-y-3">
-              <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest">4. Botões com Ícones (`icon-sm`, `icon`, `iconOnly`)</h4>
+              <h4 class="text-xs font-black text-slate-400 ">4. Botões com Ícones (`icon-sm`, `icon`, `iconOnly`)</h4>
               <div class="flex flex-wrap gap-3 items-center">
                 <BaseButton size="icon-sm" tooltip="Editar registro">
                   <Pencil class="w-4 h-4" />
@@ -194,7 +194,7 @@ function scrollToSection(id: string) {
 
             <!-- Estados Especializados -->
             <div class="space-y-3">
-              <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest">5. Estados (Loading, Disabled, Link)</h4>
+              <h4 class="text-xs font-black text-slate-400 ">5. Estados (Loading, Disabled, Link)</h4>
               <div class="flex flex-wrap gap-3 items-center">
                 <BaseButton :loading="true">Carregando...</BaseButton>
                 <BaseButton :disabled="true">Desabilitado</BaseButton>
@@ -212,7 +212,7 @@ function scrollToSection(id: string) {
       <section id="badges" class="space-y-6">
         <BaseSectionCard title="BaseBadge" subtitle="Etiquetas de status e categorias.">
           <div class="space-y-4">
-            <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest">1. Variantes Preenchidas (Filled)</h4>
+            <h4 class="text-xs font-black text-slate-400 ">1. Variantes Preenchidas (Filled)</h4>
             <div class="flex flex-wrap gap-3 items-center">
               <BaseBadge variant="default">Default / Rascunho</BaseBadge>
               <BaseBadge variant="success">Success / Aprovado</BaseBadge>
@@ -226,7 +226,7 @@ function scrollToSection(id: string) {
               <BaseBadge variant="price">R$ 1.500,00</BaseBadge>
             </div>
 
-            <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest pt-4">2. Variantes Contornadas (`outline`)</h4>
+            <h4 class="text-xs font-black text-slate-400 pt-4">2. Variantes Contornadas (`outline`)</h4>
             <div class="flex flex-wrap gap-3 items-center">
               <BaseBadge variant="default" outline>Default</BaseBadge>
               <BaseBadge variant="success" outline>Success</BaseBadge>
@@ -239,7 +239,7 @@ function scrollToSection(id: string) {
               </BaseBadge>
             </div>
 
-            <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest pt-4">3. Variantes Suaves com Alto Contraste (`light`)</h4>
+            <h4 class="text-xs font-black text-slate-400 pt-4">3. Variantes Suaves com Alto Contraste (`light`)</h4>
             <div class="flex flex-wrap gap-3 items-center">
               <BaseBadge variant="default" light>Default Light</BaseBadge>
               <BaseBadge variant="success" light>Success Light</BaseBadge>
@@ -252,7 +252,7 @@ function scrollToSection(id: string) {
               </BaseBadge>
             </div>
 
-            <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest pt-4">4. Tamanhos e Bordas Arredondadas (`size` & `rounded`)</h4>
+            <h4 class="text-xs font-black text-slate-400 pt-4">4. Tamanhos e Bordas Arredondadas (`size` & `rounded`)</h4>
             <div class="flex flex-wrap gap-3 items-center">
               <BaseBadge size="xs" rounded="full" variant="success">Extra Small Full</BaseBadge>
               <BaseBadge size="sm" rounded="md" variant="info">Small Medium (Padrão)</BaseBadge>
@@ -300,7 +300,7 @@ function scrollToSection(id: string) {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- BaseInput -->
             <div class="space-y-4 p-4 rounded-2xl bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800">
-              <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest">BaseInput</h4>
+              <h4 class="text-xs font-black text-slate-400 ">BaseInput</h4>
               
               <BaseInput
                 v-model="inputText"
@@ -339,7 +339,7 @@ function scrollToSection(id: string) {
 
             <!-- BaseTextarea, BaseCheckbox, BaseColorInput -->
             <div class="space-y-6 p-4 rounded-2xl bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800">
-              <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest">Textarea, Checkbox & Color</h4>
+              <h4 class="text-xs font-black text-slate-400 ">Textarea, Checkbox & Color</h4>
 
               <BaseTextarea
                 v-model="textareaText"
@@ -350,7 +350,7 @@ function scrollToSection(id: string) {
               />
 
               <div class="space-y-3 pt-2">
-                <h5 class="text-xs font-bold text-slate-500 uppercase">BaseCheckbox</h5>
+                <h5 class="text-xs font-bold text-slate-500 ">BaseCheckbox</h5>
                 <div class="flex items-center gap-6">
                   <BaseCheckbox v-model="checkboxValue" label="Aceito os termos" />
                   <BaseCheckbox :model-value="false" label="Não marcado" />
@@ -359,7 +359,7 @@ function scrollToSection(id: string) {
               </div>
 
               <div class="space-y-3 pt-2">
-                <h5 class="text-xs font-bold text-slate-500 uppercase">BaseColorInput</h5>
+                <h5 class="text-xs font-bold text-slate-500 ">BaseColorInput</h5>
                 <BaseColorInput v-model="colorValue" label="Cor Principal da Marca" />
               </div>
             </div>
@@ -373,7 +373,7 @@ function scrollToSection(id: string) {
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- BaseSelect -->
             <div class="space-y-4">
-              <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest">BaseSelect</h4>
+              <h4 class="text-xs font-black text-slate-400 ">BaseSelect</h4>
               <BaseSelect
                 v-model="selectValue"
                 label="Plano Escolhido"
@@ -391,7 +391,7 @@ function scrollToSection(id: string) {
 
             <!-- BaseCombobox -->
             <div class="space-y-4">
-              <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest">BaseCombobox (Autocompletar)</h4>
+              <h4 class="text-xs font-black text-slate-400 ">BaseCombobox (Autocompletar)</h4>
               <BaseCombobox
                 v-model="comboboxValue"
                 label="Estado / UF"
@@ -402,7 +402,7 @@ function scrollToSection(id: string) {
 
             <!-- BaseIconSelect -->
             <div class="space-y-4">
-              <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest">BaseIconSelect (Ícone)</h4>
+              <h4 class="text-xs font-black text-slate-400 ">BaseIconSelect (Ícone)</h4>
               <BaseIconSelect
                 v-model="iconSelectValue"
                 label="Ícone da Categoria"
@@ -456,7 +456,7 @@ function scrollToSection(id: string) {
 
           <!-- BaseProgressBar -->
           <div class="p-6 bg-slate-50 dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 space-y-6 mt-6">
-            <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest">BaseProgressBar</h4>
+            <h4 class="text-xs font-black text-slate-400 ">BaseProgressBar</h4>
             
             <BaseProgressBar
               :value="75"
@@ -489,7 +489,7 @@ function scrollToSection(id: string) {
         <BaseSectionCard title="BaseDataList & BaseTable" subtitle="Componente declarativo unificado para tabelas e cards em mobile.">
           <div class="space-y-4">
             <div class="flex items-center justify-between">
-              <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest">
+              <h4 class="text-xs font-black text-slate-400 ">
                 Tabela Declarativa com tipos `currency` (fonte mono) e `badge` (sem label no mobile)
               </h4>
             </div>
@@ -580,7 +580,7 @@ function scrollToSection(id: string) {
         <BaseSectionCard title="Skeletons & Feedbacks" subtitle="Placeholders de carregamento visual para dados em trânsito.">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div class="p-6 rounded-2xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 space-y-4">
-              <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest">BaseSkeleton (Linhas e Avatar)</h4>
+              <h4 class="text-xs font-black text-slate-400 ">BaseSkeleton (Linhas e Avatar)</h4>
               
               <div class="flex items-center gap-4">
                 <BaseSkeleton width="3rem" height="3rem" borderRadius="1rem" />
@@ -598,7 +598,7 @@ function scrollToSection(id: string) {
             </div>
 
             <div class="p-6 rounded-2xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 space-y-4">
-              <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest">BasePagination</h4>
+              <h4 class="text-xs font-black text-slate-400 ">BasePagination</h4>
               <div class="py-4 flex justify-center">
                 <BasePagination
                   :current-page="currentPage"
@@ -680,13 +680,13 @@ function scrollToSection(id: string) {
 
             <div class="space-y-4 py-2">
               <div class="p-4 bg-slate-50 dark:bg-gray-900 rounded-xl space-y-2 border border-slate-100 dark:border-gray-800">
-                <div class="text-xs font-black uppercase text-gray-400">Cliente</div>
+                <div class="text-xs font-black text-gray-400">Cliente</div>
                 <div class="text-sm font-bold text-gray-900 dark:text-gray-100">Orcei Tecnologia LTDA</div>
                 <div class="text-xs text-gray-500">CNPJ: 12.345.678/0001-90</div>
               </div>
 
               <div class="p-4 bg-slate-50 dark:bg-gray-900 rounded-xl space-y-2 border border-slate-100 dark:border-gray-800">
-                <div class="text-xs font-black uppercase text-gray-400">Contato</div>
+                <div class="text-xs font-black text-gray-400">Contato</div>
                 <div class="text-xs text-gray-600 dark:text-gray-300">contato@orcei.com.br</div>
                 <div class="text-xs text-gray-600 dark:text-gray-300">(11) 98765-4321</div>
               </div>

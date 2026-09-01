@@ -57,7 +57,7 @@ const isOpen = useVModel(props, 'open', emit, { passive: true })
         :align="align"
         :side="side"
         :side-offset="sideOffset"
-        class="min-w-[180px] bg-white dark:bg-gray-950 rounded-[0.75rem] shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-[150] outline-none"
+        class="min-w-[180px] bg-white dark:bg-gray-950 rounded-[.5rem] shadow-xl border border-line dark:border-gray-800 p-2 z-[150] outline-none"
       >
         <slot>
           <BaseDropdownMenuItem

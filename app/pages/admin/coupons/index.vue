@@ -135,7 +135,7 @@ const formatDate = (ts: number | null) => ts ? new Date(ts).toLocaleDateString('
   <div class="max-w-7xl mx-auto space-y-8">
     <PageHeader title="Cupons Promocionais" subtitle="Crie e gerencie cupons de créditos resgatáveis via Stripe.">
       <template #default>
-        <NuxtLink to="/admin" class="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline mr-6">Voltar ao Painel</NuxtLink>
+        <NuxtLink to="/admin" class="text-xs font-black text-blue-600 hover:underline mr-6">Voltar ao Painel</NuxtLink>
         <BaseButton variant="primary" @click="openCreateModal">
           <Plus class="w-4 h-4 mr-2" />
           Novo Cupom
@@ -230,7 +230,7 @@ const formatDate = (ts: number | null) => ts ? new Date(ts).toLocaleDateString('
         <BaseSelect v-model="editForm.audience" :options="audienceOptions" label="Público-alvo" />
         <div class="flex items-center gap-3 pt-2">
           <BaseCheckbox v-model="editForm.active" id="edit-coupon-active" />
-          <label for="edit-coupon-active" class="text-xs font-black text-gray-600 dark:text-gray-300 uppercase tracking-widest cursor-pointer select-none">Cupom ativo</label>
+          <label for="edit-coupon-active" class="text-xs font-black text-gray-600 dark:text-gray-300 cursor-pointer select-none">Cupom ativo</label>
         </div>
       </div>
       <template #footer>

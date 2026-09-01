@@ -51,19 +51,19 @@ const footerPaddingClasses = computed(() => {
 const cardColorClasses = computed(() => {
   switch (props.color) {
     case 'blue':
-      return 'bg-blue-50 dark:bg-blue-950/40 text-slate-900 dark:text-blue-100'
+      return 'bg-blue-500 dark:bg-blue-950/40 text-slate-900 dark:text-blue-100'
     case 'emerald':
     case 'green':
-      return 'bg-emerald-50 dark:bg-emerald-950/40 text-slate-900 dark:text-emerald-100'
+      return 'bg-emerald-500 dark:bg-emerald-950/40 text-slate-900 dark:text-emerald-100'
     case 'amber':
     case 'yellow':
-      return 'bg-amber-50 dark:bg-amber-950/40 text-slate-900 dark:text-amber-100'
+      return 'bg-amber-500 dark:bg-amber-950/40 text-slate-900 dark:text-amber-100'
     case 'purple':
     case 'violet':
-      return 'bg-purple-50 dark:bg-purple-950/40 text-slate-900 dark:text-purple-100'
+      return 'bg-purple-500 dark:bg-purple-950/40 text-slate-900 dark:text-purple-100'
     case 'rose':
     case 'red':
-      return 'bg-rose-50 dark:bg-rose-950/40 text-slate-900 dark:text-rose-100'
+      return 'bg-rose-500 dark:bg-rose-950/40 text-slate-900 dark:text-rose-100'
     case 'slate':
     case 'gray':
       return 'bg-slate-100 dark:bg-slate-800/80 text-slate-900 dark:text-slate-100'

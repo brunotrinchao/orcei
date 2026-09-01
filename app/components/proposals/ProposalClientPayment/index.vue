@@ -23,8 +23,8 @@ const {
 <template>
   <section class="proposal-client-payment-container">
     <div class="flex items-center gap-3 mb-6">
-      <div class="w-8 h-8 bg-[#3147F6]/10 rounded-xl flex items-center justify-center">
-        <CreditCard class="w-4 h-4 text-[#3147F6]" />
+      <div class="w-8 h-8 bg-brand/10 rounded-[.5rem] flex items-center justify-center">
+        <CreditCard class="w-4 h-4 text-brand" />
       </div>
       <h2 class="text-[10px] font-bold text-gray-600 uppercase tracking-[0.25em]">Forma de Pagamento</h2>
     </div>
@@ -37,22 +37,22 @@ const {
         :aria-checked="modelValue === 'cash'"
         @click="selectMethod('cash')"
         :class="[
-          'relative text-left rounded-[0.75rem] border-2 p-5 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2 cursor-pointer',
+          'relative text-left rounded-[.5rem] border-2 p-5 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 cursor-pointer',
           modelValue === 'cash'
-            ? 'border-[#3147F6] bg-[#3147F6]/5 shadow-lg shadow-[#3147F6]/10'
+            ? 'border-brand bg-brand/5'
             : 'border-gray-100 bg-white hover:border-blue-200 hover:shadow-md'
         ]"
       >
         <!-- Selected indicator -->
         <div class="absolute top-5 right-5">
-          <div v-if="modelValue === 'cash'" class="w-6 h-6 bg-[#3147F6] rounded-full flex items-center justify-center shadow-md">
+          <div v-if="modelValue === 'cash'" class="w-6 h-6 bg-brand rounded-full flex items-center justify-center shadow-md">
             <CheckCircle2 class="w-3.5 h-3.5 text-white" />
           </div>
           <div v-else class="w-6 h-6 border-2 border-gray-200 rounded-full group-hover:border-blue-300 transition-colors"></div>
         </div>
 
         <div class="mb-5">
-          <div class="w-11 h-11 bg-green-50 rounded-[0.75rem] flex items-center justify-center mb-4">
+          <div class="w-11 h-11 bg-green-50 rounded-[.5rem] flex items-center justify-center mb-4">
             <Banknote class="w-5 h-5 text-green-600" />
           </div>
           <h3 class="font-black text-gray-900 text-lg tracking-tight leading-snug">À Vista</h3>
@@ -84,23 +84,23 @@ const {
         :aria-checked="modelValue === 'credit_card'"
         @click="selectMethod('credit_card')"
         :class="[
-          'relative text-left rounded-[0.75rem] border-2 p-5 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#3147F6] focus-visible:ring-offset-2 cursor-pointer',
+          'relative text-left rounded-[.5rem] border-2 p-5 transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 cursor-pointer',
           modelValue === 'credit_card'
-            ? 'border-[#3147F6] bg-[#3147F6]/5 shadow-lg shadow-[#3147F6]/10'
+            ? 'border-brand bg-brand/5'
             : 'border-gray-100 bg-white hover:border-blue-200 hover:shadow-md'
         ]"
       >
         <!-- Selected indicator -->
         <div class="absolute top-5 right-5">
-          <div v-if="modelValue === 'credit_card'" class="w-6 h-6 bg-[#3147F6] rounded-full flex items-center justify-center shadow-md">
+          <div v-if="modelValue === 'credit_card'" class="w-6 h-6 bg-brand rounded-full flex items-center justify-center shadow-md">
             <CheckCircle2 class="w-3.5 h-3.5 text-white" />
           </div>
           <div v-else class="w-6 h-6 border-2 border-gray-200 rounded-full group-hover:border-blue-300 transition-colors"></div>
         </div>
 
         <div class="mb-5">
-          <div class="w-11 h-11 bg-blue-50 rounded-[0.75rem] flex items-center justify-center mb-4">
-            <CreditCard class="w-5 h-5 text-[#3147F6]" />
+          <div class="w-11 h-11 bg-blue-50 rounded-[.5rem] flex items-center justify-center mb-4">
+            <CreditCard class="w-5 h-5 text-brand" />
           </div>
           <h3 class="font-black text-gray-900 text-lg tracking-tight leading-snug">Cartão de Crédito</h3>
           <p class="text-xs font-bold text-gray-600 mt-0.5">Parcelado sem juros</p>
@@ -108,15 +108,15 @@ const {
 
         <p class="text-sm text-gray-600 font-medium leading-relaxed mb-6">
           Parcele em até
-          <strong class="text-[#3147F6]">{{ paymentConfig.installments }}x</strong>
+          <strong class="text-brand">{{ paymentConfig.installments }}x</strong>
           de
-          <strong class="text-[#3147F6]">R$ {{ (totals.subtotal / paymentConfig.installments).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</strong>
+          <strong class="text-brand">R$ {{ (totals.subtotal / paymentConfig.installments).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</strong>
           sem juros.
         </p>
 
         <div class="pt-5 border-t border-gray-100">
           <p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-1">Total</p>
-          <p class="text-2xl font-black text-[#3147F6]">
+          <p class="text-2xl font-black text-brand">
             R$ {{ totals.subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
           </p>
           <p class="text-[10px] font-bold text-gray-600 mt-1 uppercase tracking-widest">

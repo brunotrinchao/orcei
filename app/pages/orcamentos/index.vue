@@ -154,7 +154,7 @@ const {
           </div>
 
           <div
-            class="flex items-center gap-3 px-5 h-[52px] bg-white dark:bg-gray-900  hover:border-gray-400 dark:hover:border-gray-700 transition-all group cursor-pointer shadow-xs shrink-0 rounded-[0.75rem]">
+            class="flex items-center gap-3 px-5 h-[52px] bg-white dark:bg-gray-900  hover:border-gray-400 dark:hover:border-gray-700 transition-all group cursor-pointer shadow-xs shrink-0 rounded-[.5rem]">
             <!-- Adicionado 'shrink-0' no checkbox para evitar que ele deforme -->
             <BaseCheckbox v-model="stagedFilterPendingChat" id="pending-chat" class="shrink-0" />
 
@@ -172,13 +172,13 @@ const {
         { key: 'status', label: 'Status', type: 'badge' },
         { key: 'total', label: 'Total', align: 'right', type: 'currency' }
       ]" :items="proposals || []" :pending="pending" :has-more="hasMore" :loading-more="loadingMore"
-        @load-more="loadMore" empty-title="Sem Orçamentos"
+        @load-more="loadMore" @row-click="(proposal) => openProposalInfo(proposal)" empty-title="Sem Orçamentos"
         empty-subtitle="Clique no botão acima para criar seu primeiro orçamento.">
         <template #cell-title="{ item: proposal }">
-          <div class="flex items-center gap-3 cursor-pointer" @click="openProposalInfo(proposal)">
+          <div class="flex items-center gap-3">
             <div class="flex flex-col">
               <span
-                class="font-normal text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-base tracking-tight">
+                class="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-brand dark:group-hover:text-brand transition-colors">
                 {{ proposal.title || 'Sem título' }}
               </span>
             </div>
@@ -186,31 +186,29 @@ const {
         </template>
 
         <template #cell-client="{ item: proposal }">
-          <div class="flex flex-col cursor-pointer" @click="openProposalInfo(proposal)">
-            <span class="text-md font-normal text-gray-900 tracking-wide mt-0.5">{{ proposal.client?.name }}</span>
+          <div class="flex flex-col">
+            <span class="text-sm font-medium text-gray-900 tracking-wide">{{ proposal.client?.name }}</span>
             <span v-if="proposal.client?.email"
-              class="text-[10px] text-gray-400 dark:text-gray-500 font-medium normal-case mt-0.5">{{
+              class="text-sm font-medium text-gray-500 dark:text-gray-400">{{
                 proposal.client.email }}</span>
           </div>
         </template>
 
         <template #cell-createdAt="{ item: proposal }">
-          <span class="text-xs md:text-sm text-gray-500 font-medium cursor-pointer" @click="openProposalInfo(proposal)">
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
             {{ formatDate(proposal.createdAt) }}
           </span>
         </template>
 
         <template #cell-status="{ item: proposal }">
-          <div class="cursor-pointer" @click="openProposalInfo(proposal)">
-            <BaseBadge :variant="getStatusVariant(proposal)" light>
-              {{ getProposalStatusLabel(proposal) }}
-            </BaseBadge>
-          </div>
+          <BaseBadge :variant="getStatusVariant(proposal)" light>
+            {{ getProposalStatusLabel(proposal) }}
+          </BaseBadge>
         </template>
 
         <template #cell-total="{ item: proposal }">
-           <div class="flex flex-col items-start md:items-end cursor-pointer" @click="openProposalInfo(proposal)">
-            <span class="font-normal text-base md:text-lg text-gray-900 dark:text-gray-100">
+          <div class="flex flex-col items-start md:items-end">
+            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">
             R$ {{ proposal.totals?.final?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '0,00' }}
           </span>
           </div>
@@ -225,8 +223,8 @@ const {
       @edit-contract="p => { showProposalInfo = false; openContractModal(p) }"
       @delete="p => { showProposalInfo = false; confirmDeleteProposal(p) }" />
 
-    <!-- Modal de Orçamento -->
-    <BaseDialog v-model:open="isModalOpen" :title="selectedProposal ? 'Editar Orçamento' : 'Novo Orçamento'" size="xl">
+    <!-- Drawer de Orçamento -->
+    <BaseDrawer v-model:open="isModalOpen" :title="selectedProposal ? 'Editar Orçamento' : 'Novo Orçamento'" size="xl">
       <ProposalForm ref="proposalFormRef" :initial-data="selectedProposal || undefined"
         :prefilled-items="prefilledItems || undefined" :is-editing="!!selectedProposal" :is-submitting="isSubmitting"
         @submit="handleProposalSubmit" />
@@ -241,7 +239,7 @@ const {
 
         <!-- Total Parcial no passo 2 -->
         <div v-if="proposalFormRef?.currentStep === 2" class="hidden sm:block text-center mr-4">
-          <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Total Parcial</span>
+          <span class="text-[10px] font-black text-gray-400 block">Total Parcial</span>
           <span class="text-lg font-black text-blue-600">R$ {{ (proposalFormRef?.scopeTotal ||
             0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
         </div>
@@ -268,37 +266,37 @@ const {
               Salvar Rascunho
             </BaseButton>
             <BaseButton type="button" :disabled="isSubmitting" @click="proposalFormRef.submit('created')"
-              class="bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-200">
+              class="bg-brand hover:bg-brand-dark">
               <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin mr-2" />
               {{ creditLabel('proposalSend', 'Criar e Enviar') }}
             </BaseButton>
           </template>
         </template>
       </template>
-    </BaseDialog>
+    </BaseDrawer>
 
     <!-- Modal Proposta Aceita -->
     <BaseDialog v-model:open="isAcceptedModalOpen" title="Proposta Aceita" size="xl" @close="selectedProposal = null">
       <div v-if="selectedProposal" class="">
-        <div class="bg-green-500 rounded-[0.75rem] p-6 flex items-center gap-4 mb-6">
-          <div class="w-14 h-14 bg-white/20 rounded-[0.75rem] flex items-center justify-center shrink-0">
+        <div class="bg-green-500 rounded-[.5rem] p-6 flex items-center gap-4 mb-6">
+          <div class="w-14 h-14 bg-white/20 rounded-[.5rem] flex items-center justify-center shrink-0">
             <CheckCircle2 class="w-8 h-8 text-white" />
           </div>
           <div class="flex-1 min-w-0">
-            <p class="text-[10px] font-black text-green-100 uppercase tracking-widest mb-1">Orçamento Aceito</p>
+            <p class="text-[10px] font-black text-green-100 mb-1">Orçamento Aceito</p>
             <h3 class="text-xl font-black text-white tracking-tight truncate">{{ selectedProposal.title ||
               selectedProposal.code }}</h3>
             <p class="text-sm text-green-100 font-medium mt-0.5">{{ selectedProposal.code }}</p>
           </div>
           <div class="text-right shrink-0">
-            <p class="text-[10px] font-black text-green-100 uppercase tracking-widest mb-1">Total</p>
+            <p class="text-[10px] font-black text-green-100 mb-1">Total</p>
             <p class="text-2xl font-black text-white">R$ {{ selectedProposal.totals.final.toLocaleString('pt-BR', {
               minimumFractionDigits: 2 }) }}</p>
           </div>
         </div>
 
-        <div class="bg-gray-50 dark:bg-gray-900/60 rounded-[0.75rem] p-6 mb-4">
-          <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4">Cliente</p>
+        <div class="bg-gray-50 dark:bg-gray-900/60 rounded-[.5rem] p-6 mb-4">
+          <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 mb-4">Cliente</p>
           <div class="flex items-center justify-between gap-4 flex-wrap">
             <div class="flex items-center gap-3">
               <div
@@ -312,19 +310,19 @@ const {
             </div>
             <div class="flex gap-2">
               <a :href="`mailto:${selectedProposal.client.email}`"
-                class="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 hover:border-blue-200 dark:hover:border-blue-900 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-gray-600 dark:text-gray-300">
+                class="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 hover:border-blue-200 dark:hover:border-blue-900 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl text-xs font-black transition-all text-gray-600 dark:text-gray-300">
                 <Mail class="w-4 h-4" /> E-mail
               </a>
               <a v-if="selectedProposal.client.phone" :href="whatsappLink(selectedProposal.client.phone)"
                 target="_blank"
-                class="flex items-center gap-2 px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-green-100 dark:shadow-none">
+                class="flex items-center gap-2 px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-black transition-all shadow-lg shadow-green-100 dark:shadow-none">
                 <img :src="'/images/icons/whatsapp-svg.svg'" class="w-4 h-4" alt="WhatsApp" loading="lazy" /> WhatsApp
               </a>
             </div>
           </div>
         </div>
 
-        <div class="flex items-center gap-3 px-4 py-3 bg-blue-50 dark:bg-blue-950/30 rounded-[0.75rem] mb-4">
+        <div class="flex items-center gap-3 px-4 py-3 bg-blue-50 dark:bg-blue-950/30 rounded-[.5rem] mb-4">
           <CreditCard v-if="selectedProposal.paymentConfig?.method === 'credit_card'"
             class="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
           <Banknote v-else class="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
@@ -335,9 +333,9 @@ const {
           </p>
         </div>
 
-        <div class="border border-gray-100 dark:border-gray-800 rounded-[0.75rem] overflow-hidden mb-4">
+        <div class="border border-gray-100 dark:border-gray-800 rounded-[.5rem] overflow-hidden mb-4">
           <div class="px-5 py-3 bg-gray-50 dark:bg-gray-900/60 border-b border-gray-100 dark:border-gray-800">
-            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Itens do
+            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 ">Itens do
               Orçamento
             </p>
           </div>
@@ -359,7 +357,7 @@ const {
           </div>
           <div
             class="flex justify-between items-center px-5 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/40">
-            <span class="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">Total
+            <span class="text-xs font-black text-gray-500 dark:text-gray-400 ">Total
               Final</span>
             <span class="font-black text-green-600 dark:text-green-400 text-lg">R$ {{
               selectedProposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
@@ -370,7 +368,7 @@ const {
       <template #footer>
         <a :href="selectedProposal ? `${siteOrigin}/p/${selectedProposal.slug}${selectedProposal.token ? `?t=${selectedProposal.token}` : ''}` : '#'"
           target="_blank"
-          class="mr-auto flex items-center gap-2 text-xs font-black text-gray-400 hover:text-blue-600 uppercase tracking-widest transition-colors">
+          class="mr-auto flex items-center gap-2 text-xs font-black text-gray-400 hover:text-blue-600 transition-colors">
           <ExternalLink class="w-4 h-4" /> Ver link público
         </a>
         <BaseButton variant="secondary" size="sm" @click="isAcceptedModalOpen = false">Fechar</BaseButton>
@@ -387,19 +385,19 @@ const {
         </div>
 
         <div class="space-y-2">
-          <h3 class="text-xl font-black text-gray-900 dark:text-gray-100 tracking-tight uppercase">Tudo Pronto!</h3>
+          <h3 class="text-xl font-black text-gray-900 dark:text-gray-100 tracking-tight ">Tudo Pronto!</h3>
           <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">O orçamento foi criado e o e-mail de
             notificação
             já foi enviado para o cliente.</p>
         </div>
 
         <div
-          class="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-[0.75rem] border border-blue-100 dark:border-blue-900/30 flex items-center gap-4 text-left">
+          class="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-[.5rem] border border-blue-100 dark:border-blue-900/30 flex items-center gap-4 text-left">
           <div class="w-10 h-10 bg-green-50 dark:bg-green-950/40 rounded-xl flex items-center justify-center shrink-0">
             <img :src="'/images/icons/whatsapp-svg.svg'" class="w-6 h-6" alt="WhatsApp" loading="lazy" />
           </div>
           <div>
-            <p class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">Dica Pro</p>
+            <p class="text-[10px] font-black text-blue-600 dark:text-blue-400 ">Dica Pro</p>
             <p class="text-xs text-blue-800 dark:text-blue-300 font-bold">Enviar também pelo WhatsApp aumenta em 3x a
               velocidade de aprovação.</p>
           </div>
@@ -446,15 +444,15 @@ const {
     </BaseDialog>
 
 
-    <!-- Modal Editar Contrato -->
-    <BaseDialog v-model:open="isContractModalOpen" title="Editar Contrato" size="xl">
+    <!-- Drawer Editar Contrato -->
+    <BaseDrawer v-model:open="isContractModalOpen" title="Editar Contrato" size="xl">
       <div class="p-6 space-y-6">
         <!-- Variáveis -->
         <div
-          class="p-5 bg-slate-50/50 dark:bg-slate-900/50 rounded-[0.75rem] border border-slate-100 dark:border-slate-800">
+          class="p-5 bg-slate-50/50 dark:bg-slate-900/50 rounded-[.5rem] border border-slate-100 dark:border-slate-800">
           <div class="flex items-center gap-2 mb-3">
             <Variable class="w-4 h-4 text-slate-500 dark:text-slate-400" />
-            <h3 class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Variáveis
+            <h3 class="text-xs font-black text-slate-700 dark:text-slate-300 ">Variáveis
               Dinâmicas
             </h3>
           </div>
@@ -477,9 +475,9 @@ const {
         <!-- Editor -->
         <div class="space-y-2">
           <label
-            class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Contrato</label>
+            class="block text-xs font-black text-gray-600 dark:text-gray-400 ml-1">Contrato</label>
           <LazyRichTextEditor v-model="localContractText"
-            class="min-h-[350px] border-2 border-gray-50 dark:border-gray-800 rounded-[0.75rem] overflow-hidden" />
+            class="min-h-[350px] border-2 border-gray-50 dark:border-gray-800 rounded-[.5rem] overflow-hidden" />
         </div>
       </div>
       <template #footer>
@@ -489,7 +487,7 @@ const {
           {{ isSavingContract ? 'Salvando...' : 'Salvar Contrato' }}
         </BaseButton>
       </template>
-    </BaseDialog>
+    </BaseDrawer>
 
     <!-- Modal de Chat/Interação -->
     <LazyProposalChatModal v-model:open="isChatOpen" :proposal="selectedProposal" @refresh="refresh" />

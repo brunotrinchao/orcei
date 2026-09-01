@@ -32,7 +32,7 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
 <template>
   <div class="max-w-6xl mx-auto space-y-8">
     <PageHeader title="Logs de Auditoria" subtitle="Rastreabilidade total das ações realizadas por administradores.">
-      <NuxtLink to="/admin" class="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">Voltar ao Painel</NuxtLink>
+      <NuxtLink to="/admin" class="text-xs font-black text-blue-600 hover:underline">Voltar ao Painel</NuxtLink>
     </PageHeader>
 
     <!-- Listagem Unificada (desktop & mobile) -->

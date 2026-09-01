@@ -11,14 +11,10 @@ const { SendMethod, CreditCard } = useProposalStepPayment()
 
 <template>
   <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 proposal-step-payment-container">
-    <div class="space-y-2 px-3">
-      <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight">Condições e Finalização</h3>
-      <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Configure como o cliente pagará e receba o resumo financeiro.</p>
-    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 gap-4">
       <div class="space-y-8">
-        <BaseSectionCard title="Execução & Pagamento" :icon="CreditCard">
+        <div>
           <div class="space-y-6">
             <div class="space-y-3">
               <BaseDateTimePicker 
@@ -29,7 +25,7 @@ const { SendMethod, CreditCard } = useProposalStepPayment()
             </div>
 
             <!-- Opção de Cartão de Crédito -->
-            <div class="p-3.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 space-y-3">
+            <div class="p-3.5 rounded-[.5rem] border border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 space-y-3">
               <div 
                 class="flex items-center justify-between cursor-pointer select-none"
                 @click="form.paymentConfig.acceptCreditCard = !form.paymentConfig.acceptCreditCard"
@@ -54,8 +50,8 @@ const { SendMethod, CreditCard } = useProposalStepPayment()
             </div>
 
             <div class="space-y-3">
-              <label class="block text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Método de Envio</label>
-              <div role="radiogroup" aria-label="Método de Envio" class="flex flex-col sm:flex-row gap-2 p-1 bg-white dark:bg-gray-950 rounded-[0.75rem] border border-gray-200 dark:border-gray-800">
+              <label class="form-label block mb-1.5 ml-1">Método de Envio</label>
+              <div role="radiogroup" aria-label="Método de Envio" class="flex flex-col sm:flex-row gap-2 p-1 bg-white dark:bg-gray-950 rounded-[.5rem] border border-gray-200 dark:border-gray-800">
                 <BaseButton 
                   type="button"
                   role="radio"
@@ -81,16 +77,14 @@ const { SendMethod, CreditCard } = useProposalStepPayment()
               </div>
             </div>
           </div>
-        </BaseSectionCard>
+        </div>
       </div>
 
       <div class="space-y-8">
-        <div class="bg-blue-600 text-white p-8 md:p-10 rounded-[0.75rem] shadow-2xl shadow-blue-200 dark:shadow-blue-950/50 relative overflow-hidden h-full flex flex-col justify-center">
-          <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-          
-          <div class="relative z-10 space-y-6">
-            <div class="flex justify-between items-center text-blue-100">
-              <span class="text-[10px] font-black uppercase tracking-widest">Resumo Financeiro</span>
+        <BaseCard compact class="!bg-blue-600 !text-white">
+        <div class="relative z-10 space-y-6">
+            <div class="flex justify-between items-center !text-white">
+              <span class="section-title !text-white">Resumo Financeiro</span>
               <span class="bg-white/20 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">Investimento Final</span>
             </div>
 
@@ -101,11 +95,11 @@ const { SendMethod, CreditCard } = useProposalStepPayment()
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-xs font-bold">Acréscimo R$</span>
-                <input v-model.number="form.totals.additional" type="number" class="w-24 bg-white/10 border-none rounded-[0.75rem] text-right font-black py-1 focus:ring-2 focus:ring-white/30 outline-none">
+                <input v-model.number="form.totals.additional" type="number" class="w-24 bg-white/10 border-none rounded-[.5rem] text-right font-black py-1 focus:ring-2 focus:ring-white/30 outline-none">
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-xs font-bold">Desconto R$</span>
-                <input v-model.number="form.totals.discount" type="number" class="w-24 bg-white/10 border-none rounded-[0.75rem] text-right font-black py-1 focus:ring-2 focus:ring-white/30 outline-none">
+                <input v-model.number="form.totals.discount" type="number" class="w-24 bg-white/10 border-none rounded-[.5rem] text-right font-black py-1 focus:ring-2 focus:ring-white/30 outline-none">
               </div>
             </div>
 
@@ -116,7 +110,7 @@ const { SendMethod, CreditCard } = useProposalStepPayment()
               </p>
             </div>
           </div>
-        </div>
+        </BaseCard>
       </div>
     </div>
   </div>

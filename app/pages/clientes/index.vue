@@ -221,7 +221,7 @@ const {
               </template>
 
               <template #cell-createdAt="{ item: proposal }">
-                <span class="text-xs md:text-sm text-gray-500 font-medium cursor-pointer"
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400"
                   @click="navigateTo(`/orcamentos?search=${encodeURIComponent(proposal.title || '')}`)">
                   {{ formatDate(proposal.createdAt) }}
                 </span>
@@ -275,7 +275,7 @@ const {
             <div class="flex items-center gap-3 ml-2">
               <BaseCheckbox v-model="form.isWhatsapp" id="isWhatsapp" />
               <label for="isWhatsapp"
-                class="text-[10px] font-black text-gray-400 dark:text-gray-400 uppercase tracking-widest cursor-pointer hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+                class="text-[10px] font-black text-gray-400 dark:text-gray-400 cursor-pointer hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
                 Este número possui WhatsApp
               </label>
             </div>
@@ -285,10 +285,10 @@ const {
         <div
           class="bg-gray-50/50 dark:bg-gray-900/60 p-6 rounded-[12px] border border-gray-100 dark:border-gray-800 space-y-6">
           <div class="flex items-center justify-between px-1">
-            <h3 class="text-[10px] font-black text-gray-400 dark:text-gray-400 uppercase tracking-[0.2em]">Endereço de
+            <h3 class="text-[10px] font-black text-gray-400 dark:text-gray-400 tracking-[0.2em]">Endereço de
               Cobrança</h3>
             <div v-if="isSearchingZip"
-              class="flex items-center gap-2 text-[10px] font-black text-blue-600 dark:text-blue-400 animate-pulse uppercase tracking-widest">
+              class="flex items-center gap-2 text-[10px] font-black text-blue-600 dark:text-blue-400 animate-pulse ">
               <RefreshCcw class="w-3 h-3 animate-spin" />
               Buscando...
             </div>
@@ -352,23 +352,23 @@ const {
         { key: 'location', label: 'Localização' },
         // { key: 'actions', label: '', align: 'right' }
       ]" :items="clients || []" :pending="pending" :has-more="hasMore" :loading-more="loadingMore"
-        @load-more="loadMore" empty-title="Sem Clientes"
+        @load-more="loadMore" @row-click="(client) => openInfoModal(client)" empty-title="Sem Clientes"
         empty-subtitle="Sua lista de clientes aparecerá aqui. Comece cadastrando o primeiro.">
         <template #cell-name="{ item: client }">
-          <div class="flex flex-col cursor-pointer" @click="openInfoModal(client)">
+          <div class="flex flex-col">
             <span
-              class="font-normal text-base md:text-lg text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+              class="text-sm font-medium text-gray-900 dark:text-gray-100 transition-colors">
               {{ client.name }}
             </span>
-            <span class="text-[10px] font-normal text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">
+            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">
               {{ client.taxId || 'Sem documento' }}
             </span>
           </div>
         </template>
 
         <template #cell-contact="{ item: client }">
-          <div class="flex flex-col cursor-pointer" @click="openInfoModal(client)">
-            <span class="text-xs md:text-sm font-bold text-gray-600 dark:text-gray-300">
+          <div class="flex flex-col">
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
               {{ client.email }}
             </span>
             <div class="flex items-center gap-2 mt-0.5">
@@ -382,12 +382,12 @@ const {
         </template>
 
         <template #cell-location="{ item: client }">
-          <div class="flex flex-col cursor-pointer" @click="openInfoModal(client)">
-            <span class="text-[10px] font-normal text-gray-900 dark:text-gray-100 uppercase tracking-widest">
+          <div class="flex flex-col">
+            <span class="text-[10px] font-normal text-gray-900 dark:text-gray-100 ">
               {{ client.address?.city || '-' }} - {{ client.address?.state || '-' }}
             </span>
             <span
-              class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest line-clamp-1 max-w-[400px] mt-0.5">
+              class="text-[10px] font-bold text-gray-400 dark:text-gray-500 line-clamp-1 max-w-[400px] mt-0.5">
               {{ client.address?.street ? `${client.address?.street}, ${client.address?.number}` : '' }}
             </span>
           </div>
@@ -399,7 +399,7 @@ const {
             <DropdownMenuTrigger as-child>
               <button
                 @click.stop
-                class="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[0.75rem] transition-all"
+                class="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[.5rem] transition-all"
                 title="Mais ações"
                 aria-label="Mais ações do cliente"
               >
@@ -410,25 +410,25 @@ const {
               <DropdownMenuContent
                 align="end"
                 :side-offset="6"
-                class="min-w-[220px] bg-white dark:bg-gray-950 rounded-[0.75rem] shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
+                class="min-w-[220px] bg-white dark:bg-gray-950 rounded-[.5rem] shadow-xl border border-gray-100 dark:border-gray-800 p-2 z-50"
               >
                 <DropdownMenuItem
                   @click.stop="openInfoModal(client)"
-                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[.5rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
                 >
                   <User class="w-4 h-4" />
                   Ver Detalhes
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   @click.stop="openModal(client)"
-                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[.5rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer outline-none transition-all"
                 >
                   <Pencil class="w-4 h-4" />
                   Editar
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   @click.stop="deleteClient(client._id)"
-                  class="flex items-center gap-3 px-4 py-3 rounded-[0.75rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-red-600 dark:hover:text-red-400 cursor-pointer outline-none transition-all"
+                  class="flex items-center gap-3 px-4 py-3 rounded-[.5rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-red-600 dark:hover:text-red-400 cursor-pointer outline-none transition-all"
                 >
                   <Trash2 class="w-4 h-4" />
                   Excluir

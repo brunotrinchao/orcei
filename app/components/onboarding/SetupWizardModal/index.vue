@@ -110,7 +110,7 @@ const {
                     <div class="space-y-4">
                       <div class="flex items-center gap-3">
                         <div
-                          class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-xs"
+                          class="w-10 h-10 rounded-[.5rem] bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-xs"
                         >
                           <component
                             :is="steps[currentStep - 1]?.icon"
@@ -174,7 +174,7 @@ const {
                           class="space-y-2 pt-2"
                         >
                           <label
-                            class="block text-xs font-black text-slate-700 dark:text-gray-400 uppercase tracking-widest ml-1"
+                            class="form-label block mb-1.5 ml-1"
                           >
                             Cor Primária da Organização
                           </label>
@@ -206,7 +206,7 @@ const {
                       <!-- Step 4: Revisão dos Dados -->
                       <div v-else-if="currentStep === 4" class="space-y-6">
                         <div
-                          class="p-6 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 space-y-4 shadow-sm"
+                          class="p-6 bg-white dark:bg-gray-900 rounded-[.5rem] border border-gray-200 dark:border-gray-800 space-y-4 shadow-sm"
                         >
                           <div
                             class="flex items-center gap-3 pb-3 border-b border-gray-100 dark:border-gray-800"
@@ -249,7 +249,7 @@ const {
 
                         <!-- Resumo Cliente -->
                         <div
-                          class="p-6 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 space-y-4 shadow-sm"
+                          class="p-6 bg-white dark:bg-gray-900 rounded-[.5rem] border border-gray-200 dark:border-gray-800 space-y-4 shadow-sm"
                         >
                           <div
                             class="flex items-center gap-3 pb-3 border-b border-gray-100 dark:border-gray-800"
@@ -289,7 +289,7 @@ const {
 
                         <!-- Resumo Produto -->
                         <div
-                          class="p-6 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 space-y-4 shadow-sm"
+                          class="p-6 bg-white dark:bg-gray-900 rounded-[.5rem] border border-gray-200 dark:border-gray-800 space-y-4 shadow-sm"
                         >
                           <div
                             class="flex items-center gap-3 pb-3 border-b border-gray-100 dark:border-gray-800"

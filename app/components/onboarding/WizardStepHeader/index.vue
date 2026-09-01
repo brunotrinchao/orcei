@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useWizardStepHeader, type StepItem } from './index'
 
-defineProps<{
+const props = defineProps<{
   steps: StepItem[]
   currentStep: number
 }>()
@@ -11,56 +12,85 @@ const emit = defineEmits<{
 }>()
 
 const { Check } = useWizardStepHeader()
+
+const progress = computed(() => {
+  if (!props.steps.length) return 0
+  return Math.round((props.currentStep / props.steps.length) * 100)
+})
+
+const currentTitle = computed(() => {
+  const step = props.steps.find((s) => s.id === props.currentStep)
+  return step?.title || step?.label || ''
+})
 </script>
 
 <template>
   <header class="w-full bg-white dark:bg-gray-950 border-b border-gray-200/80 dark:border-gray-800 shrink-0">
-    <div class="max-w-5xl mx-auto px-4 md:px-8">
-      <nav class="flex items-center justify-center gap-8 md:gap-16 overflow-x-auto scrollbar-hide">
-        <div 
-          v-for="step in steps" 
-          :key="step.id"
-          class="flex flex-col items-center py-4 relative shrink-0 cursor-pointer group select-none"
-          @click="step.id < currentStep ? emit('select-step', step.id) : null"
-        >
-          <div class="flex items-center gap-2.5 px-2">
-            <!-- Step Circle Number -->
-            <div 
-              :class="[
-                'w-7 h-7 rounded-full flex items-center justify-center text-xs font-black transition-all duration-300',
-                currentStep > step.id
-                  ? 'bg-emerald-500 text-white'
-                  : currentStep === step.id
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500'
-              ]"
-            >
-              <Check v-if="currentStep > step.id" class="w-4 h-4 stroke-[3]" />
-              <span v-else>{{ step.id }}</span>
+    <!-- Mobile: etapa atual + barra de progresso + contador -->
+    <div class="md:hidden px-4 pt-3.5 pb-3">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ currentTitle }}</span>
+        <span class="text-xs font-medium text-muted shrink-0 ml-3">
+          {{ currentStep }} de {{ steps.length }}
+        </span>
+      </div>
+      <div class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+        <div
+          class="h-full bg-brand rounded-full transition-all duration-300"
+          :style="{ width: `${progress}%` }"
+        ></div>
+      </div>
+    </div>
+
+    <!-- Desktop: stepper completo -->
+    <div class="hidden md:block">
+      <div class="max-w-5xl mx-auto px-4 md:px-8">
+        <nav class="flex items-center justify-center gap-8 md:gap-16 overflow-x-auto scrollbar-hide">
+          <div
+            v-for="step in steps"
+            :key="step.id"
+            class="flex flex-col items-center py-4 relative shrink-0 cursor-pointer group select-none"
+            @click="step.id < currentStep ? emit('select-step', step.id) : null"
+          >
+            <div class="flex items-center gap-2.5 px-2">
+              <!-- Step Circle Number -->
+              <div
+                :class="[
+                  'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300',
+                  currentStep > step.id
+                    ? 'bg-emerald-500 text-white'
+                    : currentStep === step.id
+                      ? 'bg-brand text-white shadow-sm'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500'
+                ]"
+              >
+                <Check v-if="currentStep > step.id" class="w-4 h-4 stroke-[3]" />
+                <span v-else>{{ step.id }}</span>
+              </div>
+
+              <!-- Step Label -->
+              <span
+                :class="[
+                  'text-xs md:text-sm font-bold transition-colors whitespace-nowrap',
+                  currentStep === step.id
+                    ? 'text-gray-900 dark:text-white font-extrabold'
+                    : currentStep > step.id
+                      ? 'text-gray-700 dark:text-gray-300 group-hover:text-blue-600'
+                      : 'text-gray-400 dark:text-gray-500'
+                ]"
+              >
+                {{ step.label }}
+              </span>
             </div>
 
-            <!-- Step Label -->
-            <span 
-              :class="[
-                'text-xs md:text-sm font-bold transition-colors whitespace-nowrap',
-                currentStep === step.id
-                  ? 'text-gray-900 dark:text-white font-extrabold'
-                  : currentStep > step.id
-                    ? 'text-gray-700 dark:text-gray-300 group-hover:text-blue-600'
-                    : 'text-gray-400 dark:text-gray-500'
-              ]"
-            >
-              {{ step.label }}
-            </span>
+            <!-- Active Indicator Bar -->
+            <div
+              class="absolute bottom-0 left-0 right-0 h-1 bg-brand rounded-t-full transition-all duration-300"
+              :class="currentStep === step.id ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'"
+            ></div>
           </div>
-
-          <!-- Active Indicator Bar -->
-          <div 
-            class="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 rounded-t-full transition-all duration-300"
-            :class="currentStep === step.id ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'"
-          ></div>
-        </div>
-      </nav>
+        </nav>
+      </div>
     </div>
   </header>
 </template>

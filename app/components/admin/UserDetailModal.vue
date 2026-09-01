@@ -133,8 +133,8 @@ function planVariant(plan: string): 'default' | 'success' | 'info' {
 
     <div v-else-if="data" class="space-y-6 py-2">
       <!-- 1. Cabeçalho -->
-      <section class="flex items-center gap-4 p-5 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/50">
-        <div class="w-14 h-14 rounded-xl bg-white dark:bg-gray-900 flex items-center justify-center border-2 border-white dark:border-gray-800 shadow-sm overflow-hidden flex-shrink-0">
+      <section class="flex items-center gap-4 p-5 rounded-[.5rem] border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/50">
+        <div class="w-14 h-14 rounded-[.5rem] bg-white dark:bg-gray-900 flex items-center justify-center border-2 border-white dark:border-gray-800 shadow-sm overflow-hidden flex-shrink-0">
           <img v-if="data.profile.avatar" :src="data.profile.avatar" class="w-full h-full object-cover" loading="lazy">
           <User v-else class="w-7 h-7 text-gray-300 dark:text-gray-600" />
         </div>
@@ -155,7 +155,7 @@ function planVariant(plan: string): 'default' | 'success' | 'info' {
 
       <!-- 2. Uso da aplicação -->
       <section class="space-y-3">
-        <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest">Uso da Aplicação</h3>
+        <h3 class="section-title">Uso da Aplicação</h3>
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <div v-for="stat in [
             { label: 'Relatórios', value: data.profile.aiUsage?.reports },
@@ -164,7 +164,7 @@ function planVariant(plan: string): 'default' | 'success' | 'info' {
             { label: 'Leads', value: data.profile.aiUsage?.leads },
             { label: 'Saldo de Créditos', value: data.profile.creditsBalance },
             { label: 'Créditos Usados', value: data.profile.creditsUsed }
-          ]" :key="stat.label" class="p-4 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+          ]" :key="stat.label" class="p-4 rounded-[.5rem] border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
             <p class="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest">{{ stat.label }}</p>
             <p class="text-lg font-black text-gray-900 dark:text-white mt-1">{{ formatInt(stat.value || 0) }}</p>
           </div>
@@ -173,12 +173,12 @@ function planVariant(plan: string): 'default' | 'success' | 'info' {
 
       <!-- 3. Gasto com IA -->
       <section class="space-y-3">
-        <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest">Gasto com IA</h3>
+        <h3 class="section-title">Gasto com IA</h3>
         <p class="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
           O custo exibido é <strong>estimado</strong> a partir de uma tabela de preços pública por token — pode variar da fatura real do provedor.
         </p>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div class="p-4 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+          <div class="p-4 rounded-[.5rem] border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
             <p class="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest">Chamadas</p>
             <p class="text-lg font-black text-gray-900 dark:text-white mt-1">{{ formatInt(data.aiSpend.totalCalls) }}</p>
             <p class="text-[10px] text-gray-500 dark:text-gray-400 font-bold">
@@ -187,16 +187,16 @@ function planVariant(plan: string): 'default' | 'success' | 'info' {
               <span class="text-red-500 dark:text-red-400">{{ formatInt(data.aiSpend.failedCalls) }} falha</span>
             </p>
           </div>
-          <div class="p-4 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+          <div class="p-4 rounded-[.5rem] border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
             <p class="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest">Custo estimado</p>
             <p class="text-lg font-black text-gray-900 dark:text-white mt-1">{{ formatUsd(data.aiSpend.estimatedCostUsd) }}</p>
             <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold">estimativa</p>
           </div>
-          <div class="p-4 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+          <div class="p-4 rounded-[.5rem] border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
             <p class="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest">Tokens entrada</p>
             <p class="text-lg font-black text-gray-900 dark:text-white mt-1">{{ formatInt(data.aiSpend.totalTokensInput) }}</p>
           </div>
-          <div class="p-4 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+          <div class="p-4 rounded-[.5rem] border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
             <p class="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest">Tokens saída</p>
             <p class="text-lg font-black text-gray-900 dark:text-white mt-1">{{ formatInt(data.aiSpend.totalTokensOutput) }}</p>
           </div>
@@ -207,7 +207,7 @@ function planVariant(plan: string): 'default' | 'success' | 'info' {
           <div
             v-for="p in data.aiSpend.byProvider"
             :key="p.provider"
-            class="p-4 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/50"
+            class="p-4 rounded-[.5rem] border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/50"
           >
             <div class="flex items-center justify-between mb-2">
               <span class="font-black text-gray-900 dark:text-gray-100 uppercase text-xs tracking-widest">{{ providerLabel(p.provider) }}</span>
@@ -222,7 +222,7 @@ function planVariant(plan: string): 'default' | 'success' | 'info' {
 
       <!-- 4. Chamadas de IA recentes -->
       <section class="space-y-3">
-        <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest">Chamadas de IA Recentes</h3>
+        <h3 class="section-title">Chamadas de IA Recentes</h3>
         <div v-if="data.recentAiCalls.length === 0" class="text-xs text-gray-400 dark:text-gray-500 font-bold py-6 text-center">
           Nenhuma chamada de IA registrada.
         </div>
@@ -266,7 +266,7 @@ function planVariant(plan: string): 'default' | 'success' | 'info' {
       <!-- 5. Propostas -->
       <section class="space-y-3">
         <div class="flex items-center justify-between">
-          <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest">Propostas</h3>
+          <h3 class="section-title">Propostas</h3>
           <span class="text-xs font-black text-gray-500 dark:text-gray-400">{{ formatInt(data.proposalsSummary.total) }} no total</span>
         </div>
         <div v-if="Object.keys(data.proposalsSummary.byStatus).length > 0" class="flex flex-wrap gap-2">

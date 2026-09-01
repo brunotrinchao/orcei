@@ -35,8 +35,8 @@ const {
     </div>
 
     <!-- AI CONVERSION PREDICTOR SCORE -->
-    <div class="p-6 bg-gradient-to-br from-violet-500/[0.03] to-fuchsia-500/[0.03] border-2 border-violet-100/50 dark:border-violet-900/20 rounded-[0.75rem] grid grid-cols-1 md:grid-cols-4 gap-6 items-center">
-      <div class="md:col-span-1 flex flex-col items-center justify-center text-center p-4 bg-white dark:bg-gray-900 rounded-[0.75rem] border border-violet-100/30 dark:border-violet-900/30 shadow-sm relative overflow-hidden">
+    <div class="p-6 bg-gradient-to-br from-violet-500/[0.03] to-fuchsia-500/[0.03] border-2 border-violet-100/50 dark:border-violet-900/20 rounded-[.5rem] grid grid-cols-1 md:grid-cols-4 gap-6 items-center">
+      <div class="md:col-span-1 flex flex-col items-center justify-center text-center p-4 bg-white dark:bg-gray-900 rounded-[.5rem] border border-violet-100/30 dark:border-violet-900/30 shadow-sm relative overflow-hidden">
         <div class="absolute -top-10 -left-10 w-24 h-24 bg-violet-500/10 rounded-full blur-2xl pointer-events-none" />
         
         <span class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-2">Score IA</span>
@@ -59,7 +59,7 @@ const {
       <div class="md:col-span-3 space-y-3">
         <div class="flex items-center gap-2 text-violet-700 dark:text-violet-400">
           <Sparkles class="w-4 h-4 shrink-0 text-violet-600 dark:text-violet-400" />
-          <h4 class="text-xs font-black uppercase tracking-widest">Como esse score foi calculated</h4>
+          <h4 class="section-title">Como esse score foi calculated</h4>
         </div>
 
         <ul class="space-y-2.5">
@@ -85,10 +85,10 @@ const {
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       
       <!-- Cliente -->
-      <div class="bg-gray-50 dark:bg-gray-900 p-6 rounded-[0.75rem] space-y-4 border border-gray-100 dark:border-gray-800">
+      <div class="bg-gray-50 dark:bg-gray-900 p-6 rounded-[.5rem] space-y-4 border border-gray-100 dark:border-gray-800">
         <div class="flex items-center gap-3 text-blue-600 dark:text-blue-400">
           <User class="w-5 h-5" />
-          <h4 class="text-[10px] font-black uppercase tracking-widest">Cliente</h4>
+          <h4 class="section-title">Cliente</h4>
         </div>
         <div v-if="selectedClient" class="space-y-1">
           <p class="font-bold text-gray-900 dark:text-gray-50 text-sm truncate">{{ selectedClient.name }}</p>
@@ -100,10 +100,10 @@ const {
       </div>
 
       <!-- Execução -->
-      <div class="bg-gray-50 dark:bg-gray-900 p-6 rounded-[0.75rem] space-y-4 border border-gray-100 dark:border-gray-800">
+      <div class="bg-gray-50 dark:bg-gray-900 p-6 rounded-[.5rem] space-y-4 border border-gray-100 dark:border-gray-800">
         <div class="flex items-center gap-3 text-blue-600 dark:text-blue-400">
           <Calendar class="w-5 h-5" />
-          <h4 class="text-[10px] font-black uppercase tracking-widest">Execução e Envio</h4>
+          <h4 class="section-title">Execução e Envio</h4>
         </div>
         <div class="space-y-1">
           <p class="font-bold text-gray-900 dark:text-gray-50 text-sm truncate">
@@ -118,10 +118,10 @@ const {
       </div>
 
       <!-- Financeiro -->
-      <div class="bg-blue-600 p-6 rounded-[0.75rem] space-y-4 border border-gray-100 dark:border-gray-800">
+      <div class="bg-blue-600 p-6 rounded-[.5rem] space-y-4 border border-gray-100 dark:border-gray-800">
         <div class="relative z-10 flex items-center gap-3 text-blue-100">
           <CreditCard class="w-5 h-5" />
-          <h4 class="text-[10px] font-black uppercase tracking-widest">Execução e Envio</h4>
+          <h4 class="section-title">Execução e Envio</h4>
         </div>
         <div class="relative z-10 space-y-0">
           <p class="font-black text-2xl tracking-tighter">R$ {{ finalTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
@@ -134,9 +134,9 @@ const {
     </div>
 
     <!-- Escopo -->
-    <div class="bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-[0.75rem] overflow-hidden">
+    <div class="bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-[.5rem] overflow-hidden">
       <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/50">
-        <h4 class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Itens do Escopo ({{ form.items.length }})</h4>
+        <h4 class="section-title">Itens do Escopo ({{ form.items.length }})</h4>
       </div>
       <div class="divide-y divide-gray-100 dark:divide-gray-800">
         <div v-for="(item, idx) in form.items" :key="idx" class="px-6 py-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
@@ -145,7 +145,7 @@ const {
             <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">{{ item.description || 'Sem descrição' }}</p>
           </div>
           <div class="flex items-center justify-between sm:justify-end gap-6 shrink-0">
-            <span class="text-xs font-black text-gray-400 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-[0.3rem]">{{ item.quantity }}x</span>
+            <span class="text-xs font-black text-gray-400 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-[.5rem]">{{ item.quantity }}x</span>
             <span class="text-sm font-black text-gray-900 dark:text-gray-50">R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
           </div>
         </div>
@@ -156,9 +156,9 @@ const {
     </div>
 
     <!-- Opcionais -->
-    <div v-if="form.upsellItems.length > 0" class="bg-white dark:bg-gray-900 border-2 border-blue-50 dark:border-blue-900/40 rounded-[0.75rem] overflow-hidden">
+    <div v-if="form.upsellItems.length > 0" class="bg-white dark:bg-gray-900 border-2 border-blue-50 dark:border-blue-900/40 rounded-[.5rem] overflow-hidden">
       <div class="px-6 py-4 border-b border-blue-50 dark:border-blue-900/40 bg-blue-50/30 dark:bg-blue-950/30">
-        <h4 class="text-[10px] font-black text-blue-400 dark:text-blue-400 uppercase tracking-widest">Opcionais Ofertados ({{ form.upsellItems.length }})</h4>
+        <h4 class="section-title">Opcionais Ofertados ({{ form.upsellItems.length }})</h4>
       </div>
       <div class="divide-y divide-blue-50 dark:divide-blue-900/40">
         <div v-for="(item, idx) in form.upsellItems" :key="idx" class="px-6 py-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:bg-blue-50/30 dark:hover:bg-blue-950/20 transition-colors">
@@ -167,7 +167,7 @@ const {
             <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">{{ item.description || 'Sem descrição' }}</p>
           </div>
           <div class="flex items-center justify-between sm:justify-end gap-6 shrink-0">
-            <span class="text-xs font-black text-blue-400 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-2 py-1 rounded-[0.3rem]">{{ item.quantity }}x</span>
+            <span class="text-xs font-black text-blue-400 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-2 py-1 rounded-[.5rem]">{{ item.quantity }}x</span>
             <span class="text-sm font-black text-gray-900 dark:text-gray-50">+ R$ {{ (item.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
           </div>
         </div>

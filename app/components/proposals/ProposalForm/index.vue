@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { ProposalDTO } from '../../../../types'
 import { ProposalStatus } from '../../../../types/enums'
 import ProposalStepClient from '../ProposalStepClient/index.vue'
@@ -55,6 +56,15 @@ const {
   StepperSeparator
 } = useProposalForm(props, emit)
 
+const progress = computed(() => {
+  if (!steps.length) return 0
+  return Math.round((currentStep.value / steps.length) * 100)
+})
+
+const currentStepTitle = computed(() => {
+  return steps.find((s) => s.step === currentStep.value)?.title || ''
+})
+
 defineExpose({
   submit,
   currentStep,
@@ -73,8 +83,24 @@ defineExpose({
 
 <template>
   <div class="flex flex-col gap-8 proposal-form-container">
-    <!-- Radix Vue Stepper -->
-    <StepperRoot v-model="currentStep" class="flex w-full gap-2 mt-2">
+    <!-- Mobile: etapa atual + barra de progresso + contador -->
+    <div class="md:hidden">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ currentStepTitle }}</span>
+        <span class="text-xs font-medium text-muted shrink-0 ml-3">
+          {{ currentStep }} de {{ steps.length }}
+        </span>
+      </div>
+      <div class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+        <div
+          class="h-full bg-brand rounded-full transition-all duration-300"
+          :style="{ width: `${progress}%` }"
+        ></div>
+      </div>
+    </div>
+
+    <!-- Radix Vue Stepper (desktop) -->
+    <StepperRoot v-model="currentStep" class="hidden md:flex w-full gap-2 mt-2">
       <StepperItem
         v-for="step in steps"
         :key="step.step"
@@ -84,15 +110,15 @@ defineExpose({
       >
         <StepperSeparator
           v-if="step.step !== steps.length"
-          class="absolute left-[calc(50%+20px)] right-[calc(-50%+10px)] top-5 block h-[2px] shrink-0 rounded-full bg-gray-100 dark:bg-gray-800 data-[state=completed]:bg-blue-600 dark:data-[state=completed]:bg-blue-500 transition-colors"
+          class="absolute left-[calc(50%+20px)] right-[calc(-50%+10px)] top-5 block h-[2px] shrink-0 rounded-full bg-gray-100 dark:bg-gray-800 data-[state=completed]:bg-brand dark:data-[state=completed]:bg-brand transition-colors"
         />
 
-        <StepperTrigger as="button" class="flex flex-col items-center text-center gap-2 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
+        <StepperTrigger as="button" class="flex flex-col items-center text-center gap-2 rounded-[.5rem] outline-none focus-visible:ring-2 focus-visible:ring-brand">
           <StepperIndicator
             :class="[
               'flex h-10 w-10 items-center justify-center rounded-full text-sm font-black border-2 transition-all',
-              currentStep === step.step ? 'border-blue-600 bg-blue-600 text-white shadow-lg shadow-blue-500/20' :
-              currentStep > step.step ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-900'
+              currentStep === step.step ? 'border-brand bg-brand text-white' :
+              currentStep > step.step ? 'border-brand bg-brand text-white' : 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-900'
             ]"
           >
             <Check v-if="currentStep > step.step" class="w-5 h-5" />

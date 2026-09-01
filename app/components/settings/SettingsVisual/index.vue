@@ -102,7 +102,7 @@ const {
                 loading="lazy">
               <div v-else class="text-gray-300 dark:text-gray-700 flex flex-col items-center gap-2 text-center">
                 <PhotoIcon class="w-10 h-10 stroke-1" />
-                <span class="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Sem
+                <span class="text-[9px] font-black text-gray-400 dark:text-gray-500">Sem
                   Logo</span>
               </div>
             </div>

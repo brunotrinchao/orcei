@@ -63,16 +63,16 @@ const {
         <div 
           v-for="m in metrics" 
           :key="m.label" 
-          class="bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-4 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+          class="bg-white dark:bg-gray-900 p-8 rounded-[.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-4 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
         >
           <div class="flex justify-between items-start">
-            <div :class="[m.bg, m.color]" class="p-3 rounded-[0.75rem]">
+            <div :class="[m.bg, m.color]" class="p-3 rounded-[.5rem]">
               <component :is="m.icon" class="w-6 h-6" />
             </div>
             <ArrowUpRight class="w-4 h-4 text-gray-300 group-hover:text-gray-900 dark:text-gray-600 dark:group-hover:text-white transition-colors" />
           </div>
           <div>
-            <p class="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ m.label }}</p>
+            <p class="text-[9px] font-black text-gray-400 dark:text-gray-500 ">{{ m.label }}</p>
             <h3 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight mt-1">{{ m.value }}</h3>
             <p v-if="m.subValue" class="text-[10px] font-bold text-gray-400 dark:text-gray-500 mt-1 truncate">{{ m.subValue }}</p>
           </div>
@@ -83,43 +83,43 @@ const {
       <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         <!-- Custo do Gemini -->
-        <div class="bg-slate-900 text-white p-6 rounded-[0.75rem] border border-white/5 shadow-inner flex items-center justify-between">
+        <div class="bg-slate-900 text-white p-6 rounded-[.5rem] border border-white/5 shadow-inner flex items-center justify-between">
           <div class="space-y-1">
-            <span class="text-[8px] font-black text-indigo-400 uppercase tracking-widest">Custo de API</span>
-            <h4 class="text-xs font-black uppercase text-slate-300">Inteligência Artificial (Gemini)</h4>
+            <span class="text-[8px] font-black text-indigo-400 ">Custo de API</span>
+            <h4 class="text-xs font-black text-slate-300">Inteligência Artificial (Gemini)</h4>
             <p class="text-2xl font-black text-white">
               U$ {{ (stats.telemetry?.geminiCostUsd ?? 0).toFixed(2) }}
             </p>
           </div>
-          <div class="w-12 h-12 bg-white/5 rounded-[0.75rem] flex items-center justify-center text-indigo-400">
+          <div class="w-12 h-12 bg-white/5 rounded-[.5rem] flex items-center justify-center text-indigo-400">
             <Cpu class="w-6 h-6" />
           </div>
         </div>
 
         <!-- Latência do Puppeteer -->
-        <div class="bg-slate-900 text-white p-6 rounded-[0.75rem] border border-white/5 shadow-inner flex items-center justify-between">
+        <div class="bg-slate-900 text-white p-6 rounded-[.5rem] border border-white/5 shadow-inner flex items-center justify-between">
           <div class="space-y-1">
-            <span class="text-[8px] font-black text-emerald-400 uppercase tracking-widest">Servidor de PDF</span>
-            <h4 class="text-xs font-black uppercase text-slate-300">Latência do Puppeteer</h4>
+            <span class="text-[8px] font-black text-emerald-400 ">Servidor de PDF</span>
+            <h4 class="text-xs font-black text-slate-300">Latência do Puppeteer</h4>
             <p class="text-2xl font-black text-white">
               {{ stats.telemetry?.pdfAvgLatencyMs ?? 0 }} <span class="text-xs text-slate-400">ms</span>
             </p>
           </div>
-          <div class="w-12 h-12 bg-white/5 rounded-[0.75rem] flex items-center justify-center text-emerald-400">
+          <div class="w-12 h-12 bg-white/5 rounded-[.5rem] flex items-center justify-center text-emerald-400">
             <Zap class="w-6 h-6" />
           </div>
         </div>
 
         <!-- Stickiness de Engajamento -->
-        <div class="bg-slate-900 text-white p-6 rounded-[0.75rem] border border-white/5 shadow-inner flex items-center justify-between">
+        <div class="bg-slate-900 text-white p-6 rounded-[.5rem] border border-white/5 shadow-inner flex items-center justify-between">
           <div class="space-y-1">
-            <span class="text-[8px] font-black text-blue-400 uppercase tracking-widest">Engajamento SaaS</span>
-            <h4 class="text-xs font-black uppercase text-slate-300">Métrica Stickiness (DAU/MAU)</h4>
+            <span class="text-[8px] font-black text-blue-400 ">Engajamento SaaS</span>
+            <h4 class="text-xs font-black text-slate-300">Métrica Stickiness (DAU/MAU)</h4>
             <p class="text-2xl font-black text-white">
               {{ (stats.users?.stickiness ?? 0).toFixed(1) }}%
             </p>
           </div>
-          <div class="w-12 h-12 bg-white/5 rounded-[0.75rem] flex items-center justify-center text-blue-400">
+          <div class="w-12 h-12 bg-white/5 rounded-[.5rem] flex items-center justify-center text-blue-400">
             <Activity class="w-6 h-6" />
           </div>
         </div>
@@ -130,12 +130,12 @@ const {
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <!-- Previsibilidade de Receita Stripe -->
-        <div class="lg:col-span-2 bg-white dark:bg-gray-900 p-10 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+        <div class="lg:col-span-2 bg-white dark:bg-gray-900 p-10 rounded-[.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center">
               <BarChart3 class="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Previsibilidade Financeira</h2>
+            <h2 class="text-xl font-black text-gray-900 dark:text-white tracking-tight">Previsibilidade Financeira</h2>
           </div>
           <div class="h-80 relative">
             <Line :data="forecastChartData" :options="lineChartOptions" />
@@ -143,12 +143,12 @@ const {
         </div>
 
         <!-- Distribuição de Faturamento por Origem -->
-        <div class="lg:col-span-1 bg-white dark:bg-gray-900 p-10 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+        <div class="lg:col-span-1 bg-white dark:bg-gray-900 p-10 rounded-[.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center">
               <PieChart class="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Origem da Receita</h2>
+            <h2 class="text-xl font-black text-gray-900 dark:text-white tracking-tight">Origem da Receita</h2>
           </div>
           <div class="h-80 relative flex items-center justify-center">
             <Doughnut :data="breakdownChartData" :options="chartOptions" />
@@ -161,33 +161,33 @@ const {
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <!-- Ações Administrativas e Status do Sistema -->
-        <div class="lg:col-span-2 bg-white dark:bg-gray-900 p-10 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+        <div class="lg:col-span-2 bg-white dark:bg-gray-900 p-10 rounded-[.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center">
               <Activity class="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Status do Sistema</h2>
+            <h2 class="text-xl font-black text-gray-900 dark:text-white tracking-tight">Status do Sistema</h2>
           </div>
           
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <NuxtLink to="/admin/settings" class="p-6 bg-gray-50 dark:bg-gray-800/50 rounded-[0.75rem] border border-gray-100 dark:border-gray-850 hover:border-blue-200 dark:hover:border-blue-900/50 transition-all group flex flex-col justify-between">
+            <NuxtLink to="/admin/settings" class="p-6 bg-gray-50 dark:bg-gray-800/50 rounded-[.5rem] border border-gray-100 dark:border-gray-850 hover:border-blue-200 dark:hover:border-blue-900/50 transition-all group flex flex-col justify-between">
               <div>
                 <ShieldAlert class="w-6 h-6 text-red-500 mb-4" />
-                <h4 class="font-black text-gray-900 dark:text-white uppercase text-xs tracking-widest mb-1">Modo Manutenção</h4>
+                <h4 class="font-black text-gray-900 dark:text-white text-xs mb-1">Modo Manutenção</h4>
                 <p class="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed">Coloque a plataforma offline para usuários comuns.</p>
               </div>
             </NuxtLink>
-            <NuxtLink to="/admin/audit-logs" class="p-6 bg-gray-50 dark:bg-gray-800/50 rounded-[0.75rem] border border-gray-100 dark:border-gray-850 hover:border-blue-200 dark:hover:border-blue-900/50 transition-all group flex flex-col justify-between">
+            <NuxtLink to="/admin/audit-logs" class="p-6 bg-gray-50 dark:bg-gray-800/50 rounded-[.5rem] border border-gray-100 dark:border-gray-850 hover:border-blue-200 dark:hover:border-blue-900/50 transition-all group flex flex-col justify-between">
               <div>
                 <CreditCard class="w-6 h-6 text-emerald-500 mb-4" />
-                <h4 class="font-black text-gray-900 dark:text-white uppercase text-xs tracking-widest mb-1">Logs de Auditoria</h4>
+                <h4 class="font-black text-gray-900 dark:text-white text-xs mb-1">Logs de Auditoria</h4>
                 <p class="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed">Histórico detalhado de ações administrativas.</p>
               </div>
             </NuxtLink>
-            <NuxtLink to="/admin/coupons" class="p-6 bg-gray-50 dark:bg-gray-800/50 rounded-[0.75rem] border border-gray-100 dark:border-gray-850 hover:border-blue-200 dark:hover:border-blue-900/50 transition-all group flex flex-col justify-between">
+            <NuxtLink to="/admin/coupons" class="p-6 bg-gray-50 dark:bg-gray-800/50 rounded-[.5rem] border border-gray-100 dark:border-gray-850 hover:border-blue-200 dark:hover:border-blue-900/50 transition-all group flex flex-col justify-between">
               <div>
                 <Ticket class="w-6 h-6 text-blue-500 mb-4" />
-                <h4 class="font-black text-gray-900 dark:text-white uppercase text-xs tracking-widest mb-1">Cupons Promocionais</h4>
+                <h4 class="font-black text-gray-900 dark:text-white text-xs mb-1">Cupons Promocionais</h4>
                 <p class="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed">Crie e gerencie cupons de créditos via Stripe.</p>
               </div>
             </NuxtLink>
@@ -195,12 +195,12 @@ const {
         </div>
 
         <!-- Terminal de Logs de Auditoria Embutido Compacto -->
-        <div class="lg:col-span-1 bg-slate-950 text-slate-300 p-8 rounded-[0.75rem] shadow-2xl relative overflow-hidden flex flex-col justify-between h-[360px] border border-white/5">
+        <div class="lg:col-span-1 bg-slate-950 text-slate-300 p-8 rounded-[.5rem] shadow-2xl relative overflow-hidden flex flex-col justify-between h-[360px] border border-white/5">
           <div class="space-y-4">
             <div class="flex items-center justify-between border-b border-white/5 pb-3">
               <div class="flex items-center gap-2">
                 <Terminal class="w-4 h-4 text-indigo-400" />
-                <span class="text-[9px] font-black uppercase tracking-widest text-indigo-400 font-mono">Audit System Log</span>
+                <span class="text-[9px] font-black text-indigo-400 font-mono">Audit System Log</span>
               </div>
               <div class="flex gap-1.5">
                 <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
@@ -227,7 +227,7 @@ const {
 
           <NuxtLink 
             to="/admin/users" 
-            class="block w-full text-center py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl font-black uppercase text-[8px] tracking-[0.2em] hover:text-white transition-all font-mono"
+            class="block w-full text-center py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl font-black text-[8px] tracking-[0.2em] hover:text-white transition-all font-mono"
           >
             Acessar Console de Usuários
           </NuxtLink>

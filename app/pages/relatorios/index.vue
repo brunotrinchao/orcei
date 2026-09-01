@@ -99,14 +99,15 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
         :pending="pending"
         empty-title="Sem Relatórios Gerados"
         empty-subtitle="Você ainda não gerou relatórios IA ou os filtros aplicados não retornaram resultados."
+        @row-click="(report) => openView(report)"
       >
         <template #cell-title="{ item: report }">
-          <div class="flex items-center gap-3 cursor-pointer group" @click="openView(report)">
-            <div class="w-10 h-10 rounded-[0.50rem] bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-[.5rem] bg-brand-soft text-brand dark:text-blue-400 flex items-center justify-center shrink-0">
               <Sparkles class="w-5 h-5" />
             </div>
             <div class="flex flex-col min-w-0">
-              <span class="font-normal text-base text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors tracking-tight">
+              <span class="font-normal text-base text-gray-900 dark:text-gray-100 group-hover:text-brand dark:group-hover:text-brand transition-colors tracking-tight">
                 Análise Estratégica IA
               </span>
             </div>
@@ -114,21 +115,19 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
         </template>
 
         <template #cell-createdAt="{ item: report }">
-          <span class="text-xs md:text-sm text-gray-500 font-medium cursor-pointer" @click="openView(report)">
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
             {{ formatDate(report.createdAt) }}
           </span>
         </template>
 
         <template #cell-proposals="{ item: report }">
-          <div class="cursor-pointer" @click="openView(report)">
-            <BaseBadge variant="info" light>
-              {{ report.context?.totalProposals || 0 }} {{ (report.context?.totalProposals === 1) ? 'orçamento' : 'orçamentos' }}
-            </BaseBadge>
-          </div>
+          <BaseBadge variant="info" light>
+            {{ report.context?.totalProposals || 0 }} {{ (report.context?.totalProposals === 1) ? 'orçamento' : 'orçamentos' }}
+          </BaseBadge>
         </template>
 
         <template #cell-score="{ item: report }">
-          <div class="flex justify-end cursor-pointer" @click="openView(report)">
+          <div class="flex justify-end">
             <BaseBadge
               v-if="getReportScore(report) !== null"
               :variant="getReportScore(report)! >= 70 ? 'success' : (getReportScore(report)! >= 50 ? 'warning' : 'error')"
@@ -234,7 +233,7 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
         <!-- Conteúdo Markdown -->
         <div class="space-y-3">
           <div class="flex items-center justify-between px-1">
-            <h3 class="text-[10px] font-semibold text-gray-400 dark:text-gray-500 tracking-wide uppercase">
+            <h3 class="text-[10px] font-semibold text-gray-400 dark:text-gray-500 tracking-wide ">
               Conteúdo do Relatório
             </h3>
           </div>

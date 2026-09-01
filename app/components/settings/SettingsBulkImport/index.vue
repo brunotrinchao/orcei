@@ -40,7 +40,7 @@ const {
               <FileSpreadsheet class="w-4 h-4 text-gray-400 opacity-60" />
             </div>
             <div>
-              <h4 class="text-xs font-semibold uppercase tracking-tight text-gray-900 dark:text-gray-100">{{ step.title }}</h4>
+              <h4 class="text-xs font-semibold text-gray-900 dark:text-gray-100">{{ step.title }}</h4>
               <p class="text-xs text-gray-500 dark:text-gray-400 font-base leading-relaxed mt-1">{{ step.description }}</p>
             </div>
           </div>
@@ -67,7 +67,7 @@ const {
             </div>
 
             <div>
-              <h3 class="text-base font-semibold text-gray-900 dark:text-white uppercase tracking-tight">{{ card.title }}</h3>
+              <h3 class="text-base font-semibold text-gray-900 dark:text-white">{{ card.title }}</h3>
               <p class="text-xs text-gray-500 dark:text-gray-400 font-base leading-relaxed mt-1">{{ card.description }}</p>
             </div>
 

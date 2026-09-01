@@ -139,19 +139,19 @@ const {
             <!-- Ações Rápidas -->
             <div class="flex items-center gap-2 flex-wrap shrink-0 mt-2 sm:mt-0">
               <BaseButton type="button" @click="copyPublicLink" :disabled="!canOpenPublicLink" variant="outline" size="sm"
-                class="inline-flex items-center px-3 py-2 rounded-[0.50rem] text-xs font-bold transition-all"
+                class="inline-flex items-center px-3 py-2 rounded-[.5rem] text-xs font-bold transition-all"
                 :title="canOpenPublicLink ? 'Copiar Link Público' : 'Disponível apenas após o envio da proposta'">
                 <Copy class="w-4 h-4 mr-2" /> Copiar Link
               </BaseButton>
               <BaseButton type="button" @click="openPublicLink" :disabled="!canOpenPublicLink" variant="outline" size="sm"
-                class="inline-flex items-center px-3 py-2 rounded-[0.50rem] text-xs font-bold transition-all"
+                class="inline-flex items-center px-3 py-2 rounded-[.5rem] text-xs font-bold transition-all"
                 :title="canOpenPublicLink ? 'Abrir Visão do Cliente' : 'Disponível apenas após o envio da proposta'">
                 <ExternalLink class="w-4 h-4 mr-1.5" /> Abrir Link
               </BaseButton>
               <BaseButton v-if="!proposal.signature?.status || proposal.signature?.status === ProposalSignatureStatus.NONE"
                 type="button" @click="requestDigitalSignature" :disabled="isRequestingSignature" :loading="isRequestingSignature"
                 variant="solid" size="sm"
-                class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-[0.50rem] text-xs font-black uppercase tracking-wider transition-all border-none bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer"
+                class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-[.5rem] text-xs font-black uppercase tracking-wider transition-all border-none bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer"
                 title="Enviar documento para assinatura no Assinafy">
                 <FileText class="w-4 h-4 mr-1" /> Assinar
               </BaseButton>
@@ -229,10 +229,10 @@ const {
           
             <div v-if="proposal.items && proposal.items.length > 0" class="space-y-3">
               <div v-for="(item, idx) in proposal.items" :key="idx"
-                class="flex items-center justify-between gap-4 p-3.5 rounded-[0.50rem] bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-all">
+                class="flex items-center justify-between gap-4 p-3.5 rounded-[.5rem] bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-all">
                 <div class="flex items-center gap-4 min-w-0">
                   <div
-                    class="w-12 h-12 rounded-[0.50rem] border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden flex-shrink-0  items-center justify-center hidden sm:flex">
+                    class="w-12 h-12 rounded-[.5rem] border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden flex-shrink-0  items-center justify-center hidden sm:flex">
                     <BaseImage v-if="item.imageUrl" :src="item.imageUrl" :alt="item.name"
                       container-class="w-full h-full" img-class="w-full h-full object-cover" />
                     <Package v-else class="w-6 h-6 text-gray-400" />
@@ -272,14 +272,14 @@ const {
            <BaseCard compact color="slate" title="Financeiro">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div
-                class="space-y-1 p-3 rounded-[0.50rem] bg-gray-200 dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700">
+                class="space-y-1 p-3 rounded-[.5rem] bg-gray-200 dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700">
                 <span class="text-[10px] font-semibold text-gray-400 tracking-wide block">Subtotal</span>
                 <span class="font-medium text-gray-900 dark:text-gray-100 text-sm">{{ formatCurrency(calculatedSubtotal)
                   }}</span>
               </div>
 
               <div
-                class="space-y-1 p-3 rounded-[0.50rem] bg-gray-200 dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700">
+                class="space-y-1 p-3 rounded-[.5rem] bg-gray-200 dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700">
                 <span class="text-[10px] font-semibold text-gray-400 tracking-wide block">Desconto</span>
                 <span class="font-medium text-gray-900 dark:text-emerald-400 text-sm">
                   {{
@@ -291,7 +291,7 @@ const {
               </div>
 
               <div
-                class="space-y-1 p-3 rounded-[0.50rem] bg-gray-200 dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700">
+                class="space-y-1 p-3 rounded-[.5rem] bg-gray-200 dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700">
                 <span class="text-[10px] font-semibold text-gray-400 tracking-wide block">Acréscimos /
                   Taxas</span>
                 <span class="font-medium text-gray-900 dark:text-amber-400 text-sm">
@@ -304,7 +304,7 @@ const {
               </div>
 
               <div
-                class="space-y-1 p-3 rounded-[0.50rem] bg-gray-200 dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700">
+                class="space-y-1 p-3 rounded-[.5rem] bg-gray-200 dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700">
                 <span class="font-medium text-gray-900 dark:text-amber-400 text-sm">
                   {{
                     paymentTermsText
@@ -312,7 +312,7 @@ const {
                 </span>
               </div>
             </div>
-            <div class="space-y-1 p-3 mt-4 rounded-[0.50rem] bg-indigo-600 text-white shadow-md w-full">
+            <div class="space-y-1 p-3 mt-4 rounded-[.5rem] bg-indigo-600 text-white shadow-md w-full">
               <span class="text-md font-black text-indigo-200 uppercase tracking-wider block">Valor Líquido</span>
               <span class="font-black text-white text-3xl font-mono tracking-wide">{{ formatCurrency(calculatedTotal)
                 }}</span>

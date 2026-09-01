@@ -64,7 +64,7 @@ defineExpose({ validate: validateStep, reset })
     <!-- Escopo Principal -->
     <BaseCard :title="`Itens Obrigatórios (${form.items.length})`" compact color="slate">
       <div v-if="form.items.length === 0"
-        class="p-8 border-2 border-dashed rounded-[0.75rem] text-center font-medium transition-colors"
+        class="p-8 border-2 border-dashed rounded-[.5rem] text-center font-medium transition-colors"
         :class="submitAttempted ? 'border-red-300 dark:border-red-500/50 text-red-500' : 'border-gray-200 dark:border-gray-800 text-gray-400 dark:text-gray-500'">
         Adicione itens buscando no catálogo acima ou clicando em "+".
         <span v-if="submitAttempted" class="block text-[10px] font-semibold tracking-wide mt-2">Pelo menos 1 item

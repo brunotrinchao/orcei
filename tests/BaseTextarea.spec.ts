@@ -54,7 +54,7 @@ describe('BaseTextarea', () => {
     const wrapperDefault = await mountSuspended(BaseTextarea, {
       props: { modelValue: '' }
     })
-    expect(wrapperDefault.find('textarea').classes()).toContain('border-gray-300')
+    expect(wrapperDefault.find('textarea').classes()).toContain('border-line')
     expect(wrapperDefault.find('textarea').classes()).toContain('border')
 
     const wrapperNone = await mountSuspended(BaseTextarea, {

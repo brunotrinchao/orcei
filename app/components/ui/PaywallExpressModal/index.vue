@@ -34,7 +34,7 @@ const {
     <div class="space-y-6 paywall-express-modal-container">
       
       <!-- Cabeçalho Persuasivo Premium -->
-      <div class="relative overflow-hidden bg-slate-950 p-6 rounded-[0.75rem] border border-indigo-500/20 text-center space-y-3">
+      <div class="relative overflow-hidden bg-slate-950 p-6 rounded-[.5rem] border border-indigo-500/20 text-center space-y-3">
         
         <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/20 backdrop-blur-md rounded-full text-indigo-200 text-[9px] font-black uppercase tracking-widest border border-indigo-500/30">
           <Sparkles class="w-3.5 h-3.5 text-indigo-400 animate-pulse" /> Orcei Fácil Premium
@@ -59,7 +59,7 @@ const {
             :key="pack.id"
             @click="selectedPack = pack.id"
             :class="[
-              'p-4 rounded-[0.75rem] border text-left transition-all flex flex-col justify-between h-36 relative overflow-hidden',
+              'p-4 rounded-[.5rem] border text-left transition-all flex flex-col justify-between h-36 relative overflow-hidden',
               selectedPack === pack.id
                 ? 'border-indigo-600 ring-2 ring-indigo-500/10 bg-indigo-50/10 dark:bg-indigo-950/30 shadow-md scale-[1.02]'
                 : 'border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 bg-white dark:bg-gray-900 hover:bg-gray-50/20'
@@ -91,7 +91,7 @@ const {
       </div>
 
       <!-- Detalhes da Opção Selecionada -->
-      <div class="bg-gray-50 dark:bg-gray-900/50 rounded-[0.75rem] p-5 border border-gray-100/50 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div class="bg-gray-50 dark:bg-gray-900/50 rounded-[.5rem] p-5 border border-gray-100/50 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div class="space-y-1">
           <div class="flex items-center gap-2">
             <span class="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wide">Recarga de {{ activePack.credits }} Créditos</span>
@@ -115,7 +115,7 @@ const {
         <BaseButton 
           @click="handleCheckout"
           :disabled="!!isLoading"
-          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-[0.75rem] py-4.5 text-xs font-black tracking-widest uppercase shadow-lg shadow-indigo-600/10 flex items-center justify-center gap-2"
+          class="w-full bg-brand hover:bg-brand-dark text-white rounded-[.5rem] py-4.5 text-sm font-semibold flex items-center justify-center gap-2"
         >
           <Loader2 v-if="isLoading" class="w-4 h-4 animate-spin mr-2" />
           <template v-else>

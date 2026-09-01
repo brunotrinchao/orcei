@@ -8,7 +8,7 @@ export default defineNuxtConfig({
     name: 'Orcei Fácil',
   },
 
-  css: ['driver.js/dist/driver.css', '~/assets/css/dark.css', '~/assets/css/landing.css'],
+  css: ['driver.js/dist/driver.css', '~/assets/css/tokens.css', '~/assets/css/dark.css', '~/assets/css/landing.css'],
 
   imports: {
     dirs: ['composables/onboarding']

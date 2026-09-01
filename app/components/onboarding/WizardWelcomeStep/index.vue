@@ -35,8 +35,8 @@ const { stepsPreview, Check, ArrowRight, Sparkles } = useWizardWelcomeStep()
     </div>
 
     <!-- Card de Passos Previsão -->
-    <div class="w-full bg-slate-50/80 dark:bg-gray-900/60 p-6 rounded-2xl border border-gray-200/80 dark:border-gray-800 text-left space-y-4 shadow-sm wizard-welcome-preview">
-      <p class="text-xs font-black uppercase tracking-widest text-gray-700 dark:text-gray-300 flex items-center gap-2">
+    <div class="w-full bg-slate-50/80 dark:bg-gray-900/60 p-6 rounded-[.5rem] border border-gray-200/80 dark:border-gray-800 text-left space-y-4 shadow-sm wizard-welcome-preview">
+      <p class="section-title flex items-center gap-2">
         <Sparkles class="w-4 h-4 text-blue-600 dark:text-blue-400" />
         Em poucos passos, vamos:
       </p>

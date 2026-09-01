@@ -51,6 +51,7 @@ const {
 
     <!-- Filtros de Período e Título -->
     <PageHeader title="Cockpit Comercial" subtitle="Acompanhe suas conversões, produtividade IA e receitas acumuladas.">
+      
       <BaseCard compact v-if="stats" data-tour="dashboard-period-filter">
         
       <div class="flex items-center gap-2 overflow-x-auto w-full">
@@ -78,7 +79,7 @@ const {
       </section>
 
       <!-- AI ROI Card -->
-      <section class="bg-slate-900 p-8 rounded-[0.75rem] border border-slate-800">
+      <section class="bg-slate-900 p-8 rounded-[.5rem] border border-slate-800">
         <div class="flex flex-col lg:flex-row gap-8">
           <div class="space-y-6 flex-1">
             <BaseSkeleton width="12rem" height="1.5rem" borderRadius="9999px" />
@@ -98,7 +99,7 @@ const {
               </div>
             </div>
           </div>
-          <div class="bg-slate-950/40 p-6 rounded-[0.75rem] border border-slate-800 lg:w-80 shrink-0 space-y-4">
+          <div class="bg-slate-950/40 p-6 rounded-[.5rem] border border-slate-800 lg:w-80 shrink-0 space-y-4">
             <BaseSkeleton width="100%" height="4rem" borderRadius="1rem" />
             <BaseSkeleton width="100%" height="3rem" borderRadius="1rem" />
             <BaseSkeleton width="50%" height="0.65rem" borderRadius="9999px" customClass="mx-auto" />
@@ -109,7 +110,7 @@ const {
       <!-- Funil + Follow-ups -->
       <section class="grid grid-cols-1 lg:grid-cols-3  gap-4 sm:gap-6">
         <div
-          class="lg:col-span-2 bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
+          class="lg:col-span-2 bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-[.5rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
           <BaseSkeleton width="10rem" height="1rem" />
           <div class="space-y-4">
             <BaseSkeleton v-for="j in 3" :key="j" width="100%" height="2.5rem" borderRadius="0.75rem" />
@@ -117,7 +118,7 @@ const {
           <BaseSkeleton width="100%" height="5.5rem" borderRadius="1.5rem" />
         </div>
         <div
-          class="lg:col-span-1 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
+          class="lg:col-span-1 bg-white dark:bg-gray-900 p-8 rounded-[.5rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
           <BaseSkeleton width="8rem" height="1rem" />
           <div class="space-y-4">
             <BaseSkeleton v-for="j in 3" :key="j" width="100%" height="5.5rem" borderRadius="1.5rem" />
@@ -128,12 +129,12 @@ const {
       <!-- Gráficos -->
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div
-          class="lg:col-span-2 bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
+          class="lg:col-span-2 bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-[.5rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
           <BaseSkeleton width="12rem" height="1rem" />
           <BaseSkeleton width="100%" height="20rem" borderRadius="1rem" />
         </div>
         <div
-          class="lg:col-span-1 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6 flex flex-col items-center">
+          class="lg:col-span-1 bg-white dark:bg-gray-900 p-8 rounded-[.5rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6 flex flex-col items-center">
           <BaseSkeleton width="10rem" height="1rem" customClass="self-start" />
           <BaseSkeleton width="14rem" height="14rem" borderRadius="9999px" customClass="mt-4" />
         </div>
@@ -142,14 +143,14 @@ const {
       <!-- Tracking + Top Clientes -->
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div
-          class="lg:col-span-2 bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
+          class="lg:col-span-2 bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-[.5rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
           <BaseSkeleton width="14rem" height="1rem" />
           <div class="space-y-3">
             <BaseSkeleton v-for="j in 5" :key="j" width="100%" height="2.25rem" borderRadius="0.5rem" />
           </div>
         </div>
         <div
-          class="lg:col-span-1 bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
+          class="lg:col-span-1 bg-white dark:bg-gray-900 p-8 rounded-[.5rem] border border-slate-200 dark:border-gray-800 shadow-sm space-y-6">
           <BaseSkeleton width="8rem" height="1rem" />
           <div class="space-y-3">
             <BaseSkeleton v-for="j in 5" :key="j" width="100%" height="3.5rem" borderRadius="1rem" />
@@ -229,7 +230,7 @@ const {
 
             <!-- Barras de Adoção de IA -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-              <div class="space-y-2 bg-slate-950/40 p-4 rounded-[0.75rem] border border-white/5">
+              <div class="space-y-2 bg-slate-950/40 p-4 rounded-[.5rem] border border-white/5">
                 <div class="flex justify-between text-xs font-bold text-slate-300">
                   <span class="tracking-wide text-[11px] text-slate-400">Adoção em Propostas</span>
                   <span class="text-indigo-400">{{ Math.round(stats.aiRoi?.adoptionRates?.proposals || 0) }}%</span>
@@ -238,7 +239,7 @@ const {
                   :value="stats.aiRoi?.adoptionRates?.proposals || 0"></BaseProgressBar>
               </div>
 
-              <div class="space-y-2 bg-slate-950/40 p-4 rounded-[0.75rem] border border-white/5">
+              <div class="space-y-2 bg-slate-950/40 p-4 rounded-[.5rem] border border-white/5">
                 <div class="flex justify-between text-xs font-bold text-slate-300">
                   <span class="tracking-wide text-[11px] text-slate-400">Adoção no Catálogo</span>
                   <span class="text-emerald-400">{{ Math.round(stats.aiRoi?.adoptionRates?.catalog || 0) }}%</span>
@@ -251,7 +252,7 @@ const {
 
           <!-- Painel Reformulado de Créditos e Ações de IA -->
           <div
-            class="flex flex-col justify-between items-stretch gap-6 bg-slate-950/60 p-4 rounded-[0.75rem] border border-white/10 lg:w-80 shrink-0 shadow-inner">
+            class="flex flex-col justify-between items-stretch gap-6 bg-slate-950/60 p-4 rounded-[.5rem] border border-white/10 lg:w-80 shrink-0 shadow-inner">
             <!-- Mini Cards de Saldo e Consumo -->
             <div class="space-y-3">
               <div class="flex items-center justify-between">
@@ -264,7 +265,7 @@ const {
 
               <div class="grid grid-cols-2 gap-3">
                 <!-- Saldo Atual -->
-                <div class="bg-slate-900/80 p-3 rounded-[0.75rem] border border-white/5 space-y-1">
+                <div class="bg-slate-900/80 p-3 rounded-[.5rem] border border-white/5 space-y-1">
                   <div class="flex items-center gap-1.5 text-blue-400">
                     <Coins class="w-3.5 h-3.5 animate-pulse" />
                     <span class="text-[9px] font-black tracking-wider text-slate-400">Saldo</span>
@@ -277,7 +278,7 @@ const {
                 </div>
 
                 <!-- Créditos Consumidos -->
-                <div class="bg-slate-900/80 p-3 rounded-[0.75rem] border border-white/5 space-y-1">
+                <div class="bg-slate-900/80 p-3 rounded-[.5rem] border border-white/5 space-y-1">
                   <div class="flex items-center gap-1.5 text-violet-400">
                     <Zap class="w-3.5 h-3.5" />
                     <span class="text-[9px] font-black tracking-wider text-slate-400">Utilizados</span>
@@ -293,7 +294,7 @@ const {
               <div class="">
                 <BaseButton data-tour="dashboard-ai-report" @click="isReportDrawerOpen = true" :disabled="isAnalyzing"
                   variant="primary"
-                  class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white rounded-2xl py-4 text-xs font-black tracking-widest shadow-xl shadow-indigo-600/20 transition-all border border-indigo-400/20 cursor-pointer flex items-center justify-center gap-2">
+                  class="w-full">
                   <template v-if="isAnalyzing">
                     <Loader2 class="w-4 h-4 animate-spin mr-2" /> Analisando Dados...
                   </template>
@@ -329,7 +330,7 @@ const {
               <!-- Em Aberto / Enviados -->
               <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
                 <span
-                  class="w-full md:w-20 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest text-left md:text-right">Em
+                  class="w-full md:w-20 text-[10px] font-black text-gray-400 dark:text-gray-500 text-left md:text-right">Em
                   Aberto</span>
                 <BaseProgressBar height="h-10" color="bg-blue-100 dark:bg-blue-900/50"
                   :value="stats.proposalsCount > 0 ? (stats.pendingCount / stats.proposalsCount * 100) : 0">
@@ -345,7 +346,7 @@ const {
               <!-- Aceitos (Finalizados) -->
               <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
                 <span
-                  class="w-full md:w-20 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest text-left md:text-right">Aceitos</span>
+                  class="w-full md:w-20 text-[10px] font-black text-gray-400 dark:text-gray-500 text-left md:text-right">Aceitos</span>
                   <BaseProgressBar height="h-10" color="bg-emerald-100 dark:bg-emerald-900/50"
                   :value="stats.proposalsCount > 0 ? (stats.pendingCount / stats.proposalsCount * 100) : 0">
                   <template #footer>
@@ -359,12 +360,12 @@ const {
             </div>
 
             <div
-            class="mt-8 p-6 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 rounded-[0.75rem] flex flex-col sm:flex-row justify-between items-center gap-4">
+            class="mt-8 p-6 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 rounded-[.5rem] flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="space-y-1 text-center sm:text-left">
               <span
                 class="text-[9px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest bg-emerald-100/60 dark:bg-emerald-950/30 px-2 py-0.5 rounded-full">Exclusivo
                 Upsell</span>
-              <h4 class="font-black text-gray-900 dark:text-white uppercase text-xs tracking-widest">Receita de Itens
+              <h4 class="font-black text-gray-900 dark:text-white text-xs ">Receita de Itens
                 Opcionais</h4>
               <p class="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed">Faturamento extra trazido
                 por
@@ -372,8 +373,8 @@ const {
             </div>
 
             <div
-              class="text-center sm:text-right shrink-0 bg-white dark:bg-gray-950 px-6 py-3 rounded-[0.75rem] border border-emerald-100 dark:border-emerald-900/30 shadow-sm">
-              <p class="text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Valor
+              class="text-center sm:text-right shrink-0 bg-white dark:bg-gray-950 px-6 py-3 rounded-[.5rem] border border-emerald-100 dark:border-emerald-900/30 shadow-sm">
+              <p class="text-[8px] font-black text-gray-400 dark:text-gray-500 ">Valor
                 Adicional</p>
               <p class="text-xl font-black text-emerald-600 dark:text-emerald-400">R$ {{ (stats.upsellRevenue ??
                 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</p>
@@ -396,7 +397,7 @@ const {
               </div>
               </template>
              <div class="px-6">
-                <!-- <h4 class="text-xs font-black text-gray-800 dark:text-white truncate uppercase">{{ alert.title }}</h4> -->
+                <!-- <h4 class="text-xs font-black text-gray-800 dark:text-white truncate ">{{ alert.title }}</h4> -->
                 <p class="text-xs text-gray-800 dark:text-gray-400 font-bold">Cliente: {{ alert.clientName }}</p>
               </div>
               <template #footer>
@@ -413,7 +414,7 @@ const {
 
             <div v-if="!stats.followUpAlerts?.length" class="text-center py-8 space-y-3">
               <div
-                class="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 rounded-[0.75rem] flex items-center justify-center mx-auto">
+                class="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 rounded-[.5rem] flex items-center justify-center mx-auto">
                 <CheckCircle2 class="w-6 h-6" />
               </div>
               <p class="text-xs text-gray-400 dark:text-gray-500 font-semibold">Tudo em ordem! Nenhuma proposta pendente
@@ -505,7 +506,7 @@ const {
                 <div>
                   <p class="text-xs font-bold text-gray-900 dark:text-white truncate max-w-[120px]">{{ client.name }}
                   </p>
-                  <p class="text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">Faturamento
+                  <p class="text-[8px] font-black text-gray-400 dark:text-gray-500 tracking-wider">Faturamento
                     total
                   </p>
                 </div>
@@ -533,13 +534,13 @@ const {
     <BaseDialog :open="!!aiReport" @update:open="(val) => !val ? aiReport = null : null"
       title="Relatório Estratégico IA" size="lg" @close="aiReport = null">
       <div
-        class="prose prose-blue max-w-none p-4 prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tight prose-p:font-medium prose-p:text-gray-600 max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200">
+        class="prose prose-blue max-w-none p-4 prose-headings:font-black prose-headings:prose-headings:tracking-tight prose-p:font-medium prose-p:text-gray-600 max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200">
         <div v-html="aiReport ? $md.render(aiReport) : ''"></div>
       </div>
       <template #footer>
         <div class="flex justify-between w-full items-center">
           <NuxtLink to="/relatorios"
-            class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">
+            class="text-[10px] font-black text-blue-600 hover:underline">
             Ver todos os relatórios
           </NuxtLink>
           <BaseButton @click="aiReport = null">Entendido</BaseButton>
@@ -573,12 +574,12 @@ const {
                   <component :is="item.icon" class="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 </div>
                 <span
-                  :class="['text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md border', item.badgeColor]">
+                  :class="['text-[8px] font-black px-2 py-0.5 rounded-md border', item.badgeColor]">
                   {{ item.badge }}
                 </span>
               </div>
               <div>
-                <h4 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-tight">{{ item.name }}
+                <h4 class="text-sm font-black text-gray-900 dark:text-white tracking-tight">{{ item.name }}
                 </h4>
                 <p class="text-[11px] font-medium text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{{
                   item.description
@@ -587,7 +588,7 @@ const {
             </div>
 
             <div class="pt-3 border-t border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
-              <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Custo</span>
+              <span class="text-[9px] font-black text-gray-400 ">Custo</span>
               <span
                 class="text-xs font-black text-gray-900 dark:text-white bg-white dark:bg-gray-900 px-3 py-1 rounded-xl border border-gray-200/60 dark:border-gray-700">
                 {{ costText(item.key) }}

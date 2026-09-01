@@ -28,8 +28,8 @@ const { Shield } = useSettingsPrivacy()
     icon-color-class="text-red-600 dark:text-red-400"
   >
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 settings-privacy-container">
-      <div class="p-8 bg-gray-50/50 dark:bg-gray-950/50 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 space-y-4">
-        <h3 class="text-sm font-black text-gray-900 dark:text-gray-100 uppercase tracking-widest">Backup Completo</h3>
+      <div class="p-8 bg-gray-50/50 dark:bg-gray-950/50 rounded-[.5rem] border border-gray-100 dark:border-gray-800 space-y-4">
+        <h3 class="section-title">Backup Completo</h3>
         <p class="text-sm text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
           Exporte todos os seus dados cadastrados (Clientes, Catálogo, Orçamentos e Agenda) em formato JSON. O arquivo será enviado para o seu e-mail.
         </p>
@@ -45,8 +45,8 @@ const { Shield } = useSettingsPrivacy()
         </BaseButton>
       </div>
 
-      <div class="p-8 bg-orange-50/30 dark:bg-orange-950/20 rounded-[0.75rem] border border-orange-100 dark:border-orange-900/30 space-y-4">
-        <h3 class="text-sm font-black text-orange-900 dark:text-orange-300 uppercase tracking-widest">Resetar Dados</h3>
+      <div class="p-8 bg-orange-50/30 dark:bg-orange-950/20 rounded-[.5rem] border border-orange-100 dark:border-orange-900/30 space-y-4">
+        <h3 class="section-title text-orange-900 dark:text-orange-300">Resetar Dados</h3>
         <p class="text-sm text-orange-700/70 dark:text-orange-400/80 font-medium leading-relaxed">
           Apaga Clientes, Catálogo, Orçamentos e Relatórios. Sua conta, plano e créditos permanecem intactos. Ação irreversível.
         </p>
@@ -62,8 +62,8 @@ const { Shield } = useSettingsPrivacy()
         </BaseButton>
       </div>
 
-      <div class="p-8 bg-red-50/30 dark:bg-red-950/20 rounded-[0.75rem] border border-red-100 dark:border-red-900/30 space-y-4">
-        <h3 class="text-sm font-black text-red-900 dark:text-red-300 uppercase tracking-widest">Encerrar Conta</h3>
+      <div class="p-8 bg-red-50/30 dark:bg-red-950/20 rounded-[.5rem] border border-red-100 dark:border-red-900/30 space-y-4">
+        <h3 class="section-title text-red-900 dark:text-red-300">Encerrar Conta</h3>
         <p class="text-sm text-red-700/70 dark:text-red-400/80 font-medium leading-relaxed">
           Ao excluir sua conta, todos os seus dados serão apagados permanentemente. Esta ação não pode ser desfeita.
         </p>

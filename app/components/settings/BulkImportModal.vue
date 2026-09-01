@@ -103,7 +103,7 @@ async function processImport() {
 <template>
   <BaseDialog :open="open" @update:open="(v) => v ? emit('update:open', true) : close()" :title="title" size="xl">
     <div v-if="step === 'idle'" class="space-y-4">
-      <label class="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-[0.75rem] p-10 cursor-pointer">
+      <label class="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-[.5rem] p-10 cursor-pointer">
         <UploadCloud class="w-8 h-8 text-gray-400" />
         <span class="text-sm font-bold text-gray-600 dark:text-gray-300">Clique para selecionar um arquivo CSV</span>
         <input type="file" accept=".csv" class="hidden" @change="onFileChange">
@@ -113,11 +113,11 @@ async function processImport() {
 
     <div v-else-if="step === 'preview'" class="space-y-4">
       <p class="text-sm font-bold text-gray-700 dark:text-gray-300">{{ rows.length }} registro(s) encontrado(s)</p>
-      <div class="overflow-x-auto max-h-64 border border-gray-100 dark:border-gray-800 rounded-[0.75rem]">
+      <div class="overflow-x-auto max-h-64 border border-gray-100 dark:border-gray-800 rounded-[.5rem]">
         <table class="w-full text-sm  whitespace-nowrap">
           <thead>
             <tr>
-              <th v-for="key in Object.keys(rows[0] || {})" :key="key" class="text-left px-3 py-2 font-black uppercase text-xs whitespace-nowrap">{{ key }}</th>
+              <th v-for="key in Object.keys(rows[0] || {})" :key="key" class="text-left px-3 py-2 font-black text-xs whitespace-nowrap">{{ key }}</th>
             </tr>
           </thead>
           <tbody>
@@ -135,9 +135,9 @@ async function processImport() {
 
     <div v-else-if="step === 'done'" class="space-y-4">
       <div class="grid grid-cols-3 gap-4 text-center">
-        <div><p class="text-2xl font-black">{{ summary.created }}</p><p class="text-xs uppercase text-gray-500">Criados</p></div>
-        <div><p class="text-2xl font-black">{{ summary.skipped }}</p><p class="text-xs uppercase text-gray-500">Ignorados</p></div>
-        <div><p class="text-2xl font-black">{{ summary.errors }}</p><p class="text-xs uppercase text-gray-500">Erros</p></div>
+        <div><p class="text-2xl font-black">{{ summary.created }}</p><p class="text-xs text-gray-500">Criados</p></div>
+        <div><p class="text-2xl font-black">{{ summary.skipped }}</p><p class="text-xs text-gray-500">Ignorados</p></div>
+        <div><p class="text-2xl font-black">{{ summary.errors }}</p><p class="text-xs text-gray-500">Erros</p></div>
       </div>
       <ul v-if="summary.errors > 0 || summary.skipped > 0" class="text-sm space-y-1 max-h-48 overflow-y-auto">
         <li v-for="r in results.filter(r => r.status !== 'created')" :key="r.index" :class="r.status === 'error' ? 'text-red-600' : 'text-yellow-600'">

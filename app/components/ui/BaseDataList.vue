@@ -32,7 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
   currentPage: 1
 })
 
-const emit = defineEmits(['load-more', 'update:currentPage'])
+const emit = defineEmits(['load-more', 'update:currentPage', 'row-click'])
 
 const sentinelRef = ref<HTMLElement | null>(null)
 
@@ -56,6 +56,7 @@ useIntersectionObserver(sentinelRef, ([entry]) => {
         :items-per-page="itemsPerPage"
         :current-page="currentPage"
         @update:current-page="$emit('update:currentPage', $event)"
+        @row-click="(item, index) => $emit('row-click', item, index)"
       >
         <!-- Forward header slot -->
         <template v-if="$slots.header" #header>
@@ -79,7 +80,7 @@ useIntersectionObserver(sentinelRef, ([entry]) => {
             <tr v-for="i in 3" :key="`more-${i}`" class="block md:table-row p-4 sm:p-5 md:p-0 space-y-2 md:space-y-0">
               <td colspan="100%" class="px-6 py-4">
                 <div class="flex items-center gap-4">
-                  <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="0.75rem" />
+                  <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="0.5rem" />
                   <div class="space-y-2 flex-1">
                     <BaseSkeleton width="60%" height="1.25rem" />
                     <BaseSkeleton width="30%" height="0.75rem" />
@@ -156,9 +157,9 @@ useIntersectionObserver(sentinelRef, ([entry]) => {
       <div ref="sentinelRef" v-if="hasMore" class="h-1" />
 
       <!-- Empty State -->
-      <div v-if="!pending && (!items || items.length === 0)" class="text-center py-32 bg-white dark:bg-gray-900 rounded-[3rem] border-2 border-gray-100 dark:border-gray-800">
+      <div v-if="!pending && (!items || items.length === 0)" class="text-center py-32 bg-white dark:bg-gray-900 rounded-[.5rem] border-2 border-line dark:border-gray-800">
         <slot name="empty">
-          <div class="w-24 h-24 bg-gray-50 dark:bg-gray-800 text-gray-300 dark:text-gray-600 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8">
+          <div class="w-24 h-24 bg-gray-50 dark:bg-gray-800 text-gray-300 dark:text-gray-600 rounded-full flex items-center justify-center mx-auto mb-8">
             <FileSearch class="w-12 h-12" />
           </div>
           <h3 class="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">{{ emptyTitle }}</h3>

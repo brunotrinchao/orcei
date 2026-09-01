@@ -235,11 +235,11 @@ const subtitleTextClass = computed(() => {
 <template>
   <!-- Skeleton Loading State -->
   <div v-if="loading"
-    class="p-4 md:p-5 rounded-[0.75rem] flex flex-row md:flex-col items-center md:items-start justify-between md:justify-start gap-3 md:gap-0 transition-all duration-200"
+    class="p-4 md:p-5 rounded-[.5rem] flex flex-row md:flex-col items-center md:items-start justify-between md:justify-start gap-3 md:gap-0 transition-all duration-200"
     :class="cardBgClass">
     <div class="flex flex-row justify-between w-auto md:w-full items-center md:items-start mb-0 md:mb-4 shrink-0">
       <div class="flex items-center md:items-start flex-1 min-w-0">
-        <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="0.75rem" customClass="md:w-12 md:h-12 w-10 h-10" />
+        <BaseSkeleton width="2.5rem" height="2.5rem" borderRadius="0.5rem" customClass="md:w-12 md:h-12 w-10 h-10" />
         <div class="ml-2.5 md:ml-3 space-y-1.5 min-w-0">
           <BaseSkeleton width="5rem" height="0.65rem" borderRadius="0.375rem" customClass="md:w-24" />
           <BaseSkeleton width="7rem" height="0.6rem" borderRadius="0.375rem" customClass="hidden md:block" />
@@ -257,7 +257,7 @@ const subtitleTextClass = computed(() => {
 
   <!-- Metric Card Content -->
   <div v-else
-    class="p-4 md:p-5 rounded-[0.75rem] flex flex-col transition-all duration-200"
+    class="p-4 md:p-5 rounded-[.5rem] flex flex-col transition-all duration-200"
     :class="cardBgClass">
     <div class="group flex flex-row md:flex-col items-center md:items-start justify-between md:justify-start gap-3 md:gap-0 w-full md:w-auto">
       <div class="flex flex-row justify-between w-auto md:w-full items-center md:items-start mb-0 shrink-0 w-full">

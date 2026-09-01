@@ -15,10 +15,10 @@ defineEmits<{
 </script>
 
 <template>
-  <div class="rounded-2xl border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700 shadow-sm p-4">
+  <div class="rounded-[.5rem] border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700 shadow-sm p-4">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
+        <div class="w-10 h-10 rounded-[.5rem] bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
           <Ticket class="w-5 h-5 text-gray-400" />
         </div>
         <span class="font-black text-gray-900 dark:text-white tracking-wide">{{ coupon.code }}</span>

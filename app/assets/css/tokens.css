@@ -1,0 +1,47 @@
+/* ============================================
+   DESIGN TOKENS — Orcei app principal
+   Escopo: telas logadas (dashboard, catálogo, clientes,
+   orçamentos, agenda, relatórios, configurações, auth).
+   Landing usa app/assets/css/landing.css (fora do escopo).
+   ============================================ */
+:root {
+  --brand: #0870f8;
+  --brand-dark: #0055c8;
+  --brand-soft: #e9f3ff;
+  --ink: #0c1424;
+  --muted: #61708a;
+  --line: #dfe6f0;
+  --soft: #f4f7fb;
+  --navy: #07111f;
+  --radius: 0.5rem;
+}
+
+html.dark {
+  --brand: #3b82f6;
+  --brand-dark: #60a5fa;
+  --brand-soft: rgba(59, 130, 246, 0.16);
+  --ink: #f8fafc;
+  --muted: #94a3b8;
+  --line: rgba(148, 163, 184, 0.25);
+  --soft: rgba(148, 163, 184, 0.08);
+  --navy: #020617;
+}
+
+/* ============================================
+   TIPOGRAFIA — escala única (sem uppercase)
+   ============================================ */
+.page-title {
+  @apply text-2xl font-bold text-ink;
+}
+
+.section-title {
+  @apply text-sm font-semibold text-ink;
+}
+
+.form-label {
+  @apply text-sm font-medium text-muted;
+}
+
+.helper-text {
+  @apply text-sm text-muted leading-relaxed;
+}

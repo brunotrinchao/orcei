@@ -196,14 +196,14 @@ function formatDateTime(iso: string | null) {
         <div class="flex items-center gap-6">
           <NuxtLink
             to="/admin"
-            class="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline"
+            class="text-xs font-black text-blue-600 hover:underline"
             >Voltar ao Painel</NuxtLink
           >
           <BaseButton
             @click="saveSettings"
             :disabled="isSaving"
             :loading="isSaving"
-            class="shadow-xl shadow-blue-100"
+            class=""
           >
             <Save class="w-4 h-4 mr-2" />
             Salvar Alterações
@@ -227,7 +227,7 @@ function formatDateTime(iso: string | null) {
               ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-lg'
               : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'
           "
-          class="flex items-center gap-3 px-6 py-4 rounded-[0.75rem] text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
+          class="flex items-center gap-3 px-6 py-4 rounded-[.5rem] text-xs font-black transition-all whitespace-nowrap lg:whitespace-normal text-left"
         >
           <ShieldAlert class="w-4 h-4 shrink-0" />
           Sistema
@@ -239,7 +239,7 @@ function formatDateTime(iso: string | null) {
               ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-lg'
               : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'
           "
-          class="flex items-center gap-3 px-6 py-4 rounded-[0.75rem] text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
+          class="flex items-center gap-3 px-6 py-4 rounded-[.5rem] text-xs font-black transition-all whitespace-nowrap lg:whitespace-normal text-left"
         >
           <Globe class="w-4 h-4 shrink-0" />
           Landing Page
@@ -251,7 +251,7 @@ function formatDateTime(iso: string | null) {
               ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-lg'
               : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'
           "
-          class="flex items-center gap-3 px-6 py-4 rounded-[0.75rem] text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
+          class="flex items-center gap-3 px-6 py-4 rounded-[.5rem] text-xs font-black transition-all whitespace-nowrap lg:whitespace-normal text-left"
         >
           <Sparkles class="w-4 h-4 shrink-0" />
           Créditos de IA
@@ -263,7 +263,7 @@ function formatDateTime(iso: string | null) {
               ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-lg'
               : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'
           "
-          class="flex items-center gap-3 px-6 py-4 rounded-[0.75rem] text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left"
+          class="flex items-center gap-3 px-6 py-4 rounded-[.5rem] text-xs font-black transition-all whitespace-nowrap lg:whitespace-normal text-left"
         >
           <Cpu class="w-4 h-4 shrink-0" />
           Provedores de IA
@@ -278,7 +278,7 @@ function formatDateTime(iso: string | null) {
           class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
         >
           <section
-            class="bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8"
+            class="bg-white dark:bg-gray-900 p-8 rounded-[.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8"
           >
             <div class="flex items-center gap-3">
               <div
@@ -287,18 +287,18 @@ function formatDateTime(iso: string | null) {
                 <ShieldAlert class="w-5 h-5 text-red-600 dark:text-red-400" />
               </div>
               <h2
-                class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight"
+                class="text-xl font-black text-gray-900 dark:text-white tracking-tight"
               >
                 Estado do Sistema
               </h2>
             </div>
 
             <div
-              class="p-8 bg-gray-50/50 dark:bg-gray-950/50 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 flex items-center justify-between gap-6"
+              class="p-8 bg-gray-50/50 dark:bg-gray-950/50 rounded-[.5rem] border border-gray-100 dark:border-gray-800 flex items-center justify-between gap-6"
             >
               <div class="space-y-1">
                 <h3
-                  class="font-black text-gray-900 dark:text-gray-100 uppercase text-xs tracking-widest"
+                  class="font-black text-gray-900 dark:text-gray-100 text-xs "
                 >
                   Modo Manutenção
                 </h3>
@@ -351,7 +351,7 @@ function formatDateTime(iso: string | null) {
           </section>
 
           <section
-            class="bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8"
+            class="bg-white dark:bg-gray-900 p-8 rounded-[.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8"
           >
             <div class="flex items-center gap-3">
               <div
@@ -360,7 +360,7 @@ function formatDateTime(iso: string | null) {
                 <FileText class="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </div>
               <h2
-                class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight"
+                class="text-xl font-black text-gray-900 dark:text-white tracking-tight"
               >
                 Textos Globais
               </h2>
@@ -382,7 +382,7 @@ function formatDateTime(iso: string | null) {
           class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
         >
           <section
-            class="bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8"
+            class="bg-white dark:bg-gray-900 p-8 rounded-[.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8"
           >
             <div class="flex items-center gap-3">
               <div
@@ -391,7 +391,7 @@ function formatDateTime(iso: string | null) {
                 <Globe class="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </div>
               <h2
-                class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight"
+                class="text-xl font-black text-gray-900 dark:text-white tracking-tight"
               >
                 Hero Section (Início)
               </h2>
@@ -411,7 +411,7 @@ function formatDateTime(iso: string | null) {
           </section>
 
           <section
-            class="bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8"
+            class="bg-white dark:bg-gray-900 p-8 rounded-[.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8"
           >
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-3">
@@ -423,7 +423,7 @@ function formatDateTime(iso: string | null) {
                   />
                 </div>
                 <h2
-                  class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight"
+                  class="text-xl font-black text-gray-900 dark:text-white tracking-tight"
                 >
                   Funcionalidades
                 </h2>
@@ -505,7 +505,7 @@ function formatDateTime(iso: string | null) {
                   <BaseCheckbox v-model="f.enabled" :id="'f-enabled-' + idx" />
                   <label
                     :for="'f-enabled-' + idx"
-                    class="text-[10px] font-black text-gray-400 uppercase tracking-widest cursor-pointer"
+                    class="text-[10px] font-black text-gray-400 cursor-pointer"
                     >Ativo na Landpage</label
                   >
                 </div>
@@ -520,7 +520,7 @@ function formatDateTime(iso: string | null) {
           class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
         >
           <section
-            class="bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8"
+            class="bg-white dark:bg-gray-900 p-8 rounded-[.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8"
           >
             <div class="flex items-center gap-3">
               <div
@@ -531,7 +531,7 @@ function formatDateTime(iso: string | null) {
                 />
               </div>
               <h2
-                class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight"
+                class="text-xl font-black text-gray-900 dark:text-white tracking-tight"
               >
                 Custo de Créditos por Ação
               </h2>
@@ -621,7 +621,7 @@ function formatDateTime(iso: string | null) {
           </section>
 
           <section
-            class="bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8"
+            class="bg-white dark:bg-gray-900 p-8 rounded-[.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8"
           >
             <div class="flex items-center gap-3">
               <div
@@ -632,7 +632,7 @@ function formatDateTime(iso: string | null) {
                 />
               </div>
               <h2
-                class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight"
+                class="text-xl font-black text-gray-900 dark:text-white tracking-tight"
               >
                 Créditos Iniciais
               </h2>
@@ -664,7 +664,7 @@ function formatDateTime(iso: string | null) {
           class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
         >
           <section
-            class="bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8"
+            class="bg-white dark:bg-gray-900 p-8 rounded-[.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8"
           >
             <div class="flex items-center justify-between gap-3">
               <div class="flex items-center gap-3">
@@ -674,14 +674,14 @@ function formatDateTime(iso: string | null) {
                   <Cpu class="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <h2
-                  class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight"
+                  class="text-xl font-black text-gray-900 dark:text-white tracking-tight"
                 >
                   Provedores de IA
                 </h2>
               </div>
               <button
                 @click="refreshAiUsage()"
-                class="flex items-center gap-2 text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest hover:underline"
+                class="flex items-center gap-2 text-[10px] font-black text-blue-600 dark:text-blue-400 hover:underline"
               >
                 <RefreshCcw class="w-4 h-4" />
                 Atualizar
@@ -706,7 +706,7 @@ function formatDateTime(iso: string | null) {
             <!-- Erro -->
             <div
               v-if="aiUsageError"
-              class="p-6 rounded-[0.75rem] border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 text-xs font-bold text-red-600 dark:text-red-400"
+              class="p-6 rounded-[.5rem] border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 text-xs font-bold text-red-600 dark:text-red-400"
             >
               Não foi possível carregar a telemetria de IA:
               {{
@@ -730,7 +730,7 @@ function formatDateTime(iso: string | null) {
               <div
                 v-for="p in aiUsage?.providers || []"
                 :key="p.provider"
-                class="p-6 rounded-[0.75rem] border bg-gray-50/50 dark:bg-gray-950/50"
+                class="p-6 rounded-[.5rem] border bg-gray-50/50 dark:bg-gray-950/50"
                 :class="
                   (aiUsage?.enabledProviders || []).includes(p.provider)
                     ? 'border-blue-300 dark:border-blue-800'
@@ -739,7 +739,7 @@ function formatDateTime(iso: string | null) {
               >
                 <div class="flex items-center justify-between mb-4">
                   <h3
-                    class="font-black text-gray-900 dark:text-gray-100 uppercase text-sm tracking-widest"
+                    class="font-black text-gray-900 dark:text-gray-100 text-sm "
                   >
                     {{ providerLabel(p.provider) }}
                   </h3>
@@ -764,7 +764,7 @@ function formatDateTime(iso: string | null) {
                 <div class="grid grid-cols-2 gap-4">
                   <div>
                     <p
-                      class="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest"
+                      class="text-[9px] text-gray-400 dark:text-gray-500 font-black "
                     >
                       Chamadas
                     </p>
@@ -785,7 +785,7 @@ function formatDateTime(iso: string | null) {
                   </div>
                   <div>
                     <p
-                      class="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest"
+                      class="text-[9px] text-gray-400 dark:text-gray-500 font-black "
                     >
                       Custo estimado
                     </p>
@@ -800,7 +800,7 @@ function formatDateTime(iso: string | null) {
                   </div>
                   <div>
                     <p
-                      class="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest"
+                      class="text-[9px] text-gray-400 dark:text-gray-500 font-black "
                     >
                       Tokens (in / out)
                     </p>
@@ -811,7 +811,7 @@ function formatDateTime(iso: string | null) {
                   </div>
                   <div>
                     <p
-                      class="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest"
+                      class="text-[9px] text-gray-400 dark:text-gray-500 font-black "
                     >
                       Última vez
                     </p>
@@ -833,10 +833,10 @@ function formatDateTime(iso: string | null) {
 
           <!-- Chamadas recentes -->
           <section
-            class="bg-white dark:bg-gray-900 p-8 rounded-[0.75rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8"
+            class="bg-white dark:bg-gray-900 p-8 rounded-[.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8"
           >
             <h3
-              class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest"
+              class="text-sm font-black text-gray-900 dark:text-white "
             >
               Chamadas Recentes
             </h3>
@@ -855,7 +855,7 @@ function formatDateTime(iso: string | null) {
               <table class="w-full text-left text-xs whitespace-nowrap">
                 <thead>
                   <tr
-                    class="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest border-b border-gray-100 dark:border-gray-800"
+                    class="text-[9px] text-gray-400 dark:text-gray-500 font-black border-b border-gray-100 dark:border-gray-800"
                   >
                     <th class="py-2 pr-4">Provedor</th>
                     <th class="py-2 pr-4">Modelo</th>
@@ -898,7 +898,7 @@ function formatDateTime(iso: string | null) {
                             ? 'text-emerald-600 dark:text-emerald-400'
                             : 'text-red-500 dark:text-red-400'
                         "
-                        class="font-black uppercase text-[10px] tracking-widest"
+                        class="font-black text-[10px] "
                         >{{ c.success ? "OK" : "Falha" }}</span
                       >
                     </td>

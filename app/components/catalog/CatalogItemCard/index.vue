@@ -18,11 +18,11 @@ const { Pencil, Trash2, Eye } = useCatalogItemCard()
 
 <template>
   <div 
-    class="catalog-item-card rounded-[0.75rem] border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700 shadow-sm p-4 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 transition-all"
+    class="catalog-item-card rounded-[.5rem] border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700 shadow-sm p-4 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 transition-all"
     @click="$emit('view')"
   >
     <div class="flex items-center gap-4">
-      <div class="w-14 h-14 rounded-[0.50rem] border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
+      <div class="w-14 h-14 rounded-[.5rem] border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
         <BaseImage v-if="item.imageUrl" :src="item.imageUrl" :alt="item.name" container-class="w-full h-full" img-class="w-full h-full object-cover" />
         <div v-else class="text-gray-400 dark:text-gray-500">
           <component :is="getIcon(item.icon || 'Package')" class="w-7 h-7" />

@@ -8,7 +8,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="rounded-2xl border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700 shadow-sm p-4 text-xs">
+  <div class="rounded-[.5rem] border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700 shadow-sm p-4 text-xs">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2 text-gray-500 font-bold">
         <Clock class="w-3 h-3" />

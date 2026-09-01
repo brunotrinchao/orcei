@@ -116,7 +116,7 @@ function downloadPdf(reportId?: string) {
     <div v-if="notification" class="space-y-6">
       
       <!-- Cabeçalho com badge por tipo de notificação -->
-      <div class="flex items-center gap-3 p-4 rounded-2xl border" :class="{
+      <div class="flex items-center gap-3 p-4 rounded-[.5rem] border" :class="{
         'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/40 text-emerald-800 dark:text-emerald-300': notification.type === 'proposal_accepted' || notification.type === 'admin_credit_purchase',
         'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900/40 text-rose-800 dark:text-rose-300': notification.type === 'proposal_rejected',
         'bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-900/40 text-blue-800 dark:text-blue-300': notification.type === 'proposal_sent',
@@ -127,7 +127,7 @@ function downloadPdf(reportId?: string) {
         <img
           v-if="notification.details?.userAvatar && (notification.type === 'admin_new_signup' || notification.type === 'admin_credit_purchase')"
           :src="notification.details.userAvatar"
-          class="w-9 h-9 rounded-xl object-cover shrink-0 ring-2"
+          class="w-9 h-9 rounded-[.5rem] object-cover shrink-0 ring-2"
           :class="notification.type === 'admin_new_signup' ? 'ring-orange-400' : 'ring-emerald-400'"
           alt=""
         />
@@ -151,7 +151,7 @@ function downloadPdf(reportId?: string) {
           {{ notification.summary }}
         </p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800 text-xs font-bold">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-[.5rem] border border-gray-100 dark:border-gray-800 text-xs font-bold">
           <div class="space-y-1">
             <span class="text-gray-400 uppercase">Código da Proposta</span>
             <p class="text-gray-900 dark:text-white font-black text-sm">#{{ notification.details?.code || notification.metadata?.code }}</p>
@@ -176,7 +176,7 @@ function downloadPdf(reportId?: string) {
           {{ notification.summary }}
         </p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800 text-xs font-bold">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-[.5rem] border border-gray-100 dark:border-gray-800 text-xs font-bold">
           <div class="space-y-1">
             <span class="text-gray-400 uppercase">Código da Proposta</span>
             <p class="text-gray-900 dark:text-white font-black text-sm">#{{ notification.details?.code || notification.metadata?.code }}</p>
@@ -193,7 +193,7 @@ function downloadPdf(reportId?: string) {
           {{ notification.summary }}
         </p>
 
-        <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800 text-xs font-bold space-y-3">
+        <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-[.5rem] border border-gray-100 dark:border-gray-800 text-xs font-bold space-y-3">
           <div class="flex justify-between items-center">
             <span class="text-gray-400 uppercase">E-mail Destinatário:</span>
             <span class="text-gray-900 dark:text-white font-black">{{ notification.details?.clientEmail }}</span>
@@ -213,7 +213,7 @@ function downloadPdf(reportId?: string) {
         </p>
 
         <!-- Markdown do Relatório -->
-        <div v-if="notification.details?.content" class="prose prose-blue dark:prose-invert max-w-none p-6 bg-gray-50 dark:bg-gray-900/60 rounded-2xl border border-gray-100 dark:border-gray-800 max-h-[50vh] overflow-y-auto">
+        <div v-if="notification.details?.content" class="prose prose-blue dark:prose-invert max-w-none p-6 bg-gray-50 dark:bg-gray-900/60 rounded-[.5rem] border border-gray-100 dark:border-gray-800 max-h-[50vh] overflow-y-auto">
           <div v-html="$md ? $md.render(notification.details.content) : notification.details.content"></div>
         </div>
       </div>
@@ -223,7 +223,7 @@ function downloadPdf(reportId?: string) {
           {{ notification.summary }}
         </p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800 text-xs font-bold">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-[.5rem] border border-gray-100 dark:border-gray-800 text-xs font-bold">
           <div class="space-y-1">
             <span class="text-gray-400 uppercase">Código da Proposta</span>
             <p class="text-gray-900 dark:text-white font-black text-sm">#{{ notification.details?.code }}</p>
@@ -240,7 +240,7 @@ function downloadPdf(reportId?: string) {
           {{ notification.summary }}
         </p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800 text-xs font-bold">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-[.5rem] border border-gray-100 dark:border-gray-800 text-xs font-bold">
           <div class="space-y-1">
             <span class="text-gray-400 uppercase flex items-center gap-1"><User class="w-3 h-3" /> Nome</span>
             <p class="text-gray-900 dark:text-white font-black text-sm">{{ notification.details?.userName || 'Não informado' }}</p>
@@ -257,7 +257,7 @@ function downloadPdf(reportId?: string) {
           {{ notification.summary }}
         </p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800 text-xs font-bold">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-[.5rem] border border-gray-100 dark:border-gray-800 text-xs font-bold">
           <div class="space-y-1">
             <span class="text-gray-400 uppercase flex items-center gap-1"><User class="w-3 h-3" /> Nome</span>
             <p class="text-gray-900 dark:text-white font-black text-sm">{{ notification.details?.userName || 'Não informado' }}</p>

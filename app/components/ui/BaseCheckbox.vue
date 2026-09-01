@@ -30,8 +30,8 @@ const showRequiredError = computed(() => submitAttempted.value && isEmpty())
         :checked="modelValue"
         @update:checked="emit('update:modelValue', $event)"
         :class="[
-          'flex h-6 w-6 appearance-none items-center justify-center rounded-[0.75rem] border-gray-300 dark:border-gray-800 border hover:border-gray-300 dark:hover:border-gray-600 outline-none focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/20 transition-all data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600',
-          showRequiredError ? 'border-red-300 dark:border-red-500/50' : 'border-gray-200 dark:border-gray-700'
+          'flex h-6 w-6 appearance-none items-center justify-center rounded-[.5rem] border-line dark:border-gray-800 border hover:border-gray-300 dark:hover:border-gray-600 outline-none focus:ring-4 focus:ring-brand/10 dark:focus:ring-brand/20 transition-all data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600',
+          showRequiredError ? 'border-red-300 dark:border-red-500/50' : 'border-line dark:border-gray-700'
         ]"
       >
         <CheckboxIndicator class="flex items-center justify-center text-white">

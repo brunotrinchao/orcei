@@ -23,7 +23,7 @@ const {
 </script>
 
 <template>
-  <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-5 relative overflow-hidden flex flex-col justify-between report-card-container">
+  <div class="rounded-[.5rem] border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-5 relative overflow-hidden flex flex-col justify-between report-card-container">
     <div>
       <div class="flex items-start justify-between gap-2">
         <h4 class="text-lg font-black text-gray-900 dark:text-gray-50 leading-tight">Análise Estratégica IA</h4>

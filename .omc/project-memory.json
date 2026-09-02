@@ -339,6 +339,12 @@
       "type": "file"
     },
     {
+      "path": "app/components/ui/BaseAlertDialog.vue",
+      "accessCount": 10,
+      "lastAccessed": 1788367846325,
+      "type": "file"
+    },
+    {
       "path": "app/components/proposals/ProposalStepScope/index.vue",
       "accessCount": 9,
       "lastAccessed": 1788355829664,
@@ -384,12 +390,6 @@
       "path": "app/components/ui/BaseDrawer.vue",
       "accessCount": 7,
       "lastAccessed": 1788354318862,
-      "type": "file"
-    },
-    {
-      "path": "app/components/ui/BaseAlertDialog.vue",
-      "accessCount": 7,
-      "lastAccessed": 1788354337699,
       "type": "file"
     },
     {

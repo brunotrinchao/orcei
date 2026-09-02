@@ -79,27 +79,30 @@ onUnmounted(() => {
           <AlertDialogDescription v-if="description" class="text-sm text-gray-500 dark:text-gray-400 font-base leading-relaxed mb-8" v-html="description" />
 
           <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
-            <AlertDialogCancel v-if="cancelText" @click="emit('update:open', false); emit('cancel')" as-child>
-              <BaseButton 
-                type="button"
-                variant="ghost"
-                size="md"
-                @click="emit('update:open', false); emit('cancel')"
-              >
-                {{ cancelText }}
-              </BaseButton>
-            </AlertDialogCancel>
-            
-            <AlertDialogAction @click="emit('update:open', false); emit('confirm')" as-child>
-              <BaseButton 
-                type="button"
-                :variant="variant === 'destructive' ? 'danger' : 'solid'"
-                size="md"
-                @click="emit('update:open', false); emit('confirm')"
-              >
-                {{ actionText }}
-              </BaseButton>
-            </AlertDialogAction>
+            <!-- Ações customizadas (N botões). Quando presente, substitui cancel/action padrão -->
+            <slot name="actions">
+              <AlertDialogCancel v-if="cancelText" @click="emit('update:open', false); emit('cancel')" as-child>
+                <BaseButton
+                  type="button"
+                  variant="ghost"
+                  size="md"
+                  @click="emit('update:open', false); emit('cancel')"
+                >
+                  {{ cancelText }}
+                </BaseButton>
+              </AlertDialogCancel>
+
+              <AlertDialogAction @click="emit('update:open', false); emit('confirm')" as-child>
+                <BaseButton
+                  type="button"
+                  :variant="variant === 'destructive' ? 'danger' : 'solid'"
+                  size="md"
+                  @click="emit('update:open', false); emit('confirm')"
+                >
+                  {{ actionText }}
+                </BaseButton>
+              </AlertDialogAction>
+            </slot>
           </div>
         </AlertDialogContent>
       </Transition>

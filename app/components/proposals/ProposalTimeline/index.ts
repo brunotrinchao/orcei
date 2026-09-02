@@ -68,6 +68,8 @@ export function useProposalTimeline(props: { history: HistoryItem[]; status?: st
   const getActionLabel = (action: string) => {
     const labels: Record<string, string> = {
       'created': 'Orçamento criado',
+      'renew': 'Orçamento renovado',
+      'expired': 'Orçamento expirado',
       'sent': 'E-mail enviado',
       'delivered': 'E-mail entregue',
       'opened': 'E-mail aberto',

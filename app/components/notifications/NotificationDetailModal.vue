@@ -140,8 +140,8 @@ function downloadPdf(reportId?: string) {
         <Coins v-else-if="notification.type === 'admin_credit_purchase'" class="w-7 h-7 text-emerald-600 dark:text-emerald-400 shrink-0" />
 
         <div>
-          <h3 class="text-base font-black uppercase tracking-wider">{{ notification.title }}</h3>
-          <p class="text-xs font-bold opacity-80">{{ formatDate(notification.createdAt) }}</p>
+          <h3 class="text-base font-bold">{{ notification.title }}</h3>
+          <p class="text-xs font-medium opacity-80">{{ formatDate(notification.createdAt) }}</p>
         </div>
       </div>
 
@@ -154,11 +154,11 @@ function downloadPdf(reportId?: string) {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-[.5rem] border border-gray-100 dark:border-gray-800 text-xs font-bold">
           <div class="space-y-1">
             <span class="text-gray-400 uppercase">Código da Proposta</span>
-            <p class="text-gray-900 dark:text-white font-black text-sm">#{{ notification.details?.code || notification.metadata?.code }}</p>
+            <p class="text-gray-900 dark:text-gray-100 font-semibold text-sm">#{{ notification.details?.code || notification.metadata?.code }}</p>
           </div>
           <div class="space-y-1">
             <span class="text-gray-400 uppercase">Cliente</span>
-            <p class="text-gray-900 dark:text-white font-black text-sm">{{ notification.details?.clientName || 'Cliente' }}</p>
+            <p class="text-gray-900 dark:text-gray-100 font-semibold text-sm">{{ notification.details?.clientName || 'Cliente' }}</p>
           </div>
           <div class="space-y-1">
             <span class="text-gray-400 uppercase">Valor Final Aprovado</span>
@@ -179,11 +179,11 @@ function downloadPdf(reportId?: string) {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-[.5rem] border border-gray-100 dark:border-gray-800 text-xs font-bold">
           <div class="space-y-1">
             <span class="text-gray-400 uppercase">Código da Proposta</span>
-            <p class="text-gray-900 dark:text-white font-black text-sm">#{{ notification.details?.code || notification.metadata?.code }}</p>
+            <p class="text-gray-900 dark:text-gray-100 font-semibold text-sm">#{{ notification.details?.code || notification.metadata?.code }}</p>
           </div>
           <div class="space-y-1">
             <span class="text-gray-400 uppercase">Cliente</span>
-            <p class="text-gray-900 dark:text-white font-black text-sm">{{ notification.details?.clientName || 'Cliente' }}</p>
+            <p class="text-gray-900 dark:text-gray-100 font-semibold text-sm">{{ notification.details?.clientName || 'Cliente' }}</p>
           </div>
         </div>
       </div>
@@ -226,7 +226,7 @@ function downloadPdf(reportId?: string) {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-[.5rem] border border-gray-100 dark:border-gray-800 text-xs font-bold">
           <div class="space-y-1">
             <span class="text-gray-400 uppercase">Código da Proposta</span>
-            <p class="text-gray-900 dark:text-white font-black text-sm">#{{ notification.details?.code }}</p>
+            <p class="text-gray-900 dark:text-gray-100 font-semibold text-sm">#{{ notification.details?.code }}</p>
           </div>
           <div class="space-y-1">
             <span class="text-gray-400 uppercase">Falhou</span>
@@ -243,11 +243,11 @@ function downloadPdf(reportId?: string) {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-[.5rem] border border-gray-100 dark:border-gray-800 text-xs font-bold">
           <div class="space-y-1">
             <span class="text-gray-400 uppercase flex items-center gap-1"><User class="w-3 h-3" /> Nome</span>
-            <p class="text-gray-900 dark:text-white font-black text-sm">{{ notification.details?.userName || 'Não informado' }}</p>
+            <p class="text-gray-900 dark:text-gray-100 font-semibold text-sm">{{ notification.details?.userName || 'Não informado' }}</p>
           </div>
           <div class="space-y-1">
             <span class="text-gray-400 uppercase flex items-center gap-1"><Mail class="w-3 h-3" /> E-mail</span>
-            <p class="text-gray-900 dark:text-white font-black text-sm">{{ notification.details?.userEmail || 'Não informado' }}</p>
+            <p class="text-gray-900 dark:text-gray-100 font-semibold text-sm">{{ notification.details?.userEmail || 'Não informado' }}</p>
           </div>
         </div>
       </div>
@@ -260,11 +260,11 @@ function downloadPdf(reportId?: string) {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-[.5rem] border border-gray-100 dark:border-gray-800 text-xs font-bold">
           <div class="space-y-1">
             <span class="text-gray-400 uppercase flex items-center gap-1"><User class="w-3 h-3" /> Nome</span>
-            <p class="text-gray-900 dark:text-white font-black text-sm">{{ notification.details?.userName || 'Não informado' }}</p>
+            <p class="text-gray-900 dark:text-gray-100 font-semibold text-sm">{{ notification.details?.userName || 'Não informado' }}</p>
           </div>
           <div class="space-y-1">
             <span class="text-gray-400 uppercase flex items-center gap-1"><Mail class="w-3 h-3" /> E-mail</span>
-            <p class="text-gray-900 dark:text-white font-black text-sm">{{ notification.details?.userEmail || 'Não informado' }}</p>
+            <p class="text-gray-900 dark:text-gray-100 font-semibold text-sm">{{ notification.details?.userEmail || 'Não informado' }}</p>
           </div>
           <div class="space-y-1">
             <span class="text-gray-400 uppercase flex items-center gap-1"><Coins class="w-3 h-3" /> Créditos Comprados</span>
@@ -272,7 +272,7 @@ function downloadPdf(reportId?: string) {
           </div>
           <div class="space-y-1">
             <span class="text-gray-400 uppercase">Novo Saldo</span>
-            <p class="text-gray-900 dark:text-white font-black text-sm">{{ notification.details?.newBalance }}</p>
+            <p class="text-gray-900 dark:text-gray-100 font-semibold text-sm">{{ notification.details?.newBalance }}</p>
           </div>
         </div>
       </div>

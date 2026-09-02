@@ -57,12 +57,6 @@ const filteredNotifications = computed(() => {
   return notifications.value
 })
 
-const getCardColor = (type) => {
-  if (type === 'admin_new_signup') return 'amber'
-  if (type === 'admin_credit_purchase') return 'emerald'
-  return 'blue'
-}
-
 function openDetail(notification: INotificationItem) {
   selectedNotification.value = notification
   if (!notification.read) {
@@ -138,7 +132,7 @@ function timeAgo(dateStr: string) {
             {{ activeTab === 'unread' ? 'Nenhuma notificação não lida' : 'Nenhuma notificação por aqui' }}
           </p>
         </div>
-        <BaseCard v-for="n in filteredNotifications" :key="n._id" compact :color="getCardColor(n.type)"
+        <BaseCard v-for="n in filteredNotifications" :key="n._id" compact
           @click="openDetail(n)" class="transition-all cursor-pointer relative">
           <template #header>
             <!-- Avatar do usuário (cadastro/compra de crédito) no lugar do ícone genérico -->
@@ -163,21 +157,20 @@ function timeAgo(dateStr: string) {
               <Coins v-else-if="n.type === 'admin_credit_purchase'" class="w-4 h-4" />
             </div>
             <!-- Conteúdo Breve do Card -->
-            <div class="flex-1 space-y-1 pr-3">
-              <div class="flex grid grid-column items-center">
-                <h4 class="text-xs font-semibold uppercase tracking-wider"
+            <div class="flex-1 space-y-1 pr-3 min-w-0">
+              <div class="flex items-center justify-between gap-2">
+                <h4 class="text-xs font-semibold truncate"
                   :class="!n.read ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-300'">
                   {{ n.title }}
                 </h4>
-                <span class="text-[10px] font-medium text-slate-400 flex items-center gap-1">
+                <span class="text-[10px] font-medium text-slate-400 flex items-center gap-1 shrink-0">
                   <Clock class="w-3 h-3 text-slate-400" />
                   {{ timeAgo(n.createdAt) }}
                 </span>
               </div>
-
             </div>
 
-            <div v-if="!n.read" class="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0 mt-1.5"></div>
+            <div v-if="!n.read" class="w-2.5 h-2.5 rounded-full bg-blue-600 self-center shrink-0" aria-label="Não lida"></div>
           </template>
           <p class="text-xs font-base text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
             {{ n.summary }}

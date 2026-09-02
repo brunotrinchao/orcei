@@ -48,6 +48,9 @@ export function useProposalDetailModal(
     if (st === 'sent' || st === 'delivered' || st === 'opened' || st === 'clicked' || st === 'viewed' || st === 'pending') {
       return { label: 'Aguardando Aceite', variant: 'info' as const }
     }
+    if (st === 'expired') {
+      return { label: 'Expirado', variant: 'error' as const }
+    }
     const phase = getProposalPhase(st, sig)
     return {
       label: getPhaseInfo(phase).label,
@@ -89,7 +92,7 @@ export function useProposalDetailModal(
   /** Ação permitida p/ status atual (fonte central: proposalLifecycle) */
   function can(action: ProposalAction) {
     if (!props.proposal) return false
-    return getAllowedActions(props.proposal.status, props.proposal.signature?.status ?? null).includes(action)
+    return getAllowedActions(props.proposal.status, props.proposal.signature?.status ?? null, props.proposal.expiresAt).includes(action)
   }
 
   const publicUrl = computed(() => {

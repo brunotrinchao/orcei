@@ -178,6 +178,9 @@ export function useOrcamentosPage() {
   const isAiAssistedProposal = ref(false)
   const isSubmitting = ref(false)
   const isResending = ref<string | null>(null)
+  const isRenewing = ref<string | null>(null)
+  const isRenewModalOpen = ref(false)
+  const renewTarget = ref<any>(null)
   const proposalFormRef = ref<any>(null)
 
   const { notify, confirm: confirmAlert } = useAlerts()
@@ -251,6 +254,33 @@ export function useOrcamentosPage() {
         }
       }
     })
+  }
+
+  function renewProposal(proposal: any) {
+    const proposalId = typeof proposal === 'string' ? proposal : proposal._id
+    const targetProposal = typeof proposal === 'object' ? proposal : (proposals.value || []).find((p: any) => p._id === proposalId)
+    renewTarget.value = targetProposal || null
+    isRenewModalOpen.value = true
+  }
+
+  async function confirmRenew(proposal: any, resendEmail: boolean) {
+    const proposalId = typeof proposal === 'string' ? proposal : proposal._id
+    isRenewing.value = proposalId
+    try {
+      await $fetch(`/api/proposals/${proposalId}/renew`, {
+        method: 'POST',
+        body: { resendEmail }
+      })
+      notify('Sucesso', resendEmail
+        ? 'Orçamento renovado! Novo e-mail enviado com a validade atualizada.'
+        : 'Orçamento renovado com a nova data de validade.')
+      await refresh()
+    } catch (e: any) {
+      notify('Erro', e.data?.statusMessage || 'Erro ao renovar orçamento')
+    } finally {
+      isRenewing.value = null
+      isRenewModalOpen.value = false
+    }
   }
 
   async function shareProposal(proposal: ProposalDTO) {
@@ -568,6 +598,11 @@ export function useOrcamentosPage() {
     canShowWhatsappButton,
     sendWhatsapp,
     resendEmail,
+    renewProposal,
+    confirmRenew,
+    isRenewing,
+    isRenewModalOpen,
+    renewTarget,
     shareProposal,
     openModal,
     onAIWizardSuccess,

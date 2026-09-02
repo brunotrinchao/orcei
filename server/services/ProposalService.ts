@@ -52,6 +52,22 @@ export const ProposalService = {
         console.warn('[ProposalService] Erro ao sincronizar status Assinafy em getById:', err)
       }
     }
+
+    // Expiração: validade vencida vira status real 'expired' + evento no histórico
+    await this.syncExpiredStatus(proposal)
+    return proposal
+  },
+
+  /** Marca como 'expired' (persistido + histórico) quando a validade venceu. Ignora terminais e rascunhos. */
+  async syncExpiredStatus(proposal: any) {
+    if (!proposal) return proposal
+    const st = proposal.status
+    if (['accepted', 'signed', 'draft', 'expired'].includes(st)) return proposal
+    if (!proposal.expiresAt) return proposal
+    if (new Date(proposal.expiresAt).getTime() > Date.now()) return proposal
+    proposal.status = 'expired'
+    await proposal.save()
+    await this.logHistory(proposal._id, 'expired', 'system', { expiredAt: proposal.expiresAt })
     return proposal
   },
 

@@ -58,9 +58,23 @@ describe('ProposalPhaseStepper', () => {
     expect(wrapper.findAll('svg')).toHaveLength(0)
   })
 
-  it('accepted mostra 4 checks (fases concluídas)', async () => {
+  it('accepted mostra 3 checks (Rascunho + Em andamento + Assinatura concluídas)', async () => {
     const wrapper = await mountSuspended(ProposalPhaseStepper, {
       props: { status: 'accepted' }
+    })
+    expect(wrapper.findAll('svg')).toHaveLength(3)
+  })
+
+  it('expirado mostra só 2 checks (Assinatura/Fechado nunca ocorreram)', async () => {
+    const wrapper = await mountSuspended(ProposalPhaseStepper, {
+      props: { status: 'expired' }
+    })
+    expect(wrapper.findAll('svg')).toHaveLength(2)
+  })
+
+  it('assinatura recusada mostra 3 checks (Em andamento concluída antes da assinatura)', async () => {
+    const wrapper = await mountSuspended(ProposalPhaseStepper, {
+      props: { status: 'accepted', signatureStatus: 'rejected' }
     })
     expect(wrapper.findAll('svg')).toHaveLength(3)
   })

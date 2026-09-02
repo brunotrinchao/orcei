@@ -56,6 +56,11 @@ const {
   canShowWhatsappButton,
   sendWhatsapp,
   resendEmail,
+  renewProposal,
+  confirmRenew,
+  isRenewing,
+  isRenewModalOpen,
+  renewTarget,
   shareProposal,
   openModal,
   onAIWizardSuccess,
@@ -218,6 +223,7 @@ const {
       @edit="p => { showProposalInfo = false; openModal(p) }" @history="p => { openHistory(p) }"
       @download-pdf="p => { downloadPdf(p) }" @resend-email="p => { resendEmail(p) }"
       @edit-contract="p => { showProposalInfo = false; openContractModal(p) }"
+      @renew="p => { showProposalInfo = false; renewProposal(p) }"
       @delete="p => { showProposalInfo = false; confirmDeleteProposal(p) }" />
 
     <!-- Drawer de Orçamento -->
@@ -503,6 +509,37 @@ const {
     <LazyProposalChatModal v-model:open="isChatOpen" :proposal="selectedProposal" @refresh="refresh" />
     <!-- Modal de Paywall Express -->
     <PaywallExpressModal v-model:open="isPaywallOpen" :reason="paywallReason" />
+
+    <!-- Modal Renovar / Reenviar -->
+    <BaseDialog v-model:open="isRenewModalOpen" title="Renovar Orçamento" size="sm">
+      <div v-if="renewTarget" class="p-2 space-y-4">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center shrink-0">
+            <RefreshCcw class="w-5 h-5" />
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-900 dark:text-gray-50 text-sm">Este orçamento venceu</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+              <span class="font-semibold text-gray-700 dark:text-gray-300">{{ renewTarget.title || renewTarget.code }}</span>
+              — a validade expirou. Escolha como deseja renovar. O link enviado ao cliente continua o mesmo.
+            </p>
+          </div>
+        </div>
+      </div>
+      <template #footer>
+        <BaseButton variant="outline" @click="isRenewModalOpen = false" class="flex-1">
+          Cancelar
+        </BaseButton>
+        <BaseButton variant="secondary" class="flex-1" :loading="isRenewing === (renewTarget?._id || '')" :disabled="!!isRenewing"
+          @click="confirmRenew(renewTarget, false)">
+          Apenas Renovar
+        </BaseButton>
+        <BaseButton class="flex-1 bg-amber-600 hover:bg-amber-500" :loading="isRenewing === (renewTarget?._id || '')" :disabled="!!isRenewing"
+          @click="confirmRenew(renewTarget, true)">
+          Renovar e Reenviar
+        </BaseButton>
+      </template>
+    </BaseDialog>
 
   </div>
 </template>

@@ -19,6 +19,7 @@ export type ProposalAction =
   | 'public_link'
   | 'request_signature'
   | 'edit_contract'
+  | 'renew'
 
 export interface ProposalPhaseInfo {
   key: ProposalPhase
@@ -109,14 +110,44 @@ export function getPhaseColor(phase: ProposalPhase): string {
 
 interface PhaseStepperState {
   current: number
+  doneCount: number
   phases: ProposalPhase[]
 }
 
+/**
+ * Estado do stepper:
+ * - `current`: fase atual (dot destacado).
+ * - `doneCount`: quantas fases foram REALMENTE concluídas. Falha/cancelamento não
+ *   implica passar pelas etapas seguintes (ex: expirado veio de Em andamento —
+ *   Assinatura e Fechado nunca ocorreram).
+ */
 export function getPhaseStepper(status: string | null | undefined, signatureStatus?: string | null): PhaseStepperState {
   const phase = getProposalPhase(status, signatureStatus)
   const current = PROPOSAL_PHASES.findIndex((p) => p.key === phase)
+
+  let doneCount: number
+  switch (phase) {
+    case 'draft':
+      doneCount = 0
+      break
+    case 'progress':
+      doneCount = 1 // Rascunho concluído
+      break
+    case 'signature':
+      doneCount = 2 // Rascunho + Em andamento
+      break
+    case 'closed':
+      doneCount = 3 // Rascunho + Em andamento + Assinatura
+      break
+    case 'failed':
+      // Falha veio de Em andamento (envio/expiração) ou, se assinatura recusada, de Assinatura
+      doneCount = signatureStatus === 'rejected' ? 3 : 2
+      break
+  }
+
   return {
     current: current === -1 ? 0 : current,
+    doneCount,
     phases: PROPOSAL_PHASES.map((p) => p.key)
   }
 }
@@ -125,9 +156,15 @@ export function getPhaseStepper(status: string | null | undefined, signatureStat
  * Ações permitidas por status (assinatura) do orçamento.
  * Preserva o comportamento atual do frontend; corrige gaps (signed bloqueia edit/delete).
  */
-export function getAllowedActions(status: string | null | undefined, signatureStatus?: string | null): ProposalAction[] {
+export function getAllowedActions(status: string | null | undefined, signatureStatus?: string | null, expiresAt?: string | Date | null): ProposalAction[] {
   const st = status || ''
   const actions = new Set<ProposalAction>(['download', 'history'])
+
+  // Renovar: expirado por status OU vencido por data (não aceito/assinado)
+  const isExpiredByDate = !!expiresAt && st !== 'accepted' && st !== 'signed' && new Date(expiresAt).getTime() <= Date.now()
+  if (st === 'expired' || isExpiredByDate) {
+    actions.add('renew')
+  }
 
   // Edit / Delete — bloqueados p/ fechado
   if (st !== 'accepted' && st !== 'signed') {
@@ -140,8 +177,8 @@ export function getAllowedActions(status: string | null | undefined, signatureSt
     actions.add('send')
   }
 
-  // Reenviar e-mail
-  if (st !== 'draft' && st !== 'accepted' && st !== 'signed' && signatureStatus !== 'signed') {
+  // Reenviar e-mail — expirado usa Renovar / Reenviar (recalcula validade, reenvia com mesmo link)
+  if (st !== 'draft' && st !== 'accepted' && st !== 'signed' && st !== 'expired' && signatureStatus !== 'signed') {
     actions.add('resend')
   }
 
@@ -175,6 +212,7 @@ export function canDo(action: ProposalAction, status: string | null | undefined,
 export const EVENT_TO_PHASE: Record<string, ProposalPhase | 'system'> = {
   // Rascunho
   created: 'draft',
+  renew: 'progress',
   // Em andamento
   sent: 'progress',
   delivered: 'progress',
@@ -184,6 +222,7 @@ export const EVENT_TO_PHASE: Record<string, ProposalPhase | 'system'> = {
   received: 'progress',
   scheduled: 'progress',
   pending: 'progress',
+  renew: 'progress',
   // Assinatura
   signature_requested: 'signature',
   uploaded: 'signature',

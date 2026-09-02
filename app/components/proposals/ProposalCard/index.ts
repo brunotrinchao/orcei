@@ -47,7 +47,7 @@ export function useProposalCard(props: {
 
   /** Ação permitida p/ o status atual (fonte central: proposalLifecycle) */
   function can(action: ProposalAction) {
-    return getAllowedActions(props.proposal.status, props.proposal.signature?.status ?? null).includes(action)
+    return getAllowedActions(props.proposal.status, props.proposal.signature?.status ?? null, props.proposal.expiresAt).includes(action)
   }
 
   return {

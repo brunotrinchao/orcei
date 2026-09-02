@@ -16,6 +16,7 @@ const emit = defineEmits<{
   (e: "downloadPdf", proposal: ProposalDTO): void;
   (e: "resendEmail", proposal: ProposalDTO): void;
   (e: "editContract", proposal: ProposalDTO): void;
+  (e: "renew", proposal: ProposalDTO): void;
   (e: "delete", proposal: ProposalDTO): void;
 }>();
 
@@ -105,6 +106,10 @@ const drawerDescription = () => {
         <BaseDropdownMenuItem v-if="can('edit_contract')" @click="emit('editContract', proposal)">
           <FileText class="w-4 h-4 text-gray-500" />
           <span>Editar Contrato</span>
+        </BaseDropdownMenuItem>
+        <BaseDropdownMenuItem v-if="can('renew')" @click="emit('renew', proposal)">
+          <RefreshCcw class="w-4 h-4 text-amber-500" />
+          <span>Renovar / Reenviar</span>
         </BaseDropdownMenuItem>
         <BaseDropdownMenuItem v-if="can('delete')" variant="danger" @click="emit('delete', proposal)">
           <Trash2 class="w-4 h-4 text-red-500" />

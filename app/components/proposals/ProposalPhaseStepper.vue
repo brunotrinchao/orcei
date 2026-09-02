@@ -17,13 +17,15 @@ const props = withDefaults(
   }
 )
 
-const current = computed(() => getPhaseStepper(props.status, props.signatureStatus).current)
+const stepper = computed(() => getPhaseStepper(props.status, props.signatureStatus))
+const current = computed(() => stepper.value.current)
+const doneCount = computed(() => stepper.value.doneCount)
 
 const dotSize = computed(() => (props.size === 'sm' ? 'w-4 h-4' : 'w-5 h-5'))
 const checkSize = computed(() => (props.size === 'sm' ? 'w-2.5 h-2.5' : 'w-3 h-3'))
 
 function isDone(index: number) {
-  return index < current.value
+  return index < doneCount.value
 }
 
 function isCurrent(index: number) {

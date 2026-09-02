@@ -1,4 +1,5 @@
 import { ProfileService } from '../../services/ProfileService'
+import { ProposalService } from '../../services/ProposalService'
 import { Proposal } from '../../models/Proposal'
 import { ProposalMessage } from '../../models/ProposalMessage'
 import { ProposalHistory } from '../../models/ProposalHistory'
@@ -84,6 +85,11 @@ export default defineEventHandler(async (event) => {
       p.status = 'accepted'
       await Proposal.updateOne({ _id: p._id }, { status: 'accepted' })
     }
+
+    // Validade vencida → status real 'expired' persistido + histórico
+    const full = await Proposal.findById(p._id)
+    await ProposalService.syncExpiredStatus(full)
+    if (full && full.status === 'expired') p.status = 'expired'
 
     const [hasMessages, unreadCount, viewEvents] = await Promise.all([
       ProposalMessage.exists({ proposalId: p._id }),

@@ -1,8 +1,8 @@
 import { computed } from 'vue'
 import { SendMethod } from '../../../../types/enums'
-import { User, Calendar, CreditCard, Mail, Link as LinkIcon, AlertCircle, Sparkles, CheckCircle2, ShieldAlert, Circle } from 'lucide-vue-next'
+import { User, Calendar, CreditCard, Mail, Link as LinkIcon, AlertCircle, Sparkles, CheckCircle2, ShieldAlert, Circle, Clock } from 'lucide-vue-next'
 
-export function useProposalStepSummary(props: { form: any; finalTotal: number; clients: any[] }) {
+export function useProposalStepSummary(props: { form: any; finalTotal: number; clients: any[]; initialExpiresAt?: string | null; validityDays?: number }) {
   const selectedClient = computed(() => {
     return props.form.client?.name ? props.form.client : null
   })
@@ -118,6 +118,7 @@ export function useProposalStepSummary(props: { form: any; finalTotal: number; c
     Sparkles,
     CheckCircle2,
     ShieldAlert,
-    Circle
+    Circle,
+    Clock
   }
 }

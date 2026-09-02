@@ -25,6 +25,7 @@ const {
   isExpiredState,
   validityPercent,
   validityBarColor,
+  can,
   canShowChatButton,
   canShowWhatsappButton,
   MessageCircle,
@@ -62,6 +63,11 @@ const {
         <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Total</span>
         <span class="font-black text-gray-900 dark:text-gray-50">R$ {{ proposal.totals.final.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
       </div>
+    </div>
+
+    <!-- fases do ciclo de vida -->
+    <div class="mt-3">
+      <ProposalPhaseStepper :status="proposal.status" :signature-status="proposal.signature?.status ?? null" size="sm" />
     </div>
 
     <!-- barra de validade -->
@@ -130,7 +136,7 @@ const {
               Baixar Orçamento
             </DropdownMenuItem>
             <DropdownMenuItem
-              v-if="proposal.status !== 'draft' && proposal.status !== 'accepted' && proposal.signature?.status !== 'signed'"
+              v-if="can('resend')"
               :disabled="isResending"
               @click="$emit('resend-email')"
               class="flex items-center gap-3 px-4 py-3 rounded-[.5rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer outline-none transition-all disabled:opacity-50"
@@ -140,7 +146,7 @@ const {
               Reenviar E-mail
             </DropdownMenuItem>
             <DropdownMenuItem
-              v-if="proposal.status !== 'accepted' && proposal.signature?.status !== 'signed'"
+              v-if="can('edit')"
               @click="$emit('edit')"
               class="flex items-center gap-3 px-4 py-3 rounded-[.5rem] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:text-amber-600 dark:hover:text-amber-400 cursor-pointer outline-none transition-all"
             >
@@ -148,7 +154,7 @@ const {
               Editar
             </DropdownMenuItem>
             <DropdownMenuItem
-              v-if="proposal.status !== 'accepted' && proposal.signature?.status !== 'signed'"
+              v-if="can('delete')"
               @click="$emit('delete')"
               class="flex items-center gap-3 px-4 py-3 rounded-[.5rem] text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-600 dark:hover:text-red-300 cursor-pointer outline-none transition-all"
             >

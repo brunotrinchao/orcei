@@ -64,10 +64,10 @@ defineExpose({ validate: validateStep, reset })
     <!-- Escopo Principal -->
     <BaseCard :title="`Itens Obrigatórios (${form.items.length})`" compact color="slate">
       <div v-if="form.items.length === 0"
-        class="p-8 border-2 border-dashed rounded-[.5rem] text-center font-medium transition-colors"
-        :class="submitAttempted ? 'border-red-300 dark:border-red-500/50 text-red-500' : 'border-gray-200 dark:border-gray-800 text-gray-400 dark:text-gray-500'">
+        class="p-8 border-2 border-dashed rounded-[.5rem] text-center font-normal transition-colors"
+        :class="submitAttempted ? 'border-red-300 dark:border-red-500/50 text-red-500' : 'border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-500'">
         Adicione itens buscando no catálogo acima ou clicando em "+".
-        <span v-if="submitAttempted" class="block text-[10px] font-semibold tracking-wide mt-2">Pelo menos 1 item
+        <span v-if="submitAttempted" class="block text-[11px] font-semibold tracking-wide mt-2">Pelo menos 1 item
           obrigatório é necessário</span>
       </div>
 
@@ -79,13 +79,13 @@ defineExpose({ validate: validateStep, reset })
             <div class="flex-1 flex items-center gap-3 min-w-0 w-full sm:w-[30%]">
               <template v-if="!item.catalogItemId">
                 <input v-model="item.name"
-                  class="flex-1 text-sm sm:text-base font-medium text-gray-900 dark:text-gray-50 bg-transparent border-b focus:border-blue-500 focus:ring-0 p-1 outline-none transition-all truncate"
+                  class="flex-1 text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-50 bg-transparent border-b focus:border-blue-500 focus:ring-0 p-1 outline-none transition-all truncate"
                   :class="submitAttempted && !item.name.trim() ? 'border-red-400 dark:border-red-500' : 'border-transparent'"
                   placeholder="Nome do Serviço">
               </template>
               <template v-else>
                 <span
-                  class="flex-1 text-sm sm:text-base font-medium text-gray-900 dark:text-gray-50 p-1 sm:truncate ">{{
+                  class="flex-1 text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-50 p-1 sm:truncate ">{{
                     item.name }}</span>
               </template>
               <BaseButton variant="ghost" size="icon-sm" @click="toggleItemExpansion(idx)" type="button"
@@ -107,7 +107,7 @@ defineExpose({ validate: validateStep, reset })
               </div>
 
               <div class="hidden md:block text-right min-w-[90px]">
-                <span class="text-sm font-semibold text-gray-900 dark:text-gray-50">R$ {{ getItemTotal(item).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+                <span class="text-sm font-bold text-gray-900 dark:text-gray-50">R$ {{ getItemTotal(item).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
               </div>
             </div>
 
@@ -136,7 +136,7 @@ defineExpose({ validate: validateStep, reset })
               <div class="relative w-full">
                 <template v-if="!item.catalogItemId">
                   <textarea v-model="item.description" rows="1"
-                    class="w-full text-sm font-medium text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-600 bg-transparent p-0 border-0 focus:ring-0 outline-none resize-none transition-all"
+                    class="w-full text-sm font-normal text-gray-600 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-500 bg-transparent p-0 border-0 focus:ring-0 outline-none resize-none transition-all"
                     placeholder="Descreva detalhadamente o que será entregue (visível para o cliente)..."></textarea>
                 </template>
                 <template v-else>
@@ -174,7 +174,7 @@ defineExpose({ validate: validateStep, reset })
               </template>
               <template v-else>
                 <span
-                  class="flex-1 text-sm sm:text-base font-medium text-gray-900 dark:text-gray-50 p-1 sm:truncate ">{{
+                  class="flex-1 text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-50 p-1 sm:truncate ">{{
                     item.name }}</span>
               </template>
               <BaseButton variant="ghost" size="icon-sm" @click="toggleItemExpansion(idx, true)" type="button"
@@ -195,7 +195,7 @@ defineExpose({ validate: validateStep, reset })
               </div>
 
               <div class="hidden md:block text-right min-w-[80px]">
-                <span class="text-sm font-medium text-gray-900 dark:text-gray-50">+ R$ {{ getItemTotal(item).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
+                <span class="text-sm font-bold text-gray-900 dark:text-gray-50">+ R$ {{ getItemTotal(item).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
               </div>
             </div>
 
@@ -222,7 +222,7 @@ defineExpose({ validate: validateStep, reset })
               <div class="relative w-full">
                 <template v-if="!item.catalogItemId">
                   <textarea v-model="item.description" rows="1"
-                    class="w-full text-sm font-medium text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-600 bg-transparent p-0 border-0 focus:ring-0 outline-none resize-none transition-all"
+                    class="w-full text-sm font-normal text-gray-600 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-500 bg-transparent p-0 border-0 focus:ring-0 outline-none resize-none transition-all"
                     placeholder="Por que o cliente deveria adquirir este pacote adicional?"></textarea>
                 </template>
                 <template v-else>

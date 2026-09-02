@@ -241,7 +241,7 @@ export const ProposalService = {
   async _updateTxn(id: string, profileId: string, data: any, isAdmin: boolean, useSession: boolean) {
     const oldProposal = await Proposal.findOne({ _id: id, profileId })
     if (!oldProposal) return null
-    if (oldProposal.status === ProposalStatus.ACCEPTED) return null
+    if (oldProposal.status === ProposalStatus.ACCEPTED || oldProposal.status === ProposalStatus.SIGNED) return null
 
     // Verificação de saldo ANTES de abrir a transação, se a transição for cobrar crédito
     const willCharge = oldProposal.status === ProposalStatus.DRAFT && data.status !== ProposalStatus.DRAFT
@@ -269,6 +269,17 @@ export const ProposalService = {
       // Consome crédito se mudar de draft para created/pending/etc
       if (willCharge) {
         await this.consumeCredit(profileId, cost, session || undefined, isAdmin)
+
+        // Validade do orçamento conta a partir do ENVIO ao cliente, não da criação do rascunho.
+        // Rascunho saindo → reposiciona createdAt (ordenação) e recalcula expiresAt.
+        const profile = session
+          ? await Profile.findById(profileId).session(session)
+          : await Profile.findById(profileId)
+        const validityDays = profile?.defaultValidityDays || 7
+        const now = new Date()
+        const newExpiresAt = new Date(now.getTime() + validityDays * 24 * 60 * 60 * 1000)
+        data.createdAt = now
+        data.expiresAt = newExpiresAt
 
         // Se mudou para 'created' e não for manual, agenda e-mail
         if (data.status === ProposalStatus.CREATED && data.sendMethod !== SendMethod.MANUAL) {
@@ -299,8 +310,21 @@ export const ProposalService = {
         { returnDocument: 'after', session: session || undefined }
       )
 
-      if (updated && emailQueued) {
-        await this.logHistory(updated._id, ProposalStatus.SENT, 'email', { status: 'queued' })
+      if (updated) {
+        const statusChanged = oldProposal.status !== updated.status
+
+        // Registra a transição de status no histórico (fase "Em andamento").
+        // Envio manual (draft → created com sendMethod manual) não dispara e-mail,
+        // então logamos um evento explícito de envio manual.
+        if (statusChanged && updated.status === ProposalStatus.CREATED && data.sendMethod === SendMethod.MANUAL) {
+          await this.logHistory(updated._id, 'sent', 'system', { sendMethod: 'manual', status: 'completed' })
+        } else if (statusChanged && updated.status !== ProposalStatus.CREATED) {
+          await this.logHistory(updated._id, updated.status, 'system')
+        }
+
+        if (emailQueued) {
+          await this.logHistory(updated._id, ProposalStatus.SENT, 'email', { status: 'queued' })
+        }
       }
 
       if (session) {
@@ -333,7 +357,7 @@ export const ProposalService = {
   async delete(id: string, profileId: string) {
     const proposal = await Proposal.findOne({ _id: id, profileId })
     if (!proposal) return null
-    if (proposal.status === ProposalStatus.ACCEPTED) {
+    if (proposal.status === ProposalStatus.ACCEPTED || proposal.status === ProposalStatus.SIGNED) {
       throw createError({ statusCode: 409, statusMessage: 'Não é possível excluir um orçamento já aceito.' })
     }
     return await Proposal.findOneAndDelete({ _id: id, profileId })

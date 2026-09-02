@@ -28,6 +28,15 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'O cliente precisa ter nome e e-mail cadastrados para assinar digitalmente.' })
   }
 
+  // Regra de negócio: assinatura eletrônica somente APÓS o aceite do cliente.
+  // O aceite dispara a solicitação automaticamente (via fila) — este endpoint é o fallback manual.
+  if (proposal.status !== 'accepted') {
+    throw createError({
+      statusCode: 422,
+      statusMessage: 'O cliente precisa aceitar o orçamento antes de solicitar a assinatura eletrônica. O link será enviado por e-mail automaticamente após o aceite.'
+    })
+  }
+
   // Atualiza os dados de assinatura da proposta para status "pending" (Aguardando assinatura)
   proposal.signature = {
     provider: 'assinafy',
@@ -38,11 +47,6 @@ export default defineEventHandler(async (event) => {
     signedFileUrl: null,
     rejectionReason: null,
     requestedAt: new Date()
-  }
-
-  // Se o orçamento estava em rascunho, avança o status para enviado
-  if (proposal.status === 'draft') {
-    proposal.status = 'sent'
   }
 
   await proposal.save()

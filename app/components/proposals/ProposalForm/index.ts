@@ -14,10 +14,10 @@ export function useProposalForm(
   const stepScopeRef = ref<{ validate: () => boolean } | null>(null)
 
   const steps = [
-    { step: 1, title: 'Cliente' },
-    { step: 2, title: 'Serviços' },
-    { step: 3, title: 'Finalização' },
-    { step: 4, title: 'Resumo' }
+    { step: 1, title: 'Cliente', subtitle: 'Quem vai receber o orçamento' },
+    { step: 2, title: 'Serviços', subtitle: 'Itens, escopo e condições' },
+    { step: 3, title: 'Pagamento', subtitle: 'Forma de pagamento e descontos' },
+    { step: 4, title: 'Revisão', subtitle: 'Confira tudo antes de enviar' }
   ]
 
   const clientSearch = ref('')
@@ -114,35 +114,42 @@ export function useProposalForm(
     }
   })
 
-  watch(() => props.initialData, (newVal) => {
-    if (newVal) {
-      form.value = {
-        title: newVal.title,
-        status: newVal.status,
-        client: { 
-          name: newVal.client.name,
-          email: newVal.client.email,
-          phone: newVal.client.phone || ''
-        },
-        items: [...newVal.items],
-        upsellItems: newVal.upsellItems ? [...newVal.upsellItems] : [],
-        totals: {
-          additional: newVal.totals?.additional || 0,
-          discount: newVal.totals?.discount || 0
-        },
-        paymentConfig: {
-          method: newVal.paymentConfig?.method || PaymentMethod.CASH,
-          acceptCreditCard: getInitialAcceptCreditCard(newVal, profile.value),
-          installments: newVal.paymentConfig?.installments || 1,
-          cashDiscount: newVal.paymentConfig?.cashDiscount || 0
-        },
-        sendMethod: newVal.sendMethod || SendMethod.AUTO,
-        contractText: newVal.contractText || '',
-        termsAndConditions: newVal.termsAndConditions || '',
-        executionDate: newVal.executionDate ? new Date(newVal.executionDate).toISOString().slice(0, 16) : ''
-      }
+  function applyInitialData(newVal: any) {
+    form.value = {
+      title: newVal.title,
+      status: newVal.status,
+      client: {
+        name: newVal.client.name,
+        email: newVal.client.email,
+        phone: newVal.client.phone || ''
+      },
+      items: [...newVal.items],
+      upsellItems: newVal.upsellItems ? [...newVal.upsellItems] : [],
+      totals: {
+        additional: newVal.totals?.additional || 0,
+        discount: newVal.totals?.discount || 0
+      },
+      paymentConfig: {
+        method: newVal.paymentConfig?.method || PaymentMethod.CASH,
+        acceptCreditCard: getInitialAcceptCreditCard(newVal, profile.value),
+        installments: newVal.paymentConfig?.installments || 1,
+        cashDiscount: newVal.paymentConfig?.cashDiscount || 0
+      },
+      sendMethod: newVal.sendMethod || SendMethod.AUTO,
+      contractText: newVal.contractText || '',
+      termsAndConditions: newVal.termsAndConditions || '',
+      executionDate: newVal.executionDate ? new Date(newVal.executionDate).toISOString().slice(0, 16) : ''
     }
-  }, { deep: true })
+  }
+
+  applyInitialData(props.initialData)
+
+  // Watch apenas quando troca de orçamento (abertura de novo draft p/ edição).
+  // Deep watch no objeto reativo sobrescrevia campos editados (cliente, itens)
+  // quando o backend sincronizava in-place (ex: chat/refresh).
+  watch(() => props.initialData?._id, () => {
+    if (props.initialData) applyInitialData(props.initialData)
+  })
 
   function setPrefilledClientAndStep(clientData: any, targetStep: number = 2) {
     if (clientData) {
@@ -308,6 +315,7 @@ export function useProposalForm(
     totalCatalogItems,
     selectedClientId,
     form,
+    profile,
     isGenerating,
     isCreditConfirmOpen,
     confirmTitle,

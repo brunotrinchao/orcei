@@ -162,7 +162,7 @@ defineExpose({ validate, reset })
       <form id="manual-client-form" @submit.prevent="createManualClient" class="grid grid-cols-1 gap-4 py-2">
         <BaseInput v-model="manualClient.name" label="Nome do Cliente" placeholder="Ex: João Silva" required />
         <BaseInput v-model="manualClient.email" type="email" label="E-mail" placeholder="cliente@email.com" />
-        <BaseInput v-model="manualClient.phone" label="Telefone / WhatsApp" placeholder="(00) 00000-0000" mask="phone" />
+        <BaseInput v-model="manualClient.phone" label="Telefone / WhatsApp" placeholder="(00) 00000-0000" mask="phone"/>
       </form>
 
       <template #footer>

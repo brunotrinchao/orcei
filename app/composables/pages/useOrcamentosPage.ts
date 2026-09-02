@@ -406,22 +406,33 @@ export function useOrcamentosPage() {
     rejected: { label: 'Rejeitado', color: 'bg-red-700 text-white' }
   }
 
+  /** Opções do filtro agrupadas por fase do ciclo de vida (ordem = PROPOSAL_PHASES) */
+  const statusFilterGroups = computed(() => {
+    const byPhase = new Map<string, { label: string; value: string }[]>()
+    for (const [value, info] of Object.entries(statusMap)) {
+      const phase = getProposalPhase(value)
+      if (!byPhase.has(phase)) byPhase.set(phase, [])
+      byPhase.get(phase)!.push({ label: (info as any).label, value })
+    }
+    return PROPOSAL_PHASES
+      .map((p) => ({ label: p.label, options: byPhase.get(p.key) || [] }))
+      .filter((g) => g.options.length > 0)
+  })
+
   const getStatusVariant = (proposal: ProposalDTO | string): 'default' | 'success' | 'warning' | 'error' | 'info' => {
     const statusStr = typeof proposal === 'string' ? proposal : proposal.status
     const sigStatus = typeof proposal === 'object' ? proposal.signature?.status : null
 
-    if (sigStatus === 'signed' || statusStr === 'accepted') return 'success'
-    if (sigStatus === 'pending') return 'warning'
-    if (['expired', 'bounced', 'failed', 'rejected'].includes(statusStr)) return 'error'
-    if (['sent', 'delivered', 'viewed', 'opened', 'created'].includes(statusStr)) return 'info'
-    if (statusStr === 'clicked' || statusStr === 'pending') return 'warning'
-    return 'default'
+    // Assinatura só conta APÓS o aceite
+    if (sigStatus === 'signed') return 'success'
+    if (statusStr === 'accepted' && (sigStatus === 'pending' || sigStatus === 'signing')) return 'warning'
+    return getPhaseBadgeVariant(getProposalPhase(statusStr))
   }
 
   function getProposalStatusLabel(proposal: ProposalDTO) {
     if (!proposal) return ''
     if (proposal.signature?.status === 'signed') return 'Aceito & Assinado'
-    if (proposal.signature?.status === 'pending') return 'Aguardando Assinatura'
+    if (proposal.status === 'accepted' && (proposal.signature?.status === 'pending' || proposal.signature?.status === 'signing')) return 'Aguardando Assinatura'
     if (proposal.status === 'accepted') return 'Aceito'
     if (proposal.status === 'rejected') return 'Rejeitado'
     if (proposal.status === 'failed' || proposal.status === 'bounced') return 'Erro no Envio'
@@ -565,6 +576,7 @@ export function useOrcamentosPage() {
     whatsappLink,
     handleProposalSubmit,
     statusMap,
+    statusFilterGroups,
     getStatusVariant,
     getProposalStatusLabel,
     formatDate,

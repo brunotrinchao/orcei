@@ -9,6 +9,8 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from 'radix-vue'
+import { ref, watch, onUnmounted } from 'vue'
+import { useOverlayStack, overlayZ, contentZ } from '~/composables/useOverlayStack'
 
 interface Props {
   open?: boolean
@@ -27,6 +29,18 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits(['update:open', 'confirm', 'cancel'])
+
+const { register, unregister } = useOverlayStack()
+const overlayLevel = ref(0)
+
+watch(() => props.open, (isOpen) => {
+  if (isOpen) overlayLevel.value = register()
+  else unregister()
+})
+
+onUnmounted(() => {
+  if (props.open) unregister()
+})
 </script>
 
 <template>
@@ -40,7 +54,10 @@ const emit = defineEmits(['update:open', 'confirm', 'cancel'])
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <AlertDialogOverlay class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[300]" />
+        <AlertDialogOverlay
+          :style="{ zIndex: overlayZ(overlayLevel, 200) }"
+          class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm"
+        />
       </Transition>
 
       <Transition
@@ -51,8 +68,9 @@ const emit = defineEmits(['update:open', 'confirm', 'cancel'])
         leave-from-class="opacity-100 scale-100 translate-y-0"
         leave-to-class="opacity-0 scale-95 translate-y-4"
       >
-        <AlertDialogContent 
-          class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md bg-white dark:bg-gray-900 rounded-[.5rem] p-8 shadow-2xl z-[301] focus:outline-none border border-line dark:border-gray-800"
+        <AlertDialogContent
+          :style="{ zIndex: contentZ(overlayLevel, 200) }"
+          class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md bg-white dark:bg-gray-900 rounded-[.5rem] p-8 shadow-2xl focus:outline-none border border-line dark:border-gray-800"
         >
           <AlertDialogTitle class="text-xl font-medium text-gray-900 dark:text-gray-50 tracking-normal mb-2">
             {{ title }}

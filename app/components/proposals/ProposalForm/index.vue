@@ -30,6 +30,7 @@ const {
   totalCatalogItems,
   selectedClientId,
   form,
+  profile,
   isGenerating,
   isCreditConfirmOpen,
   confirmTitle,
@@ -48,6 +49,9 @@ const {
   handleCreditConfirm,
   handleCreditCancel,
   Check,
+  Loader2,
+  ArrowRight,
+  ArrowLeft,
   StepperRoot,
   StepperItem,
   StepperTrigger,
@@ -61,8 +65,8 @@ const progress = computed(() => {
   return Math.round((currentStep.value / steps.length) * 100)
 })
 
-const currentStepTitle = computed(() => {
-  return steps.find((s) => s.step === currentStep.value)?.title || ''
+const currentStepInfo = computed(() => {
+  return steps.find((s) => s.step === currentStep.value) || steps[0]
 })
 
 defineExpose({
@@ -82,16 +86,17 @@ defineExpose({
 </script>
 
 <template>
-  <div class="flex flex-col gap-8 proposal-form-container">
-    <!-- Mobile: etapa atual + barra de progresso + contador -->
+  <div class="flex flex-col gap-6 proposal-form-container">
+    <!-- Header da etapa -->
     <div class="md:hidden">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ currentStepTitle }}</span>
-        <span class="text-xs font-medium text-muted shrink-0 ml-3">
-          {{ currentStep }} de {{ steps.length }}
+      <div class="flex items-center justify-between mb-1">
+        <h2 class="text-base font-black text-gray-900 dark:text-gray-50">{{ currentStepInfo.title }}</h2>
+        <span class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest shrink-0 ml-3">
+          Etapa {{ currentStep }} de {{ steps.length }}
         </span>
       </div>
-      <div class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+      <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ currentStepInfo.subtitle }}</p>
+      <div class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden mt-3">
         <div
           class="h-full bg-brand rounded-full transition-all duration-300"
           :style="{ width: `${progress}%` }"
@@ -99,42 +104,50 @@ defineExpose({
       </div>
     </div>
 
-    <!-- Radix Vue Stepper (desktop) -->
-    <StepperRoot v-model="currentStep" class="hidden md:flex w-full gap-2 mt-2">
-      <StepperItem
-        v-for="step in steps"
-        :key="step.step"
-        class="relative flex w-full items-center justify-center"
-        :step="step.step"
-        :disabled="step.step > currentStep"
-      >
-        <StepperSeparator
-          v-if="step.step !== steps.length"
-          class="absolute left-[calc(50%+20px)] right-[calc(-50%+10px)] top-5 block h-[2px] shrink-0 rounded-full bg-gray-100 dark:bg-gray-800 data-[state=completed]:bg-brand dark:data-[state=completed]:bg-brand transition-colors"
-        />
+    <!-- Stepper principal (todas as resoluções) -->
+    <div class="rounded-[.5rem] border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/40 px-4 py-3">
+      <StepperRoot v-model="currentStep" class="flex w-full gap-1 sm:gap-2">
+        <StepperItem
+          v-for="(step, idx) in steps"
+          :key="step.step"
+          class="relative flex flex-1 items-center justify-center min-w-0"
+          :step="step.step"
+          :disabled="step.step > currentStep"
+        >
+          <StepperSeparator
+            v-if="idx !== 0"
+            class="absolute left-[calc(50%+18px)] sm:left-[calc(50%+20px)] right-[calc(50%-18px)] sm:right-[calc(50%-20px)] top-[18px] sm:top-5 h-[2px] shrink-0 rounded-full bg-gray-200 dark:bg-gray-700 data-[state=completed]:bg-brand transition-colors"
+          />
 
-        <StepperTrigger as="button" class="flex flex-col items-center text-center gap-2 rounded-[.5rem] outline-none focus-visible:ring-2 focus-visible:ring-brand">
-          <StepperIndicator
-            :class="[
-              'flex h-10 w-10 items-center justify-center rounded-full text-sm font-black border-2 transition-all',
-              currentStep === step.step ? 'border-brand bg-brand text-white' :
-              currentStep > step.step ? 'border-brand bg-brand text-white' : 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-900'
-            ]"
+          <StepperTrigger
+            as="button"
+            class="flex flex-col items-center text-center gap-1.5 rounded-[.5rem] outline-none focus-visible:ring-2 focus-visible:ring-brand cursor-pointer"
           >
-            <Check v-if="currentStep > step.step" class="w-5 h-5" />
-            <span v-else>{{ step.step }}</span>
-          </StepperIndicator>
-          <div class="space-y-0.5">
-            <StepperTitle :class="['text-xs font-black uppercase tracking-widest', currentStep >= step.step ? 'text-gray-900 dark:text-gray-50' : 'text-gray-400 dark:text-gray-500']">
+            <StepperIndicator
+              :class="[
+                'flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full text-sm font-black border-2 transition-all',
+                currentStep === step.step ? 'border-brand bg-brand text-white shadow-md shadow-brand/20' :
+                currentStep > step.step ? 'border-brand bg-brand text-white' : 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-900'
+              ]"
+            >
+              <Check v-if="currentStep > step.step" class="w-5 h-5" />
+              <span v-else>{{ step.step }}</span>
+            </StepperIndicator>
+            <StepperTitle
+              :class="[
+                'text-[9px] sm:text-xs font-black uppercase tracking-widest whitespace-nowrap overflow-hidden text-ellipsis max-w-full px-1',
+                currentStep >= step.step ? 'text-gray-900 dark:text-gray-50' : 'text-gray-400 dark:text-gray-500'
+              ]"
+            >
               {{ step.title }}
             </StepperTitle>
-          </div>
-        </StepperTrigger>
-      </StepperItem>
-    </StepperRoot>
+          </StepperTrigger>
+        </StepperItem>
+      </StepperRoot>
+    </div>
 
-    <!-- Content Area -->
-    <form @submit.prevent="submit(ProposalStatus.DRAFT)" class="pb-6">
+    <!-- Conteúdo -->
+    <form @submit.prevent="submit(ProposalStatus.DRAFT)" class="pb-2">
       <div class="min-h-[40vh]">
         <ProposalStepClient
           ref="stepClientRef"
@@ -158,17 +171,19 @@ defineExpose({
           @catalog-updated="refreshCatalog"
         />
 
-        <ProposalStepPayment 
+        <ProposalStepPayment
           v-show="currentStep === 3"
           :form="form"
           :final-total="finalTotal"
         />
 
-        <ProposalStepSummary 
+        <ProposalStepSummary
           v-show="currentStep === 4"
           :form="form"
           :final-total="finalTotal"
           :clients="clients"
+          :initial-expires-at="props.initialData?.expiresAt || null"
+          :validity-days="profile?.defaultValidityDays || 7"
         />
       </div>
     </form>

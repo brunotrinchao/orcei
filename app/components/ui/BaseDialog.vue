@@ -1,9 +1,3 @@
-<script lang="ts">
-import { ref, watch, onUnmounted } from 'vue'
-
-const activeDialogsCount = ref(0)
-</script>
-
 <script setup lang="ts">
 import {
   DialogRoot,
@@ -18,6 +12,8 @@ import {
 } from 'radix-vue'
 import { X } from 'lucide-vue-next'
 import { useVModel } from '@vueuse/core'
+import { ref, watch, onUnmounted } from 'vue'
+import { useOverlayStack, overlayZ, contentZ } from '~/composables/useOverlayStack'
 
 const props = defineProps<DialogRootProps & {
   title?: string
@@ -30,23 +26,20 @@ const emits = defineEmits<DialogRootEmits>()
 
 const open = useVModel(props, 'open', emits)
 
-const currentZIndex = ref(0)
+const { register, unregister } = useOverlayStack()
+
+const overlayLevel = ref(0)
 
 watch(open, (isOpen) => {
   if (isOpen) {
-    activeDialogsCount.value++
-    currentZIndex.value = activeDialogsCount.value
+    overlayLevel.value = register()
   } else {
-    setTimeout(() => {
-      activeDialogsCount.value = Math.max(0, activeDialogsCount.value - 1)
-    }, 300) // wait for exit animation
+    unregister()
   }
 })
 
 onUnmounted(() => {
-  if (open.value) {
-    activeDialogsCount.value = Math.max(0, activeDialogsCount.value - 1)
-  }
+  if (open.value) unregister()
 })
 </script>
 
@@ -64,7 +57,7 @@ onUnmounted(() => {
         leave-to-class="opacity-0"
       >
         <DialogOverlay
-          :style="{ zIndex: 100 + (currentZIndex * 2) }"
+          :style="{ zIndex: overlayZ(overlayLevel) }"
           class="fixed inset-0 bg-black/40 backdrop-blur-sm"
         />
       </Transition>
@@ -78,7 +71,7 @@ onUnmounted(() => {
         leave-to-class="opacity-0 scale-95 translate-y-4"
       >
         <DialogContent
-          :style="{ zIndex: 101 + (currentZIndex * 2) }"
+          :style="{ zIndex: contentZ(overlayLevel) }"
           :class="[
             'fixed left-[50%] top-[50%] flex flex-col w-[100vw] sm:w-full h-[100dvh] sm:h-auto translate-x-[-50%] translate-y-[-50%] bg-white dark:bg-gray-900 shadow-2xl rounded-none sm:rounded-[.5rem] sm:border-2 border-slate-200 dark:border-gray-800 max-h-[100dvh] sm:max-h-[90vh] overflow-hidden outline-none',
             size === 'sm' ? 'sm:max-w-sm' : '',

@@ -2,6 +2,7 @@ import { computed } from 'vue'
 import { MessageCircle, MoreVertical, History, Download, RefreshCcw, Mail, Pencil, Trash2 } from 'lucide-vue-next'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem } from 'radix-vue'
 import type { ProposalDTO } from '../../../../types'
+import { getAllowedActions, type ProposalAction } from '~/utils/proposalLifecycle'
 
 export function useProposalCard(props: {
   proposal: ProposalDTO
@@ -44,11 +45,17 @@ export function useProposalCard(props: {
     return status !== 'draft'
   }
 
+  /** Ação permitida p/ o status atual (fonte central: proposalLifecycle) */
+  function can(action: ProposalAction) {
+    return getAllowedActions(props.proposal.status, props.proposal.signature?.status ?? null).includes(action)
+  }
+
   return {
     formatDate,
     isExpiredState,
     validityPercent,
     validityBarColor,
+    can,
     canShowChatButton,
     canShowWhatsappButton,
     MessageCircle,

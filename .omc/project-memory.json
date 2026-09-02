@@ -298,8 +298,26 @@
   "hotPaths": [
     {
       "path": "app/components/proposals/ProposalForm/index.vue",
-      "accessCount": 13,
-      "lastAccessed": 1788269832442,
+      "accessCount": 21,
+      "lastAccessed": 1788360216277,
+      "type": "file"
+    },
+    {
+      "path": "app/components/ui/BaseSelect.vue",
+      "accessCount": 19,
+      "lastAccessed": 1788353261181,
+      "type": "file"
+    },
+    {
+      "path": "app/components/ui/BaseCombobox.vue",
+      "accessCount": 12,
+      "lastAccessed": 1788358526467,
+      "type": "file"
+    },
+    {
+      "path": "app/components/proposals/ProposalStepClient/index.vue",
+      "accessCount": 12,
+      "lastAccessed": 1788358686939,
       "type": "file"
     },
     {
@@ -315,15 +333,15 @@
       "type": "file"
     },
     {
-      "path": "app/components/ui/BaseCombobox.vue",
-      "accessCount": 11,
-      "lastAccessed": 1788285239027,
+      "path": "app/components/proposals/ProposalCard/index.vue",
+      "accessCount": 10,
+      "lastAccessed": 1788356485863,
       "type": "file"
     },
     {
-      "path": "app/components/proposals/ProposalStepClient/index.vue",
-      "accessCount": 10,
-      "lastAccessed": 1788285053060,
+      "path": "app/components/proposals/ProposalStepScope/index.vue",
+      "accessCount": 9,
+      "lastAccessed": 1788355829664,
       "type": "file"
     },
     {
@@ -345,21 +363,33 @@
       "type": "file"
     },
     {
+      "path": "app/components/ui/BaseDataList.vue",
+      "accessCount": 8,
+      "lastAccessed": 1788352715764,
+      "type": "file"
+    },
+    {
       "path": "app/components/ui/PaywallExpressModal/index.vue",
       "accessCount": 7,
       "lastAccessed": 1788269421799,
       "type": "file"
     },
     {
-      "path": "app/components/ui/BaseDataList.vue",
-      "accessCount": 7,
-      "lastAccessed": 1788272453200,
-      "type": "file"
-    },
-    {
       "path": "app/pages/catalogo/index.vue",
       "accessCount": 7,
       "lastAccessed": 1788275950377,
+      "type": "file"
+    },
+    {
+      "path": "app/components/ui/BaseDrawer.vue",
+      "accessCount": 7,
+      "lastAccessed": 1788354318862,
+      "type": "file"
+    },
+    {
+      "path": "app/components/ui/BaseAlertDialog.vue",
+      "accessCount": 7,
+      "lastAccessed": 1788354337699,
       "type": "file"
     },
     {
@@ -375,15 +405,15 @@
       "type": "file"
     },
     {
-      "path": "app/components/ui/BaseInput.vue",
-      "accessCount": 4,
-      "lastAccessed": 1788267571544,
+      "path": "app/components/ui/BaseDialog.vue",
+      "accessCount": 5,
+      "lastAccessed": 1788354298848,
       "type": "file"
     },
     {
-      "path": "app/components/ui/BaseSelect.vue",
+      "path": "app/components/ui/BaseInput.vue",
       "accessCount": 4,
-      "lastAccessed": 1788267573066,
+      "lastAccessed": 1788267571544,
       "type": "file"
     },
     {
@@ -423,12 +453,6 @@
       "type": "file"
     },
     {
-      "path": "app/components/ui/BaseDrawer.vue",
-      "accessCount": 3,
-      "lastAccessed": 1788267854221,
-      "type": "file"
-    },
-    {
       "path": "app/components/ui/BaseToast.vue",
       "accessCount": 3,
       "lastAccessed": 1788268029507,
@@ -459,21 +483,9 @@
       "type": "file"
     },
     {
-      "path": "app/components/ui/BaseAlertDialog.vue",
-      "accessCount": 2,
-      "lastAccessed": 1788267676877,
-      "type": "file"
-    },
-    {
       "path": "app/components/clients/ClientCard/index.vue",
       "accessCount": 2,
       "lastAccessed": 1788267929308,
-      "type": "file"
-    },
-    {
-      "path": "app/components/proposals/ProposalCard/index.vue",
-      "accessCount": 2,
-      "lastAccessed": 1788268073515,
       "type": "file"
     },
     {
@@ -516,12 +528,6 @@
       "path": "app/components/ui/BaseLabel.vue",
       "accessCount": 1,
       "lastAccessed": 1788267183629,
-      "type": "file"
-    },
-    {
-      "path": "app/components/ui/BaseDialog.vue",
-      "accessCount": 1,
-      "lastAccessed": 1788267209794,
       "type": "file"
     },
     {
@@ -588,12 +594,6 @@
       "path": "app/components/ui/BaseDropdownMenu.vue",
       "accessCount": 1,
       "lastAccessed": 1788267665365,
-      "type": "file"
-    },
-    {
-      "path": "app/components/proposals/ProposalStepScope/index.vue",
-      "accessCount": 1,
-      "lastAccessed": 1788267939249,
       "type": "file"
     }
   ],

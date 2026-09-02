@@ -22,6 +22,7 @@ import {
 } from "lucide-vue-next"
 import type { ProposalDTO } from "../../../../types"
 import { ProposalSignatureStatus } from "../../../../types/enums"
+import { getAllowedActions, getPhaseBadgeVariant, getPhaseInfo, getProposalPhase, type ProposalAction } from "~/utils/proposalLifecycle"
 
 export function useProposalDetailModal(
   props: { open: boolean; proposal: ProposalDTO | null },
@@ -29,35 +30,29 @@ export function useProposalDetailModal(
 ) {
   const { notify } = useAlerts()
 
-  const statusMap: Record<
-    string,
-    {
-      label: string
-      variant: "default" | "success" | "warning" | "error" | "info"
-    }
-  > = {
-    draft: { label: "Rascunho", variant: "default" },
-    created: { label: "Criado", variant: "info" },
-    sent: { label: "Enviado", variant: "info" },
-    viewed: { label: "Visualizado", variant: "warning" },
-    accepted: { label: "Aceito", variant: "success" },
-    rejected: { label: "Recusado", variant: "error" },
-    expired: { label: "Expirado", variant: "error" },
-    bounced: { label: "Erro Envio", variant: "error" }
-  }
-
   const currentStatus = computed(() => {
-    if (!props.proposal) return statusMap.draft
-    if (props.proposal.signature?.status === ProposalSignatureStatus.SIGNED) {
+    if (!props.proposal) return { label: 'Rascunho', variant: 'default' as const }
+    const sig = props.proposal.signature?.status
+    const st = props.proposal.status
+
+    if (sig === ProposalSignatureStatus.SIGNED) {
       return { label: 'Aceito & Assinado', variant: 'success' as const }
     }
-    if (props.proposal.signature?.status === ProposalSignatureStatus.PENDING) {
+    // Assinatura pendente só é exibida APÓS o aceite
+    if (st === 'accepted' && (sig === ProposalSignatureStatus.PENDING || sig === ProposalSignatureStatus.SIGNING)) {
       return { label: 'Aguardando Assinatura', variant: 'warning' as const }
     }
-    if (props.proposal.status === 'accepted') {
+    if (st === 'accepted') {
       return { label: 'Aceito', variant: 'success' as const }
     }
-    return statusMap[props.proposal.status] || statusMap.draft
+    if (st === 'sent' || st === 'delivered' || st === 'opened' || st === 'clicked' || st === 'viewed' || st === 'pending') {
+      return { label: 'Aguardando Aceite', variant: 'info' as const }
+    }
+    const phase = getProposalPhase(st, sig)
+    return {
+      label: getPhaseInfo(phase).label,
+      variant: getPhaseBadgeVariant(phase)
+    }
   })
 
   const calculatedViewsCount = computed(() => {
@@ -90,6 +85,12 @@ export function useProposalDetailModal(
     const st = props.proposal.status
     return st !== "draft" && st !== "rejected"
   })
+
+  /** Ação permitida p/ status atual (fonte central: proposalLifecycle) */
+  function can(action: ProposalAction) {
+    if (!props.proposal) return false
+    return getAllowedActions(props.proposal.status, props.proposal.signature?.status ?? null).includes(action)
+  }
 
   const publicUrl = computed(() => {
     if (!props.proposal?.slug) return ""
@@ -273,6 +274,7 @@ export function useProposalDetailModal(
 
   return {
     currentStatus,
+    can,
     calculatedViewsCount,
     calculatedLastViewedAt,
     canOpenPublicLink,

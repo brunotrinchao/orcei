@@ -31,8 +31,8 @@ const { SendMethod, CreditCard } = useProposalStepPayment()
                 @click="form.paymentConfig.acceptCreditCard = !form.paymentConfig.acceptCreditCard"
               >
                 <div>
-                  <label class="text-xs font-bold text-gray-900 dark:text-white block cursor-pointer">Aceitar Cartão de Crédito</label>
-                  <p class="text-[11px] text-gray-500">Permite pagamento parcelado no cartão de crédito</p>
+                  <label class="text-sm font-semibold text-gray-900 dark:text-white block cursor-pointer">Aceitar Cartão de Crédito</label>
+                  <p class="text-xs font-normal text-gray-500 dark:text-gray-400">Permite pagamento parcelado no cartão de crédito</p>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer pointer-events-none">
                   <input type="checkbox" :checked="Boolean(form.paymentConfig.acceptCreditCard)" class="sr-only peer">
@@ -50,7 +50,7 @@ const { SendMethod, CreditCard } = useProposalStepPayment()
             </div>
 
             <div class="space-y-3">
-              <label class="form-label block mb-1.5 ml-1">Método de Envio</label>
+              <label class="block mb-1.5 ml-1 text-sm font-semibold text-gray-700 dark:text-gray-300">Método de Envio</label>
               <div role="radiogroup" aria-label="Método de Envio" class="flex flex-col sm:flex-row gap-2 p-1 bg-white dark:bg-gray-950 rounded-[.5rem] border border-gray-200 dark:border-gray-800">
                 <BaseButton 
                   type="button"
@@ -94,12 +94,12 @@ const { SendMethod, CreditCard } = useProposalStepPayment()
                 <span>R$ {{ form.items.reduce((acc: any, i: any) => acc + (i.price * i.quantity), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-xs font-bold">Acréscimo R$</span>
-                <input v-model.number="form.totals.additional" type="number" class="w-24 bg-white/10 border-none rounded-[.5rem] text-right font-black py-1 focus:ring-2 focus:ring-white/30 outline-none">
+                <span class="text-xs font-semibold text-white/80">Acréscimo R$</span>
+                <input v-model.number="form.totals.additional" type="number" class="w-24 bg-white/10 border-none rounded-[.5rem] text-right font-bold py-1 focus:ring-2 focus:ring-white/30 outline-none">
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-xs font-bold">Desconto R$</span>
-                <input v-model.number="form.totals.discount" type="number" class="w-24 bg-white/10 border-none rounded-[.5rem] text-right font-black py-1 focus:ring-2 focus:ring-white/30 outline-none">
+                <span class="text-xs font-semibold text-white/80">Desconto R$</span>
+                <input v-model.number="form.totals.discount" type="number" class="w-24 bg-white/10 border-none rounded-[.5rem] text-right font-bold py-1 focus:ring-2 focus:ring-white/30 outline-none">
               </div>
             </div>
 

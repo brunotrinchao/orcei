@@ -64,6 +64,7 @@ const {
   whatsappLink,
   handleProposalSubmit,
   statusMap,
+  statusFilterGroups,
   getStatusVariant,
   getProposalStatusLabel,
   formatDate,
@@ -145,12 +146,8 @@ const {
 
           <div class="w-full md:w-48 shrink-0">
             <BaseSelect v-model="stagedFilterStatus" :options="[
-              { label: 'Todos os Status', value: '__EMPTY__' },
-              ...Object.entries(statusMap).map(([value, info]: any) => ({
-                label: info.label,
-                value
-              }))
-            ]" placeholder="Todos os Status" />
+              { label: 'Todos os Status', value: '__EMPTY__' }
+            ]" :option-groups="statusFilterGroups" placeholder="Todos os Status" />
           </div>
 
           <div
@@ -201,9 +198,9 @@ const {
         </template>
 
         <template #cell-status="{ item: proposal }">
-          <BaseBadge :variant="getStatusVariant(proposal)" light>
-            {{ getProposalStatusLabel(proposal) }}
-          </BaseBadge>
+            <BaseBadge :variant="getPhaseBadgeVariant(getProposalPhase(proposal.status))" light>
+              {{ getPhaseInfo(getProposalPhase(proposal.status)).label }}
+            </BaseBadge>
         </template>
 
         <template #cell-total="{ item: proposal }">
@@ -224,7 +221,7 @@ const {
       @delete="p => { showProposalInfo = false; confirmDeleteProposal(p) }" />
 
     <!-- Drawer de Orçamento -->
-    <BaseDrawer v-model:open="isModalOpen" :title="selectedProposal ? 'Editar Orçamento' : 'Novo Orçamento'" size="xl">
+    <BaseDrawer v-model:open="isModalOpen" :title="selectedProposal ? 'Editar Orçamento' : 'Novo Orçamento'" size="full">
       <ProposalForm ref="proposalFormRef" :initial-data="selectedProposal || undefined"
         :prefilled-items="prefilledItems || undefined" :is-editing="!!selectedProposal" :is-submitting="isSubmitting"
         @submit="handleProposalSubmit" />
@@ -417,9 +414,9 @@ const {
     </BaseDialog>
 
     <!-- Modal de Histórico -->
-    <BaseDialog v-model:open="isHistoryOpen" title="Ciclo de Vida do Orçamento" size="lg">
+    <BaseDrawer v-model:open="isHistoryOpen" title="Ciclo de Vida do Orçamento" size="xl">
       <div v-if="selectedProposal" class="p-6">
-        <div class="mb-8 flex items-center justify-between">
+        <div class="mb-6 flex items-center justify-between">
           <div>
             <h3 class="text-xl font-black text-gray-900 dark:text-gray-100 tracking-tight">{{ selectedProposal.title }}
             </h3>
@@ -431,17 +428,30 @@ const {
           </BaseBadge>
         </div>
 
+        <!-- Stepper: todas as fases do ciclo de vida -->
+        <div class="mb-8 px-2">
+          <ProposalPhaseStepper
+            :status="selectedProposal.status"
+            size="md"
+          />
+        </div>
+
         <div v-if="isLoadingHistory" class="py-20 flex flex-col items-center justify-center space-y-4">
           <Loader2 class="w-10 h-10 text-blue-600 animate-spin" />
           <p class="text-sm text-gray-500 font-bold animate-pulse">Carregando histórico...</p>
         </div>
-        <ProposalTimeline v-else :history="selectedProposalHistory" />
+        <ProposalTimeline
+          v-else
+          :history="selectedProposalHistory"
+          :status="selectedProposal.status"
+          grouped
+        />
 
         <div v-if="!isLoadingHistory && selectedProposalHistory.length === 0" class="py-10 text-center">
           <p class="text-gray-400 text-sm italic">Nenhum evento registrado ainda.</p>
         </div>
       </div>
-    </BaseDialog>
+    </BaseDrawer>
 
 
     <!-- Drawer Editar Contrato -->

@@ -271,7 +271,7 @@ const {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <BaseInput v-model="form.email" type="email" label="E-mail" placeholder="cliente@email.com" required />
           <div class="space-y-3">
-            <BaseInput v-model="form.phone" label="Telefone / Celular" placeholder="(00) 00000-0000" mask="phone" />
+            <BaseInput v-model="form.phone" label="Telefone / Celular" placeholder="(00) 00000-0000" mask="phone"  type="tel"/>
             <div class="flex items-center gap-3 ml-2">
               <BaseCheckbox v-model="form.isWhatsapp" id="isWhatsapp" />
               <label for="isWhatsapp"

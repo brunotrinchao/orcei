@@ -16,6 +16,7 @@ import {
 } from 'lucide-vue-next'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { PROPOSAL_PHASES, getProposalPhase, getEventPhase, type ProposalPhase } from '~/utils/proposalLifecycle'
 
 export interface HistoryItem {
   _id: string
@@ -25,7 +26,7 @@ export interface HistoryItem {
   timestamp: string
 }
 
-export function useProposalTimeline(props: { history: HistoryItem[] }) {
+export function useProposalTimeline(props: { history: HistoryItem[]; status?: string | null }) {
   const filteredHistory = computed(() => {
     if (!props.history || props.history.length === 0) return []
 
@@ -146,8 +147,46 @@ export function useProposalTimeline(props: { history: HistoryItem[] }) {
     return format(new Date(date), "dd 'de' MMM 'às' HH:mm", { locale: ptBR })
   }
 
+  /** Eventos agrupados por fase do ciclo de vida.
+   * Exibição de baixo p/ cima: ciclo Rascunho → Em andamento → Assinatura → Fechado → Falhou,
+   * com a etapa mais recente no TOPO. Ações dentro de cada etapa: mais recentes primeiro.
+   */
+  const groupedByPhase = computed(() => {
+    const items = filteredHistory.value
+    if (!items || items.length === 0) return []
+
+    const itemsByPhase = new Map<ProposalPhase | 'system', HistoryItem[]>()
+    for (const item of items) {
+      const phase = getEventPhase(item.action)
+      if (!itemsByPhase.has(phase)) itemsByPhase.set(phase, [])
+      itemsByPhase.get(phase)!.push(item)
+    }
+
+    const sortDesc = (list: HistoryItem[]) =>
+      [...list].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+
+    // Etapas do ciclo em ordem, invertidas p/ exibição (recente no topo)
+    const cycleGroups = PROPOSAL_PHASES
+      .filter((p) => itemsByPhase.has(p.key))
+      .map((p) => ({ phase: p.key as ProposalPhase, label: p.label, items: sortDesc(itemsByPhase.get(p.key)!) }))
+      .reverse()
+
+    // Eventos fora do ciclo (system, ex: google_sync) agrupados no topo
+    const systemItems = itemsByPhase.get('system')
+    const systemGroup = systemItems?.length
+      ? [{ phase: 'system' as const, label: 'Sistema', items: sortDesc(systemItems) }]
+      : []
+
+    return [...systemGroup, ...cycleGroups]
+  })
+
+  /** Fase atual p/ placeholder quando fase atual não tem eventos */
+  const currentPhase = computed(() => getProposalPhase(props.status))
+
   return {
     filteredHistory,
+    groupedByPhase,
+    currentPhase,
     getActionLabel,
     getActionIcon,
     getActionColor,

@@ -61,4 +61,18 @@ describe('BaseSelect', () => {
     })
     expect(wrapperViolet.find('button').classes()).toContain('border-violet-300')
   })
+
+  it('renderiza com optionGroups sem quebrar (flat + groups)', async () => {
+    const wrapper = await mountSuspended(BaseSelect, {
+      props: {
+        options: [{ label: 'Todos', value: '__EMPTY__' }],
+        optionGroups: [
+          { label: 'Rascunho', options: [{ label: 'Rascunho', value: 'draft' }] },
+          { label: 'Em andamento', options: [{ label: 'Enviado', value: 'sent' }] }
+        ]
+      }
+    })
+    expect(wrapper.find('button').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Selecione')
+  })
 })

@@ -1,11 +1,5 @@
-<script lang="ts">
-import { ref, watch, onUnmounted } from 'vue'
-
-const activeDrawersCount = ref(0)
-</script>
-
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch, onUnmounted } from 'vue'
 import {
   DialogRoot,
   DialogPortal,
@@ -19,6 +13,7 @@ import {
 } from 'radix-vue'
 import { X } from 'lucide-vue-next'
 import { useVModel } from '@vueuse/core'
+import { useOverlayStack, overlayZ, contentZ } from '~/composables/useOverlayStack'
 
 type PositionType = 'right' | 'left' | 'top' | 'bottom'
 type SizeType = 'sm' | 'md' | 'lg' | 'xl' | 'full'
@@ -48,23 +43,20 @@ const emits = defineEmits<DialogRootEmits>()
 
 const open = useVModel(props, 'open', emits)
 
-const currentZIndex = ref(0)
+const { register, unregister } = useOverlayStack()
+
+const overlayLevel = ref(0)
 
 watch(open, (isOpen) => {
   if (isOpen) {
-    activeDrawersCount.value++
-    currentZIndex.value = activeDrawersCount.value
+    overlayLevel.value = register()
   } else {
-    setTimeout(() => {
-      activeDrawersCount.value = Math.max(0, activeDrawersCount.value - 1)
-    }, 300)
+    unregister()
   }
 })
 
 onUnmounted(() => {
-  if (open.value) {
-    activeDrawersCount.value = Math.max(0, activeDrawersCount.value - 1)
-  }
+  if (open.value) unregister()
 })
 
 // Position classes for fixed placement
@@ -195,7 +187,7 @@ const descriptionVariantClasses = computed(() => {
         leave-to-class="opacity-0"
       >
         <DialogOverlay
-          :style="{ zIndex: 100 + (currentZIndex * 2) }"
+          :style="{ zIndex: overlayZ(overlayLevel) }"
           class="fixed inset-0 bg-black/40 backdrop-blur-sm"
         />
       </Transition>
@@ -210,7 +202,7 @@ const descriptionVariantClasses = computed(() => {
         :leave-to-class="transitionClasses.leaveTo"
       >
         <DialogContent
-          :style="{ zIndex: 101 + (currentZIndex * 2) }"
+          :style="{ zIndex: contentZ(overlayLevel) }"
           :class="[
             'fixed flex flex-col bg-white dark:bg-gray-950 shadow-2xl outline-none overflow-hidden max-w-full',
             positionClasses,

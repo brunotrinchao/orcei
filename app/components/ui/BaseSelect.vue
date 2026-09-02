@@ -12,20 +12,28 @@ import {
   SelectPortal,
   SelectIcon,
   SelectScrollUpButton,
-  SelectScrollDownButton
+  SelectScrollDownButton,
+  SelectGroup,
+  SelectLabel
 } from 'radix-vue'
 import { ChevronDown, ChevronUp, Check } from 'lucide-vue-next'
 import { computed, ref } from 'vue'
 import { useFieldValidation } from '~/composables/useFormValidation'
 
-interface Option {
+interface BaseSelectOption {
   label: string
   value: string
 }
 
+interface SelectOptionGroup {
+  label: string
+  options: BaseSelectOption[]
+}
+
 const props = withDefaults(
   defineProps<{
-    options: Option[]
+    options: BaseSelectOption[]
+    optionGroups?: SelectOptionGroup[]
     placeholder?: string
     label?: string
     error?: string
@@ -72,6 +80,13 @@ const nativeSelectRef = ref<HTMLSelectElement | null>(null)
 function onNativeChange(event: Event) {
   modelValue.value = (event.target as HTMLSelectElement).value
 }
+
+/** Opções agrupadas (radix + nativo) — options flat primeiro, depois optionGroups */
+const groupedOptions = computed<SelectOptionGroup[]>(() => {
+  const flat = props.options?.length ? [{ label: '', options: props.options }] : []
+  const groups = props.optionGroups?.length ? props.optionGroups : []
+  return [...flat, ...groups]
+})
 
 const isEmpty = () => !!props.required && (!modelValue.value || modelValue.value === '__EMPTY__' || modelValue.value.trim() === '')
 const { submitAttempted } = useFieldValidation({
@@ -227,10 +242,17 @@ const sizeClasses = computed(() => {
           ]"
         >
           <option value="" :selected="!modelValue">{{ placeholder || 'Selecione...' }}</option>
-          <option v-for="option in options" :key="option.value" :value="option.value" :selected="modelValue === option.value">
-            {{ option.label }}
-          </option>
-          <option v-if="!options || options.length === 0" value="" disabled>Sem Opções</option>
+          <template v-for="group in groupedOptions" :key="group.label || '__flat__'">
+            <optgroup v-if="group.label" :label="group.label">
+              <option v-for="option in group.options" :key="option.value" :value="option.value" :selected="modelValue === option.value">
+                {{ option.label }}
+              </option>
+            </optgroup>
+            <option v-for="option in group.options" v-else :key="option.value" :value="option.value" :selected="modelValue === option.value">
+              {{ option.label }}
+            </option>
+          </template>
+          <option v-if="!groupedOptions.some(g => g.options.length > 0)" value="" disabled>Sem Opções</option>
         </select>
         <ChevronDown class="pointer-events-none absolute right-4 w-4 h-4 text-gray-500" />
       </template>
@@ -271,18 +293,28 @@ const sizeClasses = computed(() => {
               </SelectScrollUpButton>
 
               <SelectViewport class="p-2">
-                <SelectItem
-                  v-for="option in options"
-                  :key="option.value"
-                  :value="option.value || '__EMPTY__'"
-                  class="relative flex items-center px-8 py-3 text-sm font-normal text-gray-600 dark:text-gray-300 rounded-[.5rem] cursor-pointer outline-none focus:bg-gray-50 dark:focus:bg-gray-800 focus:text-gray-900 dark:focus:text-white data-[state=checked]:text-gray-900 dark:data-[state=checked]:text-white data-[state=checked]:bg-gray-50 dark:data-[state=checked]:bg-gray-800 transition-colors"
-                >
-                  <SelectItemIndicator class="absolute left-2 inline-flex items-center justify-center">
-                    <Check class="w-4 h-4 text-gray-900 dark:text-white" />
-                  </SelectItemIndicator>
-                  <SelectItemText>{{ option.label }}</SelectItemText>
-                </SelectItem>
-                <div v-if="!options || options.length === 0" class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">
+                <template v-for="group in groupedOptions" :key="group.label || '__flat__'">
+                  <SelectGroup>
+                    <SelectLabel
+                      v-if="group.label"
+                      class="px-8 py-2 pt-3 text-[10px] font-black text-gray-400 uppercase tracking-[0.18em]"
+                    >
+                      {{ group.label }}
+                    </SelectLabel>
+                    <SelectItem
+                      v-for="option in group.options"
+                      :key="option.value"
+                      :value="option.value || '__EMPTY__'"
+                      class="relative flex items-center px-8 py-3 text-sm font-normal text-gray-600 dark:text-gray-300 rounded-[.5rem] cursor-pointer outline-none focus:bg-gray-50 dark:focus:bg-gray-800 focus:text-gray-900 dark:focus:text-white data-[state=checked]:text-gray-900 dark:data-[state=checked]:text-white data-[state=checked]:bg-gray-50 dark:data-[state=checked]:bg-gray-800 transition-colors"
+                    >
+                      <SelectItemIndicator class="absolute left-2 inline-flex items-center justify-center">
+                        <Check class="w-4 h-4 text-gray-900 dark:text-white" />
+                      </SelectItemIndicator>
+                      <SelectItemText>{{ option.label }}</SelectItemText>
+                    </SelectItem>
+                  </SelectGroup>
+                </template>
+                <div v-if="!groupedOptions.some(g => g.options.length > 0)" class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">
                   Sem Opções
                 </div>
               </SelectViewport>

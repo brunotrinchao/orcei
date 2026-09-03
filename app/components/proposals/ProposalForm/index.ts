@@ -142,7 +142,9 @@ export function useProposalForm(
     }
   }
 
-  applyInitialData(props.initialData)
+  // Guarda: no "novo orçamento" initialData é undefined — form usa defaults; só aplica dados quando há edição.
+  // Sem esta guarda, applyInitialData acessava `newVal.title` em undefined → erro de runtime → form não renderizava.
+  if (props.initialData) applyInitialData(props.initialData)
 
   // Watch apenas quando troca de orçamento (abertura de novo draft p/ edição).
   // Deep watch no objeto reativo sobrescrevia campos editados (cliente, itens)

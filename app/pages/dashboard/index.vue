@@ -306,7 +306,7 @@ const {
             <!-- Em Aberto -->
             <div class="flex items-center gap-4">
               <span class="w-24 shrink-0 text-sm font-medium text-muted">Em aberto</span>
-              <BaseProgressBar height="h-2" class="flex-1" color="bg-blue-100 dark:bg-blue-900/40"
+              <BaseProgressBar height="h-2" class="flex-1" color="bg-blue-500"
                 :value="stats.proposalsCount > 0 ? (stats.pendingCount / stats.proposalsCount * 100) : 0" />
               <span class="w-36 shrink-0 text-right text-sm font-medium text-ink dark:text-gray-100">
                 {{ stats.pendingCount }} <span class="text-muted font-normal">aguardando</span>
@@ -316,7 +316,7 @@ const {
             <!-- Aceitos -->
             <div class="flex items-center gap-4">
               <span class="w-24 shrink-0 text-sm font-medium text-muted">Aceitos</span>
-              <BaseProgressBar height="h-2" class="flex-1" color="bg-emerald-100 dark:bg-emerald-900/40"
+              <BaseProgressBar height="h-2" class="flex-1" color="bg-emerald-500"
                 :value="stats.proposalsCount > 0 ? (stats.acceptedCount / stats.proposalsCount * 100) : 0" />
               <span class="w-36 shrink-0 text-right text-sm font-medium text-ink dark:text-gray-100">
                 {{ stats.acceptedCount }} <span class="text-muted font-normal">fechados</span>
@@ -326,7 +326,7 @@ const {
             <!-- Enviados -->
             <div class="flex items-center gap-4">
               <span class="w-24 shrink-0 text-sm font-medium text-muted">Enviados</span>
-              <BaseProgressBar height="h-2" class="flex-1" color="bg-indigo-100 dark:bg-indigo-900/40"
+              <BaseProgressBar height="h-2" class="flex-1" color="bg-blue-400"
                 :value="stats.proposalsCount > 0 ? ((stats.sentCount ?? stats.proposalsCount) / stats.proposalsCount * 100) : 0" />
               <span class="w-36 shrink-0 text-right text-sm font-medium text-ink dark:text-gray-100">
                 {{ stats.sentCount ?? stats.proposalsCount }} <span class="text-muted font-normal">no total</span>

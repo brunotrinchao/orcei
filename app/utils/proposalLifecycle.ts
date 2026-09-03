@@ -92,6 +92,22 @@ export function getPhaseBadgeVariant(phase: ProposalPhase): 'default' | 'success
   }
 }
 
+/** Hex por fase — padrão único p/ gráficos (Chart.js), espelha getPhaseColor */
+export function getPhaseColorHex(phase: ProposalPhase): string {
+  switch (phase) {
+    case 'draft':
+      return '#6B7280' // gray-500
+    case 'progress':
+      return '#3B82F6' // blue-500
+    case 'signature':
+      return '#F59E0B' // amber-500
+    case 'closed':
+      return '#10B981' // emerald-500
+    case 'failed':
+      return '#EF4444' // red-500
+  }
+}
+
 /** Dots do stepper (flat, sem sombra) */
 export function getPhaseColor(phase: ProposalPhase): string {
   switch (phase) {

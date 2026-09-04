@@ -167,17 +167,49 @@ export function useConfiguracoesPage() {
 
   const isExporting = ref(false)
   const isDeleting = ref(false)
+  const isDeleteModalOpen = ref(false)
 
-  async function exportData() {
-    isExporting.value = true
+  /** Executa a exclusão (com ou sem backup) — usada pelo modal de Encerrar Conta */
+  async function confirmDeleteAccount(withBackup: boolean) {
+    isDeleting.value = true
     try {
-      const res: any = await $fetch('/api/profile/backup', { method: 'POST' })
-      notify('Sucesso', res.message || 'Backup enviado para seu e-mail.')
+      if (withBackup) {
+        await $fetch('/api/profile/backup', { method: 'POST' })
+      }
+      await $fetch('/api/profile', { method: 'DELETE' })
+      notify(
+        withBackup ? 'Até logo' : 'Conta excluída',
+        withBackup ? 'Backup enviado e conta excluída. Redirecionando...' : 'Redirecionando...'
+      )
+      setTimeout(() => {
+        window.location.href = '/'
+      }, 2000)
     } catch (e: any) {
-      notify('Erro', e.data?.statusMessage || 'Erro ao processar backup.')
+      notify('Erro', e.data?.statusMessage || 'Erro ao processar exclusão.')
     } finally {
-      isExporting.value = false
+      isDeleting.value = false
+      isDeleteModalOpen.value = false
     }
+  }
+
+  function exportData() {
+    confirmAlert({
+      title: 'Gerar Backup',
+      description: 'O backup completo (clientes, orçamentos, catálogo, relatórios) será gerado e enviado para o seu e-mail. <strong>Permitido apenas 1 backup por dia.</strong> Continuar?',
+      actionText: 'Gerar Backup',
+      cancelText: 'Cancelar',
+      onConfirm: async () => {
+        isExporting.value = true
+        try {
+          const res: any = await $fetch('/api/profile/backup', { method: 'POST' })
+          notify('Sucesso', res.message || 'Backup enviado para seu e-mail.')
+        } catch (e: any) {
+          notify('Erro', e.data?.statusMessage || 'Erro ao processar backup.')
+        } finally {
+          isExporting.value = false
+        }
+      }
+    })
   }
 
   const isResetting = ref(false)
@@ -217,60 +249,22 @@ export function useConfiguracoesPage() {
     })
   }
 
-  async function deleteAccount() {
+  function deleteAccount() {
     if (!localProfile.value) return
 
-    const hasActiveSub = 
-      localProfile.value.subscriptionPlan !== 'free' && 
+    const hasActiveSub =
+      localProfile.value.subscriptionPlan !== 'free' &&
       ['active', 'trialing', 'past_due'].includes(localProfile.value.subscriptionStatus || '')
 
     if (hasActiveSub) {
       return notify(
-        'Ação Necessária', 
+        'Ação Necessária',
         'Você possui uma assinatura ativa. Por favor, cancele seu plano na aba "Assinatura" antes de excluir sua conta.'
       )
     }
 
-    confirmAlert({
-      title: 'Encerrar Conta',
-      description: `Seus dados (clientes, orçamentos e agenda) serão deletados permanentemente. Seus ${localProfile.value.creditsBalance} créditos restantes ficarão salvos para quando você desejar voltar. \n\nDeseja realizar um backup antes de sair?`,
-      variant: 'destructive',
-      actionText: 'Fazer Backup e Excluir',
-      cancelText: 'Apenas Excluir Minha Conta',
-      onConfirm: async () => {
-        isDeleting.value = true
-        try {
-          await $fetch('/api/profile/backup', { method: 'POST' })
-          await $fetch('/api/profile', { method: 'DELETE' })
-          notify('Até logo', 'Backup enviado e conta excluída. Redirecionando...')
-          setTimeout(() => window.location.href = '/', 2000)
-        } catch (e: any) {
-          notify('Erro', e.data?.statusMessage || 'Erro ao processar exclusão.')
-        } finally {
-          isDeleting.value = false
-        }
-      },
-      onCancel: async () => {
-        confirmAlert({
-          title: 'Tem Certeza?',
-          description: 'Você escolheu excluir a conta SEM backup. Todos os seus dados serão perdidos. Confirmar exclusão?',
-          variant: 'destructive',
-          actionText: 'Sim, deletar tudo',
-          onConfirm: async () => {
-            isDeleting.value = true
-            try {
-              await $fetch('/api/profile', { method: 'DELETE' })
-              notify('Até logo', 'Conta excluída. Redirecionando...')
-              setTimeout(() => window.location.href = '/', 2000)
-            } catch (e: any) {
-              notify('Erro', e.data?.statusMessage || 'Erro ao excluir conta.')
-            } finally {
-              isDeleting.value = false
-            }
-          }
-        })
-      }
-    })
+    // Abre o modal com 3 opções: Cancelar / Excluir conta / Backup e Excluir
+    isDeleteModalOpen.value = true
   }
 
   const route = useRoute()
@@ -309,6 +303,8 @@ export function useConfiguracoesPage() {
     sections,
     isExporting,
     isDeleting,
+    isDeleteModalOpen,
+    confirmDeleteAccount,
     exportData,
     isResetting,
     resetData,

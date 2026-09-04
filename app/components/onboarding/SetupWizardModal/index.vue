@@ -29,6 +29,11 @@ const {
   prevStep,
   goToStep,
   handleFinish,
+  GOOGLE_CALENDAR_SCOPE,
+  GOOGLE_DRIVE_SCOPE,
+  isConnecting,
+  hasGoogleScope,
+  handleConnect,
   Building2,
   UserPlus,
   BookOpen,
@@ -38,6 +43,9 @@ const {
   ArrowLeft,
   Loader2,
   Palette,
+  Plug,
+  Calendar,
+  HardDrive,
 } = useSetupWizardModal(props, emit);
 </script>
 
@@ -177,126 +185,152 @@ const {
                         v-model="productData"
                       />
 
-                      <!-- Step 4: Revisão dos Dados -->
-                      <div v-else-if="currentStep === 4" class="space-y-6">
-                        <div
-                          class="p-6 bg-white dark:bg-gray-900 rounded-[.5rem] border border-line dark:border-gray-800 space-y-4"
-                        >
-                          <div
-                            class="flex items-center gap-3 pb-3 border-b border-line dark:border-gray-800"
-                          >
-                            <Building2 class="w-5 h-5 text-brand" />
-                            <h3
-                              class="text-sm font-bold text-gray-900 dark:text-white"
-                            >
-                              Organização & Empresa
-                            </h3>
+                      <!-- Step 4: Integrações -->
+                      <div v-else-if="currentStep === 4" class="space-y-5">
+                        <div class="rounded-[.5rem] border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
+                          <!-- Drive -->
+                          <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-5">
+                            <div class="w-10 h-10 rounded-[.5rem] bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                              <HardDrive class="w-5 h-5" />
+                            </div>
+                            <div class="flex-1 min-w-0">
+                              <div class="flex items-center gap-2 flex-wrap">
+                                <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-50">Google Drive</h3>
+                              </div>
+                              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Salva os PDFs dos orçamentos automaticamente.</p>
+                            </div>
+                            <BaseBadge v-if="hasGoogleScope(GOOGLE_DRIVE_SCOPE)" variant="success" light class="shrink-0">Conectado</BaseBadge>
+                            <BaseButton v-else type="button" variant="outline" size="sm" class="shrink-0" @click="handleConnect('drive')">
+                              Conectar
+                            </BaseButton>
                           </div>
-                          <div
-                            class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs"
-                          >
-                            <div>
-                              <span class="text-muted font-medium block"
-                                >Nome do Projeto:</span
-                              >
-                              <strong
-                                class="text-gray-900 dark:text-gray-100"
-                                >{{
-                                  localProfile.company?.tradeName ||
-                                  "Não informado"
-                                }}</strong
-                              >
+                          <div class="h-px bg-gray-100 dark:bg-gray-800" />
+                          <!-- Calendar -->
+                          <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-5">
+                            <div class="w-10 h-10 rounded-[.5rem] bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                              <Calendar class="w-5 h-5" />
                             </div>
-                            <div>
-                              <span class="text-muted font-medium block"
-                                >Documento:</span
-                              >
-                              <strong
-                                class="text-gray-900 dark:text-gray-100"
-                                >{{
-                                  localProfile.company?.taxId || "Não informado"
-                                }}</strong
-                              >
+                            <div class="flex-1 min-w-0">
+                              <div class="flex items-center gap-2 flex-wrap">
+                                <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-50">Google Calendar</h3>
+                              </div>
+                              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Sincroniza as execuções dos orçamentos aceitos na agenda.</p>
                             </div>
+                            <BaseBadge v-if="hasGoogleScope(GOOGLE_CALENDAR_SCOPE)" variant="success" light class="shrink-0">Conectado</BaseBadge>
+                            <BaseButton v-else type="button" variant="outline" size="sm" class="shrink-0" @click="handleConnect('calendar')">
+                              Conectar
+                            </BaseButton>
                           </div>
                         </div>
+                        <p class="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1.5 px-1">
+                          <Plug class="w-3.5 h-3.5" />
+                          Você pode conectar novamente depois em Configurações → Integrações.
+                        </p>
+                      </div>
 
-                        <!-- Resumo Cliente -->
+                      <!-- Step 5: Revisão dos Dados -->
+                      <div v-else-if="currentStep === 5" class="space-y-5">
                         <div
-                          class="p-6 bg-white dark:bg-gray-900 rounded-[.5rem] border border-line dark:border-gray-800 space-y-4"
+                          class="rounded-[.5rem] border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden"
                         >
-                          <div
-                            class="flex items-center gap-3 pb-3 border-b border-line dark:border-gray-800"
-                          >
-                            <UserPlus class="w-5 h-5 text-brand" />
-                            <h3
-                              class="text-sm font-bold text-gray-900 dark:text-white"
-                            >
-                              Primeiro Cliente
-                            </h3>
-                          </div>
-                          <div
-                            class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs"
-                          >
-                            <div>
-                              <span class="text-muted font-medium block"
-                                >Nome:</span
-                              >
-                              <strong
-                                class="text-gray-900 dark:text-gray-100"
-                                >{{
-                                  clientData.name || "Não adicionado"
-                                }}</strong
-                              >
+                          <!-- Organização & Empresa -->
+                          <div class="p-5 sm:p-6">
+                            <div class="flex items-center gap-2.5 mb-4">
+                              <span class="w-8 h-8 rounded-[.5rem] bg-brand-soft dark:bg-blue-950/60 text-brand dark:text-blue-400 flex items-center justify-center shrink-0">
+                                <Building2 class="w-4 h-4" />
+                              </span>
+                              <h3 class="text-sm font-bold text-gray-900 dark:text-white">Organização & Empresa</h3>
+                              <CheckCircle2 v-if="localProfile.company?.tradeName" class="w-4 h-4 ml-auto text-emerald-500 shrink-0" />
                             </div>
-                            <div v-if="clientData.email">
-                              <span class="text-muted font-medium block"
-                                >E-mail:</span
-                              >
-                              <strong
-                                class="text-gray-900 dark:text-gray-100"
-                                >{{ clientData.email }}</strong
-                              >
-                            </div>
+                            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-xs">
+                              <div>
+                                <dt class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Nome do Projeto</dt>
+                                <dd class="mt-1 font-semibold text-gray-900 dark:text-gray-100 truncate">{{ localProfile.company?.tradeName || "Não informado" }}</dd>
+                              </div>
+                              <div>
+                                <dt class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Documento</dt>
+                                <dd class="mt-1 font-semibold text-gray-900 dark:text-gray-100 truncate">{{ localProfile.company?.taxId || "Não informado" }}</dd>
+                              </div>
+                            </dl>
                           </div>
-                        </div>
+                          <div class="h-px bg-gray-100 dark:bg-gray-800" />
 
-                        <!-- Resumo Produto -->
-                        <div
-                          class="p-6 bg-white dark:bg-gray-900 rounded-[.5rem] border border-line dark:border-gray-800 space-y-4"
-                        >
-                          <div
-                            class="flex items-center gap-3 pb-3 border-b border-line dark:border-gray-800"
-                          >
-                            <BookOpen class="w-5 h-5 text-brand" />
-                            <h3
-                              class="text-sm font-bold text-gray-900 dark:text-white"
-                            >
-                              Primeiro Item do Catálogo
-                            </h3>
+                          <!-- Primeiro Cliente -->
+                          <div class="p-5 sm:p-6">
+                            <div class="flex items-center gap-2.5 mb-4">
+                              <span class="w-8 h-8 rounded-[.5rem] bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                <UserPlus class="w-4 h-4" />
+                              </span>
+                              <h3 class="text-sm font-bold text-gray-900 dark:text-white">Primeiro Cliente</h3>
+                              <CheckCircle2 v-if="clientData.name" class="w-4 h-4 ml-auto text-emerald-500 shrink-0" />
+                            </div>
+                            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-xs">
+                              <div>
+                                <dt class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Nome</dt>
+                                <dd class="mt-1 font-semibold text-gray-900 dark:text-gray-100 truncate">{{ clientData.name || "Não adicionado" }}</dd>
+                              </div>
+                              <div v-if="clientData.email">
+                                <dt class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">E-mail</dt>
+                                <dd class="mt-1 font-semibold text-gray-900 dark:text-gray-100 truncate">{{ clientData.email }}</dd>
+                              </div>
+                              <div v-if="!clientData.name" class="sm:col-span-2">
+                                <p class="text-xs text-gray-400 dark:text-gray-500 italic">Você pode adicionar clientes depois em Clientes.</p>
+                              </div>
+                            </dl>
                           </div>
-                          <div
-                            class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs"
-                          >
-                            <div>
-                              <span class="text-muted font-medium block"
-                                >Item:</span
-                              >
-                              <strong
-                                class="text-gray-900 dark:text-gray-100"
-                                >{{
-                                  productData.name || "Não adicionado"
-                                }}</strong
-                              >
+                          <div class="h-px bg-gray-100 dark:bg-gray-800" />
+
+                        <!-- Primeiro Item do Catálogo -->
+                          <div class="p-5 sm:p-6">
+                            <div class="flex items-center gap-2.5 mb-4">
+                              <span class="w-8 h-8 rounded-[.5rem] bg-violet-50 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
+                                <BookOpen class="w-4 h-4" />
+                              </span>
+                              <h3 class="text-sm font-bold text-gray-900 dark:text-white">Primeiro Item do Catálogo</h3>
+                              <CheckCircle2 v-if="productData.name" class="w-4 h-4 ml-auto text-emerald-500 shrink-0" />
                             </div>
-                            <div v-if="productData.price">
-                              <span class="text-muted font-medium block"
-                                >Valor Base:</span
-                              >
-                              <strong class="text-gray-900 dark:text-gray-100"
-                                >R$ {{ productData.price }}</strong
-                              >
+                            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-xs">
+                              <div>
+                                <dt class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Item</dt>
+                                <dd class="mt-1 font-semibold text-gray-900 dark:text-gray-100 truncate">{{ productData.name || "Não adicionado" }}</dd>
+                              </div>
+                              <div v-if="productData.price">
+                                <dt class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Valor Base</dt>
+                                <dd class="mt-1 font-semibold text-gray-900 dark:text-gray-100">R$ {{ productData.price }}</dd>
+                              </div>
+                            </dl>
+                          </div>
+                          <div class="h-px bg-gray-100 dark:bg-gray-800" />
+
+                          <!-- Integrações -->
+                          <div class="p-5 sm:p-6">
+                            <div class="flex items-center gap-2.5 mb-4">
+                              <span class="w-8 h-8 rounded-[.5rem] bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                                <Plug class="w-4 h-4" />
+                              </span>
+                              <h3 class="text-sm font-bold text-gray-900 dark:text-white">Integrações</h3>
+                              <CheckCircle2 v-if="hasGoogleScope(GOOGLE_DRIVE_SCOPE)" class="w-4 h-4 ml-auto text-emerald-500 shrink-0" />
                             </div>
+                            <div class="space-y-2">
+                              <div class="flex items-center justify-between gap-3 rounded-[.5rem] border border-gray-100 dark:border-gray-800 px-4 py-3">
+                                <span class="text-xs font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                  <HardDrive class="w-4 h-4 text-blue-500 shrink-0" /> Google Drive
+                                </span>
+                                <BaseBadge v-if="hasGoogleScope(GOOGLE_DRIVE_SCOPE)" variant="success" light>Conectado</BaseBadge>
+                                <BaseBadge v-else variant="error" light>Não conectado</BaseBadge>
+                              </div>
+                              <div class="flex items-center justify-between gap-3 rounded-[.5rem] border border-gray-100 dark:border-gray-800 px-4 py-3">
+                                <span class="text-xs font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                  <Calendar class="w-4 h-4 text-indigo-500 shrink-0" /> Google Calendar
+                                </span>
+                                <BaseBadge v-if="hasGoogleScope(GOOGLE_CALENDAR_SCOPE)" variant="success" light>Conectado</BaseBadge>
+                                <BaseBadge v-else variant="error" light>Não conectado</BaseBadge>
+                              </div>
+                            </div>
+                            <p v-if="!hasGoogleScope(GOOGLE_DRIVE_SCOPE)" class="mt-3 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                              <CheckCircle2 class="w-3.5 h-3.5 shrink-0" />
+                              Conecte o Google Drive na etapa anterior para salvar os PDFs dos orçamentos.
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -339,9 +373,9 @@ const {
                   :disabled="isSaving"
                   @click="handleFinish"
                 >
-                  <Loader2 v-if="isSaving" class="w-4 h-4 animate-spin" />
-                  <CheckCircle2 v-else class="w-4 h-4" />
-                  {{ isSaving ? "Salvando..." : "Concluir →" }}
+                  <Loader2 v-if="isSaving" class="w-4 h-4 animate-spin mr-2" />
+                  <CheckCircle2 v-else class="w-4 h-4 mr-2" />
+                  {{ isSaving ? "Salvando..." : "Concluir" }}
                 </BaseButton>
               </div>
             </footer>

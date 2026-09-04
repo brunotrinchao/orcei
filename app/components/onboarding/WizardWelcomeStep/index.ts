@@ -5,7 +5,7 @@ export function useWizardWelcomeStep() {
     'Configurar a identidade do seu negócio',
     'Cadastrar o seu primeiro cliente',
     'Adicionar o primeiro produto ou serviço ao catálogo',
-    'Preparar seu painel para emitir propostas'
+    'Conectar Google Drive e Calendar (PDFs e agenda)'
   ]
 
   return {

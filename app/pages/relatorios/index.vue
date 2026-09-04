@@ -55,7 +55,7 @@ const formatDate = (date: string) => new Date(date).toLocaleString('pt-BR')
   <div class="space-y-10 relative">
     <PageHeader >
       <div class="flex flex-row gap-3 w-full sm:w-auto justify-end">
-        <BaseButton @click="isReportDrawerOpen = true" variant="ia">
+        <BaseButton data-tour="relatorios-gerar-btn" @click="isReportDrawerOpen = true" variant="ia">
           <Sparkles class="w-4 h-4 mr-2 text-white" />
           Gerar Novo Relatório
         </BaseButton>

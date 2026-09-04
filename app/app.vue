@@ -69,6 +69,9 @@ async function handleCancel() {
   <CookieConsent v-if="mounted" />
   <SpeedInsights v-if="mounted" />
 
+  <!-- Banner global: voltar para admin durante impersonação (todas as telas, inclusive onboarding) -->
+  <ImpersonationBanner />
+
   <BaseAlertDialog
     v-model:open="isOpen"
     :title="options.title"

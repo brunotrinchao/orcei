@@ -8,8 +8,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Não autorizado' })
   }
 
-  // Rate limit: Máximo de 2 solicitações de backup por hora por usuário
-  await checkRateLimit(event, { max: 2, windowMs: 60 * 60 * 1000, keyPrefix: 'backup-csv' })
+  // Rate limit: Máximo de 1 backup por dia por usuário (24h)
+  await checkRateLimit(event, { max: 1, windowMs: 24 * 60 * 60 * 1000, keyPrefix: 'backup-daily' })
 
   const profile = await Profile.findOne({ userId: (session.user as any).id })
   if (!profile) {

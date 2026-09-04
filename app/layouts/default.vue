@@ -370,6 +370,9 @@ function isSubActive(sub: NavSubItem) {
               <Moon v-else class="w-5 h-5 text-slate-500" />
             </button>
 
+            <!-- Tour guiado da página atual (mostra só onde existe tour) -->
+            <OnboardingHelpButton />
+
             <!-- Central de Notificações -->
             <button @click="openNotificationCenter"
               class="relative w-10 h-10 rounded-xl flex items-center justify-center text-slate-600 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-gray-800 transition-all cursor-pointer"
@@ -416,6 +419,20 @@ function isSubActive(sub: NavSubItem) {
                   </p>
                 </div>
 
+                <NuxtLink
+                  v-if="user?.role === 'admin'"
+                  to="/admin"
+                   @click="isUserMenuOpen = false"
+                  class="group flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all"
+                  :class="route.path.startsWith('/admin') ? 'bg-red-100/80 dark:bg-red-950/50 font-bold' : ''"
+                  title="Painel Admin"
+                >
+                  <div class="flex items-center gap-3.5 min-w-0">
+                    <Shield class="w-5 h-5 shrink-0" />
+                    <span class="truncate">Painel Admin</span>
+                  </div>
+                </NuxtLink>
+
                 <NuxtLink to="/configuracoes" @click="isUserMenuOpen = false"
                   class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-gray-800 transition-colors">
                   <Settings class="w-4 h-4 text-slate-400" /> Configurações
@@ -423,7 +440,7 @@ function isSubActive(sub: NavSubItem) {
 
                 <NuxtLink to="/planos" @click="isUserMenuOpen = false"
                   class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-gray-800 transition-colors">
-                  <Coins class="w-4 h-4 text-amber-500" /> Planos & Créditos
+                  <Coins class="w-4 h-4 text-slate-400" /> Planos & Créditos
                 </NuxtLink>
 
                 <div class="my-1 border-t border-slate-100 dark:border-gray-800"></div>

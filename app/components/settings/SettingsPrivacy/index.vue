@@ -79,12 +79,6 @@ const { Shield } = useSettingsPrivacy()
         </BaseButton>
       </div>
     </div>
-
-    <template #footer>
-      <BaseButton type="button" size="md" class="shrink-0" :disabled="isSaving" :loading="isSaving" @click="emit('save')">
-        {{ isSaving ? 'Salvando...' : 'Salvar' }}
-      </BaseButton>
-    </template>
   </BaseCard>
 </template>
 

@@ -8,6 +8,9 @@ import {
   ArrowLeft,
   Loader2,
   Palette,
+  Plug,
+  Calendar,
+  HardDrive,
 } from "lucide-vue-next";
 import type { ProfileDTO } from "../../../../types";
 import type { StepItem } from "../WizardStepHeader/index.vue";
@@ -22,10 +25,32 @@ export function useSetupWizardModal(props: { open: boolean }, emit: (e: "close")
 
   const userName = computed(() => profile.value?.name || (user.value as any)?.name || (user.value as any)?.email || "");
 
+  // --- Integrações (etapa 4) ---
+  const GOOGLE_CALENDAR_SCOPE = 'https://www.googleapis.com/auth/calendar.events'
+  const GOOGLE_DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file'
+  const isConnecting = ref(false)
+
+  function hasGoogleScope(scope: string) {
+    return !!profile.value?.googleIntegration?.refreshToken
+      && !!profile.value?.googleIntegration?.grantedScopes?.includes(scope)
+  }
+
+  const { connect } = useGoogleConnect()
+
+  async function handleConnect(feature: 'drive' | 'calendar') {
+    isConnecting.value = true
+    try {
+      const ok = await connect(feature)
+      if (ok) await refreshNuxtData('profile')
+    } finally {
+      isConnecting.value = false
+    }
+  }
+
   // --- Estados do Fluxo ---
   const isWelcome = ref(true);
   const currentStep = ref(1);
-  const totalSteps = 4;
+  const totalSteps = 5;
   const isSaving = ref(false);
   const slideDirection = ref<'forward' | 'backward'>('forward');
 
@@ -140,6 +165,14 @@ export function useSetupWizardModal(props: { open: boolean }, emit: (e: "close")
     },
     {
       id: 4,
+      label: "Integrações",
+      title: "Conecte seus serviços",
+      subtitle:
+        "Conecte o Google Drive para salvar os PDFs dos orçamentos e, Google Calendar sincronizar sua agenda de execuções.",
+      icon: Plug,
+    },
+    {
+      id: 5,
       label: "Revisão",
       title: "Revise suas configurações",
       subtitle:
@@ -188,6 +221,17 @@ export function useSetupWizardModal(props: { open: boolean }, emit: (e: "close")
 
   async function handleFinish() {
     if (!validate()) return;
+
+    // Regra: Google Drive é necessário para salvar os PDFs dos orçamentos
+    if (!hasGoogleScope(GOOGLE_DRIVE_SCOPE)) {
+      notify(
+        'Integração necessária',
+        'Conecte o Google Drive na etapa "Integrações" para salvar os PDFs dos orçamentos. A conexão leva menos de 1 minuto.'
+      )
+      goToStep(4)
+      return
+    }
+
     isSaving.value = true;
     isProcessing.value = true;
     processingProgress.value = 15;
@@ -309,6 +353,14 @@ export function useSetupWizardModal(props: { open: boolean }, emit: (e: "close")
     prevStep,
     goToStep,
     handleFinish,
+    GOOGLE_CALENDAR_SCOPE,
+    GOOGLE_DRIVE_SCOPE,
+    isConnecting,
+    hasGoogleScope,
+    handleConnect,
+    Plug,
+    Calendar,
+    HardDrive,
     Building2,
     UserPlus,
     BookOpen,

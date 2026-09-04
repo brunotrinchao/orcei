@@ -28,6 +28,8 @@ const {
   sections,
   isExporting,
   isDeleting,
+  isDeleteModalOpen,
+  confirmDeleteAccount,
   exportData,
   isResetting,
   resetData,
@@ -109,6 +111,37 @@ const {
       </div>
 
     </div>
+
+    <!-- Modal Encerrar Conta (3 opções) -->
+    <BaseAlertDialog
+      :open="isDeleteModalOpen"
+      @update:open="(val) => isDeleteModalOpen = val"
+      title="Encerrar Conta"
+      :description="`Seus dados (clientes, orçamentos e agenda) serão deletados permanentemente. Seus ${localProfile?.creditsBalance ?? 0} créditos restantes ficarão salvos para quando você desejar voltar.`"
+    >
+      <template #actions>
+        <BaseButton type="button" variant="ghost" @click="isDeleteModalOpen = false" :disabled="isDeleting">
+          Cancelar
+        </BaseButton>
+        <BaseButton
+          type="button"
+          variant="danger"
+          :loading="isDeleting"
+          :disabled="!!isDeleting"
+          @click="confirmDeleteAccount(false)"
+        >
+          Excluir conta
+        </BaseButton>
+        <BaseButton
+          type="button"
+          :loading="isDeleting"
+          :disabled="!!isDeleting"
+          @click="confirmDeleteAccount(true)"
+        >
+          Backup e Excluir
+        </BaseButton>
+      </template>
+    </BaseAlertDialog>
   </div>
 </template>
 

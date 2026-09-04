@@ -121,6 +121,7 @@ function confirmImpersonate(targetUser: any) {
       :columns="[
         { key: 'user', label: 'Usuário' },
         { key: 'plan', label: 'Plano', align: 'center' },
+        { key: 'onboard', label: 'Onboard', align: 'center' },
         { key: 'credits', label: 'Créditos', align: 'center' },
         { key: 'createdAt', label: 'Cadastro', align: 'center' },
         { key: 'actions', label: 'Ações', align: 'right' }
@@ -156,6 +157,15 @@ function confirmImpersonate(targetUser: any) {
       <template #cell-plan="{ item: user }">
         <BaseBadge :variant="user.subscriptionPlan === 'premium' ? 'success' : user.subscriptionPlan === 'starter' ? 'info' : 'default'">
           {{ user.subscriptionPlan?.toUpperCase() || 'FREE' }}
+        </BaseBadge>
+      </template>
+
+      <template #cell-onboard="{ item: user }">
+        <BaseBadge
+          :variant="user.setupWizardCompleted ? 'success' : 'default'"
+          light
+        >
+          {{ user.role === 'admin' ? '—' : (user.setupWizardCompleted ? 'Sim' : 'Não') }}
         </BaseBadge>
       </template>
 

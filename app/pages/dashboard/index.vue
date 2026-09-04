@@ -59,11 +59,11 @@ const {
       })()"
       subtitle="Acompanhe suas conversões, produtividade IA e receitas acumuladas."
     >
-      
+
       <BaseCard compact v-if="stats" data-tour="dashboard-period-filter">
-        
+
       <div class="flex items-center gap-2 overflow-x-auto w-full">
-        
+
         <BaseButton size="sm" v-for="p in [
           { label: '7D', value: 'last_7_days' },
           { label: '30D', value: 'last_30_days' },
@@ -393,7 +393,7 @@ const {
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 
         <!-- Gráfico de Evolução de Faturamento -->
-        <BaseCard title="Evolução do Faturamento" class="lg:col-span-2">
+        <BaseCard title="Evolução do Faturamento" class="lg:col-span-2" data-tour="dashboard-revenue-chart">
           <div class="h-80 relative">
             <Line :data="revenueChartData" :options="lineChartOptions" />
           </div>

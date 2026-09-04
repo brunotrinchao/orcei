@@ -62,7 +62,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
     const isWizardCompleted = !!userProfile?.setupWizardCompleted
 
     // Se o wizard NÃO foi concluído e tentar acessar qualquer outra rota:
-    if (userProfile && !isWizardCompleted && to.path !== '/onboarding' && !to.path.startsWith('/_')) {
+    // Admin nunca é forçado ao onboarding (rotas /admin incluem a gestão);
+    // o wizard é obrigatório apenas para usuários normais.
+    if (userProfile && !isWizardCompleted && to.path !== '/onboarding' && !to.path.startsWith('/_') && !to.path.startsWith('/admin')) {
       return navigateTo('/onboarding')
     }
 

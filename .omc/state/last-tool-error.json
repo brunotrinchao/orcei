@@ -1,7 +1,7 @@
 {
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"/home/brunotrinchao/.claude/squeez/bin/squeez wrap 'grep -n \\\"import {\\\" app/components/proposals/ProposalDetailModal/index.vue | head -3; grep -n \\\"Trash2,\\\" app/components/proposals/Prop...",
-  "error": "Exit code 1\n3:import { History, Download, RefreshCcw, Trash2 } from \"lucide-vue-next\";\n4:import { useProposalDetailModal } from \"./index\";",
-  "timestamp": "2026-09-02T15:57:27.315Z",
+  "tool_name": "Read",
+  "tool_input_preview": "{\"file_path\":\"/server/api/admin/impersonate/stop.post.ts\",\"offset\":12,\"limit\":300}",
+  "error": "File does not exist. Note: your current working directory is /home/brunotrinchao/Documentos/Bruno/Orcei.",
+  "timestamp": "2026-09-04T18:42:31.418Z",
   "retry_count": 1
 }

@@ -27,12 +27,6 @@ function updateField(key: keyof WizardClientData, val: any) {
 <template>
   <div class="space-y-6 max-w-xl mx-auto py-2 wizard-client-container">
     <!-- Dica Inicial -->
-    <div class="flex items-center gap-3 p-4 bg-blue-50/60 dark:bg-blue-950/20 rounded-[.5rem] border border-blue-100 dark:border-blue-900/40">
-      <CheckCircle2 class="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
-      <p class="text-xs text-blue-700 dark:text-blue-300 font-medium">
-        Cadastre os dados da pessoa ou empresa que receberá seu primeiro orçamento no Orcei.
-      </p>
-    </div>
 
     <!-- Campos do Formulário -->
     <div class="space-y-4">

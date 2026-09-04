@@ -40,6 +40,9 @@ export default defineEventHandler(async (event) => {
   const start = resolvePeriodStart(periodStr)
   const match: any = start ? { createdAt: { $gte: start } } : {}
 
+  const page = Math.max(Number(getQuery(event).page) || 1, 1)
+  const limit = Math.min(Math.max(Number(getQuery(event).limit) || 20, 1), 100)
+
   const config = useRuntimeConfig()
   // Com a cadeia de fallback (DeepSeek → Gemini → Cloudflare → OpenRouter),
   // mais de um provedor pode estar habilitado ao mesmo tempo — não existe
@@ -49,7 +52,7 @@ export default defineEventHandler(async (event) => {
   const primaryProvider: ProviderKey | null = enabledProviders[0] || null
 
   try {
-    const [agg, recentCalls] = await Promise.all([
+    const [agg, recentCalls, recentTotal] = await Promise.all([
       AiUsageLog.aggregate([
         { $match: match },
         {
@@ -68,9 +71,11 @@ export default defineEventHandler(async (event) => {
       ]),
       AiUsageLog.find(match)
         .sort({ createdAt: -1 })
-        .limit(20)
+        .skip((page - 1) * limit)
+        .limit(limit)
         .populate('profileId', 'name email')
-        .lean()
+        .lean(),
+      AiUsageLog.countDocuments(match)
     ])
 
     const byProvider = new Map<string, any>(agg.map(a => [a._id, a]))
@@ -92,6 +97,9 @@ export default defineEventHandler(async (event) => {
 
     return {
       period: periodStr,
+      page,
+      limit,
+      recentTotal,
       enabledProviders,
       primaryProvider,
       providers,

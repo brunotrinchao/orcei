@@ -115,6 +115,9 @@ const activeTab = ref<"system" | "landing" | "credits" | "aiProviders">(
 );
 
 // --- Telemetria de Provedores de IA (aba "Provedores de IA") ---
+const aiUsagePage = ref(1)
+const AI_USAGE_PAGE_SIZE = 20
+const aiUsageQuery = computed(() => ({ period: "last_30_days", page: aiUsagePage.value, limit: AI_USAGE_PAGE_SIZE }))
 const {
   data: aiUsage,
   error: aiUsageError,
@@ -122,8 +125,16 @@ const {
   refresh: refreshAiUsage,
 } = useLazyFetch<any>("/api/admin/ai-usage", {
   key: "admin-ai-usage",
+  query: aiUsageQuery,
+  watch: [aiUsagePage],
   immediate: false,
 });
+
+const aiUsageTotalPages = computed(() => Math.max(1, Math.ceil((aiUsage.value?.recentTotal ?? 0) / AI_USAGE_PAGE_SIZE)))
+
+function setAiUsagePage(p: number) {
+  aiUsagePage.value = Math.min(Math.max(p, 1), aiUsageTotalPages.value)
+}
 
 let aiUsageInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -915,6 +926,26 @@ function formatDateTime(iso: string | null) {
                   </tr>
                 </tbody>
               </table>
+            </div>
+
+            <!-- Paginação Chamadas Recentes -->
+            <div v-if="(aiUsage?.recentTotal ?? 0) > AI_USAGE_PAGE_SIZE"
+              class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-800">
+              <span class="text-xs font-bold text-gray-400 dark:text-gray-500">
+                Página {{ aiUsagePage }} de {{ aiUsageTotalPages }}
+              </span>
+              <div class="flex items-center gap-2">
+                <BaseButton type="button" variant="outline" size="sm"
+                  :disabled="aiUsagePage <= 1 || aiUsagePending"
+                  @click="setAiUsagePage(aiUsagePage - 1)">
+                  Anterior
+                </BaseButton>
+                <BaseButton type="button" variant="outline" size="sm"
+                  :disabled="aiUsagePage >= aiUsageTotalPages || aiUsagePending"
+                  @click="setAiUsagePage(aiUsagePage + 1)">
+                  Próxima
+                </BaseButton>
+              </div>
             </div>
           </section>
         </div>

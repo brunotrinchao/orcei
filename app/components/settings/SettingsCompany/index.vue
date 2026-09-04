@@ -22,7 +22,7 @@ const { localCompany, isSearchingCnpj, handleCnpjInput, Building2 } = useSetting
 </script>
 
 <template>
-  <BaseCard title="Dados da Empresa">
+  <BaseCard title="Dados da Empresa" data-tour="config-empresa">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 settings-company-container">
 
       <BaseInput

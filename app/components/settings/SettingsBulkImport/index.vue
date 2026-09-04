@@ -17,7 +17,7 @@ const {
 </script>
 
 <template>
-  <BaseCard title="Múltiplos Cadastros">
+  <BaseCard title="Múltiplos Cadastros" data-tour="config-multiplos-cadastros">
     <div class="space-y-8 settings-bulk-import-container">
       
       <!-- Seção de Guia Passo a Passo -->

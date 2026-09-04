@@ -5,7 +5,15 @@ export const steps: TourStep[] = [
     element: '[data-tour="orcamentos-novo-btn"]',
     popover: {
       title: 'Novo Orçamento',
-      description: 'Crie um orçamento manualmente ou use a IA para gerar uma proposta comercial completa em segundos.',
+      description: 'Crie um orçamento manualmente para gerar uma proposta comercial completa em segundos.',
+      side: 'bottom'
+    }
+  },
+  {
+    element: '[data-tour="orcamentos-novo-btn-ia"]',
+    popover: {
+      title: 'Criar Orçamento com IA',
+      description: 'Crie um orçamento usando a IA.',
       side: 'bottom'
     }
   },

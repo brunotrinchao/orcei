@@ -118,7 +118,7 @@ const {
   <div class="space-y-10 relative">
     <PageHeader>
       <div class="flex flex-row gap-3 w-full sm:w-auto justify-end">
-        <BaseButton @click="isAIWizardOpen = true" variant="ia">
+        <BaseButton @click="isAIWizardOpen = true" variant="ia" data-tour="orcamentos-novo-btn-ia">
           <Sparkles class="w-4 h-4 mr-2 text-white animate-pulse" />
           Criar com IA
         </BaseButton>

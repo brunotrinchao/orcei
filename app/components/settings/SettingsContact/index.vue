@@ -29,7 +29,7 @@ const {
 </script>
 
 <template>
-  <BaseCard title="Contato e Redes Sociais">
+  <BaseCard title="Contato e Redes Sociais" data-tour="config-contato">
 
     <div class="space-y-8 settings-contact-container">
       <div class="space-y-4">

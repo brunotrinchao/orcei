@@ -23,7 +23,7 @@ const { localAddress, isSearchingCep, handleCepInput, MapPin } = useSettingsAddr
 </script>
 
 <template>
-  <BaseCard  title="Endereço Comercial">
+  <BaseCard title="Endereço Comercial" data-tour="config-endereco">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 settings-address-container">
       <BaseInput
         v-model="localAddress.zip"

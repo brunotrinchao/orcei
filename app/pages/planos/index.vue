@@ -52,7 +52,7 @@ const {
     <!-- Cabeçalho de Créditos -->
      <PageHeader title="Recargas" subtitle="Adquira pacotes de créditos cumulativos vitalícios para criar orçamentos e relatórios.">
       <!-- Saldo de Créditos (layout IA Orcei Fácil) -->
-      <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white px-5 py-4 rounded-[.5rem] border border-white/10 flex items-center gap-4 shrink-0">
+      <div data-tour="planos-saldo" class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white px-5 py-4 rounded-[.5rem] border border-white/10 flex items-center gap-4 shrink-0">
         <div
           class="w-11 h-11 rounded-[.5rem] bg-indigo-500/15 border border-indigo-400/20 flex items-center justify-center text-indigo-300 shrink-0">
           <Coins class="w-5 h-5" />
@@ -80,7 +80,7 @@ const {
     </div>
 
     <!-- Banner: Créditos Vitalícios (layout IA Orcei Fácil) -->
-    <section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-[.5rem] border border-white/10">
+    <section data-tour="planos-banner" class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-[.5rem] border border-white/10">
       <div class="absolute -top-20 -left-20 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl opacity-60"></div>
       <div class="absolute -bottom-20 -right-20 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl opacity-60"></div>
 
@@ -181,7 +181,7 @@ const {
     </BaseDialog>
 
     <!-- Cupom Promocional -->
-    <BaseCard compact>
+    <BaseCard compact data-tour="planos-cupom">
       <div class="flex flex-col md:flex-row md:items-end gap-4">
         <div class="flex-1">
           <BaseInput
@@ -199,14 +199,15 @@ const {
     </BaseCard>
 
     <section class="space-y-8">
-      <div class="text-center space-y-1.5">
+      <div data-tour="planos-pacotes" class="text-center space-y-1.5">
         <h2 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Escolha a melhor opção de recarga</h2>
         <p class="text-sm text-muted">Créditos cumulativos e vitalícios aplicados na hora.</p>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
         <BaseCard
-        
+          :data-tour="pack.highlight ? 'planos-pacote-destaque' : undefined"
+
           v-for="pack in packages"
           :key="pack.id"
           :class="[
@@ -304,7 +305,7 @@ const {
     </section>
 
     <!-- Histórico de Recargas -->
-    <BaseCard title="Histórico de Recargas" noPadding>
+    <BaseCard title="Histórico de Recargas" noPadding data-tour="planos-historico">
       <BaseTable
         :columns="[
           { key: 'date', label: 'Data' },

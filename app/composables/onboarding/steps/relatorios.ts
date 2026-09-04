@@ -5,7 +5,7 @@ export const steps: TourStep[] = [
     element: '[data-tour="relatorios-gerar-btn"]',
     popover: {
       title: 'Gerar Novo Relatório',
-      description: 'Acesse o dashboard para gerar um novo relatório estratégico com IA baseado nos seus dados comerciais.',
+      description: 'Gerar um novo relatório estratégico com IA baseado nos seus dados comerciais.',
       side: 'bottom'
     }
   },

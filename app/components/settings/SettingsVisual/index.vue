@@ -36,7 +36,7 @@ const {
 </script>
 
 <template>
-  <BaseCard title="Identidade Visual">
+  <BaseCard title="Identidade Visual" data-tour="config-visual">
     <!-- Cortador de Imagem (Cropper) -->
     <div v-if="showCropper" class="space-y-6">
       <div class="flex items-center justify-between">

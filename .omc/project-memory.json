@@ -324,6 +324,18 @@
       "type": "file"
     },
     {
+      "path": "app/components/settings/SettingsIntegrations/index.vue",
+      "accessCount": 10,
+      "lastAccessed": 1788551837212,
+      "type": "file"
+    },
+    {
+      "path": "app/pages/planos/index.vue",
+      "accessCount": 10,
+      "lastAccessed": 1788552502208,
+      "type": "file"
+    },
+    {
       "path": "app/components/ui/ImpersonationBanner.vue",
       "accessCount": 8,
       "lastAccessed": 1788549276334,
@@ -366,6 +378,12 @@
       "type": "file"
     },
     {
+      "path": "app/composables/onboarding/types.ts",
+      "accessCount": 4,
+      "lastAccessed": 1788552186811,
+      "type": "file"
+    },
+    {
       "path": "app/pages/admin/users/index.vue",
       "accessCount": 3,
       "lastAccessed": 1788549464760,
@@ -390,6 +408,24 @@
       "type": "file"
     },
     {
+      "path": "app/composables/onboarding/steps/configuracoes.ts",
+      "accessCount": 2,
+      "lastAccessed": 1788551811205,
+      "type": "file"
+    },
+    {
+      "path": "app/composables/onboarding/registry.ts",
+      "accessCount": 2,
+      "lastAccessed": 1788552188288,
+      "type": "file"
+    },
+    {
+      "path": "app/composables/onboarding/steps/planos.ts",
+      "accessCount": 2,
+      "lastAccessed": 1788552235070,
+      "type": "file"
+    },
+    {
       "path": "app/components/settings/SettingsPrivacy/index.vue",
       "accessCount": 1,
       "lastAccessed": 1788542000620,
@@ -405,12 +441,6 @@
       "path": "app/components/onboarding/OnboardingHelpButton.vue",
       "accessCount": 1,
       "lastAccessed": 1788543278060,
-      "type": "file"
-    },
-    {
-      "path": "app/composables/onboarding/types.ts",
-      "accessCount": 1,
-      "lastAccessed": 1788543278553,
       "type": "file"
     },
     {
@@ -453,6 +483,36 @@
       "path": "server/api/admin/users/index.get.ts",
       "accessCount": 1,
       "lastAccessed": 1788549443053,
+      "type": "file"
+    },
+    {
+      "path": "app/components/settings/SettingsVisual/index.vue",
+      "accessCount": 1,
+      "lastAccessed": 1788550982109,
+      "type": "file"
+    },
+    {
+      "path": "app/components/settings/SettingsCompany/index.vue",
+      "accessCount": 1,
+      "lastAccessed": 1788550982710,
+      "type": "file"
+    },
+    {
+      "path": "app/components/settings/SettingsAddress/index.vue",
+      "accessCount": 1,
+      "lastAccessed": 1788550983146,
+      "type": "file"
+    },
+    {
+      "path": "app/components/settings/SettingsContact/index.vue",
+      "accessCount": 1,
+      "lastAccessed": 1788550983724,
+      "type": "file"
+    },
+    {
+      "path": "app/components/settings/SettingsBulkImport/index.vue",
+      "accessCount": 1,
+      "lastAccessed": 1788550984330,
       "type": "file"
     }
   ],

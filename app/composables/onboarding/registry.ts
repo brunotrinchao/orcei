@@ -7,7 +7,8 @@ const loaders: Record<TourId, () => Promise<{ steps: TourStep[] }>> = {
   orcamentos: () => import('./steps/orcamentos'),
   relatorios: () => import('./steps/relatorios'),
   configuracoes: () => import('./steps/configuracoes'),
-  agenda: () => import('./steps/agenda')
+  agenda: () => import('./steps/agenda'),
+  planos: () => import('./steps/planos')
 }
 
 export async function loadTourSteps(tourId: TourId): Promise<TourStep[]> {

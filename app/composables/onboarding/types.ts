@@ -1,4 +1,4 @@
-export const TOUR_IDS = ['dashboard', 'clientes', 'catalogo', 'orcamentos', 'relatorios', 'configuracoes', 'agenda'] as const
+export const TOUR_IDS = ['dashboard', 'clientes', 'catalogo', 'orcamentos', 'relatorios', 'configuracoes', 'agenda', 'planos'] as const
 
 export type TourId = typeof TOUR_IDS[number]
 
@@ -18,5 +18,6 @@ export const ROUTE_TOUR_MAP: Record<string, TourId> = {
   '/orcamentos': 'orcamentos',
   '/relatorios': 'relatorios',
   '/configuracoes': 'configuracoes',
-  '/agenda': 'agenda'
+  '/agenda': 'agenda',
+  '/planos': 'planos'
 }

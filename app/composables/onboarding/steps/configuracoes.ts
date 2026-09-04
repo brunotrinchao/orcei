@@ -37,7 +37,23 @@ export const steps: TourStep[] = [
     element: '[data-tour="config-integracoes"]',
     popover: {
       title: 'Integrações',
-      description: 'Conecte sua conta Google para sincronizar calendário e arquivar orçamentos automaticamente no Drive.',
+      description: 'Conecte os serviços Google que automatizam a rotina de orçamentos. Cada integração tem a sua função — veja a seguir.',
+      side: 'top'
+    }
+  },
+  {
+    element: '[data-tour="config-integ-calendar"]',
+    popover: {
+      title: 'Google Calendar — Opcional, mas recomendado',
+      description: 'Nunca mais esqueça uma entrega. Todo orçamento aceito com data de execução vira automaticamente um compromisso na sua agenda, com o nome do cliente e o valor. Ideal para quem vive dos prazos e quer a rotina organizada sem tocar em nada.',
+      side: 'top'
+    }
+  },
+  {
+    element: '[data-tour="config-integ-drive"]',
+    popover: {
+      title: 'Google Drive — Obrigatório para salvar PDFs',
+      description: 'Cada orçamento aceito gera um PDF e é arquivado sozinho em uma pasta por cliente no seu Drive. Sem integração, você perde o histórico de contratos fechados — e fica dependente de baixar manualmente cada documento.',
       side: 'top'
     }
   },

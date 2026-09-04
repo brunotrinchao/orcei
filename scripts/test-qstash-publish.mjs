@@ -4,7 +4,7 @@ dotenv.config()
 async function testPublish() {
   const token = process.env.QSTASH_TOKEN
   // Usando uma URL dummy para o Upstash aceitar o publish (ja que localhost ele bloqueia)
-  const siteUrl = 'https://orcei.com.br' 
+  const siteUrl = 'https://orceifacil.com.br' 
   const destination = `${siteUrl}/api/webhooks/qstash`
 
   if (!token) {
@@ -38,7 +38,7 @@ async function testPublish() {
     console.log('1. Acesse https://console.upstash.com/qstash')
     console.log('2. Clique na aba \"Events\" ou \"Messages\" no menu superior')
     console.log('3. Voce vera o log da mensagem enviada.')
-    console.log('4. Note que o status estara como \"Failed\" ou \"Retrying\" porque a orcei.com.br ainda nao tem o endpoint, mas o importante e que o QStash RECEBEU o dado.')
+    console.log('4. Note que o status estara como \"Failed\" ou \"Retrying\" porque a orceifacil.com.br ainda nao tem o endpoint, mas o importante e que o QStash RECEBEU o dado.')
 
   } catch (error) {
     console.error('ERRO NO TESTE:', error.message)

@@ -23,7 +23,7 @@
 
 ## 1. Domínio
 
-Configure seu domínio (ex: `orcei.com.br`) apontando para o servidor/plataforma.
+Configure seu domínio (ex: `orceifacil.com.br`) apontando para o servidor/plataforma.
 Certifique-se de que HTTPS está ativo (Let's Encrypt ou certificado da plataforma).
 
 ---
@@ -31,6 +31,7 @@ Certifique-se de que HTTPS está ativo (Let's Encrypt ou certificado da platafor
 ## 2. MongoDB Atlas
 
 **O que fazer:**
+
 1. Acesse [cloud.mongodb.com](https://cloud.mongodb.com)
 2. Vá em **Network Access** → **Add IP Address**
 3. Adicione o IP do seu servidor de produção (ou `0.0.0.0/0` se a plataforma usa IPs dinâmicos)
@@ -45,6 +46,7 @@ MONGODB_URI=mongodb+srv://orcei_db:<senha>@orcei.xyw9rmn.mongodb.net/?appName=Or
 ## 3. Google OAuth
 
 **O que fazer:**
+
 1. Acesse [console.cloud.google.com](https://console.cloud.google.com)
 2. Menu → **APIs & Services** → **Credentials**
 3. Clique no seu OAuth 2.0 Client ID
@@ -70,6 +72,7 @@ NUXT_OAUTH_GOOGLE_CLIENT_SECRET=<mesmo do local>
 > ⚠️ Em produção, use chaves LIVE (não as de teste `rk_test_` / `sk_test_`).
 
 ### 4.1 Obter chaves Live
+
 1. Acesse [dashboard.stripe.com](https://dashboard.stripe.com)
 2. Desative o modo **Test** (toggle no topo)
 3. Vá em **Developers** → **API Keys**
@@ -80,6 +83,7 @@ STRIPE_SECRET_KEY=your_stripe_live_secret_key
 ```
 
 ### 4.2 Criar produtos e preços Live
+
 1. No Stripe (modo Live) → **Products** → crie os mesmos planos do ambiente de teste:
    - Starter (mensal/anual)
    - Premium (mensal/anual)
@@ -97,6 +101,7 @@ STRIPE_CREDITS_10_PRICE_ID=price_live_XXXXXXX
 ```
 
 ### 4.3 Criar webhook de produção
+
 1. Stripe → **Developers** → **Webhooks** → **Add endpoint**
 2. URL:
    ```
@@ -122,15 +127,18 @@ STRIPE_WEBHOOK_SECRET=whsec_live_XXXXXXXXXXXXXXXX
 > ⚠️ Remover `RESEND_TEST_TO` em produção. Sem essa variável, os emails vão para o cliente real.
 
 ### 5.1 Verificar domínio
+
 1. Acesse [resend.com/domains](https://resend.com/domains)
 2. Adicione `seudominio.com.br`
 3. Configure os registros DNS (SPF, DKIM, DMARC) no seu provedor de domínio
 4. Aguarde verificação (pode levar até 48h)
 
 ### 5.2 Atualizar remetente no código
+
 Após domínio verificado, atualize `server/utils/email.ts`:
+
 ```ts
-from: 'Orcei <noreply@seudominio.com.br>'
+from: "Orcei <noreply@seudominio.com.br>";
 ```
 
 ```env
@@ -183,6 +191,7 @@ ContentSquare está hardcoded no composable — nenhuma configuração adicional
 > ⚠️ Nunca use os secrets de desenvolvimento em produção.
 
 Gere novos secrets:
+
 ```bash
 # No terminal, gere um secret seguro:
 node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
@@ -267,6 +276,7 @@ node .output/server/index.mjs
 ```
 
 Ou via plataforma (Vercel, Railway, Render, Coolify):
+
 - **Build command:** `npm run build`
 - **Output directory:** `.output`
 - **Start command:** `node .output/server/index.mjs`

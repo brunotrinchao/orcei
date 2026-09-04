@@ -112,28 +112,28 @@ function scrollToSection(id: string) {
   <div class="min-h-screen bg-slate-50 dark:bg-gray-950 p-4 sm:p-8 space-y-8">
     <!-- Header / Banner de Dev -->
     <div class="max-w-7xl mx-auto space-y-4">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl text-white shadow-xl">
+      <div
+        class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl text-white shadow-xl">
         <div class="space-y-1">
-          <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/20 rounded-full text-xs font-bold tracking-wider uppercase backdrop-blur-md">
+          <div
+            class="inline-flex items-center gap-2 px-3 py-1 bg-white/20 rounded-full text-xs font-bold tracking-wider uppercase backdrop-blur-md">
             <Sparkles class="w-3.5 h-3.5 text-amber-300" />
             🧪 Guia de Componentes UI (Ambiente de Testes)
           </div>
           <h1 class="text-2xl sm:text-3xl font-black tracking-tight">Catálogo Interno de Componentes UI</h1>
           <p class="text-blue-100 text-xs sm:text-sm max-w-2xl font-medium">
-            Esta página reúne todos os componentes base e suas variações visuais/responsivas. Esta página é temporária e destinada apenas para testes.
+            Esta página reúne todos os componentes base e suas variações visuais/responsivas. Esta página é temporária e
+            destinada apenas para testes.
           </p>
         </div>
       </div>
 
       <!-- Navegação por Seções (Pills Sticky) -->
-      <div class="sticky top-4 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-slate-200 dark:border-gray-800 rounded-2xl p-2 shadow-lg overflow-x-auto custom-scrollbar flex items-center gap-2">
-        <button
-          v-for="nav in navSections"
-          :key="nav.id"
-          @click="scrollToSection(nav.id)"
+      <div
+        class="sticky top-4 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-slate-200 dark:border-gray-800 rounded-2xl p-2 shadow-lg overflow-x-auto custom-scrollbar flex items-center gap-2">
+        <button v-for="nav in navSections" :key="nav.id" @click="scrollToSection(nav.id)"
           class="px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer"
-          :class="activeTab === nav.id ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-gray-800'"
-        >
+          :class="activeTab === nav.id ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-gray-800'">
           {{ nav.label }}
         </button>
       </div>
@@ -252,7 +252,8 @@ function scrollToSection(id: string) {
               </BaseBadge>
             </div>
 
-            <h4 class="text-xs font-black text-slate-400 pt-4">4. Tamanhos e Bordas Arredondadas (`size` & `rounded`)</h4>
+            <h4 class="text-xs font-black text-slate-400 pt-4">4. Tamanhos e Bordas Arredondadas (`size` & `rounded`)
+            </h4>
             <div class="flex flex-wrap gap-3 items-center">
               <BaseBadge size="xs" rounded="full" variant="success">Extra Small Full</BaseBadge>
               <BaseBadge size="sm" rounded="md" variant="info">Small Medium (Padrão)</BaseBadge>
@@ -265,12 +266,14 @@ function scrollToSection(id: string) {
 
       <!-- ─── BASECARD ─────────────────────────────────────────────── -->
       <section id="cards" class="space-y-6">
-        <BaseSectionCard title="BaseCard" subtitle="Card multiuso com slots para header, content e footer separados por bordas divisórias.">
+        <BaseSectionCard title="BaseCard"
+          subtitle="Card multiuso com slots para header, content e footer separados por bordas divisórias.">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Card Padrão com Header e Footer -->
             <BaseCard title="Card Padrão" subtitle="Subtítulo opcional" color="blue">
               <p class="text-xs text-slate-600 dark:text-gray-300">
-                Este é o conteúdo principal do card (slot default). O header e o footer estão separados por uma linha de borda de um lado ao outro.
+                Este é o conteúdo principal do card (slot default). O header e o footer estão separados por uma linha de
+                borda de um lado ao outro.
               </p>
 
               <template #footer>
@@ -299,55 +302,31 @@ function scrollToSection(id: string) {
         <BaseSectionCard title="Inputs & Formulários" subtitle="Campos de entrada de texto, textarea, checkbox e cor.">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- BaseInput -->
-            <div class="space-y-4 p-4 rounded-2xl bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800">
+            <div
+              class="space-y-4 p-4 rounded-2xl bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800">
               <h4 class="text-xs font-black text-slate-400 ">BaseInput</h4>
-              
-              <BaseInput
-                v-model="inputText"
-                label="Nome Completo"
-                placeholder="Digite seu nome..."
-                :icon="User"
-                required
-              />
 
-              <BaseInput
-                v-model="inputSearch"
-                label="Pesquisa com Ícone"
-                placeholder="Buscar orçamento por cliente..."
-                :icon="Search"
-              />
+              <BaseInput v-model="inputText" label="Nome Completo" placeholder="Digite seu nome..." :icon="User"
+                required />
 
-              <BaseInput
-                type="password"
-                label="Senha"
-                placeholder="••••••••"
-              />
+              <BaseInput v-model="inputSearch" label="Pesquisa com Ícone" placeholder="Buscar orçamento por cliente..."
+                :icon="Search" />
 
-              <BaseInput
-                v-model="inputError"
-                label="Campo com Erro"
-                placeholder="Preencha incorretamente..."
-                error="E-mail inválido ou já cadastrado."
-              />
+              <BaseInput type="password" label="Senha" placeholder="••••••••" />
 
-              <BaseInput
-                label="Campo Desabilitado"
-                model-value="Valor bloqueado"
-                disabled
-              />
+              <BaseInput v-model="inputError" label="Campo com Erro" placeholder="Preencha incorretamente..."
+                error="E-mail inválido ou já cadastrado." />
+
+              <BaseInput label="Campo Desabilitado" model-value="Valor bloqueado" disabled />
             </div>
 
             <!-- BaseTextarea, BaseCheckbox, BaseColorInput -->
-            <div class="space-y-6 p-4 rounded-2xl bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800">
+            <div
+              class="space-y-6 p-4 rounded-2xl bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800">
               <h4 class="text-xs font-black text-slate-400 ">Textarea, Checkbox & Color</h4>
 
-              <BaseTextarea
-                v-model="textareaText"
-                label="Observações do Orçamento"
-                placeholder="Digite detalhes adicionais..."
-                :rows="3"
-                :maxlength="200"
-              />
+              <BaseTextarea v-model="textareaText" label="Observações do Orçamento"
+                placeholder="Digite detalhes adicionais..." :rows="3" :maxlength="200" />
 
               <div class="space-y-3 pt-2">
                 <h5 class="text-xs font-bold text-slate-500 ">BaseCheckbox</h5>
@@ -369,44 +348,28 @@ function scrollToSection(id: string) {
 
       <!-- ─── 4. SELEÇÃO & COMBOBOX ─────────────────────────────────── -->
       <section id="selects" class="space-y-6">
-        <BaseSectionCard title="Seleção & Combobox" subtitle="Selects customizados com Radix, busca autocomplete e icon picker.">
+        <BaseSectionCard title="Seleção & Combobox"
+          subtitle="Selects customizados com Radix, busca autocomplete e icon picker.">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- BaseSelect -->
             <div class="space-y-4">
               <h4 class="text-xs font-black text-slate-400 ">BaseSelect</h4>
-              <BaseSelect
-                v-model="selectValue"
-                label="Plano Escolhido"
-                :options="selectOptions"
-                :icon="CreditCard"
-              />
+              <BaseSelect v-model="selectValue" label="Plano Escolhido" :options="selectOptions" :icon="CreditCard" />
 
-              <BaseSelect
-                v-model="selectValue"
-                label="Tamanho Pequeno (sm)"
-                size="sm"
-                :options="selectOptions"
-              />
+              <BaseSelect v-model="selectValue" label="Tamanho Pequeno (sm)" size="sm" :options="selectOptions" />
             </div>
 
             <!-- BaseCombobox -->
             <div class="space-y-4">
               <h4 class="text-xs font-black text-slate-400 ">BaseCombobox (Autocompletar)</h4>
-              <BaseCombobox
-                v-model="comboboxValue"
-                label="Estado / UF"
-                placeholder="Selecione um estado..."
-                :options="comboboxItems"
-              />
+              <BaseCombobox v-model="comboboxValue" label="Estado / UF" placeholder="Selecione um estado..."
+                :options="comboboxItems" />
             </div>
 
             <!-- BaseIconSelect -->
             <div class="space-y-4">
               <h4 class="text-xs font-black text-slate-400 ">BaseIconSelect (Ícone)</h4>
-              <BaseIconSelect
-                v-model="iconSelectValue"
-                label="Ícone da Categoria"
-              />
+              <BaseIconSelect v-model="iconSelectValue" label="Ícone da Categoria" />
             </div>
           </div>
         </BaseSectionCard>
@@ -417,76 +380,38 @@ function scrollToSection(id: string) {
         <BaseSectionCard title="Métricas & Progresso" subtitle="Cards de KPI e barras de progresso operacionais.">
           <!-- BaseMetricCard Grid -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <BaseMetricCard
-              title="Faturamento Total"
-              value="R$ 124.500,00"
-              subtitle="+15% em relação ao mês anterior"
-              color="emerald"
-              :icon="TrendingUp"
-              badge="+15%"
-            />
+            <BaseMetricCard title="Faturamento Total" value="R$ 124.500,00" subtitle="+15% em relação ao mês anterior"
+              color="emerald" :icon="TrendingUp" badge="+15%" />
 
-            <BaseMetricCard
-              title="Orçamentos Enviados"
-              value="48"
-              subtitle="12 aguardando resposta"
-              color="blue"
-              :icon="Mail"
-              badge="Mês Atual"
-            />
+            <BaseMetricCard title="Orçamentos Enviados" value="48" subtitle="12 aguardando resposta" color="blue"
+              :icon="Mail" badge="Mês Atual" />
 
-            <BaseMetricCard
-              title="Taxa de Conversão"
-              value="68.4%"
-              subtitle="Meta: 70%"
-              color="purple"
-              :icon="Check"
-              badge="Alta Performance"
-            />
+            <BaseMetricCard title="Taxa de Conversão" value="68.4%" subtitle="Meta: 70%" color="purple" :icon="Check"
+              badge="Alta Performance" />
 
-            <BaseMetricCard
-              title="Créditos IA Restantes"
-              value="120"
-              subtitle="Renova em 15 dias"
-              color="amber"
-              :icon="Sparkles"
-              badge="Créditos"
-            />
+            <BaseMetricCard title="Créditos IA Restantes" value="120" subtitle="Renova em 15 dias" color="amber"
+              :icon="Sparkles" badge="Créditos" />
           </div>
 
           <!-- BaseProgressBar -->
-          <div class="p-6 bg-slate-50 dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 space-y-6 mt-6">
+          <div
+            class="p-6 bg-slate-50 dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 space-y-6 mt-6">
             <h4 class="text-xs font-black text-slate-400 ">BaseProgressBar</h4>
-            
-            <BaseProgressBar
-              :value="75"
-              :max="100"
-              label="Progresso da Meta Mensal"
-              show-label
-              color="bg-blue-600"
-            />
 
-            <BaseProgressBar
-              :value="90"
-              :max="100"
-              label="Uso de Armazenamento"
-              show-label
-              color="bg-purple-600"
-            />
+            <BaseProgressBar :value="75" :max="100" label="Progresso da Meta Mensal" show-label color="bg-blue-600" />
 
-            <BaseProgressBar
-              indeterminate
-              label="Processando Importação em Lote..."
-              show-label
-              color="bg-emerald-500"
-            />
+            <BaseProgressBar :value="90" :max="100" label="Uso de Armazenamento" show-label color="bg-purple-600" />
+
+            <BaseProgressBar indeterminate label="Processando Importação em Lote..." show-label
+              color="bg-emerald-500" />
           </div>
         </BaseSectionCard>
       </section>
 
       <!-- ─── 6. BASEDATALIST & BASETABLE ───────────────────────────── -->
       <section id="table" class="space-y-6">
-        <BaseSectionCard title="BaseDataList & BaseTable" subtitle="Componente declarativo unificado para tabelas e cards em mobile.">
+        <BaseSectionCard title="BaseDataList & BaseTable"
+          subtitle="Componente declarativo unificado para tabelas e cards em mobile.">
           <div class="space-y-4">
             <div class="flex items-center justify-between">
               <h4 class="text-xs font-black text-slate-400 ">
@@ -494,17 +419,12 @@ function scrollToSection(id: string) {
               </h4>
             </div>
 
-            <BaseDataList
-              :columns="tableColumns"
-              :items="tableItems"
-              :total="tableItems.length"
-              :items-per-page="10"
-              :current-page="currentPage"
-              @update:current-page="cp => currentPage = cp"
-            >
+            <BaseDataList :columns="tableColumns" :items="tableItems" :total="tableItems.length" :items-per-page="10"
+              :current-page="currentPage" @update:current-page="cp => currentPage = cp">
               <!-- Slot customizado para coluna 'status' -->
               <template #cell-status="{ item }">
-                <BaseBadge :variant="item.status === 'Concluído' ? 'success' : item.status === 'Ativo' ? 'info' : 'warning'">
+                <BaseBadge
+                  :variant="item.status === 'Concluído' ? 'success' : item.status === 'Ativo' ? 'info' : 'warning'">
                   {{ item.status }}
                 </BaseBadge>
               </template>
@@ -515,7 +435,8 @@ function scrollToSection(id: string) {
 
       <!-- ─── 7. DIÁLOGOS & MODAIS ─────────────────────────────────── -->
       <section id="dialogs" class="space-y-6">
-        <BaseSectionCard title="Modais & Alertas" subtitle="BaseDialog (com close à esquerda e menu de contexto à direita) e BaseAlertDialog.">
+        <BaseSectionCard title="Modais & Alertas"
+          subtitle="BaseDialog (com close à esquerda e menu de contexto à direita) e BaseAlertDialog.">
           <div class="flex flex-wrap gap-4 items-center">
             <BaseButton variant="primary" @click="isDialogOpen = true">
               Abrir BaseDialog (Modal Completo)
@@ -527,18 +448,14 @@ function scrollToSection(id: string) {
           </div>
 
           <!-- BaseDialog Demo -->
-          <BaseDialog
-            v-model:open="isDialogOpen"
-            title="Exemplo de Modal de Detalhes"
-            size="lg"
-          >
+          <BaseDialog v-model:open="isDialogOpen" title="Exemplo de Modal de Detalhes" size="lg">
             <template #context-menu>
               <BaseDropdownMenu>
                 <BaseDropdownMenuItem>
                   <Download class="w-4 h-4 text-blue-500" />
                   <span>Baixar Relatório PDF</span>
                 </BaseDropdownMenuItem>
-                <BaseDropdownMenuItem href="https://orcei.com.br" target="_blank">
+                <BaseDropdownMenuItem href="https://orceifacil.com.br" target="_blank">
                   <ExternalLink class="w-4 h-4 text-purple-500" />
                   <span>Acessar Link Externo</span>
                 </BaseDropdownMenuItem>
@@ -546,10 +463,12 @@ function scrollToSection(id: string) {
             </template>
 
             <div class="space-y-4 py-2">
-              <div class="p-4 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/30 text-blue-900 dark:text-blue-200">
+              <div
+                class="p-4 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/30 text-blue-900 dark:text-blue-200">
                 <h5 class="text-sm font-bold">Conteúdo Interno do Modal</h5>
                 <p class="text-xs mt-1 text-blue-700 dark:text-blue-300">
-                  O botão de fechar (X) está posicionado no canto superior esquerdo e o menu de contexto (...) à direita.
+                  O botão de fechar (X) está posicionado no canto superior esquerdo e o menu de contexto (...) à
+                  direita.
                 </p>
               </div>
             </div>
@@ -563,25 +482,21 @@ function scrollToSection(id: string) {
           </BaseDialog>
 
           <!-- BaseAlertDialog Demo -->
-          <BaseAlertDialog
-            v-model:open="isAlertDialogOpen"
-            title="Excluir Registro Permanente?"
+          <BaseAlertDialog v-model:open="isAlertDialogOpen" title="Excluir Registro Permanente?"
             description="Esta ação não poderá ser desfeita. Todos os dados associados serão removidos do servidor."
-            confirm-text="Sim, Excluir"
-            cancel-text="Cancelar"
-            variant="danger"
-            @confirm="isAlertDialogOpen = false"
-          />
+            confirm-text="Sim, Excluir" cancel-text="Cancelar" variant="danger" @confirm="isAlertDialogOpen = false" />
         </BaseSectionCard>
       </section>
 
       <!-- ─── 8. SKELETONS & FEEDBACKS ─────────────────────────────── -->
       <section id="skeletons" class="space-y-6">
-        <BaseSectionCard title="Skeletons & Feedbacks" subtitle="Placeholders de carregamento visual para dados em trânsito.">
+        <BaseSectionCard title="Skeletons & Feedbacks"
+          subtitle="Placeholders de carregamento visual para dados em trânsito.">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div class="p-6 rounded-2xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 space-y-4">
+            <div
+              class="p-6 rounded-2xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 space-y-4">
               <h4 class="text-xs font-black text-slate-400 ">BaseSkeleton (Linhas e Avatar)</h4>
-              
+
               <div class="flex items-center gap-4">
                 <BaseSkeleton width="3rem" height="3rem" borderRadius="1rem" />
                 <div class="space-y-2 flex-1">
@@ -597,15 +512,12 @@ function scrollToSection(id: string) {
               </div>
             </div>
 
-            <div class="p-6 rounded-2xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 space-y-4">
+            <div
+              class="p-6 rounded-2xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 space-y-4">
               <h4 class="text-xs font-black text-slate-400 ">BasePagination</h4>
               <div class="py-4 flex justify-center">
-                <BasePagination
-                  :current-page="currentPage"
-                  :total-items="40"
-                  :items-per-page="10"
-                  @update:current-page="p => currentPage = p"
-                />
+                <BasePagination :current-page="currentPage" :total-items="40" :items-per-page="10"
+                  @update:current-page="p => currentPage = p" />
               </div>
             </div>
           </div>
@@ -614,80 +526,62 @@ function scrollToSection(id: string) {
 
       <!-- ─── 9. CALLOUTS (AVISOS & NOTIFICAÇÕES INLINE) ──────────── -->
       <section id="callouts" class="space-y-6">
-        <BaseSectionCard title="Callouts (Avisos Inline)" subtitle="Alertas e banners explicativos sem bordas, com suporte a ícones, variantes de cores e botão de fechar.">
+        <BaseSectionCard title="Callouts (Avisos Inline)"
+          subtitle="Alertas e banners explicativos sem bordas, com suporte a ícones, variantes de cores e botão de fechar.">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <BaseCallout
-              variant="info"
-              title="Informação do Sistema"
-              description="Conexão com os servidores ativa e operacional."
-            />
+            <BaseCallout variant="info" title="Informação do Sistema"
+              description="Conexão com os servidores ativa e operacional." />
 
-            <BaseCallout
-              variant="success"
-              title="Orçamento Enviado"
-              description="A proposta em PDF foi entregue com sucesso no e-mail do cliente."
-            />
+            <BaseCallout variant="success" title="Orçamento Enviado"
+              description="A proposta em PDF foi entregue com sucesso no e-mail do cliente." />
 
-            <BaseCallout
-              variant="warning"
-              title="Atenção à Validade"
-              description="Esta proposta expira em menos de 24 horas."
-            />
+            <BaseCallout variant="warning" title="Atenção à Validade"
+              description="Esta proposta expira em menos de 24 horas." />
 
-            <BaseCallout
-              variant="danger"
-              title="Falha na Operação"
-              description="Não foi possível sincronizar o evento com o Google Calendar."
-            />
+            <BaseCallout variant="danger" title="Falha na Operação"
+              description="Não foi possível sincronizar o evento com o Google Calendar." />
 
-            <BaseCallout
-              variant="violet"
-              title="Recurso com Inteligência Artificial"
-              description="Gere propostas completas em segundos com assistência por IA."
-            />
+            <BaseCallout variant="violet" title="Recurso com Inteligência Artificial"
+              description="Gere propostas completas em segundos com assistência por IA." />
 
-            <BaseCallout
-              variant="neutral"
-              title="Dica de Uso"
-              description="Utilize a barra de pesquisa rápida para filtrar cadastros instantaneamente."
-              dismissible
-            />
+            <BaseCallout variant="neutral" title="Dica de Uso"
+              description="Utilize a barra de pesquisa rápida para filtrar cadastros instantaneamente." dismissible />
           </div>
         </BaseSectionCard>
       </section>
 
       <!-- ─── 10. DRAWERS (PAINÉIS LATERAIS) ───────────────────────── -->
       <section id="drawers" class="space-y-6">
-        <BaseSectionCard title="Drawers (Painéis Deslizantes)" subtitle="Painéis deslizantes com botão de fechar à esquerda, título e subtítulo centralizados, suporte a menu de contexto à direita e 100% de largura no mobile.">
+        <BaseSectionCard title="Drawers (Painéis Deslizantes)"
+          subtitle="Painéis deslizantes com botão de fechar à esquerda, título e subtítulo centralizados, suporte a menu de contexto à direita e 100% de largura no mobile.">
           <div class="flex flex-wrap gap-4 items-center">
             <BaseButton variant="primary" @click="isDrawerDemoOpen = true">
               Abrir BaseDrawer (Painel Lateral)
             </BaseButton>
           </div>
 
-          <BaseDrawer
-            v-model:open="isDrawerDemoOpen"
-            title="Detalhes do Cliente"
-            description="Visualização rápida das informações cadastradas"
-            position="right"
-            size="md"
-          >
+          <BaseDrawer v-model:open="isDrawerDemoOpen" title="Detalhes do Cliente"
+            description="Visualização rápida das informações cadastradas" position="right" size="md">
             <template #context-menu>
-              <button type="button" class="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-800 transition-colors" title="Mais opções">
+              <button type="button"
+                class="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-800 transition-colors"
+                title="Mais opções">
                 <MoreVertical class="w-4 h-4" />
               </button>
             </template>
 
             <div class="space-y-4 py-2">
-              <div class="p-4 bg-slate-50 dark:bg-gray-900 rounded-xl space-y-2 border border-slate-100 dark:border-gray-800">
+              <div
+                class="p-4 bg-slate-50 dark:bg-gray-900 rounded-xl space-y-2 border border-slate-100 dark:border-gray-800">
                 <div class="text-xs font-black text-gray-400">Cliente</div>
                 <div class="text-sm font-bold text-gray-900 dark:text-gray-100">Orcei Tecnologia LTDA</div>
                 <div class="text-xs text-gray-500">CNPJ: 12.345.678/0001-90</div>
               </div>
 
-              <div class="p-4 bg-slate-50 dark:bg-gray-900 rounded-xl space-y-2 border border-slate-100 dark:border-gray-800">
+              <div
+                class="p-4 bg-slate-50 dark:bg-gray-900 rounded-xl space-y-2 border border-slate-100 dark:border-gray-800">
                 <div class="text-xs font-black text-gray-400">Contato</div>
-                <div class="text-xs text-gray-600 dark:text-gray-300">contato@orcei.com.br</div>
+                <div class="text-xs text-gray-600 dark:text-gray-300">contato@orceifacil.com.br</div>
                 <div class="text-xs text-gray-600 dark:text-gray-300">(11) 98765-4321</div>
               </div>
             </div>

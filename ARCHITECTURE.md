@@ -5,6 +5,7 @@
 Orcei é um SaaS B2B para geração e gestão de propostas comerciais voltado a freelancers e pequenas empresas. O profissional cadastra seus produtos/serviços em um catálogo, monta propostas personalizadas com contrato e termos, e envia um link único ao cliente. O cliente acessa a proposta via URL pública, pode escolher forma de pagamento, solicitar alterações ou aceitar — sem precisar de cadastro.
 
 **Fluxo básico:**
+
 1. Profissional faz login via Google OAuth
 2. Cria/edita proposta (itens do catálogo ou avulsos)
 3. Publica a proposta (consome 1 crédito) — email automático enviado ao cliente
@@ -16,27 +17,27 @@ Orcei é um SaaS B2B para geração e gestão de propostas comerciais voltado a 
 
 ## 2. Stack
 
-| Camada | Tecnologia | Versão/Detalhe |
-|--------|-----------|----------------|
-| Framework | Nuxt 4 (compatibility mode) | `compatibilityVersion: 4` |
-| Frontend | Vue 3 + Composition API | SPA dentro do Nuxt |
-| Estilo | Tailwind CSS | `@nuxtjs/tailwindcss` |
-| UI Components | Radix Vue + componentes próprios com prefixo `Base*` | — |
-| Rich Text | TipTap (vue-3) | `@tiptap/starter-kit`, underline, link |
-| Calendário | FullCalendar | `@fullcalendar/vue3` |
-| Máscaras | Maska | `maska` |
-| Estado Global | `useState` do Nuxt (SSR-safe) | sem Pinia |
-| Backend | Nuxt Server (H3) | rotas em `server/api/` |
-| Banco de Dados | MongoDB via Mongoose | `mongoose` |
-| Autenticação | nuxt-auth-utils (Google OAuth) | sessão em cookie signed |
-| Pagamentos | Stripe | Checkout Sessions + Customer Portal + Webhooks |
-| Upload | Cloudinary | `@nuxtjs/cloudinary` |
-| Email | Resend (REST direto) | transacional |
-| AI | Google Gemini | `@google/generative-ai` via `geminiApiKey` |
-| PDF | Puppeteer + Chromium | `generateProposalHtml()` → PDF |
-| CEP | ViaCEP | `$fetch` direto no client |
-| Linguagem | TypeScript | `strict: true` |
-| Testes | Vitest | `vitest.config.ts` |
+| Camada         | Tecnologia                                           | Versão/Detalhe                                 |
+| -------------- | ---------------------------------------------------- | ---------------------------------------------- |
+| Framework      | Nuxt 4 (compatibility mode)                          | `compatibilityVersion: 4`                      |
+| Frontend       | Vue 3 + Composition API                              | SPA dentro do Nuxt                             |
+| Estilo         | Tailwind CSS                                         | `@nuxtjs/tailwindcss`                          |
+| UI Components  | Radix Vue + componentes próprios com prefixo `Base*` | —                                              |
+| Rich Text      | TipTap (vue-3)                                       | `@tiptap/starter-kit`, underline, link         |
+| Calendário     | FullCalendar                                         | `@fullcalendar/vue3`                           |
+| Máscaras       | Maska                                                | `maska`                                        |
+| Estado Global  | `useState` do Nuxt (SSR-safe)                        | sem Pinia                                      |
+| Backend        | Nuxt Server (H3)                                     | rotas em `server/api/`                         |
+| Banco de Dados | MongoDB via Mongoose                                 | `mongoose`                                     |
+| Autenticação   | nuxt-auth-utils (Google OAuth)                       | sessão em cookie signed                        |
+| Pagamentos     | Stripe                                               | Checkout Sessions + Customer Portal + Webhooks |
+| Upload         | Cloudinary                                           | `@nuxtjs/cloudinary`                           |
+| Email          | Resend (REST direto)                                 | transacional                                   |
+| AI             | Google Gemini                                        | `@google/generative-ai` via `geminiApiKey`     |
+| PDF            | Puppeteer + Chromium                                 | `generateProposalHtml()` → PDF                 |
+| CEP            | ViaCEP                                               | `$fetch` direto no client                      |
+| Linguagem      | TypeScript                                           | `strict: true`                                 |
+| Testes         | Vitest                                               | `vitest.config.ts`                             |
 
 ---
 
@@ -219,120 +220,129 @@ Orcei/
 ## 6. Modelos de Dados
 
 ### Profile
+
 Collection `profiles`. Um por usuário Google.
 
-| Campo | Tipo | Papel |
-|-------|------|-------|
-| `userId` | String (unique) | ID do Google (`user.sub`) |
-| `name`, `email` | String | Dados do profissional |
-| `brandConfig.logoUrl` | String | URL Cloudinary do logo |
-| `brandConfig.primaryColor` | String | Cor hex para PDFs/templates |
-| `company.taxId/legalName/tradeName` | String | Dados fiscais do profissional |
-| `address` | Object | Endereço completo |
-| `contact.phones`, `contact.social` | Array/Object | Telefones e redes sociais |
-| `creditsBalance` | Number | Créditos disponíveis (free=1, starter=5, premium=9999) |
-| `creditsUsed` | Number | Créditos consumidos (propostas publicadas) |
-| `subscriptionPlan` | 'free'\|'starter'\|'premium' | **Fonte de verdade** para feature gating |
-| `subscriptionStatus` | String | Espelho do status Stripe (para UI informativa) |
-| `stripeCustomerId` | String | ID do customer no Stripe |
-| `stripeSubscriptionId` | String | ID da subscription ativa |
-| `stripePriceId` | String | Price ID ativo (para mapear plano em webhooks) |
-| `subscriptionEndsAt` | Date | Data de término do período atual |
-| `cancelAtPeriodEnd` | Boolean | True quando cancelamento agendado |
-| `defaultValidityDays` | Number | Validade padrão de novas propostas (padrão: 7) |
-| `defaultContractTemplate` | String (HTML) | Template de contrato com variáveis `{{...}}` |
-| `defaultTermsAndConditions` | String (HTML) | T&C padrão pré-preenchido |
+| Campo                               | Tipo                         | Papel                                                  |
+| ----------------------------------- | ---------------------------- | ------------------------------------------------------ |
+| `userId`                            | String (unique)              | ID do Google (`user.sub`)                              |
+| `name`, `email`                     | String                       | Dados do profissional                                  |
+| `brandConfig.logoUrl`               | String                       | URL Cloudinary do logo                                 |
+| `brandConfig.primaryColor`          | String                       | Cor hex para PDFs/templates                            |
+| `company.taxId/legalName/tradeName` | String                       | Dados fiscais do profissional                          |
+| `address`                           | Object                       | Endereço completo                                      |
+| `contact.phones`, `contact.social`  | Array/Object                 | Telefones e redes sociais                              |
+| `creditsBalance`                    | Number                       | Créditos disponíveis (free=1, starter=5, premium=9999) |
+| `creditsUsed`                       | Number                       | Créditos consumidos (propostas publicadas)             |
+| `subscriptionPlan`                  | 'free'\|'starter'\|'premium' | **Fonte de verdade** para feature gating               |
+| `subscriptionStatus`                | String                       | Espelho do status Stripe (para UI informativa)         |
+| `stripeCustomerId`                  | String                       | ID do customer no Stripe                               |
+| `stripeSubscriptionId`              | String                       | ID da subscription ativa                               |
+| `stripePriceId`                     | String                       | Price ID ativo (para mapear plano em webhooks)         |
+| `subscriptionEndsAt`                | Date                         | Data de término do período atual                       |
+| `cancelAtPeriodEnd`                 | Boolean                      | True quando cancelamento agendado                      |
+| `defaultValidityDays`               | Number                       | Validade padrão de novas propostas (padrão: 7)         |
+| `defaultContractTemplate`           | String (HTML)                | Template de contrato com variáveis `{{...}}`           |
+| `defaultTermsAndConditions`         | String (HTML)                | T&C padrão pré-preenchido                              |
 
 ### Proposal
+
 Collection `proposals`. Status workflow: `draft → created → pending → accepted | expired`
 
-| Campo | Tipo | Papel |
-|-------|------|-------|
-| `profileId` | ObjectId → Profile | Dono da proposta |
-| `title` | String | Título da proposta |
-| `code` | String | Ex: `#ORC-2025-001` (legível) |
-| `sequenceNumber` | Number | Número sequencial por profissional/ano |
-| `slug` | String (unique) | ID público URL-safe (`nanoid(10)`) |
-| `token` | String | Token de validação no link (`nanoid(20)`) |
-| `status` | Enum | `draft\|created\|pending\|accepted\|expired` |
-| `client` | Object | Snapshot de nome/email/phone no momento da criação |
-| `items` | Array\<itemSnapshot\> | Snapshot dos itens (name, description, price, quantity, discount) |
-| `upsellItems` | Array\<itemSnapshot\> | Itens de upsell opcionais |
-| `totals` | Object | `{ subtotal, additional, discount, final }` calculado server-side |
-| `paymentConfig` | Object | `{ method: cash\|credit_card, installments, cashDiscount% }` |
-| `sendMethod` | 'manual'\|'auto' | Se auto, envia email ao publicar |
-| `contractText` | String (HTML) | Texto do contrato (com variáveis) |
-| `termsAndConditions` | String (HTML) | Termos e condições |
-| `expiresAt` | Date | Data de expiração |
-| `lastEmailId` | String | ID do email Resend enviado (para debug) |
+| Campo                | Tipo                  | Papel                                                             |
+| -------------------- | --------------------- | ----------------------------------------------------------------- |
+| `profileId`          | ObjectId → Profile    | Dono da proposta                                                  |
+| `title`              | String                | Título da proposta                                                |
+| `code`               | String                | Ex: `#ORC-2025-001` (legível)                                     |
+| `sequenceNumber`     | Number                | Número sequencial por profissional/ano                            |
+| `slug`               | String (unique)       | ID público URL-safe (`nanoid(10)`)                                |
+| `token`              | String                | Token de validação no link (`nanoid(20)`)                         |
+| `status`             | Enum                  | `draft\|created\|pending\|accepted\|expired`                      |
+| `client`             | Object                | Snapshot de nome/email/phone no momento da criação                |
+| `items`              | Array\<itemSnapshot\> | Snapshot dos itens (name, description, price, quantity, discount) |
+| `upsellItems`        | Array\<itemSnapshot\> | Itens de upsell opcionais                                         |
+| `totals`             | Object                | `{ subtotal, additional, discount, final }` calculado server-side |
+| `paymentConfig`      | Object                | `{ method: cash\|credit_card, installments, cashDiscount% }`      |
+| `sendMethod`         | 'manual'\|'auto'      | Se auto, envia email ao publicar                                  |
+| `contractText`       | String (HTML)         | Texto do contrato (com variáveis)                                 |
+| `termsAndConditions` | String (HTML)         | Termos e condições                                                |
+| `expiresAt`          | Date                  | Data de expiração                                                 |
+| `lastEmailId`        | String                | ID do email Resend enviado (para debug)                           |
 
 ### Client
+
 Collection `clients`. Agenda de clientes do profissional.
 
-| Campo | Tipo | Papel |
-|-------|------|-------|
-| `profileId` | ObjectId → Profile | Dono do cliente |
-| `name`, `email`, `phone` | String | Contato |
-| `taxId` | String | CPF/CNPJ (opcional) |
-| `isWhatsapp` | Boolean | Se o phone é WhatsApp |
-| `address` | Object | Endereço completo |
-| `notes` | String | Observações livres |
-| Índice | `{ profileId, email }` | Evita duplicatas por perfil |
+| Campo                    | Tipo                   | Papel                       |
+| ------------------------ | ---------------------- | --------------------------- |
+| `profileId`              | ObjectId → Profile     | Dono do cliente             |
+| `name`, `email`, `phone` | String                 | Contato                     |
+| `taxId`                  | String                 | CPF/CNPJ (opcional)         |
+| `isWhatsapp`             | Boolean                | Se o phone é WhatsApp       |
+| `address`                | Object                 | Endereço completo           |
+| `notes`                  | String                 | Observações livres          |
+| Índice                   | `{ profileId, email }` | Evita duplicatas por perfil |
 
 ### CatalogItem
+
 Collection `catalogitems`. Catálogo de produtos/serviços do profissional.
 
-| Campo | Tipo | Papel |
-|-------|------|-------|
-| `profileId` | ObjectId → Profile | Dono do item |
-| `type` | 'product'\|'service' | Categoria |
-| `name`, `description` | String | Descrição do item |
-| `price` | Number | Preço unitário |
-| `unit` | String | Unidade: UN, KG, CM, ML, H, DIA, MES |
-| `sku` | String | Código interno (opcional) |
-| `imageUrl` | String | URL Cloudinary |
+| Campo                 | Tipo                 | Papel                                |
+| --------------------- | -------------------- | ------------------------------------ |
+| `profileId`           | ObjectId → Profile   | Dono do item                         |
+| `type`                | 'product'\|'service' | Categoria                            |
+| `name`, `description` | String               | Descrição do item                    |
+| `price`               | Number               | Preço unitário                       |
+| `unit`                | String               | Unidade: UN, KG, CM, ML, H, DIA, MES |
+| `sku`                 | String               | Código interno (opcional)            |
+| `imageUrl`            | String               | URL Cloudinary                       |
 
 ### Event
+
 Collection `events`. Agenda/calendário do profissional.
 
-| Campo | Tipo | Papel |
-|-------|------|-------|
-| `profileId` | ObjectId → Profile | Dono do evento |
-| `proposalId` | ObjectId → Proposal | Vinculação opcional a uma proposta |
-| `title`, `description` | String | Dados do evento |
-| `start`, `end` | Date | Intervalo do evento |
-| `allDay` | Boolean | Se é evento de dia inteiro |
-| `color` | String | Cor hex para exibição no calendário |
+| Campo                  | Tipo                | Papel                               |
+| ---------------------- | ------------------- | ----------------------------------- |
+| `profileId`            | ObjectId → Profile  | Dono do evento                      |
+| `proposalId`           | ObjectId → Proposal | Vinculação opcional a uma proposta  |
+| `title`, `description` | String              | Dados do evento                     |
+| `start`, `end`         | Date                | Intervalo do evento                 |
+| `allDay`               | Boolean             | Se é evento de dia inteiro          |
+| `color`                | String              | Cor hex para exibição no calendário |
 
 ### Counter
+
 Collection `counters`. Controle de numeração sequencial por profissional/ano.
 
-| Campo | Tipo | Papel |
-|-------|------|-------|
-| `profileId` | ObjectId → Profile | Contexto do profissional |
-| `year` | Number | Ano de referência |
-| `lastSequence` | Number | Último número usado (incrementado atomicamente via `$inc`) |
-| Índice | `{ profileId, year }` (unique) | Garante um counter por profissional por ano |
+| Campo          | Tipo                           | Papel                                                      |
+| -------------- | ------------------------------ | ---------------------------------------------------------- |
+| `profileId`    | ObjectId → Profile             | Contexto do profissional                                   |
+| `year`         | Number                         | Ano de referência                                          |
+| `lastSequence` | Number                         | Último número usado (incrementado atomicamente via `$inc`) |
+| Índice         | `{ profileId, year }` (unique) | Garante um counter por profissional por ano                |
 
 ### StripeEvent
+
 Collection `stripeevents`. Idempotência de webhooks.
 
-| Campo | Tipo | Papel |
-|-------|------|-------|
-| `eventId` | String (unique) | ID do evento Stripe (`evt_*`) |
-| `type` | String | Tipo do evento (ex: `checkout.session.completed`) |
-| TTL | 30 dias (índice TTL) | Expiração automática dos registros |
+| Campo     | Tipo                 | Papel                                             |
+| --------- | -------------------- | ------------------------------------------------- |
+| `eventId` | String (unique)      | ID do evento Stripe (`evt_*`)                     |
+| `type`    | String               | Tipo do evento (ex: `checkout.session.completed`) |
+| TTL       | 30 dias (índice TTL) | Expiração automática dos registros                |
 
 ---
 
 ## 7. Integrações Externas
 
 ### Google OAuth
+
 - **Propósito**: autenticação única (sem senha local)
 - **Fluxo**: `nuxt-auth-utils` gerencia o redirect OAuth e callback em `server/api/auth/google.get.ts`
 - **Env**: `NUXT_OAUTH_GOOGLE_CLIENT_ID`, `NUXT_OAUTH_GOOGLE_CLIENT_SECRET`
 
 ### Stripe
+
 - **Propósito**: subscriptions (starter/premium), add-on de créditos avulsos, Customer Portal
 - **Fluxo**:
   - Checkout: `POST /api/stripe/checkout` → Stripe Checkout Session → redirect → webhook
@@ -342,27 +352,32 @@ Collection `stripeevents`. Idempotência de webhooks.
 - **Env**: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, todos os `STRIPE_*_PRICE_ID` (ver seção 8)
 
 ### Cloudinary
+
 - **Propósito**: upload e hospedagem de imagens (logo do profissional, imagens de catalog items)
 - **Fluxo**: `POST /api/upload/cloudinary` assina o upload server-side; módulo `@nuxtjs/cloudinary` no frontend
 - **Env**: `CLOUDINARY_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
 
 ### Google Gemini AI
+
 - **Propósito**: geração de conteúdo para propostas (sugestão de descrições, títulos)
 - **Fluxo**: `POST /api/ai/generate` e `GET /api/ai/analyze` chamam a API Gemini com `geminiApiKey`
 - **Env**: `GEMINI_API_KEY`
 
 ### Puppeteer/Chromium (PDF)
+
 - **Propósito**: geração de PDF das propostas
 - **Fluxo**: `generateProposalHtml()` → Puppeteer lança Chromium headless, renderiza HTML, exporta PDF
 - **Env**: nenhuma variável específica; requer Chromium instalado no servidor (`--no-sandbox` obrigatório em produção)
 
 ### Resend (Email transacional)
+
 - **Propósito**: envio do link da proposta ao cliente final
 - **Fluxo**: `server/utils/email.ts` faz POST direto na API REST do Resend (`https://api.resend.com/emails`)
 - **Remetente atual**: `onboarding@resend.dev` (domínio de teste — não entrega em produção; ver roadmap)
 - **Env**: `RESEND_API_KEY`
 
 ### ViaCEP (busca de endereço por CEP)
+
 - **Propósito**: preenchimento automático de endereço ao digitar CEP
 - **Fluxo**: chamada direta do browser para `https://viacep.com.br/ws/{cep}/json/`
 - **Env**: nenhuma (API pública)
@@ -371,30 +386,30 @@ Collection `stripeevents`. Idempotência de webhooks.
 
 ## 8. Variáveis de Ambiente
 
-| Variável | Obrigatória | Origem | Propósito |
-|----------|-------------|--------|-----------|
-| `NUXT_OAUTH_GOOGLE_CLIENT_ID` | Sim | Google Cloud Console | Client ID OAuth |
-| `NUXT_OAUTH_GOOGLE_CLIENT_SECRET` | Sim | Google Cloud Console | Client Secret OAuth |
-| `NUXT_SESSION_PASSWORD` | Sim | Gerada localmente (32+ chars) | Assinar cookie de sessão (nuxt-auth-utils) |
-| `MONGODB_URI` | Sim | MongoDB Atlas / local | String de conexão MongoDB |
-| `STRIPE_SECRET_KEY` | Sim | Stripe Dashboard | Chamadas server-side à API Stripe |
-| `STRIPE_WEBHOOK_SECRET` | Sim | Stripe CLI / Dashboard | Verificação de assinatura de webhooks |
-| `STRIPE_STARTER_PRICE_ID` | Sim | Stripe Dashboard | Price ID do plano Starter (subscription) |
-| `STRIPE_PREMIUM_PRICE_ID` | Sim | Stripe Dashboard | Price ID do plano Premium (subscription) |
-| `STRIPE_PRICE_MONTHLY` | Sim | Stripe Dashboard | Price ID Premium mensal (alias) |
-| `STRIPE_PRICE_ANNUAL` | Sim | Stripe Dashboard | Price ID Premium anual |
-| `STRIPE_PRICE_SINGLE` | Sim | Stripe Dashboard | Price ID de 1 crédito avulso (payment) |
-| `STRIPE_CREDITS_5_PRICE_ID` | Sim | Stripe Dashboard | Price ID de 5 créditos avulsos |
-| `STRIPE_CREDITS_10_PRICE_ID` | Sim | Stripe Dashboard | Price ID de 10 créditos avulsos |
-| `RESEND_API_KEY` | Sim | Resend Dashboard | Envio de emails transacionais |
-| `CLOUDINARY_NAME` | Sim | Cloudinary Dashboard | Cloud name para uploads |
-| `CLOUDINARY_API_KEY` | Sim | Cloudinary Dashboard | API Key para assinar uploads |
-| `CLOUDINARY_API_SECRET` | Sim | Cloudinary Dashboard | API Secret para assinar uploads |
-| `GEMINI_API_KEY` | Sim | Google AI Studio | Chamadas à API Gemini |
-| `PUBLIC_URL` | Não | Deploy | URL base para links de proposta (default: `https://orcei.com.br`) |
-| `NUXT_PUBLIC_SITE_URL` | Não | Deploy | URL base para redirect Stripe (default: `http://localhost:3000`) |
-| `APP_NAME` | Não | Deploy | Nome do app (default: `Orcei`) |
-| `APP_ENVIRONMENT` | Não | Deploy | `development` ou `production` |
+| Variável                          | Obrigatória | Origem                        | Propósito                                                              |
+| --------------------------------- | ----------- | ----------------------------- | ---------------------------------------------------------------------- |
+| `NUXT_OAUTH_GOOGLE_CLIENT_ID`     | Sim         | Google Cloud Console          | Client ID OAuth                                                        |
+| `NUXT_OAUTH_GOOGLE_CLIENT_SECRET` | Sim         | Google Cloud Console          | Client Secret OAuth                                                    |
+| `NUXT_SESSION_PASSWORD`           | Sim         | Gerada localmente (32+ chars) | Assinar cookie de sessão (nuxt-auth-utils)                             |
+| `MONGODB_URI`                     | Sim         | MongoDB Atlas / local         | String de conexão MongoDB                                              |
+| `STRIPE_SECRET_KEY`               | Sim         | Stripe Dashboard              | Chamadas server-side à API Stripe                                      |
+| `STRIPE_WEBHOOK_SECRET`           | Sim         | Stripe CLI / Dashboard        | Verificação de assinatura de webhooks                                  |
+| `STRIPE_STARTER_PRICE_ID`         | Sim         | Stripe Dashboard              | Price ID do plano Starter (subscription)                               |
+| `STRIPE_PREMIUM_PRICE_ID`         | Sim         | Stripe Dashboard              | Price ID do plano Premium (subscription)                               |
+| `STRIPE_PRICE_MONTHLY`            | Sim         | Stripe Dashboard              | Price ID Premium mensal (alias)                                        |
+| `STRIPE_PRICE_ANNUAL`             | Sim         | Stripe Dashboard              | Price ID Premium anual                                                 |
+| `STRIPE_PRICE_SINGLE`             | Sim         | Stripe Dashboard              | Price ID de 1 crédito avulso (payment)                                 |
+| `STRIPE_CREDITS_5_PRICE_ID`       | Sim         | Stripe Dashboard              | Price ID de 5 créditos avulsos                                         |
+| `STRIPE_CREDITS_10_PRICE_ID`      | Sim         | Stripe Dashboard              | Price ID de 10 créditos avulsos                                        |
+| `RESEND_API_KEY`                  | Sim         | Resend Dashboard              | Envio de emails transacionais                                          |
+| `CLOUDINARY_NAME`                 | Sim         | Cloudinary Dashboard          | Cloud name para uploads                                                |
+| `CLOUDINARY_API_KEY`              | Sim         | Cloudinary Dashboard          | API Key para assinar uploads                                           |
+| `CLOUDINARY_API_SECRET`           | Sim         | Cloudinary Dashboard          | API Secret para assinar uploads                                        |
+| `GEMINI_API_KEY`                  | Sim         | Google AI Studio              | Chamadas à API Gemini                                                  |
+| `PUBLIC_URL`                      | Não         | Deploy                        | URL base para links de proposta (default: `https://orceifacil.com.br`) |
+| `NUXT_PUBLIC_SITE_URL`            | Não         | Deploy                        | URL base para redirect Stripe (default: `http://localhost:3000`)       |
+| `APP_NAME`                        | Não         | Deploy                        | Nome do app (default: `Orcei`)                                         |
+| `APP_ENVIRONMENT`                 | Não         | Deploy                        | `development` ou `production`                                          |
 
 ---
 
@@ -414,11 +429,11 @@ Collection `stripeevents`. Idempotência de webhooks.
 
 ## 10. Sistema de Créditos e Planos
 
-| Plano | `creditsBalance` | `subscriptionPlan` | Renovação |
-|-------|-----------------|-------------------|-----------|
-| Free | 1 | `'free'` | Nunca (manual upgrade) |
-| Starter | 5 | `'starter'` | Reset para 5 a cada `invoice.payment_succeeded` |
-| Premium | 9999 | `'premium'` | ---
+| Plano   | `creditsBalance` | `subscriptionPlan` | Renovação                                       |
+| ------- | ---------------- | ------------------ | ----------------------------------------------- |
+| Free    | 1                | `'free'`           | Nunca (manual upgrade)                          |
+| Starter | 5                | `'starter'`        | Reset para 5 a cada `invoice.payment_succeeded` |
+| Premium | 9999             | `'premium'`        | ---                                             |
 
 ## 13. Roadmap de Melhorias
 

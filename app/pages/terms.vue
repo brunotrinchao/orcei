@@ -1,7 +1,10 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'blank' })
 const { public: { appName } } = useRuntimeConfig()
-useHead({ title: `Termos de Uso — ${appName}` })
+useHead({
+  title: `Termos de Uso — ${appName}`,
+  meta: [{ name: 'robots', content: 'noindex, nofollow' }]
+})
 
 const { public: { emailContactDefault } } = useRuntimeConfig()
 const { data: systemInfo } = useFetch<any>('/api/system/status', { key: 'system-status' })

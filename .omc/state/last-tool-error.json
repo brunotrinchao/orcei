@@ -1,7 +1,7 @@
 {
-  "tool_name": "Write",
-  "tool_input_preview": "{\"file_path\":\"/home/brunotrihchao/Documentos/Bruno/Orecei/app/compoents/settings/SettingsIntegrations/index.vue\",\"content\":\"<script setup lang=\\\"ts\\\">\\nimport { useSettingsIntegrations } from './index...",
-  "error": "EACCES: permission denied, mkdir '/home/brunotrihchao'",
-  "timestamp": "2026-09-04T19:47:59.384Z",
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"/home/brunotrinchao/.claude/squeez/bin/squeez wrap 'echo \\\"=== dev log tail ===\\\"; tail -20 /tmp/claude-1001/-home-brunotrinchao-Documentos-Bruno-Orcei/e5aa3622-4df8-423b-a6f4-5fad9adf2db1...",
+  "error": "Exit code 7\n=== dev log tail ===\n│\n●  Nuxt 4.4.5 (with Nitro 2.13.4, Vite 7.3.3 and Vue 3.5.34)\n\n  ➜ Local:    http://localhost:3100/\n  ➜ Network:  use --host to expose\n\n[exited with code 0]\n=== curl verbose ===\n* IPv6: ::1\n* IPv4: 127.0.0.1\n*   Trying [::1]:3100...\n* connect to ::1 port 3100 from ::1 port 46468 failed: Connection refused\n*   Trying 127.0.0.1:3100...\n* connect to 127.0.0.1 port 3100 from 127.0.0.1 port 50600 failed: Connection refused\n* Failed to connect to localhost port 3100 a...",
+  "timestamp": "2026-09-08T14:07:17.811Z",
   "retry_count": 1
 }

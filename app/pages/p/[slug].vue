@@ -6,7 +6,11 @@ definePageMeta({
 })
 
 useHead({
-  meta: [{ name: 'referrer', content: 'no-referrer' }]
+  meta: [
+    { name: 'referrer', content: 'no-referrer' },
+    // Propostas são acessadas por link direto enviado ao cliente — nunca indexar
+    { name: 'robots', content: 'noindex, nofollow' }
+  ]
 })
 
 const route = useRoute()

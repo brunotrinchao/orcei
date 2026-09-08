@@ -1,0 +1,25 @@
+# Orcei Fácil
+
+> Orcei Fácil é um software de orçamento online com inteligência artificial para freelancers, autônomos e pequenas empresas no Brasil. Crie propostas comerciais profissionais em 2 minutos, envie por link e feche mais clientes. Grátis para começar.
+
+## Pages
+
+- [Home — Software de Orçamento com IA](https://orceifacil.com.br/): Plataforma SaaS pt-BR para freelancers criarem orçamentos com IA, enviarem por link e aprovarem online.
+- [Planos e Preços](https://orceifacil.com.br/planos): Plano gratuito sem cartão, créditos avulsos de IA (R$ 15,00) e Plano Profissional (R$ 29,90/mês).
+
+## Key Facts
+
+- Orcei Fácil é um SaaS brasileiro de criação de orçamentos com inteligência artificial.
+- Público-alvo: freelancers, autônomos e pequenas empresas que cobram por serviços.
+- Fluxo: o usuário descreve o serviço com as próprias palavras e a IA estrutura a proposta comercial completa.
+- Envio: proposta enviada por link exclusivo ao cliente, com confirmação de leitura em tempo real e aprovação digital.
+- Formato: PDF profissional com logo e dados da empresa, ou página web interativa.
+- Preço: gratuito para começar; créditos de IA avulsos a partir de R$ 15,00; Plano Profissional R$ 29,90/mês com orçamentos ilimitados.
+- Idioma: português do Brasil (pt-BR).
+- Segurança: criptografia de padrão bancário; dados de clientes nunca são vendidos.
+
+## Contact
+
+- Site: https://orceifacil.com.br
+- Instagram: https://www.instagram.com/orceifacil
+- LinkedIn: https://www.linkedin.com/company/orceifacil

@@ -5,6 +5,10 @@ definePageMeta({
   layout: 'blank'
 })
 
+useHead({
+  meta: [{ name: 'robots', content: 'noindex, nofollow' }]
+})
+
 const {
   systemInfo,
   acceptedTerms,

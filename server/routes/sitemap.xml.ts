@@ -6,9 +6,9 @@ export default defineEventHandler((event) => {
   const currentDate = new Date().toISOString().split('T')[0]
 
   // Lista de rotas públicas indexáveis do seu sistema
+  // /auth/login foi removido: página de autenticação não deve ser indexada (noindex)
   const routes = [
-    { url: '/', changefreq: 'daily', priority: '1.0' },
-    { url: '/auth/login', changefreq: 'monthly', priority: '0.5' }
+    { url: '/', changefreq: 'daily', priority: '1.0' }
   ]
 
   const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>

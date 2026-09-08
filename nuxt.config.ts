@@ -245,6 +245,12 @@ export default defineNuxtConfig({
       hidePoweredBy: true
     },
     routeRules: {
+      // ISR na landing: serve HTML estático do cache edge e regenera em background
+      // a cada 5 min. Conteúdo (landingPage) vem de /api/system/status com fetch do lado do servidor,
+      // então o skeleton não fica obsoleto; headers de segurança do '/**' continuam aplicados (merge).
+      '/': {
+        isr: 300
+      },
       '/**': {
         headers: {
           'X-Frame-Options': 'SAMEORIGIN',

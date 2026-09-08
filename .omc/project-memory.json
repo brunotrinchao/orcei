@@ -306,6 +306,12 @@
   },
   "hotPaths": [
     {
+      "path": "nuxt.config.ts",
+      "accessCount": 3,
+      "lastAccessed": 1788877249218,
+      "type": "file"
+    },
+    {
       "path": "app/composables/pages/useLandingPage.ts",
       "accessCount": 2,
       "lastAccessed": 1788876259976,
@@ -339,12 +345,6 @@
       "path": "package.json",
       "accessCount": 1,
       "lastAccessed": 1788871596115,
-      "type": "file"
-    },
-    {
-      "path": "nuxt.config.ts",
-      "accessCount": 1,
-      "lastAccessed": 1788871600965,
       "type": "file"
     },
     {

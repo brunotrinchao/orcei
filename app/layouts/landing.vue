@@ -77,6 +77,7 @@ onUnmounted(() => {
             <a href="#como-funciona" @click="scrollToSection($event, '#como-funciona')" class="text-sm font-semibold text-[#61708a] hover:text-[#0870f8] transition-colors cursor-pointer">Como Funciona</a>
             <a href="#pricing" @click="scrollToSection($event, '#pricing')" class="text-sm font-semibold text-[#61708a] hover:text-[#0870f8] transition-colors cursor-pointer">Preços</a>
             <a href="#faq" @click="scrollToSection($event, '#faq')" class="text-sm font-semibold text-[#61708a] hover:text-[#0870f8] transition-colors cursor-pointer">FAQ</a>
+            <a href="https://blog.orceifacil.com.br" class="text-sm font-semibold text-[#61708a] hover:text-[#0870f8] transition-colors cursor-pointer">Blog</a>
           </div>
         </div>
 

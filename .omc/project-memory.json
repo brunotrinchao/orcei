@@ -307,8 +307,8 @@
   "hotPaths": [
     {
       "path": "nuxt.config.ts",
-      "accessCount": 3,
-      "lastAccessed": 1788877249218,
+      "accessCount": 4,
+      "lastAccessed": 1788887374071,
       "type": "file"
     },
     {
@@ -343,8 +343,14 @@
     },
     {
       "path": "package.json",
-      "accessCount": 1,
-      "lastAccessed": 1788871596115,
+      "accessCount": 2,
+      "lastAccessed": 1788887373946,
+      "type": "file"
+    },
+    {
+      "path": "app/layouts/landing.vue",
+      "accessCount": 2,
+      "lastAccessed": 1788956124037,
       "type": "file"
     },
     {
@@ -417,6 +423,18 @@
       "path": "public/llms.txt",
       "accessCount": 1,
       "lastAccessed": 1788876334484,
+      "type": "file"
+    },
+    {
+      "path": "vercel.json",
+      "accessCount": 1,
+      "lastAccessed": 1788887373799,
+      "type": "file"
+    },
+    {
+      "path": ".vercel/repo.json",
+      "accessCount": 1,
+      "lastAccessed": 1788887374417,
       "type": "file"
     }
   ],

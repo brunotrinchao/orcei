@@ -136,6 +136,7 @@ onUnmounted(() => {
           <a href="#como-funciona" @click="scrollToSection($event, '#como-funciona')" class="text-base font-semibold text-[#61708a] hover:text-[#0870f8] transition-colors py-1">Como Funciona</a>
           <a href="#pricing" @click="scrollToSection($event, '#pricing')" class="text-base font-semibold text-[#61708a] hover:text-[#0870f8] transition-colors py-1">Preços</a>
           <a href="#faq" @click="scrollToSection($event, '#faq')" class="text-base font-semibold text-[#61708a] hover:text-[#0870f8] transition-colors py-1">FAQ</a>
+          <a href="https://blog.orceifacil.com.br" class="text-base font-semibold text-[#61708a] hover:text-[#0870f8] transition-colors py-1">Blog</a>
         </nav>
         <div class="pt-4 border-t border-gray-100" v-if="!loggedIn">
           <NuxtLink

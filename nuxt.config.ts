@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@vueuse/nuxt', '@nuxtjs/cloudinary', '@vercel/speed-insights', '@sentry/nuxt/module', 'nuxt-simple-sitemap'],
+  modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@vueuse/nuxt', '@nuxtjs/cloudinary', '@vercel/speed-insights', '@vercel/analytics', '@sentry/nuxt/module', 'nuxt-simple-sitemap'],
 
   // Usado pelo nuxt-simple-sitemap v4 para compor URLs absolutas
   site: {

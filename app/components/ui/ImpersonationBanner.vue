@@ -13,7 +13,8 @@ async function stopImpersonating() {
   try {
     await $fetch('/api/admin/impersonate/stop', { method: 'POST' })
     await refreshSession()
-    await refreshNuxtData('profile') // limpa cache do perfil personificado
+    clearNuxtData('profile') // invalida cache antes de recarregar o próprio perfil
+    await refreshNuxtData('profile')
     notify('Sucesso', 'Você voltou ao seu painel de administrador.')
     await navigateTo('/admin/users')
   } catch (e: any) {

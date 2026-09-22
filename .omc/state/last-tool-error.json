@@ -1,7 +1,7 @@
 {
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"/home/brunotrinchao/.claude/squeez/bin/squeez wrap 'ls ~/.claude/skills/ | grep -i \\\"ui\\\\|ux\\\" | head; echo ---; ls ~/.claude/skills/ | grep -i \\\"max-pro\\\"'\",\"description\":\"Find ui/ux skil...",
-  "error": "Exit code 1\n[squeez: cache idle 59741s — 5-min ephemeral cache may have expired; next turn will re-create context at full write cost]\n00-andruia-consultant\n10-andruia-skill-smith\n20-andruia-niche-intelligence\nagent-tool-builder\nandroid_ui_verification\nangular-ui-patterns\napi-endpoint-builder\napp-builder\naudit-context-building\nbackend-dev-guidelines\n---",
-  "timestamp": "2026-09-09T12:14:28.200Z",
+  "tool_name": "mcp__plugin_context-mode_context-mode__ctx_execute",
+  "tool_input_preview": "{\"language\":\"javascript\",\"intent\":\"profiles with setupWizardCompleted true but empty company data\",\"timeout\":60000,\"code\":\"cd /home/brunotrinchao/Documentos/Bruno/Orcei && node - <<'EOF'\\ntry {\\n  con...",
+  "error": "Exit code: 1\n\nstdout:\n\n\nstderr:\n/tmp/.ctx-mode-hX46wy/script.js:56\ncd /home/brunotrinchao/Documentos/Bruno/Orcei && node - <<'EOF'\n                                                        ^^\n\nSyntaxError: Unexpected token '<<'\n    at wrapSafe (node:internal/modules/cjs/loader:1713:18)\n    at Module._compile (node:internal/modules/cjs/loader:1755:20)\n    at Object..js (node:internal/modules/cjs/loader:1913:10)\n    at Module.load (node:internal/modules/cjs/loader:1505:32)\n    at Function._load (nod...",
+  "timestamp": "2026-09-22T14:26:56.561Z",
   "retry_count": 1
 }

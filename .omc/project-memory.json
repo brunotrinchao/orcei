@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1788870958348,
+  "lastScanned": 1790086734289,
   "projectRoot": "/home/brunotrinchao/Documentos/Bruno/Orcei",
   "techStack": {
     "languages": [
@@ -101,7 +101,7 @@
       "path": "app",
       "purpose": "Application code",
       "fileCount": 1,
-      "lastAccessed": 1788870958330,
+      "lastAccessed": 1790086734269,
       "keyFiles": [
         "app.vue"
       ]
@@ -110,7 +110,7 @@
       "path": "docs",
       "purpose": "Documentation",
       "fileCount": 10,
-      "lastAccessed": 1788870958331,
+      "lastAccessed": 1790086734269,
       "keyFiles": [
         "analise-concorrente-propoz.md",
         "auditoria-juridico-po-2026-07.md",
@@ -123,7 +123,7 @@
       "path": "playwright-report",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1788870958339,
+      "lastAccessed": 1790086734269,
       "keyFiles": [
         "index.html"
       ]
@@ -132,14 +132,14 @@
       "path": "resources",
       "purpose": null,
       "fileCount": 0,
-      "lastAccessed": 1788870958343,
+      "lastAccessed": 1790086734269,
       "keyFiles": []
     },
     "scripts": {
       "path": "scripts",
       "purpose": "Build/utility scripts",
       "fileCount": 18,
-      "lastAccessed": 1788870958345,
+      "lastAccessed": 1790086734270,
       "keyFiles": [
         "check-db.mjs",
         "check-messages.mjs",
@@ -152,21 +152,21 @@
       "path": "server",
       "purpose": null,
       "fileCount": 0,
-      "lastAccessed": 1788870958345,
+      "lastAccessed": 1790086734270,
       "keyFiles": []
     },
     "test-results": {
       "path": "test-results",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1788870958345,
+      "lastAccessed": 1790086734270,
       "keyFiles": []
     },
     "tests": {
       "path": "tests",
       "purpose": "Test files",
       "fileCount": 43,
-      "lastAccessed": 1788870958345,
+      "lastAccessed": 1790086734270,
       "keyFiles": [
         "AIGuardrails.spec.ts",
         "AIService.spec.ts",
@@ -179,7 +179,7 @@
       "path": "types",
       "purpose": "Type definitions",
       "fileCount": 4,
-      "lastAccessed": 1788870958345,
+      "lastAccessed": 1790086734280,
       "keyFiles": [
         "auth.d.ts",
         "enums.ts",
@@ -191,14 +191,14 @@
       "path": "app/assets",
       "purpose": "Static assets",
       "fileCount": 0,
-      "lastAccessed": 1788870958346,
+      "lastAccessed": 1790086734285,
       "keyFiles": []
     },
     "app/components": {
       "path": "app/components",
       "purpose": "UI components",
       "fileCount": 1,
-      "lastAccessed": 1788870958346,
+      "lastAccessed": 1790086734285,
       "keyFiles": [
         "RichTextEditor.vue"
       ]
@@ -207,7 +207,7 @@
       "path": "app/middleware",
       "purpose": "Middleware",
       "fileCount": 1,
-      "lastAccessed": 1788870958346,
+      "lastAccessed": 1790086734286,
       "keyFiles": [
         "auth.global.ts"
       ]
@@ -216,7 +216,7 @@
       "path": "app/pages",
       "purpose": "Page components",
       "fileCount": 5,
-      "lastAccessed": 1788870958346,
+      "lastAccessed": 1790086734286,
       "keyFiles": [
         "componentes.vue",
         "index.vue",
@@ -226,10 +226,11 @@
     "app/public": {
       "path": "app/public",
       "purpose": "Public files",
-      "fileCount": 2,
-      "lastAccessed": 1788870958347,
+      "fileCount": 3,
+      "lastAccessed": 1790086734286,
       "keyFiles": [
         "favicon.ico",
+        "llms.txt",
         "robots.txt"
       ]
     },
@@ -237,7 +238,7 @@
       "path": "app/utils",
       "purpose": "Utility functions",
       "fileCount": 1,
-      "lastAccessed": 1788870958347,
+      "lastAccessed": 1790086734286,
       "keyFiles": [
         "proposalLifecycle.ts"
       ]
@@ -246,7 +247,7 @@
       "path": "server/api",
       "purpose": "API routes",
       "fileCount": 1,
-      "lastAccessed": 1788870958348,
+      "lastAccessed": 1790086734287,
       "keyFiles": [
         "test.get.ts"
       ]
@@ -255,7 +256,7 @@
       "path": "server/middleware",
       "purpose": "Middleware",
       "fileCount": 2,
-      "lastAccessed": 1788870958348,
+      "lastAccessed": 1790086734287,
       "keyFiles": [
         "01.mongodb.ts",
         "domain-router.ts"
@@ -265,7 +266,7 @@
       "path": "server/models",
       "purpose": "Data models",
       "fileCount": 15,
-      "lastAccessed": 1788870958348,
+      "lastAccessed": 1790086734287,
       "keyFiles": [
         "AiUsageLog.ts",
         "AuditLog.ts",
@@ -276,7 +277,7 @@
       "path": "server/routes",
       "purpose": "Route handlers",
       "fileCount": 1,
-      "lastAccessed": 1788870958348,
+      "lastAccessed": 1790086734288,
       "keyFiles": [
         "sitemap.xml.ts"
       ]
@@ -285,7 +286,7 @@
       "path": "server/services",
       "purpose": "Business logic services",
       "fileCount": 14,
-      "lastAccessed": 1788870958348,
+      "lastAccessed": 1790086734288,
       "keyFiles": [
         "AIService.ts",
         "AssinafyService.ts",
@@ -296,7 +297,7 @@
       "path": "server/utils",
       "purpose": "Utility functions",
       "fileCount": 19,
-      "lastAccessed": 1788870958348,
+      "lastAccessed": 1790086734288,
       "keyFiles": [
         "aiGuardrails.ts",
         "aiPricing.ts",
@@ -306,135 +307,39 @@
   },
   "hotPaths": [
     {
-      "path": "nuxt.config.ts",
+      "path": "tests/SetupWizardDraft.spec.ts",
+      "accessCount": 19,
+      "lastAccessed": 1790088305988,
+      "type": "file"
+    },
+    {
+      "path": "app/components/onboarding/SetupWizardModal/index.ts",
+      "accessCount": 6,
+      "lastAccessed": 1790087747969,
+      "type": "file"
+    },
+    {
+      "path": "tests/SetupWizardApi.spec.ts",
+      "accessCount": 6,
+      "lastAccessed": 1790087902126,
+      "type": "file"
+    },
+    {
+      "path": "server/api/profile/setup-wizard.post.ts",
       "accessCount": 4,
-      "lastAccessed": 1788887374071,
+      "lastAccessed": 1790087841526,
       "type": "file"
     },
     {
-      "path": "app/composables/pages/useLandingPage.ts",
+      "path": "app/pages/admin/users/index.vue",
       "accessCount": 2,
-      "lastAccessed": 1788876259976,
+      "lastAccessed": 1790088327017,
       "type": "file"
     },
     {
-      "path": "app/pages/auth/login.vue",
+      "path": "app/components/ui/ImpersonationBanner.vue",
       "accessCount": 2,
-      "lastAccessed": 1788876260525,
-      "type": "file"
-    },
-    {
-      "path": "app/pages/terms.vue",
-      "accessCount": 2,
-      "lastAccessed": 1788876261135,
-      "type": "file"
-    },
-    {
-      "path": "app/pages/privacy.vue",
-      "accessCount": 2,
-      "lastAccessed": 1788876261927,
-      "type": "file"
-    },
-    {
-      "path": "server/routes/sitemap.xml.ts",
-      "accessCount": 2,
-      "lastAccessed": 1788876263192,
-      "type": "file"
-    },
-    {
-      "path": "package.json",
-      "accessCount": 2,
-      "lastAccessed": 1788887373946,
-      "type": "file"
-    },
-    {
-      "path": "app/layouts/landing.vue",
-      "accessCount": 2,
-      "lastAccessed": 1788956124037,
-      "type": "file"
-    },
-    {
-      "path": "server/api/auth/google.get.ts",
-      "accessCount": 1,
-      "lastAccessed": 1788871622687,
-      "type": "file"
-    },
-    {
-      "path": "server/api/integrations/google/connect.get.ts",
-      "accessCount": 1,
-      "lastAccessed": 1788871627200,
-      "type": "file"
-    },
-    {
-      "path": "server/api/integrations/google/callback.get.ts",
-      "accessCount": 1,
-      "lastAccessed": 1788871707793,
-      "type": "file"
-    },
-    {
-      "path": "server/api/integrations/google/disconnect.post.ts",
-      "accessCount": 1,
-      "lastAccessed": 1788871751724,
-      "type": "file"
-    },
-    {
-      "path": "app/components/onboarding/SetupWizardModal/index.vue",
-      "accessCount": 1,
-      "lastAccessed": 1788871913325,
-      "type": "file"
-    },
-    {
-      "path": "server/services/ProfileService.ts",
-      "accessCount": 1,
-      "lastAccessed": 1788872091265,
-      "type": "file"
-    },
-    {
-      "path": "app/components/RichTextEditor.vue",
-      "accessCount": 1,
-      "lastAccessed": 1788872100117,
-      "type": "file"
-    },
-    {
-      "path": "app/pages/index.vue",
-      "accessCount": 1,
-      "lastAccessed": 1788876136666,
-      "type": "file"
-    },
-    {
-      "path": "app/pages/planos/index.vue",
-      "accessCount": 1,
-      "lastAccessed": 1788876273720,
-      "type": "file"
-    },
-    {
-      "path": "app/middleware/auth.global.ts",
-      "accessCount": 1,
-      "lastAccessed": 1788876316403,
-      "type": "file"
-    },
-    {
-      "path": "app/pages/p/[slug].vue",
-      "accessCount": 1,
-      "lastAccessed": 1788876331172,
-      "type": "file"
-    },
-    {
-      "path": "public/llms.txt",
-      "accessCount": 1,
-      "lastAccessed": 1788876334484,
-      "type": "file"
-    },
-    {
-      "path": "vercel.json",
-      "accessCount": 1,
-      "lastAccessed": 1788887373799,
-      "type": "file"
-    },
-    {
-      "path": ".vercel/repo.json",
-      "accessCount": 1,
-      "lastAccessed": 1788887374417,
+      "lastAccessed": 1790088327197,
       "type": "file"
     }
   ],

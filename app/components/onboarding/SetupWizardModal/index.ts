@@ -103,39 +103,105 @@ export function useSetupWizardModal(props: { open: boolean }, emit: (e: "close")
     description: "",
   });
 
+  // --- Rascunho em sessionStorage (sobrevive ao reload do fluxo OAuth e ao fechar sem salvar) ---
+  // O fluxo de conectar Google Drive recarrega a página; sem persistência, tudo digitado é perdido.
+  const draftKey = computed(() => `setup-wizard-draft:${(user.value as any)?.id || 'anon'}`);
+
+  let hydrating = false;
+  const isDirty = ref(false);
+
+  function persistDraft() {
+    if (!import.meta.client) return;
+    try {
+      sessionStorage.setItem(
+        draftKey.value,
+        JSON.stringify({
+          localProfile: localProfile.value,
+          clientData: clientData.value,
+          productData: productData.value,
+          currentStep: currentStep.value,
+          isWelcome: isWelcome.value,
+        }),
+      );
+    } catch {}
+  }
+
+  function clearDraft() {
+    if (!import.meta.client) return;
+    try {
+      sessionStorage.removeItem(draftKey.value);
+    } catch {}
+  }
+
+  function restoreDraft(): boolean {
+    if (!import.meta.client) return false;
+    try {
+      const raw = sessionStorage.getItem(draftKey.value);
+      if (!raw) return false;
+      const d = JSON.parse(raw);
+      if (!d || typeof d !== "object") return false;
+      if (d.localProfile && typeof d.localProfile === "object") localProfile.value = d.localProfile;
+      if (d.clientData && typeof d.clientData === "object") clientData.value = d.clientData;
+      if (d.productData && typeof d.productData === "object") productData.value = d.productData;
+      if (typeof d.currentStep === "number") currentStep.value = d.currentStep;
+      if (typeof d.isWelcome === "boolean") isWelcome.value = d.isWelcome;
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // Restaura o rascunho ANTES de qualquer prefill: rascunho tem prioridade.
+  const hasDraft = restoreDraft();
+  if (hasDraft) isDirty.value = true;
+
+  // Protege dados digitados: o fetch (lazy) do perfil resolve depois que o usuário
+  // já começou a preencher. Sem este guard, o watch substitui localProfile inteiro
+  // pelos dados (vazios) do fetch e apaga silenciosamente o que foi digitado.
+  watch(
+    localProfile,
+    () => {
+      if (!hydrating) isDirty.value = true;
+    },
+    { deep: true },
+  );
+
+  function hydrateFromProfile(p: Partial<ProfileDTO> | undefined) {
+    if (!p) return;
+    hydrating = true;
+    localProfile.value = {
+      company: {
+        tradeName: p.company?.tradeName || "",
+        legalName: p.company?.legalName || "",
+        taxId: p.company?.taxId || "",
+      },
+      address: p.address ? { ...p.address } : { street: "", number: "", neighborhood: "", city: "", state: "", zip: "" },
+      contact: p.contact
+        ? JSON.parse(JSON.stringify(p.contact))
+        : { phones: [{ number: "", isWhatsapp: true }], social: { instagram: "", youtube: "", facebook: "", twitter: "" } },
+      brandConfig: p.brandConfig ? { ...p.brandConfig } : { logoUrl: "", primaryColor: "#3B82F6" },
+    };
+    nextTick(() => {
+      hydrating = false;
+    });
+  }
+
+  // Prefill apenas enquanto o usuário não editou nada.
   watch(
     [() => props.open, () => profile.value],
     ([val, p]) => {
-      if (val && p) {
-        localProfile.value = {
-          company: {
-            tradeName: p.company?.tradeName || "",
-            legalName: p.company?.legalName || "",
-            taxId: p.company?.taxId || "",
-          },
-          address: p.address
-            ? { ...p.address }
-            : {
-                street: "",
-                number: "",
-                neighborhood: "",
-                city: "",
-                state: "",
-                zip: "",
-              },
-          contact: p.contact
-            ? JSON.parse(JSON.stringify(p.contact))
-            : {
-                phones: [{ number: "", isWhatsapp: true }],
-                social: { instagram: "", youtube: "", facebook: "", twitter: "" },
-              },
-          brandConfig: p.brandConfig
-            ? { ...p.brandConfig }
-            : { logoUrl: "", primaryColor: "#3B82F6" },
-        };
-      }
+      if (val && p && !isDirty.value) hydrateFromProfile(p);
     },
     { immediate: true, deep: true },
+  );
+
+  // Persiste o rascunho a cada alteração enquanto o wizard está aberto.
+  watch(
+    [localProfile, clientData, productData, currentStep, isWelcome],
+    () => {
+      if (props.open) persistDraft();
+    },
+    { deep: true },
   );
 
   const steps: StepItem[] = [
@@ -188,6 +254,12 @@ export function useSetupWizardModal(props: { open: boolean }, emit: (e: "close")
   }
 
   function nextStep() {
+    // Nome da organização é o único dado obrigatório do wizard: impede concluir
+    // com empresa vazia (causa raiz dos dados não salvos).
+    if (currentStep.value === 1 && !localProfile.value.company?.tradeName?.trim()) {
+      notify("Campo obrigatório", "Informe o nome da organização para continuar.");
+      return;
+    }
     if (!validate()) return;
     if (currentStep.value < totalSteps) {
       slideDirection.value = 'forward';
@@ -222,6 +294,13 @@ export function useSetupWizardModal(props: { open: boolean }, emit: (e: "close")
   async function handleFinish() {
     if (!validate()) return;
 
+    // Nome da organização obrigatório: evita marcar wizard completo com empresa vazia.
+    if (!localProfile.value.company?.tradeName?.trim()) {
+      notify("Campo obrigatório", "Informe o nome da organização na etapa “Negócio”.");
+      goToStep(1);
+      return;
+    }
+
     // Regra: Google Drive é necessário para salvar os PDFs dos orçamentos
     if (!hasGoogleScope(GOOGLE_DRIVE_SCOPE)) {
       notify(
@@ -244,6 +323,7 @@ export function useSetupWizardModal(props: { open: boolean }, emit: (e: "close")
         method: "POST",
         body: localProfile.value,
       });
+      clearDraft();
 
       processingProgress.value = 45;
       processingStatusText.value = "Criando seu espaço";

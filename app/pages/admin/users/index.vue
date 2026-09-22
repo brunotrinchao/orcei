@@ -83,6 +83,7 @@ function confirmImpersonate(targetUser: any) {
       isImpersonating.value = true
       try {
         await $fetch(`/api/admin/users/${targetUser._id}/impersonate`, { method: 'POST' })
+        clearNuxtData('profile') // invalida cache antes de navegar como outro usuário
         await refreshSession()
         navigateTo('/dashboard')
       } catch (e: any) {

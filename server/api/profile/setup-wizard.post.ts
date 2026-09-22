@@ -5,7 +5,7 @@ const schema = z.object({
   company: z.object({
     taxId: z.string().optional(),
     legalName: z.string().optional(),
-    tradeName: z.string().optional()
+    tradeName: z.string().min(1, 'Informe o nome da organização para concluir o cadastro.')
   }).optional(),
   address: z.object({
     street: z.string().optional(),
@@ -55,7 +55,22 @@ export default defineEventHandler(async (event) => {
     return { success: true, skipped: true }
   }
 
-  const data = schema.parse(body)
+  const parsed = schema.safeParse(body)
+  if (!parsed.success) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: parsed.error.issues[0]?.message || 'Dados inválidos no formulário.'
+    })
+  }
+  const data = parsed.data
+
+  // Blindagem: wizard completo exige ao menos o nome da organização.
+  if (!data.company?.tradeName?.trim()) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Informe o nome da organização para concluir o cadastro.'
+    })
+  }
 
   // Monta o objeto de atualização com os dados preenchidos
   const updateFields: Record<string, any> = { setupWizardCompleted: true, setupWizardSkippedAt: null }

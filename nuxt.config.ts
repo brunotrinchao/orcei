@@ -1,4 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+// Sentry: eventos e upload de sourcemaps apenas em produção. O plugin Sentry
+// (vite) lê SENTRY_AUTH_TOKEN direto do processo, então o token é removido
+// aqui para builds fora de produção não dispararem upload.
+if (process.env.APP_ENVIRONMENT !== 'production') {
+  delete process.env.SENTRY_AUTH_TOKEN
+}
+
 export default defineNuxtConfig({
   modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@vueuse/nuxt', '@nuxtjs/cloudinary', '@vercel/speed-insights', '@sentry/nuxt/module', 'nuxt-simple-sitemap', '@vercel/analytics'],
 
@@ -282,7 +289,9 @@ export default defineNuxtConfig({
   sentry: {
     org: process.env.SENTRY_ORG,
     project: process.env.SENTRY_PROJECT,
-    authToken: process.env.SENTRY_AUTH_TOKEN,
+    // Upload de sourcemaps somente em build de produção. O token também é
+    // removido do processo (abaixo), pois o plugin Sentry lê a env var direto.
+    authToken: process.env.APP_ENVIRONMENT === 'production' ? process.env.SENTRY_AUTH_TOKEN : undefined,
     sourcemaps: {
       filesToDeleteAfterUpload: ['.output/**/public/**/*.map']
     }

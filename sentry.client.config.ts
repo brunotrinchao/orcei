@@ -13,7 +13,8 @@ Sentry.init({
     // httpBodies: [],
   },
 
-  // Set tracesSampleRate to 1.0 to capture 100% of transactions for tracing.
-  // Recomendado ajustar em produção.
+  // Só emite eventos (erros/traces) em produção
+  enabled: runtimeConfig.public.appEnv === 'production',
+
   tracesSampleRate: 1.0
 })
